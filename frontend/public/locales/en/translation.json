@@ -1,0 +1,24 @@
+{
+  "site": {
+    "title": "Nuor Steel | Home",
+    "header": "Nuor Steel Industry Company"
+  },
+  "nav": {
+    "about": "About Us",
+    "products": "Products",
+    "quality": "Quality",
+    "careers": "Career Opportunities",
+    "certificates": "Supplier Approvals and Certificates",
+    "contact": "Get in Touch"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View"
+  }
+}
