@@ -14,6 +14,56 @@
 
 ---
 
+## Build Progress
+
+### Backend (DONE)
+- [x] Database migrations (14 tables)
+- [x] Eloquent models with relationships
+- [x] Admin API controllers (CRUD for all resources)
+- [x] Public API controllers (read-only + form submissions)
+- [x] Auth with Sanctum (login, logout, token expiry)
+- [x] Admin middleware (role guard)
+- [x] Rate limiting on login
+- [x] File storage in private directory
+- [x] Database seeders
+
+### Admin Panel Frontend (DONE)
+- [x] Auth context + login page + admin layout with sidebar
+- [x] Dashboard with stats
+- [x] Content editor (bilingual side-by-side EN/AR)
+- [x] Timeline events CRUD
+- [x] Media library (upload, grid, folder/type filter)
+- [x] Products CRUD (3-tab form: details/images/specs)
+- [x] Certificates CRUD (PDF upload)
+- [x] Careers CRUD + Applications inbox (status workflow)
+- [x] Contact submissions inbox (read/archive)
+- [x] Newsletter management (admin-only, stats, export)
+- [x] Settings page (admin-only, grouped key-value editor)
+- [x] Users page (admin-only, CRUD with self-protection)
+- [x] RequireAdmin guard on admin-only routes
+
+### Public Pages Frontend (IN PROGRESS)
+- [x] PublicLayout (Header + Footer + Outlet)
+- [x] Home page (hero, features, CTA — static UI)
+- [x] About page (partial — timeline stub)
+- [x] Products listing (placeholder data)
+- [x] Quality page (static UI)
+- [x] Career page (placeholder data, form stub)
+- [x] Certificates page (placeholder data)
+- [x] Contact page (form UI built, no API)
+- [ ] Wire all public pages to API
+- [ ] Product detail page (`/products/:slug`)
+- [ ] Job detail page (`/career/:slug`)
+- [ ] Recycling page (`/about/recycling`)
+
+### Remaining
+- [ ] Email notifications (contact → info/it, careers → careers/hr)
+- [ ] LinkedIn API integration (homepage feed)
+- [ ] Code splitting (chunk >500kB)
+- [ ] Testing & deployment
+
+---
+
 ## Key Decisions Made
 
 ### Branding & Language
@@ -147,8 +197,8 @@ About Us | Products | Quality | Career | Certificates | Contact
 /admin/careers          → Job listings CRUD
 /admin/applications     → Career applications
 /admin/contacts         → Contact submissions
-/admin/newsletter       → Subscriber management
-/admin/settings         → Site settings
+/admin/newsletter       → Subscriber management (admin only)
+/admin/settings         → Site settings (admin only)
 /admin/users            → User management (admin only)
 ```
 
@@ -182,37 +232,46 @@ Security is extremely important for this project. Every code change must conside
 ### Authentication & Authorization
 - All admin routes MUST be behind `auth:sanctum` middleware
 - Admin-only routes (users, settings, newsletter) MUST use `admin` middleware
-- Tokens MUST have expiration (not infinite)
-- Login endpoint MUST be rate-limited to prevent brute force
+- Tokens MUST have expiration (not infinite) — currently 8 hours via Sanctum config
+- Login endpoint MUST be rate-limited to prevent brute force — currently 5/minute
 - Frontend MUST enforce auth guards (redirect unauthenticated users) and role guards (block editors from admin-only pages)
 
 ### Input & Output
 - Server-side validation on ALL endpoints (never trust client input)
 - Client-side validation for UX only (not as a security layer)
-- Sanitize all user-generated content before rendering (XSS prevention)
+- Sanitize all user-generated content before storage (strip_tags on text fields)
 - Use parameterized queries / Eloquent (SQL injection prevention)
-- Validate file types server-side (not just by extension, check MIME)
+- Validate file types server-side using BOTH extension AND MIME type (`mimes:pdf|mime_types:application/pdf`)
+- Render user content with React (auto-escapes by default) — never use `dangerouslySetInnerHTML` with unsanitized data
 
 ### File Uploads
 - Validate file types, sizes, and MIME types server-side
-- Store uploads outside public directory (local disk for private files)
+- Store uploads outside public directory (local disk in `storage/app/private/`)
 - Generate random filenames (never use original filename for storage path)
 - Scan/validate PDF files before storing
 
 ### API Security
-- CORS must be configured for the SPA domain only
+- CORS must be configured for the SPA domain only (explicit allowed_origins in .env)
 - Never expose sensitive data in API responses (passwords, tokens, internal paths)
 - Return consistent error shapes (don't leak stack traces in production)
+- Rate-limit ALL public POST endpoints (contact, career apply, newsletter subscribe)
+
+### Frontend Security
+- Never store sensitive data in localStorage beyond auth token
+- Sanitize any HTML content before rendering (use DOMPurify for rich text)
+- Validate file types client-side for UX, but NEVER rely on it for security
+- Use `rel="noopener noreferrer"` on external links
+- All form submissions must handle errors gracefully without exposing internals
 
 ---
 
 ## Technical Notes
 
 ### File Storage
-- CVs: `storage/app/cvs/`
-- Attachments: `storage/app/attachments/`
-- Certificates: `storage/app/certificates/`
-- Media: `storage/app/media/`
+- CVs: `storage/app/private/cvs/`
+- Attachments: `storage/app/private/attachments/`
+- Certificates: `storage/app/private/certificates/`
+- Media: `storage/app/private/media/`
 
 ### File Limits
 | Type | Max Size | Formats |
@@ -221,6 +280,16 @@ Security is extremely important for this project. Every code change must conside
 | CVs | 5MB | PDF only |
 | Attachments | 5MB | PDF only |
 | Certificates | 10MB | PDF |
+
+### Frontend Architecture
+- **API client**: Axios instance at `/api/v1` with auth token interceptor
+- **Data fetching**: React Query v5 (useQuery/useMutation with query invalidation)
+- **Routing**: React Router v7 with nested layouts
+- **State**: React Context for auth + language; React Query for server state
+- **Styling**: TailwindCSS v4 with custom `primary` color
+- **Icons**: Lucide React
+- **i18n**: react-i18next with EN/AR translation files
+- **Admin pattern**: Each resource has a custom hook (useProducts, useCareers, etc.) wrapping API calls
 
 ### LinkedIn Integration
 - Method: LinkedIn API (requires Developer App approval)
@@ -249,15 +318,3 @@ Security is extremely important for this project. Every code change must conside
 
 - Full specification: [docs/WEBSITE_SPECIFICATION.md](docs/WEBSITE_SPECIFICATION.md)
 - This context file: [CLAUDE.md](CLAUDE.md)
-
----
-
-## Next Steps
-
-1. Create database migrations (14 tables)
-2. Build Laravel API endpoints
-3. Implement React frontend pages
-4. Build admin panel
-5. Set up email notifications
-6. LinkedIn API integration
-7. Testing & deployment

@@ -22,7 +22,7 @@ class ContactController extends Controller
             'request_type' => 'required|in:vendor,partnership,careers,sustainability,general,quotation',
             'subject' => 'required|string|max:255',
             'message' => 'required|string|max:2000',
-            'file' => 'nullable|file|mimes:pdf|max:5120',
+            'file' => 'nullable|file|mimes:pdf|mimetypes:application/pdf|max:5120',
         ]);
 
         $filePath = null;
@@ -31,14 +31,14 @@ class ContactController extends Controller
         }
 
         $submission = ContactSubmission::create([
-            'name' => $request->name,
-            'company' => $request->company,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'country' => $request->country,
+            'name' => trim(strip_tags($request->name)),
+            'company' => trim(strip_tags($request->company)),
+            'email' => trim($request->email),
+            'phone' => trim(strip_tags($request->phone)),
+            'country' => trim(strip_tags($request->country)),
             'request_type' => $request->request_type,
-            'subject' => $request->subject,
-            'message' => $request->message,
+            'subject' => trim(strip_tags($request->subject)),
+            'message' => trim(strip_tags($request->message)),
             'file_path' => $filePath,
         ]);
 

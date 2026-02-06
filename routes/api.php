@@ -46,15 +46,15 @@ Route::prefix('v1')->middleware('locale')->group(function () {
     // Careers
     Route::get('/careers', [CareerController::class, 'index']);
     Route::get('/careers/{slug}', [CareerController::class, 'show']);
-    Route::post('/careers/apply', [CareerController::class, 'apply']);
-    Route::post('/careers/{slug}/apply', [CareerController::class, 'apply']);
+    Route::post('/careers/apply', [CareerController::class, 'apply'])->middleware('throttle:5,10');
+    Route::post('/careers/{slug}/apply', [CareerController::class, 'apply'])->middleware('throttle:5,10');
 
-    // Contact
-    Route::post('/contact', [ContactController::class, 'submit']);
+    // Contact (rate limited: 5 submissions per 10 minutes)
+    Route::post('/contact', [ContactController::class, 'submit'])->middleware('throttle:5,10');
 
-    // Newsletter
-    Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe']);
-    Route::post('/newsletter/unsubscribe', [NewsletterController::class, 'unsubscribe']);
+    // Newsletter (rate limited: 5 per 10 minutes)
+    Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->middleware('throttle:5,10');
+    Route::post('/newsletter/unsubscribe', [NewsletterController::class, 'unsubscribe'])->middleware('throttle:5,10');
 
     /*
     |--------------------------------------------------------------------------

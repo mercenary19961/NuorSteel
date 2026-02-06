@@ -71,7 +71,7 @@ class CareerController extends Controller
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:50',
             'job_title' => 'required|string|max:255',
-            'cv' => 'required|file|mimes:pdf|max:5120',
+            'cv' => 'required|file|mimes:pdf|mimetypes:application/pdf|max:5120',
         ]);
 
         $listing = null;
@@ -89,10 +89,10 @@ class CareerController extends Controller
 
         $application = CareerApplication::create([
             'career_listing_id' => $listing?->id,
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'job_title' => $request->job_title,
+            'name' => trim(strip_tags($request->name)),
+            'email' => trim($request->email),
+            'phone' => trim(strip_tags($request->phone)),
+            'job_title' => trim(strip_tags($request->job_title)),
             'cv_path' => $cvPath,
         ]);
 

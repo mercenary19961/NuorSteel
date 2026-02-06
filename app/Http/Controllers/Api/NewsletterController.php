@@ -29,9 +29,10 @@ class NewsletterController extends Controller
     public function unsubscribe(Request $request): JsonResponse
     {
         $request->validate([
-            'email' => 'required|email|exists:newsletter_subscribers,email',
+            'email' => 'required|email|max:255',
         ]);
 
+        // Silently succeed even if email doesn't exist (prevents email enumeration)
         $subscriber = NewsletterSubscriber::where('email', $request->email)->first();
         $subscriber?->unsubscribe();
 
