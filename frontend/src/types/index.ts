@@ -116,16 +116,17 @@ export interface Certificate {
 // Timeline
 export interface TimelineEvent {
   id: number;
-  year: number;
+  year: string;
   title_en: string;
   title_ar: string;
   description_en: string | null;
   description_ar: string | null;
-  icon: string | null;
+  image_id: number | null;
   is_active: boolean;
   sort_order: number;
   created_at: string;
   updated_at: string;
+  image?: Media;
 }
 
 // Career

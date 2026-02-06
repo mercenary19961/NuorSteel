@@ -38,7 +38,7 @@ export default function ConfirmDialog({
       {/* Dialog */}
       <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
         <div className="flex items-start gap-4">
-          <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
+          <div className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
             variant === 'danger' ? 'bg-red-100' : 'bg-yellow-100'
           }`}>
             <AlertTriangle size={20} className={variant === 'danger' ? 'text-red-600' : 'text-yellow-600'} />

@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
+import type { ReactNode } from 'react';
 import { X } from 'lucide-react';
 
 type ToastType = 'success' | 'error' | 'info' | 'warning';
@@ -52,7 +53,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg min-w-[300px] max-w-[450px] animate-slide-in ${typeStyles[t.type]}`}
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg min-w-7 max-w-112.5 animate-slide-in ${typeStyles[t.type]}`}
           >
             <span className="flex-1 text-sm font-medium">{t.message}</span>
             <button

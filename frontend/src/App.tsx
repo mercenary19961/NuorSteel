@@ -21,6 +21,17 @@ import ContactPage from "./pages/public/ContactPage";
 // Admin Pages
 import LoginPage from "./pages/admin/LoginPage";
 import DashboardPage from "./pages/admin/DashboardPage";
+import ContentPage from "./pages/admin/ContentPage";
+import TimelinePage from "./pages/admin/TimelinePage";
+import MediaPage from "./pages/admin/MediaPage";
+import AdminProductsPage from "./pages/admin/ProductsPage";
+import ProductFormPage from "./pages/admin/ProductFormPage";
+import AdminCertificatesPage from "./pages/admin/CertificatesPage";
+import CertificateFormPage from "./pages/admin/CertificateFormPage";
+import CareersPage from "./pages/admin/CareersPage";
+import CareerFormPage from "./pages/admin/CareerFormPage";
+import ApplicationsPage from "./pages/admin/ApplicationsPage";
+import ContactsPage from "./pages/admin/ContactsPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -59,6 +70,17 @@ function App() {
                 {/* Admin Routes (protected by AdminLayout auth guard) */}
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<DashboardPage />} />
+                  <Route path="content" element={<ContentPage />} />
+                  <Route path="timeline" element={<TimelinePage />} />
+                  <Route path="media" element={<MediaPage />} />
+                  <Route path="products" element={<AdminProductsPage />} />
+                  <Route path="products/:id" element={<ProductFormPage />} />
+                  <Route path="certificates" element={<AdminCertificatesPage />} />
+                  <Route path="certificates/:id" element={<CertificateFormPage />} />
+                  <Route path="careers" element={<CareersPage />} />
+                  <Route path="careers/:id" element={<CareerFormPage />} />
+                  <Route path="applications" element={<ApplicationsPage />} />
+                  <Route path="contacts" element={<ContactsPage />} />
                 </Route>
 
                 {/* 404 */}
