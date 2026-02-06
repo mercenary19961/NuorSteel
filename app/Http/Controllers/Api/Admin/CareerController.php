@@ -51,7 +51,11 @@ class CareerController extends Controller
             'expires_at' => 'nullable|date',
         ]);
 
-        $data = $request->all();
+        $data = $request->only([
+            'title_en', 'title_ar', 'slug', 'description_en', 'description_ar',
+            'requirements_en', 'requirements_ar', 'location', 'employment_type',
+            'status', 'expires_at',
+        ]);
         $data['slug'] = $data['slug'] ?? Str::slug($data['title_en']);
         $data['created_by'] = $request->user()->id;
         $data['updated_by'] = $request->user()->id;
@@ -93,7 +97,11 @@ class CareerController extends Controller
 
         $listing = CareerListing::findOrFail($id);
 
-        $data = $request->all();
+        $data = $request->only([
+            'title_en', 'title_ar', 'slug', 'description_en', 'description_ar',
+            'requirements_en', 'requirements_ar', 'location', 'employment_type',
+            'status', 'expires_at',
+        ]);
         $data['updated_by'] = $request->user()->id;
 
         $listing->update($data);

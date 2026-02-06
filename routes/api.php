@@ -27,8 +27,8 @@ use App\Http\Controllers\Api\Admin\UserController;
 
 Route::prefix('v1')->middleware('locale')->group(function () {
 
-    // Authentication
-    Route::post('/auth/login', [AuthController::class, 'login']);
+    // Authentication (rate limited: 5 attempts per minute)
+    Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
     // Public Pages
     Route::get('/pages/home', [PageController::class, 'home']);

@@ -55,7 +55,11 @@ class ProductController extends Controller
             'sort_order' => 'integer',
         ]);
 
-        $data = $request->all();
+        $data = $request->only([
+            'name_en', 'name_ar', 'slug', 'short_description_en', 'short_description_ar',
+            'description_en', 'description_ar', 'category', 'featured_image_id',
+            'is_active', 'is_featured', 'sort_order',
+        ]);
         $data['slug'] = $data['slug'] ?? Str::slug($data['name_en']);
         $data['created_by'] = $request->user()->id;
         $data['updated_by'] = $request->user()->id;
@@ -99,7 +103,11 @@ class ProductController extends Controller
 
         $product = Product::findOrFail($id);
 
-        $data = $request->all();
+        $data = $request->only([
+            'name_en', 'name_ar', 'slug', 'short_description_en', 'short_description_ar',
+            'description_en', 'description_ar', 'category', 'featured_image_id',
+            'is_active', 'is_featured', 'sort_order',
+        ]);
         $data['updated_by'] = $request->user()->id;
 
         $product->update($data);
