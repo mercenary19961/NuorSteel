@@ -1,44 +1,60 @@
 import { useTranslation } from 'react-i18next';
 import { FileText, Download } from 'lucide-react';
+import { useCertificatesPage } from '../../hooks/usePublicData';
+
+interface CertificateItem {
+  id: number;
+  title: string;
+  description: string | null;
+  file_url: string;
+  thumbnail: string | null;
+}
+
+function CertificateCard({ cert }: { cert: CertificateItem }) {
+  return (
+    <a
+      href={cert.file_url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow flex items-start justify-between"
+    >
+      <div className="flex items-start">
+        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
+          {cert.thumbnail ? (
+            <img src={cert.thumbnail} alt={cert.title} className="w-12 h-12 object-cover rounded-lg" />
+          ) : (
+            <FileText className="text-blue-600" size={24} />
+          )}
+        </div>
+        <div className="ml-4">
+          <h3 className="font-semibold text-gray-900">{cert.title}</h3>
+          {cert.description && (
+            <p className="text-sm text-gray-600 mt-1">{cert.description}</p>
+          )}
+        </div>
+      </div>
+      <Download size={20} className="text-gray-400 hover:text-blue-600 transition-colors shrink-0 ml-4" />
+    </a>
+  );
+}
 
 export default function CertificatesPage() {
   const { t } = useTranslation();
+  const { data, isLoading } = useCertificatesPage();
 
-  // Placeholder certificates - will be loaded from API
-  const certificateGroups = {
-    esg: [
-      { id: 1, title: 'EPD Certificate', description: 'Environmental Product Declaration' },
-      { id: 2, title: 'HPD Certificate', description: 'Health Product Declaration' },
-      { id: 3, title: 'ISO 14001', description: 'Environmental Management System' },
-      { id: 4, title: 'ISO 45001', description: 'Occupational Health & Safety' },
-    ],
-    quality: [
-      { id: 5, title: 'ISO 9001', description: 'Quality Management System' },
-      { id: 6, title: 'MTC File', description: 'Mill Test Certificate' },
-      { id: 7, title: 'SASO Test', description: 'Saudi Standards Compliance' },
-    ],
-    governance: [
-      { id: 8, title: 'Integrated Policy', description: 'Company Integrated Policy Document' },
-      { id: 9, title: 'Code of Conduct', description: 'Business Ethics Guidelines' },
-    ],
-  };
-
-  const CertificateCard = ({ cert }: { cert: { id: number; title: string; description: string } }) => (
-    <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between">
-        <div className="flex items-start">
-          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
-            <FileText className="text-blue-600" size={24} />
-          </div>
-          <div className="ml-4">
-            <h3 className="font-semibold text-gray-900">{cert.title}</h3>
-            <p className="text-sm text-gray-600">{cert.description}</p>
+  const LoadingSkeleton = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {[1, 2].map((i) => (
+        <div key={i} className="bg-white border border-gray-200 rounded-lg p-6 animate-pulse">
+          <div className="flex items-start">
+            <div className="w-12 h-12 bg-gray-200 rounded-lg shrink-0" />
+            <div className="ml-4 space-y-2 flex-1">
+              <div className="h-4 bg-gray-200 rounded w-2/3" />
+              <div className="h-3 bg-gray-200 rounded w-full" />
+            </div>
           </div>
         </div>
-        <button className="p-2 text-gray-400 hover:text-blue-600 transition-colors">
-          <Download size={20} />
-        </button>
-      </div>
+      ))}
     </div>
   );
 
@@ -62,11 +78,17 @@ export default function CertificatesPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-8">
             {t('certificates.esg.title')}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {certificateGroups.esg.map((cert) => (
-              <CertificateCard key={cert.id} cert={cert} />
-            ))}
-          </div>
+          {isLoading ? (
+            <LoadingSkeleton />
+          ) : data?.esg && data.esg.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {data.esg.map((cert) => (
+                <CertificateCard key={cert.id} cert={cert} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">{t('certificates.empty')}</p>
+          )}
         </div>
       </section>
 
@@ -76,11 +98,17 @@ export default function CertificatesPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-8">
             {t('certificates.quality.title')}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {certificateGroups.quality.map((cert) => (
-              <CertificateCard key={cert.id} cert={cert} />
-            ))}
-          </div>
+          {isLoading ? (
+            <LoadingSkeleton />
+          ) : data?.quality && data.quality.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {data.quality.map((cert) => (
+                <CertificateCard key={cert.id} cert={cert} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">{t('certificates.empty')}</p>
+          )}
         </div>
       </section>
 
@@ -90,11 +118,17 @@ export default function CertificatesPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-8">
             {t('certificates.governance.title')}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {certificateGroups.governance.map((cert) => (
-              <CertificateCard key={cert.id} cert={cert} />
-            ))}
-          </div>
+          {isLoading ? (
+            <LoadingSkeleton />
+          ) : data?.governance && data.governance.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {data.governance.map((cert) => (
+                <CertificateCard key={cert.id} cert={cert} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">{t('certificates.empty')}</p>
+          )}
         </div>
       </section>
     </div>

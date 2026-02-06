@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
+import { useContactPage, useSubmitContact } from '../../hooks/usePublicData';
 
 const requestTypes = [
   { value: 'vendor', labelKey: 'contact.types.vendor' },
@@ -13,17 +14,41 @@ const requestTypes = [
 
 export default function ContactPage() {
   const { t } = useTranslation();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { data: pageData } = useContactPage();
+  const submitContact = useSubmitContact();
+
   const [submitted, setSubmitted] = useState(false);
+  const [formError, setFormError] = useState('');
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const settings = pageData?.settings;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    // API call will go here
-    setTimeout(() => {
-      setIsSubmitting(false);
+    setFormError('');
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    // Client-side file validation for UX only (server validates too)
+    const file = formData.get('file') as File;
+    if (file && file.size > 0) {
+      if (file.type !== 'application/pdf') {
+        setFormError(t('contact.form.filePdfOnly'));
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setFormError(t('contact.form.fileTooLarge'));
+        return;
+      }
+    }
+
+    try {
+      await submitContact.mutateAsync(formData);
       setSubmitted(true);
-    }, 1000);
+    } catch {
+      setFormError(t('contact.form.submitError'));
+    }
   };
 
   return (
@@ -56,7 +81,7 @@ export default function ContactPage() {
                   </div>
                   <div className="ml-4">
                     <h3 className="font-medium text-gray-900">{t('contact.info.address')}</h3>
-                    <p className="text-gray-600">Riyadh, Saudi Arabia</p>
+                    <p className="text-gray-600">{settings?.address || 'Riyadh, Saudi Arabia'}</p>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -65,7 +90,7 @@ export default function ContactPage() {
                   </div>
                   <div className="ml-4">
                     <h3 className="font-medium text-gray-900">{t('contact.info.phone')}</h3>
-                    <p className="text-gray-600">+966 XX XXX XXXX</p>
+                    <p className="text-gray-600">{settings?.phone || ''}</p>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -74,7 +99,7 @@ export default function ContactPage() {
                   </div>
                   <div className="ml-4">
                     <h3 className="font-medium text-gray-900">{t('contact.info.email')}</h3>
-                    <p className="text-gray-600">info@nuorsteel.com</p>
+                    <p className="text-gray-600">{settings?.email || 'info@nuorsteel.com'}</p>
                   </div>
                 </div>
               </div>
@@ -88,6 +113,7 @@ export default function ContactPage() {
 
               {submitted ? (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+                  <CheckCircle size={48} className="mx-auto text-green-600 mb-4" />
                   <h3 className="text-lg font-medium text-green-800 mb-2">
                     {t('contact.form.successTitle')}
                   </h3>
@@ -96,7 +122,12 @@ export default function ContactPage() {
                   </p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+                  {formError && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+                      {formError}
+                    </div>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -104,7 +135,9 @@ export default function ContactPage() {
                       </label>
                       <input
                         type="text"
+                        name="name"
                         required
+                        maxLength={255}
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
@@ -114,7 +147,9 @@ export default function ContactPage() {
                       </label>
                       <input
                         type="text"
+                        name="company"
                         required
+                        maxLength={255}
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
@@ -124,7 +159,9 @@ export default function ContactPage() {
                       </label>
                       <input
                         type="email"
+                        name="email"
                         required
+                        maxLength={255}
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
@@ -134,7 +171,9 @@ export default function ContactPage() {
                       </label>
                       <input
                         type="tel"
+                        name="phone"
                         required
+                        maxLength={50}
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
@@ -144,7 +183,9 @@ export default function ContactPage() {
                       </label>
                       <input
                         type="text"
+                        name="country"
                         required
+                        maxLength={100}
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
@@ -153,6 +194,7 @@ export default function ContactPage() {
                         {t('contact.form.requestType')} *
                       </label>
                       <select
+                        name="request_type"
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
@@ -171,7 +213,9 @@ export default function ContactPage() {
                     </label>
                     <input
                       type="text"
+                      name="subject"
                       required
+                      maxLength={255}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
@@ -180,6 +224,7 @@ export default function ContactPage() {
                       {t('contact.form.message')} *
                     </label>
                     <textarea
+                      name="message"
                       required
                       rows={5}
                       maxLength={2000}
@@ -192,7 +237,8 @@ export default function ContactPage() {
                     </label>
                     <input
                       type="file"
-                      accept=".pdf"
+                      name="file"
+                      accept=".pdf,application/pdf"
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                     <p className="text-xs text-gray-500 mt-1">
@@ -201,10 +247,10 @@ export default function ContactPage() {
                   </div>
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={submitContact.isPending}
                     className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-md font-medium transition-colors"
                   >
-                    {isSubmitting ? t('contact.form.sending') : t('contact.form.submit')}
+                    {submitContact.isPending ? t('contact.form.sending') : t('contact.form.submit')}
                     <Send className="ml-2" size={18} />
                   </button>
                 </form>

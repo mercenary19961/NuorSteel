@@ -1,31 +1,50 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { MapPin, Clock, ArrowRight, Send } from 'lucide-react';
+import { MapPin, Clock, ArrowRight, Send, CheckCircle } from 'lucide-react';
+import { useCareersPage, useSubmitApplication } from '../../hooks/usePublicData';
 
 export default function CareerPage() {
   const { t } = useTranslation();
-  const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const { data, isLoading } = useCareersPage();
+  const submitApplication = useSubmitApplication();
 
-  // Placeholder jobs - will be loaded from API
-  const jobs = [
-    {
-      id: 1,
-      slug: 'senior-engineer',
-      title: 'Senior Mechanical Engineer',
-      location: 'Riyadh',
-      type: 'Full-time',
-      postedAt: '2026-02-01',
-    },
-    {
-      id: 2,
-      slug: 'quality-inspector',
-      title: 'Quality Control Inspector',
-      location: 'Riyadh',
-      type: 'Full-time',
-      postedAt: '2026-01-28',
-    },
-  ];
+  const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [formError, setFormError] = useState('');
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const listings = data?.listings ?? [];
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFormError('');
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    // Client-side file validation for UX
+    const cv = formData.get('cv') as File;
+    if (!cv || cv.size === 0) {
+      setFormError(t('career.form.cvRequired'));
+      return;
+    }
+    if (cv.type !== 'application/pdf') {
+      setFormError(t('career.form.cvPdfOnly'));
+      return;
+    }
+    if (cv.size > 5 * 1024 * 1024) {
+      setFormError(t('career.form.cvTooLarge'));
+      return;
+    }
+
+    try {
+      await submitApplication.mutateAsync({ formData });
+      setSubmitted(true);
+    } catch {
+      setFormError(t('career.form.submitError'));
+    }
+  };
 
   return (
     <div>
@@ -48,9 +67,18 @@ export default function CareerPage() {
             {t('career.openPositions')}
           </h2>
 
-          {jobs.length > 0 ? (
+          {isLoading ? (
             <div className="space-y-4">
-              {jobs.map((job) => (
+              {[1, 2].map((i) => (
+                <div key={i} className="bg-white border border-gray-200 rounded-lg p-6 animate-pulse">
+                  <div className="h-5 bg-gray-200 rounded w-1/3 mb-3" />
+                  <div className="h-4 bg-gray-200 rounded w-1/4" />
+                </div>
+              ))}
+            </div>
+          ) : listings.length > 0 ? (
+            <div className="space-y-4">
+              {listings.map((job) => (
                 <div
                   key={job.id}
                   className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
@@ -61,13 +89,15 @@ export default function CareerPage() {
                         {job.title}
                       </h3>
                       <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                        <span className="flex items-center">
-                          <MapPin size={16} className="mr-1" />
-                          {job.location}
-                        </span>
+                        {job.location && (
+                          <span className="flex items-center">
+                            <MapPin size={16} className="mr-1" />
+                            {job.location}
+                          </span>
+                        )}
                         <span className="flex items-center">
                           <Clock size={16} className="mr-1" />
-                          {job.type}
+                          {job.employment_type}
                         </span>
                       </div>
                     </div>
@@ -99,7 +129,15 @@ export default function CareerPage() {
               {t('career.openApplication.description')}
             </p>
 
-            {!showApplicationForm ? (
+            {submitted ? (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                <CheckCircle size={48} className="mx-auto text-green-600 mb-4" />
+                <h3 className="text-lg font-medium text-green-800 mb-2">
+                  {t('career.form.successTitle')}
+                </h3>
+                <p className="text-green-600">{t('career.form.successMessage')}</p>
+              </div>
+            ) : !showApplicationForm ? (
               <button
                 onClick={() => setShowApplicationForm(true)}
                 className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors"
@@ -108,7 +146,12 @@ export default function CareerPage() {
                 <ArrowRight className="ml-2" size={20} />
               </button>
             ) : (
-              <form className="text-left bg-white p-8 rounded-lg shadow-sm">
+              <form ref={formRef} onSubmit={handleSubmit} className="text-left bg-white p-8 rounded-lg shadow-sm">
+                {formError && (
+                  <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+                    {formError}
+                  </div>
+                )}
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -116,7 +159,9 @@ export default function CareerPage() {
                     </label>
                     <input
                       type="text"
+                      name="name"
                       required
+                      maxLength={255}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
@@ -126,7 +171,9 @@ export default function CareerPage() {
                     </label>
                     <input
                       type="email"
+                      name="email"
                       required
+                      maxLength={255}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
@@ -136,7 +183,9 @@ export default function CareerPage() {
                     </label>
                     <input
                       type="tel"
+                      name="phone"
                       required
+                      maxLength={50}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
@@ -146,7 +195,9 @@ export default function CareerPage() {
                     </label>
                     <input
                       type="text"
+                      name="job_title"
                       required
+                      maxLength={255}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
@@ -156,8 +207,9 @@ export default function CareerPage() {
                     </label>
                     <input
                       type="file"
+                      name="cv"
                       required
-                      accept=".pdf"
+                      accept=".pdf,application/pdf"
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                     <p className="text-xs text-gray-500 mt-1">
@@ -166,9 +218,10 @@ export default function CareerPage() {
                   </div>
                   <button
                     type="submit"
-                    className="w-full inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors"
+                    disabled={submitApplication.isPending}
+                    className="w-full inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-md font-medium transition-colors"
                   >
-                    {t('career.form.submit')}
+                    {submitApplication.isPending ? t('career.form.submitting') : t('career.form.submit')}
                     <Send className="ml-2" size={18} />
                   </button>
                 </div>

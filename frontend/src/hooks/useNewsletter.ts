@@ -19,7 +19,7 @@ export function useNewsletter(filters: NewsletterFilters = {}) {
     queryFn: async () => {
       const params = new URLSearchParams();
       if (filters.page) params.set('page', String(filters.page));
-      const { data } = await api.get(`/v1/admin/newsletter?${params}`);
+      const { data } = await api.get(`/admin/newsletter?${params}`);
       return data as PaginatedResponse<NewsletterSubscriber>;
     },
   });
@@ -29,7 +29,7 @@ export function useNewsletterStats() {
   return useQuery({
     queryKey: ['admin', 'newsletter', 'stats'],
     queryFn: async () => {
-      const { data } = await api.get('/v1/admin/newsletter/stats');
+      const { data } = await api.get('/admin/newsletter/stats');
       return data.data as NewsletterStats;
     },
   });
@@ -39,7 +39,7 @@ export function useAddSubscriber() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (payload: { email: string; source?: string }) => {
-      const { data } = await api.post('/v1/admin/newsletter', payload);
+      const { data } = await api.post('/admin/newsletter', payload);
       return data;
     },
     onSuccess: () => {
@@ -52,7 +52,7 @@ export function useToggleSubscriber() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: number) => {
-      const { data } = await api.post(`/v1/admin/newsletter/${id}/toggle`);
+      const { data } = await api.post(`/admin/newsletter/${id}/toggle`);
       return data;
     },
     onSuccess: () => {
@@ -65,7 +65,7 @@ export function useDeleteSubscriber() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: number) => {
-      const { data } = await api.delete(`/v1/admin/newsletter/${id}`);
+      const { data } = await api.delete(`/admin/newsletter/${id}`);
       return data;
     },
     onSuccess: () => {
@@ -77,7 +77,7 @@ export function useDeleteSubscriber() {
 export function useExportSubscribers() {
   return useMutation({
     mutationFn: async () => {
-      const { data } = await api.get('/v1/admin/newsletter/export');
+      const { data } = await api.get('/admin/newsletter/export');
       return data.data as string[];
     },
   });

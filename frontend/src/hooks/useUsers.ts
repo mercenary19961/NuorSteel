@@ -6,7 +6,7 @@ export function useUsers() {
   return useQuery({
     queryKey: ['admin', 'users'],
     queryFn: async () => {
-      const { data } = await api.get('/v1/admin/users');
+      const { data } = await api.get('/admin/users');
       return data.data as User[];
     },
   });
@@ -16,7 +16,7 @@ export function useUser(id: number | undefined) {
   return useQuery({
     queryKey: ['admin', 'users', id],
     queryFn: async () => {
-      const { data } = await api.get(`/v1/admin/users/${id}`);
+      const { data } = await api.get(`/admin/users/${id}`);
       return data.data as User;
     },
     enabled: !!id,
@@ -45,7 +45,7 @@ export function useCreateUser() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (payload: CreateUserPayload) => {
-      const { data } = await api.post('/v1/admin/users', payload);
+      const { data } = await api.post('/admin/users', payload);
       return data;
     },
     onSuccess: () => {
@@ -58,7 +58,7 @@ export function useUpdateUser() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...payload }: UpdateUserPayload & { id: number }) => {
-      const { data } = await api.put(`/v1/admin/users/${id}`, payload);
+      const { data } = await api.put(`/admin/users/${id}`, payload);
       return data;
     },
     onSuccess: () => {
@@ -71,7 +71,7 @@ export function useDeleteUser() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: number) => {
-      const { data } = await api.delete(`/v1/admin/users/${id}`);
+      const { data } = await api.delete(`/admin/users/${id}`);
       return data;
     },
     onSuccess: () => {
@@ -84,7 +84,7 @@ export function useToggleUserStatus() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: number) => {
-      const { data } = await api.post(`/v1/admin/users/${id}/toggle`);
+      const { data } = await api.post(`/admin/users/${id}/toggle`);
       return data;
     },
     onSuccess: () => {

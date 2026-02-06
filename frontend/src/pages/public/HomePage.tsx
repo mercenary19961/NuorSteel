@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, Recycle, Award } from 'lucide-react';
+import { useHomePage } from '../../hooks/usePublicData';
 
 export default function HomePage() {
   const { t } = useTranslation();
+  const { data, isLoading } = useHomePage();
 
   return (
     <div>
@@ -92,6 +94,31 @@ export default function HomePage() {
               {t('home.products.subtitle')}
             </p>
           </div>
+          {!isLoading && data?.featured_products && data.featured_products.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {data.featured_products.map((product) => (
+                <Link
+                  key={product.id}
+                  to={`/products/${product.slug}`}
+                  className="group bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  <div className="aspect-video bg-gray-100 flex items-center justify-center overflow-hidden">
+                    {product.image ? (
+                      <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                    ) : (
+                      <span className="text-gray-400 text-sm">{product.name}</span>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-semibold text-gray-900">{product.name}</h3>
+                    {product.short_description && (
+                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">{product.short_description}</p>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
           <div className="text-center">
             <Link
               to="/products"

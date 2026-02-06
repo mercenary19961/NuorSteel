@@ -17,6 +17,9 @@ import QualityPage from "./pages/public/QualityPage";
 import CareerPage from "./pages/public/CareerPage";
 import CertificatesPage from "./pages/public/CertificatesPage";
 import ContactPage from "./pages/public/ContactPage";
+import ProductDetailPage from "./pages/public/ProductDetailPage";
+import JobDetailPage from "./pages/public/JobDetailPage";
+import RecyclingPage from "./pages/public/RecyclingPage";
 
 // Admin Pages
 import LoginPage from "./pages/admin/LoginPage";
@@ -58,12 +61,12 @@ function App() {
                 <Route element={<PublicLayout />}>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/about" element={<AboutPage />} />
-                  <Route path="/about/recycling" element={<div>Recycling Page</div>} />
+                  <Route path="/about/recycling" element={<RecyclingPage />} />
                   <Route path="/products" element={<ProductsPage />} />
-                  <Route path="/products/:slug" element={<div>Product Detail</div>} />
+                  <Route path="/products/:slug" element={<ProductDetailPage />} />
                   <Route path="/quality" element={<QualityPage />} />
                   <Route path="/career" element={<CareerPage />} />
-                  <Route path="/career/:slug" element={<div>Job Detail</div>} />
+                  <Route path="/career/:slug" element={<JobDetailPage />} />
                   <Route path="/certificates" element={<CertificatesPage />} />
                   <Route path="/contact" element={<ContactPage />} />
                 </Route>

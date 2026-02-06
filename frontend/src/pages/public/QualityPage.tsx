@@ -1,8 +1,10 @@
 import { useTranslation } from 'react-i18next';
-import { Shield, CheckCircle, Award } from 'lucide-react';
+import { Shield, CheckCircle, Award, Download } from 'lucide-react';
+import { useQualityPage } from '../../hooks/usePublicData';
 
 export default function QualityPage() {
   const { t } = useTranslation();
+  const { data } = useQualityPage();
 
   return (
     <div>
@@ -67,13 +69,40 @@ export default function QualityPage() {
       {/* Certifications */}
       <section className="py-16 lg:py-24">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">
               {t('quality.certifications.title')}
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-gray-600 text-center mb-12">
               {t('quality.certifications.description')}
             </p>
+            {data?.certificates && data.certificates.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {data.certificates.map((cert) => (
+                  <a
+                    key={cert.id}
+                    href={cert.file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-4 bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                  >
+                    {cert.thumbnail ? (
+                      <img src={cert.thumbnail} alt={cert.title} className="w-12 h-12 object-cover rounded" />
+                    ) : (
+                      <div className="w-12 h-12 bg-blue-100 rounded flex items-center justify-center shrink-0">
+                        <Download className="text-blue-600" size={20} />
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <h3 className="font-medium text-gray-900 truncate">{cert.title}</h3>
+                      {cert.description && (
+                        <p className="text-sm text-gray-500 truncate">{cert.description}</p>
+                      )}
+                    </div>
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
