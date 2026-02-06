@@ -175,6 +175,37 @@ About Us | Products | Quality | Career | Certificates | Contact
 
 ---
 
+## Security (CRITICAL)
+
+Security is extremely important for this project. Every code change must consider security implications. Follow these rules strictly:
+
+### Authentication & Authorization
+- All admin routes MUST be behind `auth:sanctum` middleware
+- Admin-only routes (users, settings, newsletter) MUST use `admin` middleware
+- Tokens MUST have expiration (not infinite)
+- Login endpoint MUST be rate-limited to prevent brute force
+- Frontend MUST enforce auth guards (redirect unauthenticated users) and role guards (block editors from admin-only pages)
+
+### Input & Output
+- Server-side validation on ALL endpoints (never trust client input)
+- Client-side validation for UX only (not as a security layer)
+- Sanitize all user-generated content before rendering (XSS prevention)
+- Use parameterized queries / Eloquent (SQL injection prevention)
+- Validate file types server-side (not just by extension, check MIME)
+
+### File Uploads
+- Validate file types, sizes, and MIME types server-side
+- Store uploads outside public directory (local disk for private files)
+- Generate random filenames (never use original filename for storage path)
+- Scan/validate PDF files before storing
+
+### API Security
+- CORS must be configured for the SPA domain only
+- Never expose sensitive data in API responses (passwords, tokens, internal paths)
+- Return consistent error shapes (don't leak stack traces in production)
+
+---
+
 ## Technical Notes
 
 ### File Storage

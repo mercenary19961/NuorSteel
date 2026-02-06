@@ -113,8 +113,8 @@ class ContactController extends Controller
             ], 404);
         }
 
-        return Storage::disk('local')->download(
-            $submission->file_path,
+        return response()->download(
+            storage_path('app/' . $submission->file_path),
             $submission->name . '_attachment.pdf'
         );
     }

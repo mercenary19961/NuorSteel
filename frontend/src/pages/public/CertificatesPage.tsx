@@ -27,7 +27,7 @@ export default function CertificatesPage() {
     <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between">
         <div className="flex items-start">
-          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
             <FileText className="text-blue-600" size={24} />
           </div>
           <div className="ml-4">
@@ -45,7 +45,7 @@ export default function CertificatesPage() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-16 lg:py-24">
+      <section className="bg-linear-to-br from-gray-900 to-gray-800 text-white py-16 lg:py-24">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl lg:text-5xl font-bold mb-4">
             {t('certificates.hero.title')}

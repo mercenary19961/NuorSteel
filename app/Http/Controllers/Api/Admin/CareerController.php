@@ -182,8 +182,8 @@ class CareerController extends Controller
     {
         $application = CareerApplication::findOrFail($id);
 
-        return Storage::disk('local')->download(
-            $application->cv_path,
+        return response()->download(
+            storage_path('app/' . $application->cv_path),
             $application->name . '_CV.pdf'
         );
     }

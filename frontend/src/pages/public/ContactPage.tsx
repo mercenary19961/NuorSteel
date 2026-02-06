@@ -29,7 +29,7 @@ export default function ContactPage() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-16 lg:py-24">
+      <section className="bg-linear-to-br from-gray-900 to-gray-800 text-white py-16 lg:py-24">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl lg:text-5xl font-bold mb-4">
             {t('contact.hero.title')}
@@ -51,7 +51,7 @@ export default function ContactPage() {
               </h2>
               <div className="space-y-6">
                 <div className="flex items-start">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
                     <MapPin className="text-blue-600" size={20} />
                   </div>
                   <div className="ml-4">
@@ -60,7 +60,7 @@ export default function ContactPage() {
                   </div>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
                     <Phone className="text-blue-600" size={20} />
                   </div>
                   <div className="ml-4">
@@ -69,7 +69,7 @@ export default function ContactPage() {
                   </div>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
                     <Mail className="text-blue-600" size={20} />
                   </div>
                   <div className="ml-4">

@@ -64,17 +64,17 @@ export default function Footer() {
             <h4 className="text-lg font-semibold mb-4">{t('footer.contactUs')}</h4>
             <ul className="space-y-3">
               <li className="flex items-start text-sm text-gray-400">
-                <MapPin size={16} className="mr-2 mt-0.5 flex-shrink-0" />
+                <MapPin size={16} className="mr-2 mt-0.5 shrink-0" />
                 <span>{t('footer.address')}</span>
               </li>
               <li className="flex items-center text-sm text-gray-400">
-                <Phone size={16} className="mr-2 flex-shrink-0" />
+                <Phone size={16} className="mr-2 shrink-0" />
                 <a href="tel:+966XXXXXXXX" className="hover:text-white transition-colors">
                   +966 XX XXX XXXX
                 </a>
               </li>
               <li className="flex items-center text-sm text-gray-400">
-                <Mail size={16} className="mr-2 flex-shrink-0" />
+                <Mail size={16} className="mr-2 shrink-0" />
                 <a href="mailto:info@nuorsteel.com" className="hover:text-white transition-colors">
                   info@nuorsteel.com
                 </a>

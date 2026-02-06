@@ -8,7 +8,7 @@ export default function HomePage() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-20 lg:py-32">
+      <section className="bg-linear-to-br from-gray-900 to-gray-800 text-white py-20 lg:py-32">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl">
             <h1 className="text-4xl lg:text-6xl font-bold mb-6">
