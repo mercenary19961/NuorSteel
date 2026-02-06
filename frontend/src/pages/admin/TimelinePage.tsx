@@ -173,7 +173,7 @@ export default function TimelinePage() {
             >
               <GripVertical size={18} className="text-gray-300 cursor-grab shrink-0" />
 
-              <div className="flex items-center gap-3 min-w-[80px]">
+              <div className="flex items-center gap-3 min-w-80">
                 <span className="text-lg font-bold text-primary">{event.year}</span>
               </div>
 
@@ -231,7 +231,7 @@ export default function TimelinePage() {
                   required
                   maxLength={20}
                   placeholder="e.g. 2020"
-                  className="w-full max-w-[200px] px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  className="w-full max-w-50 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 />
               </div>
 

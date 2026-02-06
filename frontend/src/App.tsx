@@ -32,6 +32,10 @@ import CareersPage from "./pages/admin/CareersPage";
 import CareerFormPage from "./pages/admin/CareerFormPage";
 import ApplicationsPage from "./pages/admin/ApplicationsPage";
 import ContactsPage from "./pages/admin/ContactsPage";
+import NewsletterPage from "./pages/admin/NewsletterPage";
+import SettingsPage from "./pages/admin/SettingsPage";
+import UsersPage from "./pages/admin/UsersPage";
+import RequireAdmin from "./components/admin/RequireAdmin";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -81,6 +85,9 @@ function App() {
                   <Route path="careers/:id" element={<CareerFormPage />} />
                   <Route path="applications" element={<ApplicationsPage />} />
                   <Route path="contacts" element={<ContactsPage />} />
+                  <Route path="newsletter" element={<RequireAdmin><NewsletterPage /></RequireAdmin>} />
+                  <Route path="settings" element={<RequireAdmin><SettingsPage /></RequireAdmin>} />
+                  <Route path="users" element={<RequireAdmin><UsersPage /></RequireAdmin>} />
                 </Route>
 
                 {/* 404 */}
