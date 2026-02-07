@@ -8,8 +8,10 @@ use App\Models\CareerApplication;
 use App\Models\SiteContent;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use App\Mail\CareerApplicationReceived;
 use App\Models\Setting;
 
 class CareerController extends Controller
@@ -110,10 +112,16 @@ class CareerController extends Controller
 
     private function sendApplicationNotification(CareerApplication $application, ?CareerListing $listing): void
     {
-        $recipients = Setting::get('career_recipients', 'careers@nuorsteel.com,hr@nuorsteel.com');
-        $emails = array_map('trim', explode(',', $recipients));
+        try {
+            $recipients = Setting::get('career_recipients', 'careers@nuorsteel.com,hr@nuorsteel.com');
+            $emails = array_map('trim', explode(',', $recipients));
 
-        // In production, you would send an actual email here
-        // Mail::to($emails)->send(new CareerApplicationReceived($application, $listing));
+            Mail::to($emails)->send(new CareerApplicationReceived($application, $listing));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send career application notification email', [
+                'application_id' => $application->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

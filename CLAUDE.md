@@ -58,10 +58,13 @@
 - [x] Vite proxy `/api` → Laravel backend
 - [x] CORS configured for `localhost:3000`
 
+### Email Notifications (DONE)
+- [x] ContactFormSubmitted Mailable + HTML template
+- [x] CareerApplicationReceived Mailable + HTML template
+- [x] Controllers wired with try/catch (failures logged, don't break submissions)
+- [x] Recipients configurable via admin Settings (contact_recipients, career_recipients)
+
 ### Remaining
-- [ ] Job detail page (`/career/:slug`)
-- [ ] Recycling page (`/about/recycling`)
-- [ ] Email notifications (contact → info/it, careers → careers/hr)
 - [ ] LinkedIn API integration (homepage feed)
 - [ ] Code splitting (chunk >500kB)
 - [ ] Testing & deployment

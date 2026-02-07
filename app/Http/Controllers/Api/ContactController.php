@@ -7,7 +7,9 @@ use App\Models\ContactSubmission;
 use App\Models\Setting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\ContactFormSubmitted;
 
 class ContactController extends Controller
 {
@@ -56,10 +58,16 @@ class ContactController extends Controller
 
     private function sendContactNotification(ContactSubmission $submission): void
     {
-        $recipients = Setting::get('contact_recipients', 'info@nuorsteel.com,it@nuorsteel.com');
-        $emails = array_map('trim', explode(',', $recipients));
+        try {
+            $recipients = Setting::get('contact_recipients', 'info@nuorsteel.com,it@nuorsteel.com');
+            $emails = array_map('trim', explode(',', $recipients));
 
-        // In production, you would send an actual email here
-        // Mail::to($emails)->send(new ContactFormSubmitted($submission));
+            Mail::to($emails)->send(new ContactFormSubmitted($submission));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send contact notification email', [
+                'submission_id' => $submission->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

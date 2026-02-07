@@ -66,7 +66,8 @@
     },
     "timeline": {
       "title": "Our Journey",
-      "loading": "Loading timeline..."
+      "loading": "Loading timeline...",
+      "empty": "No timeline events yet."
     },
     "governance": {
       "title": "Governance",
@@ -123,6 +124,13 @@
       "description": "Don't see a position that fits? Submit your CV and we'll keep it on file for future opportunities.",
       "button": "Submit Your CV"
     },
+    "notFound": "Job listing not found",
+    "backToCareers": "Back to Careers",
+    "posted": "Posted",
+    "description": "Job Description",
+    "requirements": "Requirements",
+    "applyNow": "Apply Now",
+    "applyFor": "Apply for",
     "form": {
       "name": "Full Name",
       "email": "Email Address",
@@ -130,8 +138,23 @@
       "jobTitle": "Desired Job Title",
       "cv": "Upload CV",
       "cvHint": "PDF only, max 5MB",
-      "submit": "Submit Application"
+      "submit": "Submit Application",
+      "submitting": "Submitting...",
+      "cvRequired": "Please upload your CV",
+      "cvPdfOnly": "CV must be a PDF file",
+      "cvTooLarge": "CV must be less than 5MB",
+      "submitError": "Failed to submit application. Please try again.",
+      "successTitle": "Application Submitted!",
+      "successMessage": "Thank you for your application. We will review it and get back to you."
     }
+  },
+  "recycling": {
+    "backToAbout": "Back to About Us",
+    "hero": {
+      "title": "Recycling",
+      "subtitle": "Our commitment to sustainable steel manufacturing through recycling"
+    },
+    "comingSoon": "Recycling information coming soon."
   },
   "certificates": {
     "hero": {
