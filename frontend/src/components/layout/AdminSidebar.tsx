@@ -100,7 +100,7 @@ export default function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps)
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4">
+      <nav className="flex-1 overflow-y-auto scrollbar-thin py-4">
         {navGroups.map((group) => {
           const visibleItems = group.items.filter(
             (item) => !item.adminOnly || isAdmin

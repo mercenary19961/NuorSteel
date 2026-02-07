@@ -42,21 +42,25 @@
 - [x] Users page (admin-only, CRUD with self-protection)
 - [x] RequireAdmin guard on admin-only routes
 
-### Public Pages Frontend (IN PROGRESS)
+### Public Pages Frontend (DONE)
 - [x] PublicLayout (Header + Footer + Outlet)
-- [x] Home page (hero, features, CTA — static UI)
-- [x] About page (partial — timeline stub)
-- [x] Products listing (placeholder data)
-- [x] Quality page (static UI)
-- [x] Career page (placeholder data, form stub)
-- [x] Certificates page (placeholder data)
-- [x] Contact page (form UI built, no API)
-- [ ] Wire all public pages to API
-- [ ] Product detail page (`/products/:slug`)
-- [ ] Job detail page (`/career/:slug`)
-- [ ] Recycling page (`/about/recycling`)
+- [x] Home page (hero, features, CTA — wired to API)
+- [x] About page (overview, vision, mission, timeline — wired to API)
+- [x] Products listing (wired to API)
+- [x] Product detail page (`/products/:slug`)
+- [x] Quality page (wired to API)
+- [x] Career page (listings + application form — wired to API)
+- [x] Certificates page (wired to API)
+- [x] Contact page (form wired to API)
+
+### Local Dev Environment (DONE)
+- [x] TailwindCSS v4 Vite plugin configured (`@tailwindcss/vite`)
+- [x] Vite proxy `/api` → Laravel backend
+- [x] CORS configured for `localhost:3000`
 
 ### Remaining
+- [ ] Job detail page (`/career/:slug`)
+- [ ] Recycling page (`/about/recycling`)
 - [ ] Email notifications (contact → info/it, careers → careers/hr)
 - [ ] LinkedIn API integration (homepage feed)
 - [ ] Code splitting (chunk >500kB)
@@ -280,6 +284,17 @@ Security is extremely important for this project. Every code change must conside
 | CVs | 5MB | PDF only |
 | Attachments | 5MB | PDF only |
 | Certificates | 10MB | PDF |
+
+### Local Development
+- **Backend**: `php artisan serve` (runs on `http://localhost:8000`)
+- **Frontend**: `cd frontend && npm run dev` (runs on `http://localhost:3000`)
+- **Both servers must run simultaneously** — frontend proxies `/api` to backend
+- **Database**: MySQL on port 3307, database `nour_steel`, root user
+- **Seeded accounts**:
+  - Admin: `admin@nuorsteel.com` / `password`
+  - Editor: `editor@nuorsteel.com` / `password`
+- **Admin dashboard**: `http://localhost:3000/admin/login`
+- **IMPORTANT**: Run `npm install` from `frontend/` directory, NOT the project root
 
 ### Frontend Architecture
 - **API client**: Axios instance at `/api/v1` with auth token interceptor

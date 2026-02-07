@@ -6,7 +6,7 @@ export function useDashboard() {
   return useQuery({
     queryKey: ['admin', 'dashboard'],
     queryFn: async (): Promise<DashboardData> => {
-      const { data } = await api.get<ApiResponse<DashboardData>>('/v1/admin/dashboard');
+      const { data } = await api.get<ApiResponse<DashboardData>>('/admin/dashboard');
       return data.data!;
     },
     refetchInterval: 60000, // Refresh every minute

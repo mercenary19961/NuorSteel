@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import api from '../api/axios';
 
 interface User {
@@ -34,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchUser = async () => {
     try {
-      const response = await api.get('/v1/auth/user');
+      const response = await api.get('/auth/user');
       if (response.data.success) {
         setUser(response.data.data);
       }
@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = async (email: string, password: string) => {
-    const response = await api.post('/v1/auth/login', { email, password });
+    const response = await api.post('/auth/login', { email, password });
     if (response.data.success) {
       const { user, token } = response.data.data;
       localStorage.setItem('auth_token', token);
@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await api.post('/v1/auth/logout');
+      await api.post('/auth/logout');
     } finally {
       localStorage.removeItem('auth_token');
       setToken(null);
