@@ -253,7 +253,7 @@ export default function CertificateFormPage() {
               type="number"
               value={form.sort_order}
               onChange={(e) => setForm((f) => ({ ...f, sort_order: Number(e.target.value) }))}
-              className={`${inputClass} max-w-[120px]`}
+              className={`${inputClass} max-w-30`}
             />
           </div>
           <div className="flex items-end pb-2">

@@ -1,18 +1,12 @@
 import { useState } from 'react';
-import {
-  useContacts,
-  useMarkAsRead,
-  useArchiveContact,
-  useUnarchiveContact,
-  useDeleteContact,
-} from '../../hooks/useContacts';
-import { useToast } from '../../contexts/ToastContext';
-import DataTable, { type Column } from '../../components/admin/DataTable';
-import StatusBadge from '../../components/admin/StatusBadge';
-import Pagination from '../../components/admin/Pagination';
-import ConfirmDialog from '../../components/admin/ConfirmDialog';
+import { Head, router } from '@inertiajs/react';
+import AdminLayout from '@/Layouts/AdminLayout';
+import DataTable, { type Column } from '@/Components/Admin/DataTable';
+import StatusBadge from '@/Components/Admin/StatusBadge';
+import Pagination from '@/Components/Admin/Pagination';
+import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import { Eye, Archive, ArchiveRestore, Trash2, Download, X, Mail } from 'lucide-react';
-import type { ContactSubmission } from '../../types';
+import type { PaginatedData, ContactSubmission } from '@/types';
 
 const TYPE_LABELS: Record<string, string> = {
   vendor: 'Vendor Registration',
@@ -23,64 +17,81 @@ const TYPE_LABELS: Record<string, string> = {
   quotation: 'Quotation',
 };
 
-export default function ContactsPage() {
-  const [page, setPage] = useState(1);
-  const [requestType, setRequestType] = useState('');
-  const [readFilter, setReadFilter] = useState('');
-  const [showArchived, setShowArchived] = useState(false);
+interface Props {
+  submissions: PaginatedData<ContactSubmission>;
+  stats: {
+    total: number;
+    unread: number;
+    by_type: Record<string, number>;
+  };
+  filters: {
+    request_type?: string;
+    is_read?: string;
+    archived?: string;
+  };
+}
 
-  const { data, isLoading } = useContacts({
-    page,
-    request_type: requestType || undefined,
-    is_read: readFilter === '' ? undefined : readFilter === 'true',
-    archived: showArchived,
-  });
-  const markReadMutation = useMarkAsRead();
-  const archiveMutation = useArchiveContact();
-  const unarchiveMutation = useUnarchiveContact();
-  const deleteMutation = useDeleteContact();
-  const { success, error: showError } = useToast();
-
+export default function Contacts({ submissions, stats, filters }: Props) {
   const [viewItem, setViewItem] = useState<ContactSubmission | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ContactSubmission | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
-  const handleMarkRead = async (id: number) => {
-    try {
-      await markReadMutation.mutateAsync(id);
-      success('Marked as read.');
-    } catch {
-      showError('Failed to mark as read.');
-    }
+  const requestType = filters.request_type ?? '';
+  const readFilter = filters.is_read ?? '';
+  const showArchived = filters.archived === '1' || filters.archived === 'true';
+
+  const applyFilters = (overrides: Record<string, string | undefined>) => {
+    const params: Record<string, string | undefined> = {
+      request_type: requestType || undefined,
+      is_read: readFilter || undefined,
+      archived: showArchived ? '1' : undefined,
+      ...overrides,
+    };
+
+    // Clean out undefined/empty values
+    const cleanParams: Record<string, string> = {};
+    Object.entries(params).forEach(([key, val]) => {
+      if (val) cleanParams[key] = val;
+    });
+
+    router.get('/admin/contacts', cleanParams, {
+      preserveState: true,
+      preserveScroll: true,
+    });
   };
 
-  const handleArchive = async (id: number) => {
-    try {
-      await archiveMutation.mutateAsync(id);
-      success('Submission archived.');
-      if (viewItem?.id === id) setViewItem(null);
-    } catch {
-      showError('Failed to archive.');
-    }
+  const handleMarkRead = (id: number) => {
+    router.post(`/admin/contacts/${id}/read`, {}, {
+      preserveScroll: true,
+      preserveState: true,
+    });
   };
 
-  const handleUnarchive = async (id: number) => {
-    try {
-      await unarchiveMutation.mutateAsync(id);
-      success('Submission unarchived.');
-    } catch {
-      showError('Failed to unarchive.');
-    }
+  const handleArchive = (id: number) => {
+    router.post(`/admin/contacts/${id}/archive`, {}, {
+      preserveScroll: true,
+      preserveState: true,
+      onSuccess: () => {
+        if (viewItem?.id === id) setViewItem(null);
+      },
+    });
   };
 
-  const handleDelete = async () => {
+  const handleUnarchive = (id: number) => {
+    router.post(`/admin/contacts/${id}/unarchive`, {}, {
+      preserveScroll: true,
+      preserveState: true,
+    });
+  };
+
+  const handleDelete = () => {
     if (!deleteTarget) return;
-    try {
-      await deleteMutation.mutateAsync(deleteTarget.id);
-      success('Submission deleted.');
-      setDeleteTarget(null);
-    } catch {
-      showError('Failed to delete submission.');
-    }
+    setDeleting(true);
+    router.delete(`/admin/contacts/${deleteTarget.id}`, {
+      preserveScroll: true,
+      onSuccess: () => setDeleteTarget(null),
+      onFinish: () => setDeleting(false),
+    });
   };
 
   const openView = (item: ContactSubmission) => {
@@ -88,6 +99,24 @@ export default function ContactsPage() {
     if (!item.is_read) {
       handleMarkRead(item.id);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    const params: Record<string, string | undefined> = {
+      request_type: requestType || undefined,
+      is_read: readFilter || undefined,
+      archived: showArchived ? '1' : undefined,
+    };
+    const cleanParams: Record<string, string> = {};
+    Object.entries(params).forEach(([key, val]) => {
+      if (val) cleanParams[key] = val;
+    });
+
+    router.get(
+      window.location.pathname,
+      { ...cleanParams, page },
+      { preserveState: true, preserveScroll: true },
+    );
   };
 
   const columns: Column<ContactSubmission>[] = [
@@ -112,7 +141,7 @@ export default function ContactsPage() {
       key: 'subject',
       label: 'Subject',
       render: (item) => (
-        <p className={`text-sm truncate max-w-50 ${item.is_read ? 'text-gray-600' : 'font-medium text-gray-900'}`}>
+        <p className={`text-sm truncate max-w-[200px] ${item.is_read ? 'text-gray-600' : 'font-medium text-gray-900'}`}>
           {item.subject}
         </p>
       ),
@@ -132,7 +161,9 @@ export default function ContactsPage() {
   ];
 
   return (
-    <div>
+    <AdminLayout>
+      <Head title="Contact Submissions" />
+
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Contact Submissions</h1>
       </div>
@@ -141,7 +172,7 @@ export default function ContactsPage() {
       <div className="flex items-center gap-3 mb-4 flex-wrap">
         <select
           value={requestType}
-          onChange={(e) => { setRequestType(e.target.value); setPage(1); }}
+          onChange={(e) => applyFilters({ request_type: e.target.value || undefined })}
           className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
         >
           <option value="">All Types</option>
@@ -152,7 +183,7 @@ export default function ContactsPage() {
 
         <select
           value={readFilter}
-          onChange={(e) => { setReadFilter(e.target.value); setPage(1); }}
+          onChange={(e) => applyFilters({ is_read: e.target.value || undefined })}
           className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
         >
           <option value="">All</option>
@@ -161,7 +192,7 @@ export default function ContactsPage() {
         </select>
 
         <button
-          onClick={() => { setShowArchived(!showArchived); setPage(1); }}
+          onClick={() => applyFilters({ archived: showArchived ? undefined : '1' })}
           className={`px-3 py-2 text-sm border rounded-lg transition-colors ${
             showArchived
               ? 'bg-gray-900 text-white border-gray-900'
@@ -171,15 +202,14 @@ export default function ContactsPage() {
           {showArchived ? 'Showing Archived' : 'Show Archived'}
         </button>
 
-        {data?.meta && (
-          <span className="text-sm text-gray-500 ml-auto">{data.meta.total} submissions</span>
-        )}
+        <span className="text-sm text-gray-500 ml-auto">
+          {submissions.total} submissions
+        </span>
       </div>
 
       <DataTable
         columns={columns}
-        data={data?.items ?? []}
-        loading={isLoading}
+        data={submissions.data}
         emptyMessage="No contact submissions found."
         actions={(item) => (
           <>
@@ -214,14 +244,14 @@ export default function ContactsPage() {
         )}
       />
 
-      {data?.meta && data.meta.last_page > 1 && (
+      {submissions.last_page > 1 && (
         <div className="mt-4">
           <Pagination
-            currentPage={data.meta.current_page}
-            lastPage={data.meta.last_page}
-            perPage={data.meta.per_page}
-            total={data.meta.total}
-            onPageChange={setPage}
+            currentPage={submissions.current_page}
+            lastPage={submissions.last_page}
+            perPage={submissions.per_page}
+            total={submissions.total}
+            onPageChange={handlePageChange}
           />
         </div>
       )}
@@ -283,7 +313,7 @@ export default function ContactsPage() {
 
               {viewItem.file_path && (
                 <a
-                  href={`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}/admin/contacts/${viewItem.id}/file`}
+                  href={`/admin/contacts/${viewItem.id}/file`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-primary/5 w-fit"
@@ -322,10 +352,10 @@ export default function ContactsPage() {
         message={`Are you sure you want to delete the submission from "${deleteTarget?.name}"? This action cannot be undone.`}
         confirmLabel="Delete"
         variant="danger"
-        loading={deleteMutation.isPending}
+        loading={deleting}
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
       />
-    </div>
+    </AdminLayout>
   );
 }
