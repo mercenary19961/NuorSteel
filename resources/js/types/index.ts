@@ -26,6 +26,7 @@ export interface PageProps {
     routes: Record<string, unknown>;
     location: string;
   };
+  [key: string]: unknown;
 }
 
 // Laravel Paginator shape (auto-serialized by Inertia)

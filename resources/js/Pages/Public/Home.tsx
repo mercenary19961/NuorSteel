@@ -8,7 +8,7 @@ interface Props {
   certificates: { id: number; title: string; category: string; thumbnail: string | null }[];
 }
 
-export default function Home({ featured_products, certificates }: Props) {
+export default function Home({ featured_products }: Props) {
   const { t } = useTranslation();
 
   return (

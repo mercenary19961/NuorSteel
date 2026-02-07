@@ -71,7 +71,7 @@ export default function Content({ content: contentByPage }: Props) {
       content_ar: editedItems[id].content_ar,
     }));
 
-    router.post('/admin/content/bulk-update', { contents }, {
+    router.put('/admin/content', { contents }, {
       preserveScroll: true,
       onStart: () => setSaving(true),
       onFinish: () => setSaving(false),

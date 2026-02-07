@@ -76,9 +76,9 @@ export default function Timeline({ events }: Props) {
     };
 
     if (editingId) {
-      router.put(`/admin/timeline/${editingId}`, form, options);
+      router.put(`/admin/timeline/${editingId}`, form as any, options);
     } else {
-      router.post('/admin/timeline', form, options);
+      router.post('/admin/timeline', form as any, options);
     }
   };
 

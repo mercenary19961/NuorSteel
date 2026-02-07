@@ -44,7 +44,7 @@ export default function Contact({ settings }: Props) {
     }
 
     setProcessing(true);
-    router.post('/contact', formData as unknown as Record<string, unknown>, {
+    router.post('/contact', formData as any, {
       forceFormData: true,
       onSuccess: () => setSubmitted(true),
       onError: () => setFormError(t('contact.form.submitError')),

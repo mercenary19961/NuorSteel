@@ -31,7 +31,7 @@ interface Props {
   };
 }
 
-export default function Contacts({ submissions, stats, filters }: Props) {
+export default function Contacts({ submissions, filters }: Props) {
   const [viewItem, setViewItem] = useState<ContactSubmission | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ContactSubmission | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -141,7 +141,7 @@ export default function Contacts({ submissions, stats, filters }: Props) {
       key: 'subject',
       label: 'Subject',
       render: (item) => (
-        <p className={`text-sm truncate max-w-[200px] ${item.is_read ? 'text-gray-600' : 'font-medium text-gray-900'}`}>
+        <p className={`text-sm truncate max-w-50 ${item.is_read ? 'text-gray-600' : 'font-medium text-gray-900'}`}>
           {item.subject}
         </p>
       ),

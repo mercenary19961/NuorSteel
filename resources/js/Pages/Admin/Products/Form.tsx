@@ -4,7 +4,7 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import { ArrowLeft, Plus, Trash2, Image, X } from 'lucide-react';
-import type { Product, ProductImage, ProductSpecification } from '@/types';
+import type { Product } from '@/types';
 
 interface Props {
   item: Product | null;
@@ -109,12 +109,12 @@ export default function ProductFormPage({ item }: Props) {
     setSaving(true);
 
     if (isEditing) {
-      router.put(`/admin/products/${item.id}`, form, {
+      router.put(`/admin/products/${item.id}`, form as any, {
         preserveScroll: true,
         onFinish: () => setSaving(false),
       });
     } else {
-      router.post('/admin/products', form, {
+      router.post('/admin/products', form as any, {
         onSuccess: () => router.visit('/admin/products'),
         onFinish: () => setSaving(false),
       });

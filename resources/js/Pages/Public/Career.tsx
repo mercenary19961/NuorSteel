@@ -48,7 +48,7 @@ export default function Career({ listings }: Props) {
     }
 
     setProcessing(true);
-    router.post('/career/apply', formData as unknown as Record<string, unknown>, {
+    router.post('/career/apply', formData as any, {
       forceFormData: true,
       onSuccess: () => setSubmitted(true),
       onError: () => setFormError(t('career.form.submitError')),

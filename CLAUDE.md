@@ -8,8 +8,9 @@
 
 **Company:** Nuor Steel Industry Company (شركة نور للصناعات الحديدية)
 **Type:** Corporate industrial website with admin CMS
-**Stack:** Laravel 12 + React 19 + TypeScript
+**Stack:** Laravel 12 + Inertia.js + React 19 + TypeScript
 **Database:** MySQL
+**Architecture:** Single-service monolith (Laravel serves everything via Inertia)
 **Branch:** `construction_phase`
 
 ---
@@ -19,44 +20,50 @@
 ### Backend (DONE)
 - [x] Database migrations (14 tables)
 - [x] Eloquent models with relationships
-- [x] Admin API controllers (CRUD for all resources)
-- [x] Public API controllers (read-only + form submissions)
-- [x] Auth with Sanctum (login, logout, token expiry)
+- [x] Public Inertia controllers (pages + form submissions)
+- [x] Admin Inertia controllers (CRUD for all resources)
+- [x] Session-based auth (login, logout)
 - [x] Admin middleware (role guard)
-- [x] Rate limiting on login
+- [x] Rate limiting on login and public POST endpoints
 - [x] File storage in private directory
 - [x] Database seeders
+- [x] HandleInertiaRequests middleware (shares auth, locale, flash, ziggy)
 
 ### Admin Panel Frontend (DONE)
-- [x] Auth context + login page + admin layout with sidebar
+- [x] Login page with Inertia form
+- [x] Admin layout with sidebar (active state via `usePage().url`)
 - [x] Dashboard with stats
 - [x] Content editor (bilingual side-by-side EN/AR)
-- [x] Timeline events CRUD
+- [x] Timeline events CRUD (drag-and-drop reorder)
 - [x] Media library (upload, grid, folder/type filter)
 - [x] Products CRUD (3-tab form: details/images/specs)
 - [x] Certificates CRUD (PDF upload)
 - [x] Careers CRUD + Applications inbox (status workflow)
-- [x] Contact submissions inbox (read/archive)
+- [x] Contact submissions inbox (read/archive/filters)
 - [x] Newsletter management (admin-only, stats, export)
 - [x] Settings page (admin-only, grouped key-value editor)
 - [x] Users page (admin-only, CRUD with self-protection)
-- [x] RequireAdmin guard on admin-only routes
 
 ### Public Pages Frontend (DONE)
-- [x] PublicLayout (Header + Footer + Outlet)
-- [x] Home page (hero, features, CTA — wired to API)
-- [x] About page (overview, vision, mission, timeline — wired to API)
-- [x] Products listing (wired to API)
-- [x] Product detail page (`/products/:slug`)
-- [x] Quality page (wired to API)
-- [x] Career page (listings + application form — wired to API)
-- [x] Certificates page (wired to API)
-- [x] Contact page (form wired to API)
+- [x] PublicLayout (Header + Footer + children)
+- [x] Home page (hero, features, products, CTA)
+- [x] About page (overview, vision, mission, timeline)
+- [x] Recycling page (sub-page under About)
+- [x] Products listing + Product detail page
+- [x] Quality page
+- [x] Career page (listings + open application form)
+- [x] Job detail page (job info + application form)
+- [x] Certificates page
+- [x] Contact page (form with file upload)
 
-### Local Dev Environment (DONE)
-- [x] TailwindCSS v4 Vite plugin configured (`@tailwindcss/vite`)
-- [x] Vite proxy `/api` → Laravel backend
-- [x] CORS configured for `localhost:3000`
+### Inertia Migration (DONE)
+- [x] Inertia.js infrastructure (packages, Vite config, root template, entry point)
+- [x] Shared code (types, utils, i18n, contexts, components, layouts)
+- [x] All public pages converted from React Query to Inertia page props
+- [x] Auth converted from Sanctum API tokens to session-based
+- [x] All admin pages converted from React Query/Router to Inertia
+- [x] Old frontend/ SPA directory removed
+- [x] Old API controllers removed
 
 ### Email Notifications (DONE)
 - [x] ContactFormSubmitted Mailable + HTML template
@@ -184,10 +191,10 @@ About Us | Products | Quality | Career | Certificates | Contact
 /about                  → About Us
 /about/recycling        → Recycling (sub-page)
 /products               → Product listing
-/products/:slug         → Product detail
+/products/{slug}        → Product detail
 /quality                → Quality & certifications
 /career                 → Job listings + open application
-/career/:slug           → Job detail
+/career/{slug}          → Job detail
 /certificates           → Supplier approvals & certificates
 /contact                → Get in Touch form
 ```
@@ -237,11 +244,10 @@ About Us | Products | Quality | Career | Certificates | Contact
 Security is extremely important for this project. Every code change must consider security implications. Follow these rules strictly:
 
 ### Authentication & Authorization
-- All admin routes MUST be behind `auth:sanctum` middleware
+- All admin routes MUST be behind `auth` middleware (session-based)
 - Admin-only routes (users, settings, newsletter) MUST use `admin` middleware
-- Tokens MUST have expiration (not infinite) — currently 8 hours via Sanctum config
 - Login endpoint MUST be rate-limited to prevent brute force — currently 5/minute
-- Frontend MUST enforce auth guards (redirect unauthenticated users) and role guards (block editors from admin-only pages)
+- Server middleware handles protection — no client-side auth guards needed
 
 ### Input & Output
 - Server-side validation on ALL endpoints (never trust client input)
@@ -257,14 +263,12 @@ Security is extremely important for this project. Every code change must conside
 - Generate random filenames (never use original filename for storage path)
 - Scan/validate PDF files before storing
 
-### API Security
-- CORS must be configured for the SPA domain only (explicit allowed_origins in .env)
-- Never expose sensitive data in API responses (passwords, tokens, internal paths)
+### Security Notes
+- Never expose sensitive data in responses (passwords, tokens, internal paths)
 - Return consistent error shapes (don't leak stack traces in production)
 - Rate-limit ALL public POST endpoints (contact, career apply, newsletter subscribe)
 
 ### Frontend Security
-- Never store sensitive data in localStorage beyond auth token
 - Sanitize any HTML content before rendering (use DOMPurify for rich text)
 - Validate file types client-side for UX, but NEVER rely on it for security
 - Use `rel="noopener noreferrer"` on external links
@@ -289,25 +293,48 @@ Security is extremely important for this project. Every code change must conside
 | Certificates | 10MB | PDF |
 
 ### Local Development
-- **Backend**: `php artisan serve` (runs on `http://localhost:8000`)
-- **Frontend**: `cd frontend && npm run dev` (runs on `http://localhost:3000`)
-- **Both servers must run simultaneously** — frontend proxies `/api` to backend
+- **Start**: `php artisan serve` + `npm run dev` (both from project root)
+- **URL**: `http://localhost:8000` (Laravel serves everything)
 - **Database**: MySQL on port 3307, database `nour_steel`, root user
 - **Seeded accounts**:
   - Admin: `admin@nuorsteel.com` / `password`
   - Editor: `editor@nuorsteel.com` / `password`
-- **Admin dashboard**: `http://localhost:3000/admin/login`
-- **IMPORTANT**: Run `npm install` from `frontend/` directory, NOT the project root
+- **Admin dashboard**: `http://localhost:8000/admin/login`
+- **Build**: `npm run build` (outputs to `public/build/`)
 
 ### Frontend Architecture
-- **API client**: Axios instance at `/api/v1` with auth token interceptor
-- **Data fetching**: React Query v5 (useQuery/useMutation with query invalidation)
-- **Routing**: React Router v7 with nested layouts
-- **State**: React Context for auth + language; React Query for server state
+- **Framework**: Inertia.js — bridges Laravel controllers to React page components
+- **Data flow**: Controllers pass data as props via `Inertia::render('Page/Name', [...props])`
+- **Mutations**: `router.post/put/delete()` with `preserveScroll`, `onSuccess`, `onFinish`
+- **Forms with files**: Use native `FormData` + `forceFormData: true`
+- **Routing**: Server-driven via `routes/web.php` — no client-side router
+- **Auth state**: `usePage<PageProps>().props.auth.user` (shared by middleware)
 - **Styling**: TailwindCSS v4 with custom `primary` color
 - **Icons**: Lucide React
-- **i18n**: react-i18next with EN/AR translation files
-- **Admin pattern**: Each resource has a custom hook (useProducts, useCareers, etc.) wrapping API calls
+- **i18n**: react-i18next with EN/AR translation files (bundled, not HTTP-loaded)
+- **Flash messages**: Server redirects with `->with('success', '...')`, rendered by FlashMessages component via toast
+
+### Key File Locations
+```
+resources/js/Pages/Public/     → Public page components (10 pages)
+resources/js/Pages/Admin/      → Admin page components (16 pages)
+resources/js/Layouts/          → PublicLayout, AdminLayout
+resources/js/Components/       → Shared components (Layout/, Admin/)
+resources/js/types/            → TypeScript interfaces
+resources/js/i18n/             → Translation files (en.ts, ar.ts)
+resources/js/contexts/         → LanguageContext
+resources/js/app.tsx           → Inertia entry point
+resources/views/app.blade.php  → Root Blade template (@inertia)
+app/Http/Controllers/Public/   → Public Inertia controllers
+app/Http/Controllers/Admin/    → Admin Inertia controllers
+app/Http/Controllers/Auth/     → Login/logout controller
+routes/web.php                 → All routes (public + admin)
+```
+
+### Deployment (Railway)
+- Single service — Nixpacks auto-detects Laravel + Node.js
+- Build: `composer install && npm install && npm run build && php artisan migrate --force`
+- `npm run build` outputs to `public/build/` (laravel-vite-plugin default)
 
 ### LinkedIn Integration
 - Method: LinkedIn API (requires Developer App approval)
@@ -329,6 +356,8 @@ Security is extremely important for this project. Every code change must conside
 - ~~Auto language detection~~ (manual toggle only)
 - ~~Draft/publish workflow~~ (simple active/inactive)
 - ~~Full audit log~~ (basic created_by/updated_by only)
+- ~~Standalone React SPA~~ (migrated to Inertia.js)
+- ~~API routes / Sanctum tokens~~ (replaced with session auth)
 
 ---
 
