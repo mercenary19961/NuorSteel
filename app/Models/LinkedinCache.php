@@ -28,7 +28,7 @@ class LinkedinCache extends Model
         ];
     }
 
-    public function scopeLatest(Builder $query, int $limit = 5): Builder
+    public function scopeRecentPosts(Builder $query, int $limit = 5): Builder
     {
         return $query->orderByDesc('posted_at')->limit($limit);
     }
@@ -54,7 +54,7 @@ class LinkedinCache extends Model
 
     public static function getLatestPosts(int $limit = 5)
     {
-        return static::latest($limit)->get();
+        return static::recentPosts($limit)->get();
     }
 
     public static function needsSync(int $hoursThreshold = 6): bool
