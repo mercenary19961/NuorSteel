@@ -1,14 +1,22 @@
 import { useTranslation } from 'react-i18next';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowRight, Shield, Recycle, Award } from 'lucide-react';
+import { ArrowRight, Shield, Recycle, Award, Linkedin, ExternalLink } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
+
+interface LinkedinPost {
+  id: number;
+  content: string;
+  image_url: string | null;
+  post_url: string;
+  posted_at: string;
+}
 
 interface Props {
   featured_products: { id: number; name: string; slug: string; short_description: string | null; image: string | null }[];
-  certificates: { id: number; title: string; category: string; thumbnail: string | null }[];
+  linkedin_posts: LinkedinPost[];
 }
 
-export default function Home({ featured_products }: Props) {
+export default function Home({ featured_products, linkedin_posts }: Props) {
   const { t } = useTranslation();
 
   return (
@@ -133,6 +141,68 @@ export default function Home({ featured_products }: Props) {
               {t('home.products.viewAll')}
               <ArrowRight className="ml-2" size={20} />
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* LinkedIn Feed Section */}
+      <section className="py-16 lg:py-24 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <div className="w-16 h-16 bg-[#0A66C2] rounded-full flex items-center justify-center mx-auto mb-4">
+              <Linkedin className="text-white" size={32} />
+            </div>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              {t('home.linkedin.title')}
+            </h2>
+            <p className="text-lg text-gray-600">
+              {t('home.linkedin.subtitle')}
+            </p>
+          </div>
+
+          {linkedin_posts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto mb-8">
+              {linkedin_posts.slice(0, 3).map((post) => (
+                <a
+                  key={post.id}
+                  href={post.post_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  {post.image_url && (
+                    <div className="aspect-video bg-gray-100 overflow-hidden">
+                      <img src={post.image_url} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                    </div>
+                  )}
+                  <div className="p-5">
+                    <p className="text-gray-700 text-sm line-clamp-4 mb-3">
+                      {post.content}
+                    </p>
+                    <div className="flex items-center justify-between text-xs text-gray-400">
+                      <span>{new Date(post.posted_at).toLocaleDateString()}</span>
+                      <ExternalLink size={14} />
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center mb-8">
+              <p className="text-gray-500 mb-4">{t('home.linkedin.noPosts')}</p>
+            </div>
+          )}
+
+          <div className="text-center">
+            <a
+              href="https://www.linkedin.com/company/nuorsteel"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-6 py-3 bg-[#0A66C2] hover:bg-[#004182] text-white rounded-md font-medium transition-colors"
+            >
+              {t('footer.followLinkedIn')}
+              <Linkedin className="ml-2" size={18} />
+            </a>
           </div>
         </div>
       </section>

@@ -20,8 +20,10 @@ class SettingsSeeder extends Seeder
             ['key' => 'company_address_en', 'value' => 'Riyadh, Saudi Arabia', 'type' => 'text', 'group' => 'contact'],
             ['key' => 'company_address_ar', 'value' => 'الرياض، المملكة العربية السعودية', 'type' => 'text', 'group' => 'contact'],
 
-            // Social
+            // Social / LinkedIn
             ['key' => 'linkedin_url', 'value' => 'https://linkedin.com/company/nuorsteel', 'type' => 'url', 'group' => 'social'],
+            ['key' => 'linkedin_organization_id', 'value' => '', 'type' => 'text', 'group' => 'social'],
+            ['key' => 'linkedin_access_token', 'value' => '', 'type' => 'text', 'group' => 'social'],
 
             // Email Recipients
             ['key' => 'contact_recipients', 'value' => 'info@nuorsteel.com,it@nuorsteel.com', 'type' => 'text', 'group' => 'email'],

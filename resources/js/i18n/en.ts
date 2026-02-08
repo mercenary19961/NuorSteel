@@ -41,6 +41,11 @@ const en = {
       subtitle: "Discover our range of high-quality steel products",
       viewAll: "View All Products",
     },
+    linkedin: {
+      title: "Latest from LinkedIn",
+      subtitle: "Stay updated with our latest news and insights",
+      noPosts: "Follow us on LinkedIn for the latest updates.",
+    },
     cta: {
       title: "Ready to Get Started?",
       description: "Contact us today to discuss your steel requirements.",
