@@ -71,7 +71,7 @@ class ContactController extends Controller
         $submission = ContactSubmission::findOrFail($id);
 
         if ($submission->file_path) {
-            Storage::disk('local')->delete($submission->file_path);
+            Storage::delete($submission->file_path);
         }
 
         $submission->delete();
@@ -87,9 +87,6 @@ class ContactController extends Controller
             abort(404, 'No file attached.');
         }
 
-        return response()->download(
-            storage_path('app/' . $submission->file_path),
-            $submission->name . '_attachment.pdf'
-        );
+        return Storage::download($submission->file_path, $submission->name . '_attachment.pdf');
     }
 }

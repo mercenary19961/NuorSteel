@@ -51,7 +51,7 @@ class MediaController extends Controller
         $folder = $request->input('folder', 'general');
 
         $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs("media/{$folder}", $filename, 'public');
+        $path = $file->storeAs("media/{$folder}", $filename);
 
         Media::create([
             'filename' => $filename,

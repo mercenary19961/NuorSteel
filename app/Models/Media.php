@@ -37,7 +37,7 @@ class Media extends Model
         });
 
         static::deleting(function (Media $media) {
-            Storage::disk('public')->delete($media->path);
+            Storage::delete($media->path);
         });
     }
 
@@ -53,7 +53,7 @@ class Media extends Model
 
     public function getUrlAttribute(): string
     {
-        return asset('storage/' . $this->path);
+        return Storage::url($this->path);
     }
 
     public function getAltTextAttribute(): string

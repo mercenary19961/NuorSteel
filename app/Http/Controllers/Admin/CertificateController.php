@@ -55,7 +55,7 @@ class CertificateController extends Controller
             'sort_order' => 'integer',
         ]);
 
-        $filePath = $request->file('file')->store('certificates', 'public');
+        $filePath = $request->file('file')->store('certificates');
 
         Certificate::create([
             'title_en' => $request->title_en,
@@ -107,10 +107,8 @@ class CertificateController extends Controller
         $data['updated_by'] = $request->user()->id;
 
         if ($request->hasFile('file')) {
-            // Delete old file
-            Storage::disk('public')->delete($certificate->file_path);
-            // Store new file
-            $data['file_path'] = $request->file('file')->store('certificates', 'public');
+            Storage::delete($certificate->file_path);
+            $data['file_path'] = $request->file('file')->store('certificates');
         }
 
         $certificate->update($data);
@@ -122,8 +120,7 @@ class CertificateController extends Controller
     {
         $certificate = Certificate::findOrFail($id);
 
-        // Delete the file
-        Storage::disk('public')->delete($certificate->file_path);
+        Storage::delete($certificate->file_path);
 
         $certificate->delete();
 

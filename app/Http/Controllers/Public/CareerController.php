@@ -80,7 +80,7 @@ class CareerController extends Controller
             }
         }
 
-        $cvPath = $request->file('cv')->store('cvs', 'local');
+        $cvPath = $request->file('cv')->store('cvs');
 
         $application = CareerApplication::create([
             'career_listing_id' => $listing?->id,
