@@ -45,7 +45,7 @@ class ContactController extends Controller
 
         $filePath = null;
         if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('attachments', 'local');
+            $filePath = $request->file('file')->store('attachments');
         }
 
         $submission = ContactSubmission::create([

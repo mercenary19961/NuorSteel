@@ -155,16 +155,13 @@ class CareerController extends Controller
     {
         $application = CareerApplication::findOrFail($id);
 
-        return response()->download(
-            storage_path('app/' . $application->cv_path),
-            $application->name . '_CV.pdf'
-        );
+        return Storage::download($application->cv_path, $application->name . '_CV.pdf');
     }
 
     public function deleteApplication(int $id): RedirectResponse
     {
         $application = CareerApplication::findOrFail($id);
-        Storage::disk('local')->delete($application->cv_path);
+        Storage::delete($application->cv_path);
         $application->delete();
 
         return redirect()->back()->with('success', 'Application deleted successfully.');

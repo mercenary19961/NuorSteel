@@ -71,9 +71,22 @@
 - [x] Controllers wired with try/catch (failures logged, don't break submissions)
 - [x] Recipients configurable via admin Settings (contact_recipients, career_recipients)
 
+### SEO / Structured Data (PARTIAL)
+- [x] JSON-LD schema markup added (`resources/views/partials/structured-data.blade.php`)
+- [x] Schemas: Organization, WebSite, SiteNavigationElement, FAQPage
+- [x] Included in `app.blade.php` via `@include('partials.structured-data')`
+- [ ] **TODO: Replace PLACEHOLDER values** with real company details before going live:
+  - Address (street, city, region, postal code)
+  - Phone number
+  - LinkedIn URL
+  - Number of employees
+  - FAQ answers (city name)
+  - OG image path
+
 ### Remaining
 - [ ] LinkedIn API integration (homepage feed)
 - [ ] Code splitting (chunk >500kB)
+- [ ] Structured data placeholders (see above)
 - [ ] Testing & deployment
 
 ---
