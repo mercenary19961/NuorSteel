@@ -12,6 +12,8 @@
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.tsx'])
     @inertiaHead
+
+    @include('partials.structured-data')
 </head>
 <body class="font-sans antialiased">
     @inertia
