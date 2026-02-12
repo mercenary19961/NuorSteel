@@ -2,17 +2,17 @@ import { useState, useEffect } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
-import { ChevronDown, ChevronRight, Save, Eye, ExternalLink, Maximize2, Minimize2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, Save, Eye, ExternalLink, Maximize2, Minimize2, MousePointerClick, Home, Building2, Recycle, ShieldCheck, Briefcase, Award, Mail, type LucideIcon } from 'lucide-react';
 import type { SiteContent } from '@/types';
 
-const PAGE_LABELS: Record<string, string> = {
-  home: 'Home',
-  about: 'About Us',
-  recycling: 'Recycling',
-  quality: 'Quality',
-  career: 'Career',
-  certificates: 'Certificates',
-  contact: 'Contact',
+const PAGE_CONFIG: Record<string, { label: string; labelAr: string; icon: LucideIcon }> = {
+  home: { label: 'Home', labelAr: 'الرئيسية', icon: Home },
+  about: { label: 'About Us', labelAr: 'من نحن', icon: Building2 },
+  recycling: { label: 'Recycling', labelAr: 'إعادة التدوير', icon: Recycle },
+  quality: { label: 'Quality', labelAr: 'الجودة', icon: ShieldCheck },
+  career: { label: 'Career', labelAr: 'الوظائف', icon: Briefcase },
+  certificates: { label: 'Certificates', labelAr: 'الشهادات', icon: Award },
+  contact: { label: 'Contact', labelAr: 'تواصل معنا', icon: Mail },
 };
 
 const PAGE_URLS: Record<string, string> = {
@@ -151,9 +151,16 @@ export default function Content({ content: contentByPage }: Props) {
                 >
                   <div className="flex items-center gap-3">
                     {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                    {PAGE_CONFIG[page] && (() => {
+                      const Icon = PAGE_CONFIG[page].icon;
+                      return <Icon size={18} className="text-gray-400" />;
+                    })()}
                     <h2 className="text-lg font-semibold text-gray-900">
-                      {PAGE_LABELS[page] || page}
+                      {PAGE_CONFIG[page]?.label || page}
                     </h2>
+                    <span className="text-xs text-gray-400" dir="rtl">
+                      {PAGE_CONFIG[page]?.labelAr}
+                    </span>
                     <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
                       {items.length} items
                     </span>
@@ -204,7 +211,7 @@ export default function Content({ content: contentByPage }: Props) {
                 <div className="flex items-center gap-2">
                   <Eye size={16} className="text-gray-500" />
                   <span className="text-sm font-medium text-gray-700">
-                    {PAGE_LABELS[previewPage] || previewPage}
+                    {PAGE_CONFIG[previewPage]?.label || previewPage}
                   </span>
                   <span className="text-xs text-gray-400">{previewUrl}</span>
                 </div>
@@ -235,15 +242,20 @@ export default function Content({ content: contentByPage }: Props) {
               >
                 {!previewInteractive && (
                   <div
-                    className="absolute inset-0 z-10 cursor-pointer"
+                    className="absolute inset-0 z-10 cursor-pointer bg-black/10"
                     onClick={() => setPreviewInteractive(true)}
-                  />
+                  >
+                    <div className="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 bg-gray-900/70 text-white text-xs rounded-full">
+                      <MousePointerClick size={12} />
+                      Click to interact with preview
+                    </div>
+                  </div>
                 )}
                 <iframe
                   key={iframeKey}
                   src={previewUrl}
                   className="w-full h-full border-0"
-                  title={`Preview: ${PAGE_LABELS[previewPage] || previewPage}`}
+                  title={`Preview: ${PAGE_CONFIG[previewPage]?.label || previewPage}`}
                 />
               </div>
             </div>
