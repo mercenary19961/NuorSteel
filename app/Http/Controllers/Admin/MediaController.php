@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Media;
+use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -16,11 +17,11 @@ class MediaController extends Controller
     {
         $query = Media::query();
 
-        if ($request->has('folder')) {
+        if ($request->filled('folder')) {
             $query->where('folder', $request->folder);
         }
 
-        if ($request->has('type')) {
+        if ($request->filled('type')) {
             if ($request->type === 'image') {
                 $query->where('mime_type', 'like', 'image/%');
             } elseif ($request->type === 'pdf') {
@@ -29,11 +30,24 @@ class MediaController extends Controller
         }
 
         $media = $query->orderByDesc('created_at')->paginate(24);
-        $folders = Media::distinct()->pluck('folder');
+
+        // Merge DB-derived folders with custom (empty) folders from settings
+        $dbFolders = Media::distinct()->pluck('folder')->toArray();
+        $customFolders = $this->getCustomFolders();
+        $allFolders = collect(array_unique(array_merge($dbFolders, $customFolders)))
+            ->sort()
+            ->values()
+            ->sortBy(fn ($f) => $f === 'general' ? 0 : 1)
+            ->values();
+
+        $folderCounts = Media::selectRaw('folder, count(*) as count')
+            ->groupBy('folder')
+            ->pluck('count', 'folder');
 
         return Inertia::render('Admin/Media', [
             'media' => $media,
-            'folders' => $folders,
+            'folders' => $allFolders,
+            'folderCounts' => $folderCounts,
             'filters' => $request->only(['folder', 'type']),
         ]);
     }
@@ -143,5 +157,109 @@ class MediaController extends Controller
         ]);
 
         return response()->json(['media' => $media]);
+    }
+
+    public function createFolder(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z0-9_-]+$/'],
+        ]);
+
+        $name = $request->input('name');
+        $customFolders = $this->getCustomFolders();
+
+        if (!in_array($name, $customFolders)) {
+            $customFolders[] = $name;
+            $this->saveCustomFolders($customFolders);
+        }
+
+        return redirect()->route('admin.media.index', ['folder' => $name])
+            ->with('success', "Folder \"{$name}\" created.");
+    }
+
+    public function renameFolder(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'old_name' => ['required', 'string', 'max:50'],
+            'new_name' => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z0-9_-]+$/'],
+        ]);
+
+        $oldName = $request->input('old_name');
+        $newName = $request->input('new_name');
+
+        if ($oldName === 'general') {
+            return redirect()->back()->with('error', 'The "general" folder cannot be renamed.');
+        }
+
+        if ($oldName === $newName) {
+            return redirect()->back();
+        }
+
+        // Update all media records in this folder
+        Media::where('folder', $oldName)->update(['folder' => $newName]);
+
+        // Update custom folders list
+        $customFolders = $this->getCustomFolders();
+        $customFolders = array_map(fn ($f) => $f === $oldName ? $newName : $f, $customFolders);
+        // Also add new name if old wasn't in custom list (was DB-derived)
+        if (!in_array($newName, $customFolders)) {
+            $customFolders[] = $newName;
+        }
+        $this->saveCustomFolders($customFolders);
+
+        return redirect()->route('admin.media.index', ['folder' => $newName])
+            ->with('success', "Folder renamed to \"{$newName}\".");
+    }
+
+    public function deleteFolder(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'name' => ['required', 'string'],
+        ]);
+
+        $name = $request->input('name');
+
+        if ($name === 'general') {
+            return redirect()->back()->with('error', 'The "general" folder cannot be deleted.');
+        }
+
+        // Move any files in this folder to "general"
+        Media::where('folder', $name)->update(['folder' => 'general']);
+
+        // Remove from custom folders list
+        $customFolders = array_filter($this->getCustomFolders(), fn ($f) => $f !== $name);
+        $this->saveCustomFolders(array_values($customFolders));
+
+        return redirect()->route('admin.media.index')
+            ->with('success', "Folder \"{$name}\" deleted. Files moved to \"general\".");
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getCustomFolders(): array
+    {
+        $setting = Setting::where('key', 'media_custom_folders')->first();
+        if (!$setting || !$setting->value) {
+            return [];
+        }
+
+        $decoded = json_decode($setting->value, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * @param string[] $folders
+     */
+    private function saveCustomFolders(array $folders): void
+    {
+        Setting::updateOrCreate(
+            ['key' => 'media_custom_folders'],
+            [
+                'value' => json_encode(array_values(array_unique($folders))),
+                'type' => 'text',
+                'group' => 'media',
+            ]
+        );
     }
 }

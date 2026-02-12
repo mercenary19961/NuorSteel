@@ -28,6 +28,9 @@ class SettingsSeeder extends Seeder
             // Email Recipients
             ['key' => 'contact_recipients', 'value' => 'info@nuorsteel.com,it@nuorsteel.com', 'type' => 'text', 'group' => 'email'],
             ['key' => 'career_recipients', 'value' => 'careers@nuorsteel.com,hr@nuorsteel.com', 'type' => 'text', 'group' => 'email'],
+
+            // Media
+            ['key' => 'media_custom_folders', 'value' => '["general"]', 'type' => 'text', 'group' => 'media'],
         ];
 
         foreach ($settings as $setting) {

@@ -267,7 +267,7 @@ export default function MediaPicker({
           </select>
 
           {/* Search input */}
-          <div className="relative flex-1 min-w-[180px]">
+          <div className="relative flex-1 min-w-45">
             <Search
               size={16}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
@@ -295,7 +295,7 @@ export default function MediaPicker({
         {showUpload && (
           <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 shrink-0">
             <div className="flex flex-wrap items-end gap-3">
-              <div className="flex-1 min-w-[140px]">
+              <div className="flex-1 min-w-35">
                 <label className="block text-xs font-medium text-gray-600 mb-1">
                   Folder
                 </label>
@@ -307,7 +307,7 @@ export default function MediaPicker({
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 />
               </div>
-              <div className="flex-1 min-w-[200px]">
+              <div className="flex-1 min-w-50">
                 <label className="block text-xs font-medium text-gray-600 mb-1">
                   File
                 </label>

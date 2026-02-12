@@ -55,7 +55,7 @@ class Media extends Model
 
     public function getUrlAttribute(): string
     {
-        return Storage::url($this->path);
+        return url("/media/{$this->id}");
     }
 
     public function getAltTextAttribute(): string
