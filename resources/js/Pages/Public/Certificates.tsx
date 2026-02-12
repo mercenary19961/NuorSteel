@@ -15,6 +15,7 @@ interface Props {
   esg: CertificateItem[];
   quality: CertificateItem[];
   governance: CertificateItem[];
+  content: Record<string, Record<string, string>>;
 }
 
 function CertificateCard({ cert }: { cert: CertificateItem }) {
@@ -30,7 +31,7 @@ function CertificateCard({ cert }: { cert: CertificateItem }) {
           {cert.thumbnail ? (
             <img src={cert.thumbnail} alt={cert.title} className="w-12 h-12 object-cover rounded-lg" />
           ) : (
-            <FileText className="text-blue-600" size={24} />
+            <FileText className="text-primary" size={24} />
           )}
         </div>
         <div className="ml-4">
@@ -40,12 +41,12 @@ function CertificateCard({ cert }: { cert: CertificateItem }) {
           )}
         </div>
       </div>
-      <Download size={20} className="text-gray-400 hover:text-blue-600 transition-colors shrink-0 ml-4" />
+      <Download size={20} className="text-gray-400 hover:text-primary transition-colors shrink-0 ml-4" />
     </a>
   );
 }
 
-export default function Certificates({ esg, quality, governance }: Props) {
+export default function Certificates({ esg, quality, governance, content }: Props) {
   const { t } = useTranslation();
 
   return (
@@ -56,10 +57,10 @@ export default function Certificates({ esg, quality, governance }: Props) {
       <section className="bg-linear-to-br from-gray-900 to-gray-800 text-white py-16 lg:py-24">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl lg:text-5xl font-bold mb-4">
-            {t('certificates.hero.title')}
+            {content?.overview?.title || t('certificates.hero.title')}
           </h1>
           <p className="text-xl text-gray-300">
-            {t('certificates.hero.subtitle')}
+            {content?.overview?.description || t('certificates.hero.subtitle')}
           </p>
         </div>
       </section>
@@ -67,9 +68,13 @@ export default function Certificates({ esg, quality, governance }: Props) {
       {/* ESG Section */}
       <section className="py-16 lg:py-20">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">
-            {t('certificates.esg.title')}
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            {content?.esg?.title || t('certificates.esg.title')}
           </h2>
+          {content?.esg?.description && (
+            <p className="text-gray-600 mb-8">{content.esg.description}</p>
+          )}
+          {!content?.esg?.description && <div className="mb-6" />}
           {esg.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {esg.map((cert) => (
@@ -77,7 +82,7 @@ export default function Certificates({ esg, quality, governance }: Props) {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500">{t('certificates.empty')}</p>
+            <p className="text-gray-500">No certificates in this category.</p>
           )}
         </div>
       </section>
@@ -86,7 +91,7 @@ export default function Certificates({ esg, quality, governance }: Props) {
       <section className="py-16 lg:py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">
-            {t('certificates.quality.title')}
+            {content?.quality?.title || t('certificates.quality.title')}
           </h2>
           {quality.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -95,7 +100,7 @@ export default function Certificates({ esg, quality, governance }: Props) {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500">{t('certificates.empty')}</p>
+            <p className="text-gray-500">No certificates in this category.</p>
           )}
         </div>
       </section>
@@ -104,7 +109,7 @@ export default function Certificates({ esg, quality, governance }: Props) {
       <section className="py-16 lg:py-20">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">
-            {t('certificates.governance.title')}
+            {content?.governance?.title || t('certificates.governance.title')}
           </h2>
           {governance.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -113,7 +118,7 @@ export default function Certificates({ esg, quality, governance }: Props) {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500">{t('certificates.empty')}</p>
+            <p className="text-gray-500">No certificates in this category.</p>
           )}
         </div>
       </section>

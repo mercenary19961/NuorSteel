@@ -15,6 +15,15 @@ class SiteContentSeeder extends Seeder
             ['page' => 'home', 'section' => 'hero', 'key' => 'subtitle', 'content_en' => 'Quality steel products for a sustainable future', 'content_ar' => 'منتجات حديدية عالية الجودة لمستقبل مستدام', 'type' => 'text'],
             ['page' => 'home', 'section' => 'hero', 'key' => 'cta_text', 'content_en' => 'Get in Touch', 'content_ar' => 'تواصل معنا', 'type' => 'text'],
 
+            // Home - Features section
+            ['page' => 'home', 'section' => 'features', 'key' => 'title', 'content_en' => 'Why Choose Us', 'content_ar' => 'لماذا تختارنا', 'type' => 'text'],
+            ['page' => 'home', 'section' => 'features', 'key' => 'quality_title', 'content_en' => 'Quality Assurance', 'content_ar' => 'ضمان الجودة', 'type' => 'text'],
+            ['page' => 'home', 'section' => 'features', 'key' => 'quality_description', 'content_en' => 'ISO certified manufacturing processes ensuring consistent product quality.', 'content_ar' => 'عمليات تصنيع معتمدة بشهادة ISO تضمن جودة منتجات ثابتة.', 'type' => 'text'],
+            ['page' => 'home', 'section' => 'features', 'key' => 'sustainability_title', 'content_en' => 'Sustainability', 'content_ar' => 'الاستدامة', 'type' => 'text'],
+            ['page' => 'home', 'section' => 'features', 'key' => 'sustainability_description', 'content_en' => 'Committed to environmental responsibility through recycling and efficient processes.', 'content_ar' => 'ملتزمون بالمسؤولية البيئية من خلال إعادة التدوير والعمليات الفعالة.', 'type' => 'text'],
+            ['page' => 'home', 'section' => 'features', 'key' => 'certified_title', 'content_en' => 'Certified Products', 'content_ar' => 'منتجات معتمدة', 'type' => 'text'],
+            ['page' => 'home', 'section' => 'features', 'key' => 'certified_description', 'content_en' => 'Full compliance with international standards and certifications.', 'content_ar' => 'التزام كامل بالمعايير والشهادات الدولية.', 'type' => 'text'],
+
             ['page' => 'home', 'section' => 'about', 'key' => 'title', 'content_en' => 'About Nuor Steel', 'content_ar' => 'عن شركة نور للحديد', 'type' => 'text'],
             ['page' => 'home', 'section' => 'about', 'key' => 'description', 'content_en' => 'Nuor Steel Industry Company is a leading manufacturer of high-quality steel products, committed to excellence and sustainability.', 'content_ar' => 'شركة نور للصناعات الحديدية هي شركة رائدة في تصنيع منتجات الحديد عالية الجودة، ملتزمة بالتميز والاستدامة.', 'type' => 'textarea'],
 
@@ -26,6 +35,11 @@ class SiteContentSeeder extends Seeder
 
             ['page' => 'home', 'section' => 'newsletter', 'key' => 'title', 'content_en' => 'Stay Updated', 'content_ar' => 'ابق على اطلاع', 'type' => 'text'],
             ['page' => 'home', 'section' => 'newsletter', 'key' => 'description', 'content_en' => 'Subscribe to our newsletter for the latest news and updates.', 'content_ar' => 'اشترك في نشرتنا الإخبارية لأحدث الأخبار والتحديثات.', 'type' => 'text'],
+
+            // Home - CTA section
+            ['page' => 'home', 'section' => 'cta', 'key' => 'title', 'content_en' => 'Ready to Get Started?', 'content_ar' => 'هل أنت مستعد للبدء؟', 'type' => 'text'],
+            ['page' => 'home', 'section' => 'cta', 'key' => 'description', 'content_en' => 'Contact us today to discuss your steel requirements.', 'content_ar' => 'تواصل معنا اليوم لمناقشة متطلباتك من الحديد.', 'type' => 'text'],
+            ['page' => 'home', 'section' => 'cta', 'key' => 'button', 'content_en' => 'Contact Us', 'content_ar' => 'تواصل معنا', 'type' => 'text'],
 
             // About Page
             ['page' => 'about', 'section' => 'overview', 'key' => 'title', 'content_en' => 'About Us', 'content_ar' => 'من نحن', 'type' => 'text'],

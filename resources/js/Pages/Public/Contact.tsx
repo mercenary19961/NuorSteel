@@ -15,9 +15,10 @@ const requestTypes = [
 
 interface Props {
   settings: { phone: string | null; email: string | null; address: string | null };
+  content: Record<string, Record<string, string>>;
 }
 
-export default function Contact({ settings }: Props) {
+export default function Contact({ settings, content }: Props) {
   const { t } = useTranslation();
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
@@ -60,10 +61,10 @@ export default function Contact({ settings }: Props) {
       <section className="bg-linear-to-br from-gray-900 to-gray-800 text-white py-16 lg:py-24">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl lg:text-5xl font-bold mb-4">
-            {t('contact.hero.title')}
+            {content?.overview?.title || t('contact.hero.title')}
           </h1>
           <p className="text-xl text-gray-300">
-            {t('contact.hero.subtitle')}
+            {content?.overview?.description || t('contact.hero.subtitle')}
           </p>
         </div>
       </section>
@@ -79,8 +80,8 @@ export default function Contact({ settings }: Props) {
               </h2>
               <div className="space-y-6">
                 <div className="flex items-start">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
-                    <MapPin className="text-blue-600" size={20} />
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                    <MapPin className="text-primary" size={20} />
                   </div>
                   <div className="ml-4">
                     <h3 className="font-medium text-gray-900">{t('contact.info.address')}</h3>
@@ -88,8 +89,8 @@ export default function Contact({ settings }: Props) {
                   </div>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
-                    <Phone className="text-blue-600" size={20} />
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                    <Phone className="text-primary" size={20} />
                   </div>
                   <div className="ml-4">
                     <h3 className="font-medium text-gray-900">{t('contact.info.phone')}</h3>
@@ -97,8 +98,8 @@ export default function Contact({ settings }: Props) {
                   </div>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
-                    <Mail className="text-blue-600" size={20} />
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                    <Mail className="text-primary" size={20} />
                   </div>
                   <div className="ml-4">
                     <h3 className="font-medium text-gray-900">{t('contact.info.email')}</h3>
@@ -121,7 +122,7 @@ export default function Contact({ settings }: Props) {
                     {t('contact.form.successTitle')}
                   </h3>
                   <p className="text-green-600">
-                    {t('contact.form.successMessage')}
+                    {content?.form?.success_message || t('contact.form.successMessage')}
                   </p>
                 </div>
               ) : (
@@ -141,7 +142,7 @@ export default function Contact({ settings }: Props) {
                         name="name"
                         required
                         maxLength={255}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
                       />
                     </div>
                     <div>
@@ -153,7 +154,7 @@ export default function Contact({ settings }: Props) {
                         name="company"
                         required
                         maxLength={255}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
                       />
                     </div>
                     <div>
@@ -165,7 +166,7 @@ export default function Contact({ settings }: Props) {
                         name="email"
                         required
                         maxLength={255}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
                       />
                     </div>
                     <div>
@@ -177,7 +178,7 @@ export default function Contact({ settings }: Props) {
                         name="phone"
                         required
                         maxLength={50}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
                       />
                     </div>
                     <div>
@@ -189,7 +190,7 @@ export default function Contact({ settings }: Props) {
                         name="country"
                         required
                         maxLength={100}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
                       />
                     </div>
                     <div>
@@ -199,7 +200,7 @@ export default function Contact({ settings }: Props) {
                       <select
                         name="request_type"
                         required
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
                       >
                         <option value="">{t('contact.form.selectType')}</option>
                         {requestTypes.map((type) => (
@@ -219,7 +220,7 @@ export default function Contact({ settings }: Props) {
                       name="subject"
                       required
                       maxLength={255}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -231,7 +232,7 @@ export default function Contact({ settings }: Props) {
                       required
                       rows={5}
                       maxLength={2000}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
                     />
                   </div>
                   <div>
@@ -242,7 +243,7 @@ export default function Contact({ settings }: Props) {
                       type="file"
                       name="file"
                       accept=".pdf,application/pdf"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
                     />
                     <p className="text-xs text-gray-500 mt-1">
                       {t('contact.form.fileHint')}
@@ -251,9 +252,9 @@ export default function Contact({ settings }: Props) {
                   <button
                     type="submit"
                     disabled={processing}
-                    className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-md font-medium transition-colors"
+                    className="inline-flex items-center px-6 py-3 bg-primary hover:bg-primary-dark disabled:bg-primary/60 text-white rounded-md font-medium transition-colors"
                   >
-                    {processing ? t('contact.form.sending') : t('contact.form.submit')}
+                    {processing ? t('contact.form.sending') : (content?.form?.submit_text || t('contact.form.submit'))}
                     <Send className="ml-2" size={18} />
                   </button>
                 </form>
