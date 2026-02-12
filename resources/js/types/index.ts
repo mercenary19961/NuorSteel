@@ -244,7 +244,7 @@ export interface SiteContent {
   key: string;
   content_en: string;
   content_ar: string;
-  content_type: "text" | "textarea" | "html";
+  type: "text" | "textarea" | "html";
 }
 
 // Settings

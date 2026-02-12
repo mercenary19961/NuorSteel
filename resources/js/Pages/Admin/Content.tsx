@@ -148,12 +148,12 @@ export default function Content({ content: contentByPage }: Props) {
                         {sectionItems.map((item) => (
                           <BilingualEditor
                             key={item.id}
-                            label={`${item.key} (${item.content_type})`}
+                            label={`${item.key} (${item.type})`}
                             valueEn={getItemValue(item, 'content_en')}
                             valueAr={getItemValue(item, 'content_ar')}
                             onChangeEn={(v) => handleChange(item, 'content_en', v)}
                             onChangeAr={(v) => handleChange(item, 'content_ar', v)}
-                            type={item.content_type}
+                            type={item.type}
                           />
                         ))}
                       </div>
