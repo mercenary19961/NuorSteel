@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
-import { ChevronDown, ChevronRight, Save } from 'lucide-react';
+import { ChevronDown, ChevronRight, Save, Eye, ExternalLink, Maximize2, Minimize2 } from 'lucide-react';
 import type { SiteContent } from '@/types';
 
 const PAGE_LABELS: Record<string, string> = {
@@ -13,6 +13,16 @@ const PAGE_LABELS: Record<string, string> = {
   career: 'Career',
   certificates: 'Certificates',
   contact: 'Contact',
+};
+
+const PAGE_URLS: Record<string, string> = {
+  home: '/',
+  about: '/about',
+  recycling: '/about/recycling',
+  quality: '/quality',
+  career: '/career',
+  certificates: '/certificates',
+  contact: '/contact',
 };
 
 interface Props {
@@ -26,6 +36,10 @@ export default function Content({ content: contentByPage }: Props) {
   >({});
   const [hasChanges, setHasChanges] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [previewPage, setPreviewPage] = useState('home');
+  const [iframeKey, setIframeKey] = useState(0);
+  const [previewExpanded, setPreviewExpanded] = useState(false);
+  const [previewInteractive, setPreviewInteractive] = useState(false);
 
   // Reset edited items when data changes (after successful save / page reload)
   useEffect(() => {
@@ -38,8 +52,12 @@ export default function Content({ content: contentByPage }: Props) {
   const togglePage = (page: string) => {
     setExpandedPages((prev) => {
       const next = new Set(prev);
-      if (next.has(page)) next.delete(page);
-      else next.add(page);
+      if (next.has(page)) {
+        next.delete(page);
+      } else {
+        next.add(page);
+        setPreviewPage(page);
+      }
       return next;
     });
   };
@@ -78,6 +96,7 @@ export default function Content({ content: contentByPage }: Props) {
       onSuccess: () => {
         setEditedItems({});
         setHasChanges(false);
+        setIframeKey((k) => k + 1);
       },
     });
   };
@@ -91,6 +110,8 @@ export default function Content({ content: contentByPage }: Props) {
     }
     return sections;
   };
+
+  const previewUrl = PAGE_URLS[previewPage] || '/';
 
   return (
     <AdminLayout>
@@ -114,56 +135,120 @@ export default function Content({ content: contentByPage }: Props) {
         </div>
       )}
 
-      <div className="space-y-2">
-        {pages.map((page) => {
-          const isExpanded = expandedPages.has(page);
-          const items = contentByPage[page];
-          const sections = groupBySection(items);
+      <div className="flex gap-6">
+        {/* Left: Editor */}
+        <div className={`w-full space-y-2 min-w-0 transition-all duration-300 ${previewExpanded ? 'xl:w-[30%]' : 'xl:w-[55%]'}`}>
+          {pages.map((page) => {
+            const isExpanded = expandedPages.has(page);
+            const items = contentByPage[page];
+            const sections = groupBySection(items);
 
-          return (
-            <div key={page} className="bg-white rounded-xl border border-gray-200">
-              <button
-                onClick={() => togglePage(page)}
-                className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    {PAGE_LABELS[page] || page}
-                  </h2>
-                  <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
-                    {items.length} items
-                  </span>
-                </div>
-              </button>
+            return (
+              <div key={page} className="bg-white rounded-xl border border-gray-200">
+                <button
+                  onClick={() => togglePage(page)}
+                  className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      {PAGE_LABELS[page] || page}
+                    </h2>
+                    <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+                      {items.length} items
+                    </span>
+                  </div>
+                  {previewPage === page && (
+                    <span className="hidden xl:flex items-center gap-1 text-xs text-primary">
+                      <Eye size={14} />
+                      Preview
+                    </span>
+                  )}
+                </button>
 
-              {isExpanded && (
-                <div className="px-6 pb-6 space-y-6">
-                  {Object.entries(sections).map(([section, sectionItems]) => (
-                    <div key={section}>
-                      <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b border-gray-100 pb-2">
-                        {section}
-                      </h3>
-                      <div className="space-y-4">
-                        {sectionItems.map((item) => (
-                          <BilingualEditor
-                            key={item.id}
-                            label={`${item.key} (${item.type})`}
-                            valueEn={getItemValue(item, 'content_en')}
-                            valueAr={getItemValue(item, 'content_ar')}
-                            onChangeEn={(v) => handleChange(item, 'content_en', v)}
-                            onChangeAr={(v) => handleChange(item, 'content_ar', v)}
-                            type={item.type}
-                          />
-                        ))}
+                {isExpanded && (
+                  <div className="px-6 pb-6 space-y-6">
+                    {Object.entries(sections).map(([section, sectionItems]) => (
+                      <div key={section}>
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b border-gray-100 pb-2">
+                          {section}
+                        </h3>
+                        <div className="space-y-4">
+                          {sectionItems.map((item) => (
+                            <BilingualEditor
+                              key={item.id}
+                              label={`${item.key} (${item.type})`}
+                              valueEn={getItemValue(item, 'content_en')}
+                              valueAr={getItemValue(item, 'content_ar')}
+                              onChangeEn={(v) => handleChange(item, 'content_en', v)}
+                              onChangeAr={(v) => handleChange(item, 'content_ar', v)}
+                              type={item.type}
+                            />
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Right: Live Preview */}
+        <div className={`hidden xl:block transition-all duration-300 ${previewExpanded ? 'xl:w-[70%]' : 'xl:w-[45%]'}`}>
+          <div className="sticky top-24">
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden" style={{ height: 'calc(100vh - 8rem)' }}>
+              {/* Preview header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50">
+                <div className="flex items-center gap-2">
+                  <Eye size={16} className="text-gray-500" />
+                  <span className="text-sm font-medium text-gray-700">
+                    {PAGE_LABELS[previewPage] || previewPage}
+                  </span>
+                  <span className="text-xs text-gray-400">{previewUrl}</span>
                 </div>
-              )}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPreviewExpanded((v) => !v)}
+                    className="text-gray-400 hover:text-primary transition-colors"
+                    title={previewExpanded ? 'Collapse preview' : 'Expand preview'}
+                  >
+                    {previewExpanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                  </button>
+                  <a
+                    href={previewUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-primary transition-colors"
+                    title="Open in new tab"
+                  >
+                    <ExternalLink size={14} />
+                  </a>
+                </div>
+              </div>
+              {/* Iframe with scroll-trap overlay */}
+              <div
+                className="relative"
+                style={{ height: 'calc(100% - 3rem)' }}
+                onMouseLeave={() => setPreviewInteractive(false)}
+              >
+                {!previewInteractive && (
+                  <div
+                    className="absolute inset-0 z-10 cursor-pointer"
+                    onClick={() => setPreviewInteractive(true)}
+                  />
+                )}
+                <iframe
+                  key={iframeKey}
+                  src={previewUrl}
+                  className="w-full h-full border-0"
+                  title={`Preview: ${PAGE_LABELS[previewPage] || previewPage}`}
+                />
+              </div>
             </div>
-          );
-        })}
+          </div>
+        </div>
       </div>
     </AdminLayout>
   );
