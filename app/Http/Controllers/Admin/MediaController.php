@@ -91,7 +91,21 @@ class MediaController extends Controller
         ]);
 
         $media = Media::findOrFail($id);
+        $oldFolder = $media->folder;
+
         $media->update($request->only(['alt_text_en', 'alt_text_ar', 'folder']));
+
+        // If the folder changed and the old folder is now empty, preserve it in custom folders
+        if ($request->filled('folder') && $request->folder !== $oldFolder) {
+            $remaining = Media::where('folder', $oldFolder)->count();
+            if ($remaining === 0) {
+                $customFolders = $this->getCustomFolders();
+                if (!in_array($oldFolder, $customFolders)) {
+                    $customFolders[] = $oldFolder;
+                    $this->saveCustomFolders($customFolders);
+                }
+            }
+        }
 
         return redirect()->back()->with('success', 'Media updated successfully.');
     }
