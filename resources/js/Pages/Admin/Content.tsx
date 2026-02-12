@@ -52,6 +52,17 @@ const KEY_LABELS: Record<string, string> = {
   certified_description: 'وصف المنتجات المعتمدة',
 };
 
+// Section display order per page (matches website layout)
+const SECTION_ORDER: Record<string, string[]> = {
+  home: ['hero', 'about', 'features', 'products', 'certificates', 'cta', 'newsletter'],
+  about: ['overview', 'vision', 'mission', 'timeline', 'governance'],
+  recycling: ['overview', 'process'],
+  quality: ['overview', 'certifications'],
+  certificates: ['overview', 'esg', 'quality', 'governance'],
+  career: ['overview', 'open_application'],
+  contact: ['overview', 'form'],
+};
+
 const PAGE_URLS: Record<string, string> = {
   home: '/',
   about: '/about',
@@ -99,6 +110,11 @@ export default function Content({ content: contentByPage }: Props) {
     });
   };
 
+  const selectPage = (page: string) => {
+    setExpandedPages(new Set([page]));
+    setPreviewPage(page);
+  };
+
   const getItemValue = (item: SiteContent, field: 'content_en' | 'content_ar') => {
     if (editedItems[item.id]) return editedItems[item.id][field];
     return item[field];
@@ -138,14 +154,24 @@ export default function Content({ content: contentByPage }: Props) {
     });
   };
 
-  // Group content items by section within each page
-  const groupBySection = (items: SiteContent[]) => {
+  // Group content items by section within each page, ordered to match website layout
+  const groupBySection = (page: string, items: SiteContent[]) => {
     const sections: Record<string, SiteContent[]> = {};
     for (const item of items) {
       if (!sections[item.section]) sections[item.section] = [];
       sections[item.section].push(item);
     }
-    return sections;
+    const order = SECTION_ORDER[page];
+    if (!order) return sections;
+    const ordered: Record<string, SiteContent[]> = {};
+    for (const key of order) {
+      if (sections[key]) ordered[key] = sections[key];
+    }
+    // Append any sections not in the order list
+    for (const key of Object.keys(sections)) {
+      if (!ordered[key]) ordered[key] = sections[key];
+    }
+    return ordered;
   };
 
   const previewUrl = PAGE_URLS[previewPage] || '/';
@@ -172,13 +198,36 @@ export default function Content({ content: contentByPage }: Props) {
         </div>
       )}
 
+      {/* Quick page selector */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {pages.map((page) => {
+          const config = PAGE_CONFIG[page];
+          const isActive = expandedPages.has(page) && expandedPages.size === 1;
+          const Icon = config?.icon;
+          return (
+            <button
+              key={page}
+              onClick={() => selectPage(page)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+                isActive
+                  ? 'bg-primary text-white border-primary'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-primary hover:text-primary'
+              }`}
+            >
+              {Icon && <Icon size={14} />}
+              {config?.label || page}
+            </button>
+          );
+        })}
+      </div>
+
       <div className="flex gap-6">
         {/* Left: Editor */}
         <div className={`w-full space-y-2 min-w-0 transition-all duration-300 ${previewExpanded ? 'xl:w-[30%]' : 'xl:w-[55%]'}`}>
           {pages.map((page) => {
             const isExpanded = expandedPages.has(page);
             const items = contentByPage[page];
-            const sections = groupBySection(items);
+            const sections = groupBySection(page, items);
 
             return (
               <div key={page} className="bg-white rounded-xl border border-gray-200">
