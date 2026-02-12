@@ -15,6 +15,43 @@ const PAGE_CONFIG: Record<string, { label: string; labelAr: string; icon: Lucide
   contact: { label: 'Contact', labelAr: 'تواصل معنا', icon: Mail },
 };
 
+const SECTION_LABELS: Record<string, string> = {
+  hero: 'القسم الرئيسي',
+  features: 'المميزات',
+  about: 'من نحن',
+  products: 'المنتجات',
+  certificates: 'الشهادات',
+  newsletter: 'النشرة الإخبارية',
+  cta: 'دعوة للتواصل',
+  overview: 'نظرة عامة',
+  vision: 'الرؤية',
+  mission: 'المهمة',
+  timeline: 'المسيرة',
+  governance: 'الحوكمة',
+  process: 'العملية',
+  certifications: 'الاعتمادات',
+  esg: 'البيئة والمجتمع والحوكمة',
+  quality: 'الجودة',
+  open_application: 'تقديم طلب مفتوح',
+  form: 'النموذج',
+};
+
+const KEY_LABELS: Record<string, string> = {
+  title: 'العنوان',
+  subtitle: 'العنوان الفرعي',
+  description: 'الوصف',
+  cta_text: 'نص الزر',
+  button: 'الزر',
+  submit_text: 'نص الإرسال',
+  success_message: 'رسالة النجاح',
+  quality_title: 'عنوان الجودة',
+  quality_description: 'وصف الجودة',
+  sustainability_title: 'عنوان الاستدامة',
+  sustainability_description: 'وصف الاستدامة',
+  certified_title: 'عنوان المنتجات المعتمدة',
+  certified_description: 'وصف المنتجات المعتمدة',
+};
+
 const PAGE_URLS: Record<string, string> = {
   home: '/',
   about: '/about',
@@ -177,14 +214,17 @@ export default function Content({ content: contentByPage }: Props) {
                   <div className="px-6 pb-6 space-y-6">
                     {Object.entries(sections).map(([section, sectionItems]) => (
                       <div key={section}>
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b border-gray-100 pb-2">
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b border-gray-100 pb-2 flex items-center gap-2">
                           {section}
+                          {SECTION_LABELS[section] && (
+                            <span className="text-xs text-gray-400 font-normal normal-case" dir="rtl">{SECTION_LABELS[section]}</span>
+                          )}
                         </h3>
                         <div className="space-y-4">
                           {sectionItems.map((item) => (
                             <BilingualEditor
                               key={item.id}
-                              label={`${item.key} (${item.type})`}
+                              label={`${item.key}${KEY_LABELS[item.key] ? ` / ${KEY_LABELS[item.key]}` : ''} (${item.type})`}
                               valueEn={getItemValue(item, 'content_en')}
                               valueAr={getItemValue(item, 'content_ar')}
                               onChangeEn={(v) => handleChange(item, 'content_en', v)}
