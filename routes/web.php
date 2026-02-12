@@ -85,6 +85,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
     // Media
     Route::get('/media', [AdminMediaController::class, 'index'])->name('media.index');
+    Route::get('/media/json', [AdminMediaController::class, 'jsonIndex'])->name('media.json');
+    Route::post('/media/json', [AdminMediaController::class, 'storeJson'])->name('media.store-json');
     Route::post('/media', [AdminMediaController::class, 'store'])->name('media.store');
     Route::put('/media/{id}', [AdminMediaController::class, 'update'])->name('media.update');
     Route::delete('/media/{id}', [AdminMediaController::class, 'destroy'])->name('media.destroy');

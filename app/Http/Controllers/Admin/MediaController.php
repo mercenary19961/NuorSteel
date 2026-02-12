@@ -89,4 +89,59 @@ class MediaController extends Controller
 
         return redirect()->back()->with('success', 'Media deleted successfully.');
     }
+
+    public function jsonIndex(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $query = Media::query();
+
+        if ($request->filled('folder')) {
+            $query->where('folder', $request->folder);
+        }
+
+        if ($request->filled('type')) {
+            if ($request->type === 'image') {
+                $query->where('mime_type', 'like', 'image/%');
+            } elseif ($request->type === 'pdf') {
+                $query->where('mime_type', 'application/pdf');
+            }
+        }
+
+        if ($request->filled('search')) {
+            $query->where('original_filename', 'like', '%' . $request->search . '%');
+        }
+
+        $media = $query->orderByDesc('created_at')->paginate(24);
+        $folders = Media::distinct()->pluck('folder');
+
+        return response()->json([
+            'media' => $media,
+            'folders' => $folders,
+        ]);
+    }
+
+    public function storeJson(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:jpeg,jpg,png,webp,pdf|mimetypes:image/jpeg,image/png,image/webp,application/pdf|max:10240',
+            'folder' => ['nullable', 'string', 'max:50', 'regex:/^[a-zA-Z0-9_-]+$/'],
+        ]);
+
+        $file = $request->file('file');
+        $folder = $request->input('folder', 'general');
+
+        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs("media/{$folder}", $filename);
+
+        $media = Media::create([
+            'filename' => $filename,
+            'original_filename' => $file->getClientOriginalName(),
+            'path' => $path,
+            'mime_type' => $file->getMimeType(),
+            'size' => $file->getSize(),
+            'folder' => $folder,
+            'uploaded_by' => $request->user()->id,
+        ]);
+
+        return response()->json(['media' => $media]);
+    }
 }
