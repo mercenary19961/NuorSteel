@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductSpecification;
+use App\Services\UndoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -14,6 +15,9 @@ use Inertia\Response;
 
 class ProductController extends Controller
 {
+    public function __construct(
+        protected UndoService $undoService,
+    ) {}
     public function index(Request $request): Response
     {
         $query = Product::with('featuredImage');
@@ -103,12 +107,30 @@ class ProductController extends Controller
 
         $product = Product::findOrFail($id);
 
-        $data = $request->only([
-            'name_en', 'name_ar', 'slug', 'short_description_en', 'short_description_ar',
+        $trackedFields = [
+            'name_en', 'name_ar', 'short_description_en', 'short_description_ar',
             'description_en', 'description_ar', 'category', 'featured_image_id',
             'is_active', 'is_featured', 'sort_order',
-        ]);
+        ];
+
+        $oldData = ['id' => $product->id];
+        foreach ($trackedFields as $field) {
+            $oldData[$field] = (string) ($product->$field ?? '');
+        }
+
+        $data = $request->only(array_merge($trackedFields, ['slug']));
         $data['updated_by'] = $request->user()->id;
+
+        $newData = ['id' => $product->id];
+        foreach ($trackedFields as $field) {
+            $newData[$field] = (string) ($data[$field] ?? '');
+        }
+
+        $hasChanges = $this->undoService->saveState('product', $product->id, $oldData, $newData);
+
+        if (!$hasChanges) {
+            return redirect()->back()->with('success', 'No changes detected.');
+        }
 
         $product->update($data);
 

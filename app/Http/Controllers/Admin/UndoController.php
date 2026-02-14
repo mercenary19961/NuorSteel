@@ -3,13 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Setting;
-use App\Models\SiteContent;
 use App\Services\UndoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class UndoController extends Controller
 {
@@ -42,17 +38,13 @@ class UndoController extends Controller
             return redirect()->back()->with('error', 'No undo state available.');
         }
 
-        $redirectUrl = match ($model) {
-            'settings' => $this->restoreSettings($oldData),
-            'site_content' => $this->restoreSiteContent($oldData),
-            default => null,
-        };
+        $redirectUrl = $this->undoService->restoreFromSnapshot($model, $oldData);
 
         if ($redirectUrl === null) {
             return redirect()->back()->with('error', 'Unknown model type.');
         }
 
-        if (!is_string($redirectUrl) || trim($redirectUrl) === '') {
+        if (trim($redirectUrl) === '') {
             return redirect()->back()->with('error', 'Restore failed: invalid redirect URL.');
         }
 
@@ -70,32 +62,5 @@ class UndoController extends Controller
         $this->undoService->clear($model, $id);
 
         return response()->json(['cleared' => true]);
-    }
-
-    /**
-     * Restore settings from saved state.
-     */
-    protected function restoreSettings(array $oldData): string
-    {
-        $userId = Auth::id();
-        foreach ($oldData as $key => $value) {
-            Setting::set($key, $value, $userId);
-        }
-
-        return '/admin/settings';
-    }
-
-    protected function restoreSiteContent(array $oldData): string
-    {
-        $userId = Auth::id();
-        foreach ($oldData as $id => $fields) {
-            SiteContent::where('id', $id)->update([
-                'content_en' => $fields['content_en'] ?? null,
-                'content_ar' => $fields['content_ar'] ?? null,
-                'updated_by' => $userId,
-            ]);
-        }
-
-        return '/admin/content';
     }
 }

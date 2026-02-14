@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\NewsletterController as AdminNewsletterController
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\UndoController as AdminUndoController;
+use App\Http\Controllers\Admin\ChangeLogController as AdminChangeLogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -164,5 +165,9 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::put('/users/{id}', [AdminUserController::class, 'update'])->name('users.update');
         Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
         Route::post('/users/{id}/toggle', [AdminUserController::class, 'toggleStatus'])->name('users.toggle');
+
+        // Change Log
+        Route::get('/change-log', [AdminChangeLogController::class, 'index'])->name('change-log.index');
+        Route::post('/change-log/{id}/revert', [AdminChangeLogController::class, 'revert'])->name('change-log.revert');
     });
 });

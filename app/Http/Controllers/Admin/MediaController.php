@@ -7,6 +7,7 @@ use App\Models\Media;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\Setting;
+use App\Services\UndoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -15,6 +16,9 @@ use Inertia\Response;
 
 class MediaController extends Controller
 {
+    public function __construct(
+        protected UndoService $undoService,
+    ) {}
     public function index(Request $request): Response
     {
         $query = Media::query();
@@ -125,6 +129,17 @@ class MediaController extends Controller
 
         $media = Media::findOrFail($id);
         $oldFolder = $media->folder;
+
+        $trackedFields = ['alt_text_en', 'alt_text_ar', 'folder'];
+
+        $oldData = ['id' => $media->id];
+        $newData = ['id' => $media->id];
+        foreach ($trackedFields as $field) {
+            $oldData[$field] = (string) ($media->$field ?? '');
+            $newData[$field] = (string) ($request->input($field) ?? '');
+        }
+
+        $this->undoService->saveState('media', $media->id, $oldData, $newData);
 
         $media->update($request->only(['alt_text_en', 'alt_text_ar', 'folder']));
 

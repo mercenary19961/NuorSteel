@@ -107,6 +107,17 @@ export interface UndoMeta {
   changes: UndoFieldChange[];
 }
 
+// Change Log
+export interface ChangeLog {
+  id: number;
+  model_type: string;
+  model_id: string;
+  changes: UndoFieldChange[];
+  changed_by: number;
+  user?: Pick<User, 'id' | 'name'>;
+  created_at: string;
+}
+
 // Products
 export interface Product {
   id: number;

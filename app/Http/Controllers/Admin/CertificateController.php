@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Certificate;
+use App\Services\UndoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -12,6 +13,9 @@ use Inertia\Response;
 
 class CertificateController extends Controller
 {
+    public function __construct(
+        protected UndoService $undoService,
+    ) {}
     public function index(Request $request): Response
     {
         $query = Certificate::with('thumbnail');
@@ -102,6 +106,21 @@ class CertificateController extends Controller
         ]);
 
         $certificate = Certificate::findOrFail($id);
+
+        // Track metadata changes (file_path excluded — old file is deleted on replace)
+        $trackedFields = [
+            'title_en', 'title_ar', 'category', 'description_en', 'description_ar',
+            'thumbnail_id', 'issue_date', 'expiry_date', 'is_active', 'sort_order',
+        ];
+
+        $oldData = ['id' => $certificate->id];
+        $newData = ['id' => $certificate->id];
+        foreach ($trackedFields as $field) {
+            $oldData[$field] = (string) ($certificate->$field ?? '');
+            $newData[$field] = (string) ($request->input($field) ?? '');
+        }
+
+        $this->undoService->saveState('certificate', $certificate->id, $oldData, $newData);
 
         $data = $request->except('file');
         $data['updated_by'] = $request->user()->id;

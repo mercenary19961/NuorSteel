@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CareerListing;
 use App\Models\CareerApplication;
+use App\Services\UndoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -14,6 +15,9 @@ use Inertia\Response;
 
 class CareerController extends Controller
 {
+    public function __construct(
+        protected UndoService $undoService,
+    ) {}
     public function index(Request $request): Response
     {
         $query = CareerListing::withCount('applications');
@@ -92,12 +96,27 @@ class CareerController extends Controller
 
         $listing = CareerListing::findOrFail($id);
 
-        $data = $request->only([
-            'title_en', 'title_ar', 'slug', 'description_en', 'description_ar',
+        $trackedFields = [
+            'title_en', 'title_ar', 'description_en', 'description_ar',
             'requirements_en', 'requirements_ar', 'location', 'employment_type',
             'status', 'expires_at',
-        ]);
+        ];
+
+        $oldData = ['id' => $listing->id];
+        $newData = ['id' => $listing->id];
+        foreach ($trackedFields as $field) {
+            $oldData[$field] = (string) ($listing->$field ?? '');
+            $newData[$field] = (string) ($request->input($field) ?? '');
+        }
+
+        $data = $request->only(array_merge($trackedFields, ['slug']));
         $data['updated_by'] = $request->user()->id;
+
+        $hasChanges = $this->undoService->saveState('career', $listing->id, $oldData, $newData);
+
+        if (!$hasChanges) {
+            return redirect()->back()->with('success', 'No changes detected.');
+        }
 
         $listing->update($data);
 
@@ -142,6 +161,20 @@ class CareerController extends Controller
         ]);
 
         $application = CareerApplication::findOrFail($id);
+
+        $oldData = [
+            'id' => $application->id,
+            'status' => (string) ($application->status ?? ''),
+            'admin_notes' => (string) ($application->admin_notes ?? ''),
+        ];
+        $newData = [
+            'id' => $application->id,
+            'status' => (string) ($request->status ?? ''),
+            'admin_notes' => (string) ($request->admin_notes ?? ''),
+        ];
+
+        $this->undoService->saveState('application', $application->id, $oldData, $newData);
+
         $application->update([
             'status' => $request->status,
             'admin_notes' => $request->admin_notes,

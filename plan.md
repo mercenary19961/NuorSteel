@@ -1,153 +1,159 @@
-# Admin Panel Implementation Plan
+# Plan: Change Log + Extended Change Tracking
 
 ## Overview
-Build the full admin panel frontend for Nuor Steel. The backend API is already complete with all endpoints defined in `routes/api.php`. The frontend needs: admin layout, login, dashboard, and 11 CRUD/management pages.
 
-## File Structure
+Two parts:
+1. **Change Log page** — Persistent history of all changes, shown under System in the sidebar
+2. **Extend change tracking** — Add undo/snapshot support to Products, Media, Certificates, Job Listings, and Applications (currently only Settings and Site Content have it)
 
+Every tracked section automatically feeds into the Change Log page.
+
+---
+
+## Part A: Change Log Infrastructure
+
+### Step 1: Database Migration — `change_logs` table
+
+Create `database/migrations/2026_02_14_000001_create_change_logs_table.php`:
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| id | bigint PK | Auto-increment |
+| model_type | string, indexed | 'settings', 'site_content', 'product', etc. |
+| model_id | string | 'all' (batch) or specific record ID |
+| changes | JSON | `[{field, label, old, new}]` |
+| old_data | JSON | Full snapshot for reverting |
+| new_data | JSON | What was applied |
+| changed_by | FK → users | Who made the change |
+| created_at | timestamp | When (no updated_at — immutable) |
+
+### Step 2: Eloquent Model — `ChangeLog`
+
+Create `app/Models/ChangeLog.php`:
+- `belongsTo(User::class, 'changed_by')`, JSON casts, no `updated_at`
+
+### Step 3: Modify `UndoService` — Persist + Shared Restore
+
+Modify `app/Services/UndoService.php`:
+
+**A) Auto-persist** — After saving to session, also `ChangeLog::create(...)`. Any section using `saveState()` automatically gets persistent history.
+
+**B) Extract restore logic** — Move restore methods from `UndoController` into `UndoService::restoreFromSnapshot($modelType, $oldData): string`. This shared method is called by both `UndoController` (session undo) and `ChangeLogController` (history revert).
+
+**C) Add field configs** — Extend `getFieldConfig()` with labels for products, media, certificates, careers, applications.
+
+### Step 4: Refactor `UndoController`
+
+Remove `restoreSettings()` and `restoreSiteContent()` — call `$this->undoService->restoreFromSnapshot()` instead.
+
+### Step 5: New `ChangeLogController`
+
+Create `app/Http/Controllers/Admin/ChangeLogController.php`:
+- **`index()`** — Paginated (20/page), eager-loads user, filters (model_type, changed_by), passes users list + section labels
+- **`revert($id)`** — Restore from snapshot, log the revert as a new entry, redirect with flash
+
+### Step 6: Routes
+
+Add under admin-only group in `routes/web.php`:
 ```
-frontend/src/
-├── components/
-│   ├── layout/
-│   │   ├── AdminLayout.tsx      ← Sidebar + header shell
-│   │   └── AdminSidebar.tsx     ← Collapsible nav sidebar
-│   ├── admin/
-│   │   ├── DataTable.tsx        ← Reusable table with sort/search/pagination
-│   │   ├── StatsCard.tsx        ← Dashboard stat widget
-│   │   ├── StatusBadge.tsx      ← Colored status pills
-│   │   ├── BilingualEditor.tsx  ← Side-by-side EN/AR text inputs
-│   │   ├── ConfirmDialog.tsx    ← Delete/action confirmation modal
-│   │   ├── Pagination.tsx       ← Page controls
-│   │   ├── FileUpload.tsx       ← Drag & drop file upload
-│   │   └── Toast.tsx            ← Success/error notifications
-│   └── ui/                      ← (existing utils.ts)
-├── hooks/
-│   ├── useDashboard.ts
-│   ├── useProducts.ts
-│   ├── useCertificates.ts
-│   ├── useCareers.ts
-│   ├── useContacts.ts
-│   ├── useNewsletter.ts
-│   ├── useMedia.ts
-│   ├── useContent.ts
-│   ├── useTimeline.ts
-│   ├── useSettings.ts
-│   └── useUsers.ts
-├── pages/
-│   └── admin/
-│       ├── LoginPage.tsx
-│       ├── DashboardPage.tsx
-│       ├── ContentPage.tsx
-│       ├── TimelinePage.tsx
-│       ├── MediaPage.tsx
-│       ├── ProductsPage.tsx
-│       ├── ProductFormPage.tsx
-│       ├── CertificatesPage.tsx
-│       ├── CertificateFormPage.tsx
-│       ├── CareersPage.tsx
-│       ├── CareerFormPage.tsx
-│       ├── ApplicationsPage.tsx
-│       ├── ContactsPage.tsx
-│       ├── NewsletterPage.tsx
-│       ├── SettingsPage.tsx
-│       └── UsersPage.tsx
-└── types/index.ts               ← Add admin-specific types
+GET  /admin/change-log          → index
+POST /admin/change-log/{id}/revert → revert
 ```
 
-## Phase 0: Backend Security Hardening
+### Step 7: TypeScript Type
 
-**Goal:** Lock down the API before building the frontend.
+Add `ChangeLog` interface to `resources/js/types/index.ts`.
 
-1. **Rate limit login** — Add `throttle:5,1` middleware to `POST /v1/auth/login` (5 attempts per minute)
-2. **Token expiration** — Set `sanctum.expiration` to `480` (8 hours) so tokens auto-expire
-3. **CORS config** — Verify `config/cors.php` allows only the SPA origin (`localhost:5173` in dev)
-4. **Sanitize file uploads** — Validate MIME types server-side (not just extension) in all upload controllers
-5. **Strip sensitive data** — Ensure no API response leaks password hashes, internal paths, or tokens
+### Step 8: Frontend Page — `ChangeLog.tsx`
 
-## Implementation Phases
+Create `resources/js/Pages/Admin/ChangeLog.tsx`:
+- Filters: Section dropdown + User dropdown
+- DataTable: Section badge, User name, Date, Change count, Actions (View + Revert)
+- Detail modal: field-level diff (old → new)
+- Revert confirmation dialog
+- Pagination
 
-### Phase 1: Foundation (Admin Layout + Login + Dashboard + Shared Components)
+### Step 9: Sidebar
 
-**Goal:** Get the admin shell working with auth-protected routing, login, and a dashboard.
+Add `{ label: 'Change Log', path: '/admin/change-log', icon: <History />, adminOnly: true }` to System group in `AdminSidebar.tsx`.
 
-1. **Types** — Add types to `types/index.ts`:
-   - Product, ProductImage, ProductSpecification
-   - Certificate, TimelineEvent, CareerListing, CareerApplication
-   - ContactSubmission, NewsletterSubscriber, Media, Setting, SiteContent
-   - DashboardData
+---
 
-2. **Shared Components** (build once, reuse everywhere):
-   - `AdminSidebar.tsx` — Collapsible sidebar with nav grouped by section, role-aware (hide Users/Settings/Newsletter for editors)
-   - `AdminLayout.tsx` — Sidebar + top bar (user info, logout) + `<Outlet />`, wraps with auth guard (redirect to /admin/login if not authenticated)
-   - `DataTable.tsx` — Props: columns, data, searchable, sortable, actions. Renders table with header/rows/empty state
-   - `StatsCard.tsx` — Icon + label + value + optional trend
-   - `StatusBadge.tsx` — Colored pill based on status string
-   - `ConfirmDialog.tsx` — Modal overlay with title/message/confirm/cancel
-   - `Pagination.tsx` — Previous/Next + page numbers from PaginatedResponse meta
-   - `Toast.tsx` — Simple toast context/provider for notifications
+## Part B: Extend Change Tracking to More Sections
 
-3. **Login Page** (`LoginPage.tsx`):
-   - Email + password form with react-hook-form + zod validation
-   - Uses existing `useAuth().login()`
-   - Redirects to `/admin` on success
-   - Error display for invalid credentials
+For each section below, the pattern is the same:
+1. Inject `UndoService` in the controller constructor
+2. Snapshot current values before update
+3. Call `saveState()` (auto-persists to DB + session)
+4. Guard: return early if no changes
+5. Apply the actual update
 
-4. **Dashboard Page** (`DashboardPage.tsx`):
-   - `useDashboard` hook — fetches `/admin/dashboard`
-   - 6 stats cards (products, active products, open jobs, new apps, unread contacts, subscribers)
-   - Recent applications table (last 5)
-   - Recent contacts table (last 5)
+### B1: Products (`ProductController::update`)
 
-5. **Update App.tsx routing**:
-   - Import AdminLayout and admin pages
-   - Nest admin routes under `<Route element={<AdminLayout />}>`
-   - Keep `/admin/login` outside admin layout
+**Tracked fields:** `name_en`, `name_ar`, `short_description_en`, `short_description_ar`, `description_en`, `description_ar`, `category`, `is_active`, `is_featured`, `sort_order`, `featured_image_id`
 
-### Phase 2: Content Management (Content Editor + Timeline + Media)
+**Restore:** Update product with old values + `updated_by`.
 
-1. **useContent hook** — CRUD for site_content (`/admin/content`)
-2. **ContentPage.tsx** — Grouped by page, expandable sections, side-by-side EN/AR editor using `BilingualEditor.tsx`
-3. **BilingualEditor.tsx** — Two textarea/input fields side by side (EN left LTR, AR right RTL), synced save
-4. **useTimeline hook** — CRUD for timeline events (`/admin/timeline`)
-5. **TimelinePage.tsx** — List with drag-to-reorder, add/edit modal form
-6. **useMedia hook** — Upload, list, delete for media (`/admin/media`)
-7. **MediaPage.tsx** — Grid view with folder filter, upload button, edit alt text modal
-8. **FileUpload.tsx** — Drag & drop zone, progress indicator, file type validation
+### B2: Media (`MediaController::update`)
 
-### Phase 3: Business Data (Products + Certificates)
+**Tracked fields:** `alt_text_en`, `alt_text_ar`, `folder`
 
-1. **useProducts hook** — CRUD + image management + specs (`/admin/products`)
-2. **ProductsPage.tsx** — Data table with category filter, active/inactive toggle, search
-3. **ProductFormPage.tsx** — Create/edit form with bilingual fields, image gallery upload, specifications table
-4. **useCertificates hook** — CRUD (`/admin/certificates`)
-5. **CertificatesPage.tsx** — Data table grouped by category (ESG/Quality/Governance)
-6. **CertificateFormPage.tsx** — Create/edit with PDF upload, category picker, bilingual name/description
+**Restore:** Update media with old values. Folder change restore should work the same as a normal folder move.
 
-### Phase 4: Careers + Submissions (Careers + Applications + Contacts)
+### B3: Certificates (`CertificateController::update`)
 
-1. **useCareers hook** — CRUD for listings (`/admin/careers`)
-2. **CareersPage.tsx** — Data table with status filter (draft/open/closed), expiry dates
-3. **CareerFormPage.tsx** — Create/edit job listing with bilingual fields, requirements, expiry date
-4. **ApplicationsPage.tsx** — Inbox-style list, status workflow (new → reviewed → shortlisted/rejected), CV download link
-5. **useContacts hook** — List, mark read, archive (`/admin/contacts`)
-6. **ContactsPage.tsx** — Inbox-style list, filter by type/read/archived, detail expand, attachment download
+**Tracked fields:** `title_en`, `title_ar`, `category`, `description_en`, `description_ar`, `thumbnail_id`, `issue_date`, `expiry_date`, `is_active`, `sort_order`
 
-### Phase 5: System (Newsletter + Settings + Users)
+**NOT tracked:** `file_path` — old file is deleted from disk when replaced, so it can't be restored.
 
-1. **useNewsletter hook** — List, toggle, delete, export (`/admin/newsletter`)
-2. **NewsletterPage.tsx** — Subscriber list with stats, export CSV button, toggle active (admin-only page)
-3. **useSettings hook** — Get/update settings (`/admin/settings`)
-4. **SettingsPage.tsx** — Grouped form (company info, contact info, social links, email recipients) (admin-only page)
-5. **useUsers hook** — CRUD for users (`/admin/users`)
-6. **UsersPage.tsx** — User list, create/edit modal, role assignment, activate/deactivate (admin-only page)
+**Restore:** Update certificate metadata with old values + `updated_by`.
 
-## Key Patterns
+### B4: Job Listings (`CareerController::update`)
 
-- **Auth Guard:** `AdminLayout` checks `useAuth().isAuthenticated` and redirects to login if false. Shows loading spinner while checking auth state.
-- **Role Guard:** `RequireAdmin` wrapper component checks `user.role === 'admin'`, redirects editors to `/admin` dashboard with an unauthorized toast
-- **API Hooks:** Each `use*.ts` hook uses React Query (`useQuery`, `useMutation`) with `apiClient` from `axios.ts`
-- **Forms:** React Hook Form + Zod schemas for all create/edit forms. Zod validates on client, server validates again.
-- **Tables:** All list pages use `DataTable` with column definitions, search, and pagination
-- **Toast:** Success/error notifications after mutations via toast context
-- **Bilingual:** All content forms use `BilingualEditor` for EN/AR fields
-- **Security:** Never trust client-side validation alone. All file uploads validated both client and server. No sensitive data in API responses. Rate limiting on login. Token expiration enforced.
+**Tracked fields:** `title_en`, `title_ar`, `description_en`, `description_ar`, `requirements_en`, `requirements_ar`, `location`, `employment_type`, `status`, `expires_at`
+
+**Restore:** Update listing with old values + `updated_by`.
+
+### B5: Applications (`CareerController::updateApplication`)
+
+**Tracked fields:** `status`, `admin_notes`
+
+**Restore:** Update application with old values + `reviewed_by`.
+
+---
+
+## UndoService Restore Methods (all in `restoreFromSnapshot`)
+
+```php
+match ($modelType) {
+    'settings'     => restoreSettings($oldData),
+    'site_content' => restoreSiteContent($oldData),
+    'product'      => restoreProduct($oldData),
+    'media'        => restoreMedia($oldData),
+    'certificate'  => restoreCertificate($oldData),
+    'career'       => restoreCareer($oldData),
+    'application'  => restoreApplication($oldData),
+};
+```
+
+Each returns the redirect URL for that section.
+
+---
+
+## Files Summary
+
+| File | Action |
+|------|--------|
+| `database/migrations/..._create_change_logs_table.php` | **Create** |
+| `app/Models/ChangeLog.php` | **Create** |
+| `app/Services/UndoService.php` | **Modify** (DB persist, shared restore, field configs) |
+| `app/Http/Controllers/Admin/UndoController.php` | **Modify** (use shared restore) |
+| `app/Http/Controllers/Admin/ChangeLogController.php` | **Create** |
+| `app/Http/Controllers/Admin/ProductController.php` | **Modify** (add snapshot) |
+| `app/Http/Controllers/Admin/MediaController.php` | **Modify** (add snapshot) |
+| `app/Http/Controllers/Admin/CertificateController.php` | **Modify** (add snapshot) |
+| `app/Http/Controllers/Admin/CareerController.php` | **Modify** (add snapshot to update + updateApplication) |
+| `routes/web.php` | **Modify** (add 2 routes) |
+| `resources/js/types/index.ts` | **Modify** (add ChangeLog type) |
+| `resources/js/Pages/Admin/ChangeLog.tsx` | **Create** |
+| `resources/js/Components/Layout/AdminSidebar.tsx` | **Modify** (add nav item) |
