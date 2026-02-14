@@ -102,6 +102,21 @@ export default function ChangeLog({ logs, users, sectionLabels, filters }: Props
 
   const PREVIEW_COUNT = 2;
 
+  const ChangeItem = ({ change }: { change: UndoFieldChange }) => (
+    <div className="py-1.5">
+      <p className="text-[11px] font-medium text-gray-400 mb-0.5">{change.label}</p>
+      <div className="flex items-center gap-1.5 text-xs">
+        <span className="text-red-500 line-through truncate" title={change.old || '(empty)'}>
+          {change.old || <span className="no-underline italic text-gray-300">(empty)</span>}
+        </span>
+        <ArrowRight size={10} className="text-gray-300 shrink-0" />
+        <span className="text-green-600 truncate" title={change.new || '(empty)'}>
+          {change.new || <span className="italic text-gray-300">(empty)</span>}
+        </span>
+      </div>
+    </div>
+  );
+
   return (
     <AdminLayout>
       <Head title="Change Log" />
@@ -139,13 +154,13 @@ export default function ChangeLog({ logs, users, sectionLabels, filters }: Props
         </select>
       </div>
 
-      {/* Cards */}
+      {/* Card grid */}
       {logs.data.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 px-6 py-12 text-center text-sm text-gray-500">
           No change history found.
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
           {logs.data.map((item) => {
             const isExpanded = expandedId === item.id;
             const isReverted = !!item.reverted_at;
@@ -156,106 +171,82 @@ export default function ChangeLog({ logs, users, sectionLabels, filters }: Props
             return (
               <div
                 key={item.id}
-                className={`bg-white rounded-xl border transition-colors ${
+                className={`bg-white rounded-xl border shadow-sm flex flex-col transition-all ${
                   isReverted
-                    ? 'border-gray-200 opacity-60'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-gray-200 opacity-50'
+                    : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
                 }`}
               >
                 {/* Card header */}
-                <div className="flex items-center gap-3 px-4 py-3">
-                  <span className={`shrink-0 inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full ${colorClass}`}>
-                    {sectionLabels[item.model_type] || item.model_type}
-                  </span>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-700">
+                <div className="flex items-start justify-between gap-2 px-4 pt-3 pb-2">
+                  <div className="min-w-0">
+                    <span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full ${colorClass}`}>
+                      {sectionLabels[item.model_type] || item.model_type}
+                    </span>
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      <span className="text-xs font-medium text-gray-600">
                         {item.user?.name || 'Unknown'}
                       </span>
-                      <span className="text-xs text-gray-400" title={new Date(item.created_at).toLocaleString()}>
+                      <span className="text-[11px] text-gray-400" title={new Date(item.created_at).toLocaleString()}>
                         {formatDate(item.created_at)}
                       </span>
-                      {isReverted && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full bg-gray-100 text-gray-500">
-                          <RotateCcw size={10} />
-                          Reverted{item.reverter ? ` by ${item.reverter.name}` : ''}
-                        </span>
-                      )}
                     </div>
                   </div>
 
-                  {!isReverted && (
+                  {!isReverted ? (
                     <button
                       onClick={() => setRevertTarget(item)}
-                      className="shrink-0 p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                      className="shrink-0 p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
                       title="Revert to previous state"
                     >
-                      <Undo2 size={16} />
+                      <Undo2 size={14} />
+                    </button>
+                  ) : (
+                    <span className="shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded-full bg-gray-100 text-gray-400">
+                      <RotateCcw size={9} />
+                      Reverted
+                    </span>
+                  )}
+                </div>
+
+                {/* Changes */}
+                <div className="px-4 pb-3 flex-1">
+                  <div className="divide-y divide-gray-100">
+                    {previewChanges.map((change: UndoFieldChange, idx: number) => (
+                      <ChangeItem key={idx} change={change} />
+                    ))}
+
+                    {isExpanded && item.changes.slice(PREVIEW_COUNT).map((change: UndoFieldChange, idx: number) => (
+                      <ChangeItem key={`exp-${idx}`} change={change} />
+                    ))}
+                  </div>
+
+                  {remainingCount > 0 && (
+                    <button
+                      onClick={() => setExpandedId(isExpanded ? null : item.id)}
+                      className="flex items-center gap-1 mt-1.5 text-[11px] text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      {isExpanded ? (
+                        <>
+                          <ChevronUp size={12} />
+                          Show less
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown size={12} />
+                          +{remainingCount} more
+                        </>
+                      )}
                     </button>
                   )}
                 </div>
 
-                {/* Change preview (always visible) */}
-                <div className="px-4 pb-3">
-                  <div className="space-y-1.5">
-                    {previewChanges.map((change: UndoFieldChange, idx: number) => (
-                      <div key={idx} className="flex items-center gap-2 text-sm">
-                        <span className="shrink-0 text-xs font-medium text-gray-400 w-32 truncate" title={change.label}>
-                          {change.label}
-                        </span>
-                        <span className="text-red-500 line-through truncate max-w-[35%]" title={change.old || '(empty)'}>
-                          {change.old || <span className="no-underline italic text-gray-300">(empty)</span>}
-                        </span>
-                        <ArrowRight size={11} className="text-gray-300 shrink-0" />
-                        <span className="text-green-600 truncate max-w-[35%]" title={change.new || '(empty)'}>
-                          {change.new || <span className="italic text-gray-300">(empty)</span>}
-                        </span>
-                      </div>
-                    ))}
+                {/* Reverted by footer */}
+                {isReverted && item.reverter && (
+                  <div className="px-4 py-2 border-t border-gray-100 text-[11px] text-gray-400">
+                    Reverted by {item.reverter.name}
                   </div>
-
-                  {/* Expand/collapse for remaining changes */}
-                  {remainingCount > 0 && (
-                    <>
-                      {isExpanded && (
-                        <div className="space-y-1.5 mt-1.5">
-                          {item.changes.slice(PREVIEW_COUNT).map((change: UndoFieldChange, idx: number) => (
-                            <div key={idx} className="flex items-center gap-2 text-sm">
-                              <span className="shrink-0 text-xs font-medium text-gray-400 w-32 truncate" title={change.label}>
-                                {change.label}
-                              </span>
-                              <span className="text-red-500 line-through truncate max-w-[35%]" title={change.old || '(empty)'}>
-                                {change.old || <span className="no-underline italic text-gray-300">(empty)</span>}
-                              </span>
-                              <ArrowRight size={11} className="text-gray-300 shrink-0" />
-                              <span className="text-green-600 truncate max-w-[35%]" title={change.new || '(empty)'}>
-                                {change.new || <span className="italic text-gray-300">(empty)</span>}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      <button
-                        onClick={() => setExpandedId(isExpanded ? null : item.id)}
-                        className="flex items-center gap-1 mt-2 text-xs text-gray-400 hover:text-gray-600 transition-colors"
-                      >
-                        {isExpanded ? (
-                          <>
-                            <ChevronUp size={13} />
-                            Show less
-                          </>
-                        ) : (
-                          <>
-                            <ChevronDown size={13} />
-                            +{remainingCount} more {remainingCount === 1 ? 'change' : 'changes'}
-                          </>
-                        )}
-                      </button>
-                    </>
-                  )}
-                </div>
+                )}
               </div>
             );
           })}
