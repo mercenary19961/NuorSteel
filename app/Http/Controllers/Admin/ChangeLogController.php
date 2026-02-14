@@ -30,7 +30,7 @@ class ChangeLogController extends Controller
 
     public function index(Request $request): Response
     {
-        $query = ChangeLog::with('user:id,name');
+        $query = ChangeLog::with(['user:id,name', 'reverter:id,name']);
 
         if ($request->filled('model_type')) {
             $query->where('model_type', $request->model_type);
@@ -58,28 +58,28 @@ class ChangeLogController extends Controller
     {
         $log = ChangeLog::findOrFail($id);
 
+        if ($log->reverted_at) {
+            return redirect()->back()->with('error', 'This change has already been reverted.');
+        }
+
         $redirectUrl = $this->undoService->restoreFromSnapshot($log->model_type, $log->old_data);
 
         if ($redirectUrl === null) {
             return redirect()->back()->with('error', 'Unknown model type.');
         }
 
-        // Log the revert itself as a new change log entry
-        $currentNewData = $log->old_data;
-        $currentOldData = $log->new_data;
-        $changes = $this->undoService->computeChanges($log->model_type, $currentOldData, $currentNewData);
+        // Mark the original entry as reverted (no new entry created)
+        $log->update([
+            'reverted_at' => now(),
+            'reverted_by' => Auth::id(),
+        ]);
 
-        if (!empty($changes)) {
-            ChangeLog::create([
-                'model_type' => $log->model_type,
-                'model_id' => $log->model_id,
-                'changes' => $changes,
-                'old_data' => $currentOldData,
-                'new_data' => $currentNewData,
-                'changed_by' => Auth::id(),
-            ]);
-        }
+        // Clear session-based undo for this section so the UndoButton
+        // doesn't show stale state after a change-log revert
+        $this->undoService->clear($log->model_type, $log->model_id);
 
-        return redirect('/admin/change-log')->with('success', self::SECTION_LABELS[$log->model_type] ?? $log->model_type . ' reverted successfully.');
+        $sectionName = self::SECTION_LABELS[$log->model_type] ?? $log->model_type;
+
+        return redirect('/admin/change-log')->with('success', $sectionName . ' reverted successfully.');
     }
 }

@@ -116,6 +116,9 @@ export interface ChangeLog {
   changed_by: number;
   user?: Pick<User, 'id' | 'name'>;
   created_at: string;
+  reverted_at: string | null;
+  reverted_by: number | null;
+  reverter?: Pick<User, 'id' | 'name'> | null;
 }
 
 // Products

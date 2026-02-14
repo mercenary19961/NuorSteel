@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
-import DataTable, { type Column } from '@/Components/Admin/DataTable';
 import Pagination from '@/Components/Admin/Pagination';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
-import { Eye, Undo2, X } from 'lucide-react';
+import { ChevronDown, ChevronUp, Undo2, ArrowRight, RotateCcw } from 'lucide-react';
 import type { PaginatedData, ChangeLog as ChangeLogType, UndoFieldChange, User } from '@/types';
 
 const SECTION_COLORS: Record<string, string> = {
@@ -28,7 +27,7 @@ interface Props {
 }
 
 export default function ChangeLog({ logs, users, sectionLabels, filters }: Props) {
-  const [viewItem, setViewItem] = useState<ChangeLogType | null>(null);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
   const [revertTarget, setRevertTarget] = useState<ChangeLogType | null>(null);
   const [reverting, setReverting] = useState(false);
 
@@ -101,45 +100,7 @@ export default function ChangeLog({ logs, users, sectionLabels, filters }: Props
     });
   };
 
-  const columns: Column<ChangeLogType>[] = [
-    {
-      key: 'model_type',
-      label: 'Section',
-      render: (item) => {
-        const colorClass = SECTION_COLORS[item.model_type] || 'bg-gray-100 text-gray-600';
-        return (
-          <span className={`inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full ${colorClass}`}>
-            {sectionLabels[item.model_type] || item.model_type}
-          </span>
-        );
-      },
-    },
-    {
-      key: 'changed_by',
-      label: 'Changed By',
-      render: (item) => (
-        <span className="text-sm text-gray-700">{item.user?.name || 'Unknown'}</span>
-      ),
-    },
-    {
-      key: 'created_at',
-      label: 'Date',
-      render: (item) => (
-        <span className="text-sm text-gray-500" title={new Date(item.created_at).toLocaleString()}>
-          {formatDate(item.created_at)}
-        </span>
-      ),
-    },
-    {
-      key: 'changes',
-      label: 'Changes',
-      render: (item) => (
-        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-700">
-          {item.changes.length} {item.changes.length === 1 ? 'field' : 'fields'}
-        </span>
-      ),
-    },
-  ];
+  const PREVIEW_COUNT = 2;
 
   return (
     <AdminLayout>
@@ -178,29 +139,128 @@ export default function ChangeLog({ logs, users, sectionLabels, filters }: Props
         </select>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={logs.data}
-        emptyMessage="No change history found."
-        actions={(item) => (
-          <>
-            <button
-              onClick={() => setViewItem(item)}
-              className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
-              title="View details"
-            >
-              <Eye size={16} />
-            </button>
-            <button
-              onClick={() => setRevertTarget(item)}
-              className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-              title="Revert to this state"
-            >
-              <Undo2 size={16} />
-            </button>
-          </>
-        )}
-      />
+      {/* Cards */}
+      {logs.data.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-200 px-6 py-12 text-center text-sm text-gray-500">
+          No change history found.
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {logs.data.map((item) => {
+            const isExpanded = expandedId === item.id;
+            const isReverted = !!item.reverted_at;
+            const colorClass = SECTION_COLORS[item.model_type] || 'bg-gray-100 text-gray-600';
+            const previewChanges = item.changes.slice(0, PREVIEW_COUNT);
+            const remainingCount = item.changes.length - PREVIEW_COUNT;
+
+            return (
+              <div
+                key={item.id}
+                className={`bg-white rounded-xl border transition-colors ${
+                  isReverted
+                    ? 'border-gray-200 opacity-60'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                {/* Card header */}
+                <div className="flex items-center gap-3 px-4 py-3">
+                  <span className={`shrink-0 inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full ${colorClass}`}>
+                    {sectionLabels[item.model_type] || item.model_type}
+                  </span>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-700">
+                        {item.user?.name || 'Unknown'}
+                      </span>
+                      <span className="text-xs text-gray-400" title={new Date(item.created_at).toLocaleString()}>
+                        {formatDate(item.created_at)}
+                      </span>
+                      {isReverted && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full bg-gray-100 text-gray-500">
+                          <RotateCcw size={10} />
+                          Reverted{item.reverter ? ` by ${item.reverter.name}` : ''}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {!isReverted && (
+                    <button
+                      onClick={() => setRevertTarget(item)}
+                      className="shrink-0 p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                      title="Revert to previous state"
+                    >
+                      <Undo2 size={16} />
+                    </button>
+                  )}
+                </div>
+
+                {/* Change preview (always visible) */}
+                <div className="px-4 pb-3">
+                  <div className="space-y-1.5">
+                    {previewChanges.map((change: UndoFieldChange, idx: number) => (
+                      <div key={idx} className="flex items-center gap-2 text-sm">
+                        <span className="shrink-0 text-xs font-medium text-gray-400 w-32 truncate" title={change.label}>
+                          {change.label}
+                        </span>
+                        <span className="text-red-500 line-through truncate max-w-[35%]" title={change.old || '(empty)'}>
+                          {change.old || <span className="no-underline italic text-gray-300">(empty)</span>}
+                        </span>
+                        <ArrowRight size={11} className="text-gray-300 shrink-0" />
+                        <span className="text-green-600 truncate max-w-[35%]" title={change.new || '(empty)'}>
+                          {change.new || <span className="italic text-gray-300">(empty)</span>}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Expand/collapse for remaining changes */}
+                  {remainingCount > 0 && (
+                    <>
+                      {isExpanded && (
+                        <div className="space-y-1.5 mt-1.5">
+                          {item.changes.slice(PREVIEW_COUNT).map((change: UndoFieldChange, idx: number) => (
+                            <div key={idx} className="flex items-center gap-2 text-sm">
+                              <span className="shrink-0 text-xs font-medium text-gray-400 w-32 truncate" title={change.label}>
+                                {change.label}
+                              </span>
+                              <span className="text-red-500 line-through truncate max-w-[35%]" title={change.old || '(empty)'}>
+                                {change.old || <span className="no-underline italic text-gray-300">(empty)</span>}
+                              </span>
+                              <ArrowRight size={11} className="text-gray-300 shrink-0" />
+                              <span className="text-green-600 truncate max-w-[35%]" title={change.new || '(empty)'}>
+                                {change.new || <span className="italic text-gray-300">(empty)</span>}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <button
+                        onClick={() => setExpandedId(isExpanded ? null : item.id)}
+                        className="flex items-center gap-1 mt-2 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                      >
+                        {isExpanded ? (
+                          <>
+                            <ChevronUp size={13} />
+                            Show less
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown size={13} />
+                            +{remainingCount} more {remainingCount === 1 ? 'change' : 'changes'}
+                          </>
+                        )}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {logs.last_page > 1 && (
         <div className="mt-4">
@@ -214,71 +274,11 @@ export default function ChangeLog({ logs, users, sectionLabels, filters }: Props
         </div>
       )}
 
-      {/* Detail Modal */}
-      {viewItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setViewItem(null)} />
-          <div className="relative bg-white rounded-xl shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">Change Details</h2>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  {sectionLabels[viewItem.model_type] || viewItem.model_type} &middot;{' '}
-                  {viewItem.user?.name || 'Unknown'} &middot;{' '}
-                  {formatDate(viewItem.created_at)}
-                </p>
-              </div>
-              <button onClick={() => setViewItem(null)} className="text-gray-400 hover:text-gray-600">
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="p-6">
-              <div className="space-y-3">
-                {viewItem.changes.map((change: UndoFieldChange, idx: number) => (
-                  <div key={idx} className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-xs font-medium text-gray-500 mb-1.5">{change.label}</p>
-                    <div className="space-y-1">
-                      {change.old ? (
-                        <p className="text-sm text-red-600 line-through">{change.old}</p>
-                      ) : (
-                        <p className="text-sm text-gray-400 italic">(empty)</p>
-                      )}
-                      {change.new ? (
-                        <p className="text-sm text-green-600">{change.new}</p>
-                      ) : (
-                        <p className="text-sm text-gray-400 italic">(empty)</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-gray-200">
-                <button
-                  onClick={() => setViewItem(null)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={() => { setRevertTarget(viewItem); setViewItem(null); }}
-                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-orange-700 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100"
-                >
-                  <Undo2 size={14} />
-                  Revert
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Revert Confirmation */}
       <ConfirmDialog
         open={!!revertTarget}
         title="Revert Changes"
-        message={`This will restore ${sectionLabels[revertTarget?.model_type ?? ''] || 'this section'} to its previous state (${revertTarget?.changes.length || 0} field${(revertTarget?.changes.length || 0) === 1 ? '' : 's'}). A new log entry will be created for this revert.`}
+        message={`This will restore ${sectionLabels[revertTarget?.model_type ?? ''] || 'this section'} to its previous state (${revertTarget?.changes.length || 0} field${(revertTarget?.changes.length || 0) === 1 ? '' : 's'}).`}
         confirmLabel="Revert"
         variant="warning"
         loading={reverting}

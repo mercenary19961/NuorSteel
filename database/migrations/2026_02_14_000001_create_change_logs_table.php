@@ -17,6 +17,8 @@ return new class extends Migration
             $table->json('new_data');
             $table->foreignId('changed_by')->constrained('users')->cascadeOnDelete();
             $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('reverted_at')->nullable();
+            $table->foreignId('reverted_by')->nullable()->constrained('users')->nullOnDelete();
         });
     }
 
