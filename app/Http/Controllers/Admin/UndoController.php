@@ -32,6 +32,19 @@ class UndoController extends Controller
      */
     public function restore(string $model, string $id): RedirectResponse
     {
+        // Check if this is a soft-delete undo
+        if ($this->undoService->isDeleteAction($model, $id)) {
+            $redirectUrl = $this->undoService->restoreDeleted($model, $id);
+
+            if ($redirectUrl === null) {
+                return redirect()->back()->with('error', 'Unknown model type.');
+            }
+
+            $this->undoService->clear($model, $id);
+
+            return redirect($redirectUrl)->with('success', ucfirst($model) . ' restored successfully.');
+        }
+
         $oldData = $this->undoService->getOldData($model, $id);
 
         if (!$oldData) {

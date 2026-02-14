@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\NewsletterSubscriber;
+use App\Services\UndoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,6 +12,10 @@ use Inertia\Response;
 
 class NewsletterController extends Controller
 {
+    public function __construct(
+        protected UndoService $undoService,
+    ) {}
+
     public function index(Request $request): Response
     {
         $query = NewsletterSubscriber::query();
@@ -22,6 +27,9 @@ class NewsletterController extends Controller
                 $query->inactive();
             }
         }
+
+        $lastId = session('undo_newsletter_last_id');
+        $undoMeta = $lastId ? $this->undoService->getUndoMeta('newsletter', $lastId) : null;
 
         return Inertia::render('Admin/Newsletter', [
             'subscribers' => $query->ordered()->paginate(25)->withQueryString(),
@@ -35,6 +43,8 @@ class NewsletterController extends Controller
                     ->pluck('count', 'source'),
             ],
             'filters' => $request->only(['active']),
+            'undoMeta' => $undoMeta,
+            'undoModelId' => $undoMeta ? (string) $lastId : null,
         ]);
     }
 
@@ -56,7 +66,12 @@ class NewsletterController extends Controller
 
     public function destroy(int $id): RedirectResponse
     {
-        NewsletterSubscriber::findOrFail($id)->delete();
+        $subscriber = NewsletterSubscriber::findOrFail($id);
+
+        $this->undoService->saveDeleteState('newsletter', $subscriber->id);
+        session()->put('undo_newsletter_last_id', $subscriber->id);
+
+        $subscriber->delete();
 
         return redirect()->back()->with('success', 'Subscriber removed.');
     }

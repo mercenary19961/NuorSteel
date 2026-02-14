@@ -4,15 +4,18 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import Pagination from '@/Components/Admin/Pagination';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import { Mail, Plus, Download, ToggleLeft, ToggleRight, Trash2, Users, UserCheck, UserX } from 'lucide-react';
-import type { NewsletterSubscriber, PaginatedData } from '@/types';
+import UndoButton from '@/Components/Admin/UndoButton';
+import type { NewsletterSubscriber, PaginatedData, UndoMeta } from '@/types';
 
 interface Props {
   subscribers: PaginatedData<NewsletterSubscriber>;
   stats: { total: number; active: number; inactive: number; by_source: Record<string, number> };
   filters: { active?: string };
+  undoMeta?: UndoMeta | null;
+  undoModelId?: string | null;
 }
 
-export default function Newsletter({ subscribers, stats, filters }: Props) {
+export default function Newsletter({ subscribers, stats, filters, undoMeta, undoModelId }: Props) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<NewsletterSubscriber | null>(null);
@@ -77,7 +80,10 @@ export default function Newsletter({ subscribers, stats, filters }: Props) {
             <h1 className="text-2xl font-bold text-gray-900">Newsletter</h1>
             <p className="text-sm text-gray-500 mt-1">Manage newsletter subscribers</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex items-center gap-2">
+            {undoMeta && undoModelId && (
+              <UndoButton modelType="newsletter" modelId={undoModelId} undoMeta={undoMeta} />
+            )}
             <button
               onClick={handleExport}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"

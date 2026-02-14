@@ -33,10 +33,15 @@ class ProductController extends Controller
         $products = $query->ordered()->paginate(15);
         $categories = Product::distinct()->whereNotNull('category')->pluck('category');
 
+        $lastId = session('undo_product_last_id');
+        $undoMeta = $lastId ? $this->undoService->getUndoMeta('product', $lastId) : null;
+
         return Inertia::render('Admin/Products/Index', [
             'products' => $products,
             'categories' => $categories,
             'filters' => $request->only(['category', 'active']),
+            'undoMeta' => $undoMeta,
+            'undoModelId' => $undoMeta ? (string) $lastId : null,
         ]);
     }
 
@@ -141,6 +146,10 @@ class ProductController extends Controller
     public function destroy(int $id): RedirectResponse
     {
         $product = Product::findOrFail($id);
+
+        $this->undoService->saveDeleteState('product', $product->id);
+        session()->put('undo_product_last_id', $product->id);
+
         $product->delete();
 
         return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');

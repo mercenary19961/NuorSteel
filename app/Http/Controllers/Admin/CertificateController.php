@@ -30,9 +30,14 @@ class CertificateController extends Controller
 
         $certificates = $query->ordered()->paginate(15);
 
+        $lastId = session('undo_certificate_last_id');
+        $undoMeta = $lastId ? $this->undoService->getUndoMeta('certificate', $lastId) : null;
+
         return Inertia::render('Admin/Certificates/Index', [
             'certificates' => $certificates,
             'filters' => $request->only(['category', 'active']),
+            'undoMeta' => $undoMeta,
+            'undoModelId' => $undoMeta ? (string) $lastId : null,
         ]);
     }
 
@@ -140,7 +145,8 @@ class CertificateController extends Controller
     {
         $certificate = Certificate::findOrFail($id);
 
-        Storage::delete($certificate->file_path);
+        $this->undoService->saveDeleteState('certificate', $certificate->id);
+        session()->put('undo_certificate_last_id', $certificate->id);
 
         $certificate->delete();
 

@@ -168,6 +168,10 @@ class MediaController extends Controller
     public function destroy(int $id): RedirectResponse
     {
         $media = Media::findOrFail($id);
+
+        $this->undoService->saveDeleteState('media', $media->id);
+        session()->put('undo_media_last_id', $media->id);
+
         $media->delete();
 
         return redirect()->back()->with('success', 'Media deleted successfully.');

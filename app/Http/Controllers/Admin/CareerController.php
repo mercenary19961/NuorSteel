@@ -26,9 +26,14 @@ class CareerController extends Controller
             $query->where('status', $request->status);
         }
 
+        $lastId = session('undo_career_last_id');
+        $undoMeta = $lastId ? $this->undoService->getUndoMeta('career', $lastId) : null;
+
         return Inertia::render('Admin/Careers/Index', [
             'listings' => $query->ordered()->paginate(15)->withQueryString(),
             'filters' => $request->only(['status']),
+            'undoMeta' => $undoMeta,
+            'undoModelId' => $undoMeta ? (string) $lastId : null,
         ]);
     }
 
@@ -126,7 +131,12 @@ class CareerController extends Controller
 
     public function destroy(int $id): RedirectResponse
     {
-        CareerListing::findOrFail($id)->delete();
+        $listing = CareerListing::findOrFail($id);
+
+        $this->undoService->saveDeleteState('career', $listing->id);
+        session()->put('undo_career_last_id', $listing->id);
+
+        $listing->delete();
 
         return redirect()->route('admin.careers.index')->with('success', 'Job listing deleted successfully.');
     }
@@ -202,7 +212,10 @@ class CareerController extends Controller
     public function deleteApplication(int $id): RedirectResponse
     {
         $application = CareerApplication::findOrFail($id);
-        Storage::delete($application->cv_path);
+
+        $this->undoService->saveDeleteState('application', $application->id);
+        session()->put('undo_application_last_id', $application->id);
+
         $application->delete();
 
         return redirect()->back()->with('success', 'Application deleted successfully.');

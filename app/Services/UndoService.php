@@ -10,6 +10,9 @@ use App\Models\Media;
 use App\Models\Certificate;
 use App\Models\CareerListing;
 use App\Models\CareerApplication;
+use App\Models\TimelineEvent;
+use App\Models\ContactSubmission;
+use App\Models\NewsletterSubscriber;
 use Illuminate\Support\Facades\Auth;
 
 class UndoService
@@ -84,6 +87,79 @@ class UndoService
         $state = session($sessionKey);
 
         return $state['old_data'] ?? null;
+    }
+
+    /**
+     * Save delete action to session and change log for soft-delete undo.
+     */
+    public function saveDeleteState(string $modelType, string|int $id): void
+    {
+        $sessionKey = "undo_{$modelType}_{$id}";
+        session()->put($sessionKey, [
+            'action' => 'delete',
+            'changes' => [['field' => 'status', 'label' => 'Record', 'old' => 'Active', 'new' => 'Deleted']],
+            'saved_at' => now()->toIso8601String(),
+            'saved_by' => Auth::id(),
+        ]);
+
+        ChangeLog::create([
+            'model_type' => $modelType,
+            'model_id' => (string) $id,
+            'changes' => [['field' => 'status', 'label' => 'Record', 'old' => 'Active', 'new' => 'Deleted']],
+            'old_data' => null,
+            'new_data' => null,
+            'changed_by' => Auth::id(),
+        ]);
+    }
+
+    /**
+     * Check if the undo state is a delete action.
+     */
+    public function isDeleteAction(string $modelType, string|int $id): bool
+    {
+        $state = session("undo_{$modelType}_{$id}");
+        return isset($state['action']) && $state['action'] === 'delete';
+    }
+
+    /**
+     * Restore a soft-deleted model.
+     *
+     * @return string|null  Redirect URL on success, null on unknown model type
+     */
+    public function restoreDeleted(string $modelType, string|int $id): ?string
+    {
+        $modelClass = match ($modelType) {
+            'product' => Product::class,
+            'certificate' => Certificate::class,
+            'career' => CareerListing::class,
+            'application' => CareerApplication::class,
+            'media' => Media::class,
+            'timeline' => TimelineEvent::class,
+            'contact' => ContactSubmission::class,
+            'newsletter' => NewsletterSubscriber::class,
+            default => null,
+        };
+
+        if (!$modelClass) {
+            return null;
+        }
+
+        $model = $modelClass::withTrashed()->find($id);
+        if ($model && $model->trashed()) {
+            $model->restore();
+        }
+
+        return match ($modelType) {
+            'product' => '/admin/products',
+            'certificate' => '/admin/certificates',
+            'career' => '/admin/careers',
+            'application' => '/admin/applications',
+            'media' => '/admin/media',
+            'timeline' => '/admin/timeline',
+            'contact' => '/admin/contacts',
+            'newsletter' => '/admin/newsletter',
+            default => null,
+        };
     }
 
     /**
