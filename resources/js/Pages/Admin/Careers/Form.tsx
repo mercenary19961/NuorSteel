@@ -3,6 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
 import { ArrowLeft } from 'lucide-react';
+import CustomSelect from '@/Components/Admin/CustomSelect';
 import UndoButton from '@/Components/Admin/UndoButton';
 import type { CareerListing, UndoMeta } from '@/types';
 
@@ -159,37 +160,37 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Employment Type <span className="text-red-500">*</span>
               </label>
-              <select
+              <CustomSelect
                 value={form.employment_type}
-                onChange={(e) =>
+                onChange={(val) =>
                   setForm((f) => ({
                     ...f,
-                    employment_type: e.target.value as CareerForm['employment_type'],
+                    employment_type: val as CareerForm['employment_type'],
                   }))
                 }
-                className={inputClass}
-              >
-                <option value="full-time">Full-time</option>
-                <option value="part-time">Part-time</option>
-                <option value="contract">Contract</option>
-              </select>
+                options={[
+                  { value: 'full-time', label: 'Full-time' },
+                  { value: 'part-time', label: 'Part-time' },
+                  { value: 'contract', label: 'Contract' },
+                ]}
+              />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Status <span className="text-red-500">*</span>
               </label>
-              <select
+              <CustomSelect
                 value={form.status}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, status: e.target.value as CareerForm['status'] }))
+                onChange={(val) =>
+                  setForm((f) => ({ ...f, status: val as CareerForm['status'] }))
                 }
-                className={inputClass}
-              >
-                <option value="draft">Draft</option>
-                <option value="open">Open</option>
-                <option value="closed">Closed</option>
-              </select>
+                options={[
+                  { value: 'draft', label: 'Draft' },
+                  { value: 'open', label: 'Open' },
+                  { value: 'closed', label: 'Closed' },
+                ]}
+              />
             </div>
           </div>
 

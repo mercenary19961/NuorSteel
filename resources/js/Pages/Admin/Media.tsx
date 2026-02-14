@@ -608,20 +608,17 @@ export default function MediaPage({ media, folders, folderCounts, filters, media
               {/* Folder selector */}
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Folder</label>
-                <select
+                <CustomSelect
                   value={uploadFolder}
-                  onChange={(e) => setUploadFolder(e.target.value)}
+                  onChange={(val) => setUploadFolder(val)}
                   disabled={uploading}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-50"
-                >
-                  {folders.map((f) => (
-                    <option key={f} value={f}>{folderDisplayName(f)}</option>
-                  ))}
-                  {/* If currently inside a folder not in the list (new/empty), include it */}
-                  {filters.folder && !folders.includes(filters.folder) && (
-                    <option value={filters.folder}>{filters.folder}</option>
-                  )}
-                </select>
+                  options={[
+                    ...folders.map((f) => ({ value: f, label: folderDisplayName(f) })),
+                    ...(filters.folder && !folders.includes(filters.folder)
+                      ? [{ value: filters.folder, label: filters.folder }]
+                      : []),
+                  ]}
+                />
               </div>
 
               {/* File input */}

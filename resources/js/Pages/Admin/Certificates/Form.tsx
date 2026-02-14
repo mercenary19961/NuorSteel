@@ -3,6 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
 import { ArrowLeft, Upload, FileText } from 'lucide-react';
+import CustomSelect from '@/Components/Admin/CustomSelect';
 import UndoButton from '@/Components/Admin/UndoButton';
 import type { Certificate, UndoMeta } from '@/types';
 
@@ -136,17 +137,18 @@ export default function CertificateForm({ item, undoMeta }: Props) {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Category <span className="text-red-500">*</span>
             </label>
-            <select
+            <CustomSelect
               value={form.category}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, category: e.target.value as CertForm['category'] }))
+              onChange={(val) =>
+                setForm((f) => ({ ...f, category: val as CertForm['category'] }))
               }
-              className={`${inputClass} max-w-xs`}
-            >
-              <option value="esg">ESG</option>
-              <option value="quality">Quality</option>
-              <option value="governance">Governance</option>
-            </select>
+              options={[
+                { value: 'esg', label: 'ESG' },
+                { value: 'quality', label: 'Quality' },
+                { value: 'governance', label: 'Governance' },
+              ]}
+              className="max-w-xs"
+            />
           </div>
 
           <BilingualEditor

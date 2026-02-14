@@ -6,6 +6,7 @@ import StatusBadge from '@/Components/Admin/StatusBadge';
 import Pagination from '@/Components/Admin/Pagination';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import { Eye, Archive, ArchiveRestore, Trash2, Download, X, Mail } from 'lucide-react';
+import CustomSelect from '@/Components/Admin/CustomSelect';
 import UndoButton from '@/Components/Admin/UndoButton';
 import type { PaginatedData, ContactSubmission, UndoMeta } from '@/types';
 
@@ -176,26 +177,28 @@ export default function Contacts({ submissions, filters, undoMeta, undoModelId }
 
       {/* Filters */}
       <div className="flex items-center gap-3 mb-4 flex-wrap">
-        <select
+        <CustomSelect
           value={requestType}
-          onChange={(e) => applyFilters({ request_type: e.target.value || undefined })}
-          className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-        >
-          <option value="">All Types</option>
-          {Object.entries(TYPE_LABELS).map(([key, label]) => (
-            <option key={key} value={key}>{label}</option>
-          ))}
-        </select>
+          onChange={(val) => applyFilters({ request_type: val || undefined })}
+          placeholder="All Types"
+          options={[
+            { value: '', label: 'All Types' },
+            ...Object.entries(TYPE_LABELS).map(([key, label]) => ({ value: key, label })),
+          ]}
+          className="w-48"
+        />
 
-        <select
+        <CustomSelect
           value={readFilter}
-          onChange={(e) => applyFilters({ is_read: e.target.value || undefined })}
-          className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-        >
-          <option value="">All</option>
-          <option value="false">Unread</option>
-          <option value="true">Read</option>
-        </select>
+          onChange={(val) => applyFilters({ is_read: val || undefined })}
+          placeholder="All"
+          options={[
+            { value: '', label: 'All' },
+            { value: 'false', label: 'Unread' },
+            { value: 'true', label: 'Read' },
+          ]}
+          className="w-32"
+        />
 
         <button
           onClick={() => applyFilters({ archived: showArchived ? undefined : '1' })}

@@ -3,6 +3,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import { Plus, Edit2, Trash2, ToggleLeft, ToggleRight, Shield, User as UserIcon } from 'lucide-react';
+import CustomSelect from '@/Components/Admin/CustomSelect';
 import type { User, PageProps } from '@/types';
 
 interface UserFormData {
@@ -270,15 +271,15 @@ export default function UsersPage({ users }: Props) {
                 )}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                  <select
+                  <CustomSelect
                     value={form.role}
-                    onChange={(e) => setForm((f) => ({ ...f, role: e.target.value as 'admin' | 'editor' }))}
+                    onChange={(val) => setForm((f) => ({ ...f, role: val as 'admin' | 'editor' }))}
                     disabled={editingUser?.id === currentUser?.id}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm disabled:bg-gray-100"
-                  >
-                    <option value="editor">Editor</option>
-                    <option value="admin">Admin</option>
-                  </select>
+                    options={[
+                      { value: 'editor', label: 'Editor' },
+                      { value: 'admin', label: 'Admin' },
+                    ]}
+                  />
                   {editingUser?.id === currentUser?.id && (
                     <p className="text-xs text-gray-400 mt-1">You cannot change your own role</p>
                   )}

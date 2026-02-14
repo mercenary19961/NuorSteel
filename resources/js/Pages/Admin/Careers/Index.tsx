@@ -6,6 +6,7 @@ import StatusBadge from '@/Components/Admin/StatusBadge';
 import Pagination from '@/Components/Admin/Pagination';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
+import CustomSelect from '@/Components/Admin/CustomSelect';
 import UndoButton from '@/Components/Admin/UndoButton';
 import type { CareerListing, PaginatedData, UndoMeta } from '@/types';
 
@@ -103,16 +104,18 @@ export default function CareersIndex({ listings, filters, undoMeta, undoModelId 
 
         {/* Filters */}
         <div className="flex items-center gap-3 mb-4">
-          <select
+          <CustomSelect
             value={filters.status ?? ''}
-            onChange={(e) => handleFilterChange({ status: e.target.value })}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-          >
-            <option value="">All Status</option>
-            <option value="draft">Draft</option>
-            <option value="open">Open</option>
-            <option value="closed">Closed</option>
-          </select>
+            onChange={(val) => handleFilterChange({ status: val })}
+            placeholder="All Status"
+            options={[
+              { value: '', label: 'All Status' },
+              { value: 'draft', label: 'Draft' },
+              { value: 'open', label: 'Open' },
+              { value: 'closed', label: 'Closed' },
+            ]}
+            className="w-36"
+          />
 
           <span className="text-sm text-gray-500 ml-auto">{listings.total} listings</span>
         </div>

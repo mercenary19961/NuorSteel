@@ -6,6 +6,7 @@ import StatusBadge from '@/Components/Admin/StatusBadge';
 import Pagination from '@/Components/Admin/Pagination';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import { Download, Trash2, Eye, X } from 'lucide-react';
+import CustomSelect from '@/Components/Admin/CustomSelect';
 import UndoButton from '@/Components/Admin/UndoButton';
 import type { PaginatedData, CareerApplication, UndoMeta } from '@/types';
 
@@ -131,17 +132,19 @@ export default function Applications({ applications, filters, undoMeta, undoMode
 
       {/* Filters */}
       <div className="flex items-center gap-3 mb-4">
-        <select
+        <CustomSelect
           value={statusFilter}
-          onChange={(e) => handleFilterChange(e.target.value)}
-          className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-        >
-          <option value="">All Status</option>
-          <option value="new">New</option>
-          <option value="reviewed">Reviewed</option>
-          <option value="shortlisted">Shortlisted</option>
-          <option value="rejected">Rejected</option>
-        </select>
+          onChange={(val) => handleFilterChange(val)}
+          placeholder="All Status"
+          options={[
+            { value: '', label: 'All Status' },
+            { value: 'new', label: 'New' },
+            { value: 'reviewed', label: 'Reviewed' },
+            { value: 'shortlisted', label: 'Shortlisted' },
+            { value: 'rejected', label: 'Rejected' },
+          ]}
+          className="w-40"
+        />
 
         <span className="text-sm text-gray-500 ml-auto">
           {applications.total} applications

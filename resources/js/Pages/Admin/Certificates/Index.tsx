@@ -6,6 +6,7 @@ import StatusBadge from '@/Components/Admin/StatusBadge';
 import Pagination from '@/Components/Admin/Pagination';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
+import CustomSelect from '@/Components/Admin/CustomSelect';
 import UndoButton from '@/Components/Admin/UndoButton';
 import type { Certificate, PaginatedData, UndoMeta } from '@/types';
 
@@ -113,16 +114,18 @@ export default function CertificatesIndex({ certificates, filters, undoMeta, und
 
         {/* Category Filter */}
         <div className="flex items-center gap-3 mb-4">
-          <select
+          <CustomSelect
             value={filters.category ?? ''}
-            onChange={(e) => handleFilterChange({ category: e.target.value })}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-          >
-            <option value="">All Categories</option>
-            <option value="esg">ESG</option>
-            <option value="quality">Quality</option>
-            <option value="governance">Governance</option>
-          </select>
+            onChange={(val) => handleFilterChange({ category: val })}
+            placeholder="All Categories"
+            options={[
+              { value: '', label: 'All Categories' },
+              { value: 'esg', label: 'ESG' },
+              { value: 'quality', label: 'Quality' },
+              { value: 'governance', label: 'Governance' },
+            ]}
+            className="w-44"
+          />
 
           <span className="text-sm text-gray-500 ml-auto">{certificates.total} certificates</span>
         </div>
