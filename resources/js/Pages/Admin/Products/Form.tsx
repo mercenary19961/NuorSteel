@@ -5,10 +5,12 @@ import BilingualEditor from '@/Components/Admin/BilingualEditor';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import MediaPicker from '@/Components/Admin/MediaPicker';
 import { ArrowLeft, Plus, Trash2, Image, X } from 'lucide-react';
-import type { Product, Media } from '@/types';
+import UndoButton from '@/Components/Admin/UndoButton';
+import type { Product, Media, UndoMeta } from '@/types';
 
 interface Props {
   item: Product | null;
+  undoMeta?: UndoMeta | null;
 }
 
 interface ProductForm {
@@ -92,7 +94,7 @@ function initSpecs(item: Product | null): SpecForm[] {
   }));
 }
 
-export default function ProductFormPage({ item }: Props) {
+export default function ProductFormPage({ item, undoMeta }: Props) {
   const isEditing = !!item;
 
   const [form, setForm] = useState<ProductForm>(() => initForm(item));
@@ -186,6 +188,11 @@ export default function ProductFormPage({ item }: Props) {
           <h1 className="text-2xl font-bold text-gray-900">
             {isEditing ? 'Edit Product' : 'New Product'}
           </h1>
+          {isEditing && item && (
+            <div className="ml-auto">
+              <UndoButton modelType="product" modelId={item.id} undoMeta={undoMeta ?? null} />
+            </div>
+          )}
         </div>
 
         {/* Tabs (only show images/specs for existing products) */}

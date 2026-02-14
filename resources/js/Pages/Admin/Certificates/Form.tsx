@@ -3,7 +3,8 @@ import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
 import { ArrowLeft, Upload, FileText } from 'lucide-react';
-import type { Certificate } from '@/types';
+import UndoButton from '@/Components/Admin/UndoButton';
+import type { Certificate, UndoMeta } from '@/types';
 
 interface CertForm {
   title_en: string;
@@ -31,9 +32,10 @@ const emptyForm: CertForm = {
 
 interface Props {
   item: Certificate | null;
+  undoMeta?: UndoMeta | null;
 }
 
-export default function CertificateForm({ item }: Props) {
+export default function CertificateForm({ item, undoMeta }: Props) {
   const isEditing = !!item;
 
   const [form, setForm] = useState<CertForm>(
@@ -113,6 +115,11 @@ export default function CertificateForm({ item }: Props) {
           <h1 className="text-2xl font-bold text-gray-900">
             {isEditing ? 'Edit Certificate' : 'New Certificate'}
           </h1>
+          {isEditing && item && (
+            <div className="ml-auto">
+              <UndoButton modelType="certificate" modelId={item.id} undoMeta={undoMeta ?? null} />
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">

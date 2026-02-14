@@ -85,6 +85,7 @@ class ProductController extends Controller
 
         return Inertia::render('Admin/Products/Form', [
             'item' => $product,
+            'undoMeta' => $this->undoService->getUndoMeta('product', $id),
         ]);
     }
 

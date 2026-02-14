@@ -86,6 +86,7 @@ class CertificateController extends Controller
 
         return Inertia::render('Admin/Certificates/Form', [
             'item' => $certificate,
+            'undoMeta' => $this->undoService->getUndoMeta('certificate', $id),
         ]);
     }
 

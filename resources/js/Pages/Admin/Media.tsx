@@ -22,7 +22,8 @@ import {
   FolderInput,
   Link2,
 } from 'lucide-react';
-import type { Media, MediaUsage, PaginatedData } from '@/types';
+import UndoButton from '@/Components/Admin/UndoButton';
+import type { Media, MediaUsage, PaginatedData, UndoMeta } from '@/types';
 
 interface Props {
   media: PaginatedData<Media>;
@@ -30,9 +31,11 @@ interface Props {
   folderCounts: Record<string, number>;
   filters: { folder?: string; type?: string };
   mediaUsage: Record<number, MediaUsage[]>;
+  undoMeta?: UndoMeta | null;
+  undoModelId?: string | null;
 }
 
-export default function MediaPage({ media, folders, folderCounts, filters, mediaUsage }: Props) {
+export default function MediaPage({ media, folders, folderCounts, filters, mediaUsage, undoMeta, undoModelId }: Props) {
   // ---------------------------------------------------------------------------
   // State
   // ---------------------------------------------------------------------------
@@ -314,6 +317,9 @@ export default function MediaPage({ media, folders, folderCounts, filters, media
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {undoMeta && undoModelId && (
+              <UndoButton modelType="media" modelId={undoModelId} undoMeta={undoMeta} />
+            )}
             {!insideFolder && (
               <button
                 onClick={() => setShowCreateFolder(true)}

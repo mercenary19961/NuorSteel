@@ -75,6 +75,7 @@ class CareerController extends Controller
 
         return Inertia::render('Admin/Careers/Form', [
             'item' => $listing,
+            'undoMeta' => $this->undoService->getUndoMeta('career', $id),
         ]);
     }
 
@@ -147,9 +148,15 @@ class CareerController extends Controller
             $query->openApplications();
         }
 
+        // Undo support: check if an application was recently updated
+        $lastEditedId = session('undo_application_last_id');
+        $undoMeta = $lastEditedId ? $this->undoService->getUndoMeta('application', $lastEditedId) : null;
+
         return Inertia::render('Admin/Applications', [
             'applications' => $query->ordered()->paginate(15)->withQueryString(),
             'filters' => $request->only(['status', 'listing_id', 'open_only']),
+            'undoMeta' => $undoMeta,
+            'undoModelId' => $undoMeta ? (string) $lastEditedId : null,
         ]);
     }
 
@@ -174,6 +181,7 @@ class CareerController extends Controller
         ];
 
         $this->undoService->saveState('application', $application->id, $oldData, $newData);
+        session()->put('undo_application_last_id', $application->id);
 
         $application->update([
             'status' => $request->status,

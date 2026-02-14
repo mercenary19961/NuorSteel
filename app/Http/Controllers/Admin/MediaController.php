@@ -80,12 +80,18 @@ class MediaController extends Controller
             }
         }
 
+        // Undo support: check if a media item was recently edited
+        $lastEditedId = session('undo_media_last_id');
+        $undoMeta = $lastEditedId ? $this->undoService->getUndoMeta('media', $lastEditedId) : null;
+
         return Inertia::render('Admin/Media', [
             'media' => $media,
             'folders' => $allFolders,
             'folderCounts' => $folderCounts,
             'filters' => $request->only(['folder', 'type']),
             'mediaUsage' => $usageMap,
+            'undoMeta' => $undoMeta,
+            'undoModelId' => $undoMeta ? (string) $lastEditedId : null,
         ]);
     }
 
@@ -140,6 +146,7 @@ class MediaController extends Controller
         }
 
         $this->undoService->saveState('media', $media->id, $oldData, $newData);
+        session()->put('undo_media_last_id', $media->id);
 
         $media->update($request->only(['alt_text_en', 'alt_text_ar', 'folder']));
 
