@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\Storage;
  */
 class Media extends Model
 {
+    use SoftDeletes;
+
     public $timestamps = false;
 
     protected $table = 'media';
@@ -29,6 +32,8 @@ class Media extends Model
         'folder',
         'uploaded_by',
     ];
+
+    protected $appends = ['url'];
 
     protected static function booted(): void
     {
@@ -53,7 +58,7 @@ class Media extends Model
 
     public function getUrlAttribute(): string
     {
-        return Storage::url($this->path);
+        return url("/media/{$this->id}");
     }
 
     public function getAltTextAttribute(): string

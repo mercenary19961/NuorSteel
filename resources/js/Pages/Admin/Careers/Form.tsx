@@ -3,7 +3,8 @@ import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
 import { ArrowLeft } from 'lucide-react';
-import type { CareerListing } from '@/types';
+import UndoButton from '@/Components/Admin/UndoButton';
+import type { CareerListing, UndoMeta } from '@/types';
 
 interface CareerForm {
   title_en: string;
@@ -35,9 +36,10 @@ const emptyForm: CareerForm = {
 
 interface Props {
   item: CareerListing | null;
+  undoMeta?: UndoMeta | null;
 }
 
-export default function CareerFormPage({ item }: Props) {
+export default function CareerFormPage({ item, undoMeta }: Props) {
   const isEditing = !!item;
 
   const [form, setForm] = useState<CareerForm>(
@@ -91,6 +93,11 @@ export default function CareerFormPage({ item }: Props) {
           <h1 className="text-2xl font-bold text-gray-900">
             {isEditing ? 'Edit Job Listing' : 'New Job Listing'}
           </h1>
+          {isEditing && item && (
+            <div className="ml-auto">
+              <UndoButton modelType="career" modelId={item.id} undoMeta={undoMeta ?? null} />
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">

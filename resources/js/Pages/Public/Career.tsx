@@ -16,9 +16,10 @@ interface CareerListItem {
 
 interface Props {
   listings: CareerListItem[];
+  content: Record<string, Record<string, string>>;
 }
 
-export default function Career({ listings }: Props) {
+export default function Career({ listings, content }: Props) {
   const { t } = useTranslation();
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -64,10 +65,10 @@ export default function Career({ listings }: Props) {
       <section className="bg-linear-to-br from-gray-900 to-gray-800 text-white py-16 lg:py-24">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl lg:text-5xl font-bold mb-4">
-            {t('career.hero.title')}
+            {content?.overview?.title || t('career.hero.title')}
           </h1>
           <p className="text-xl text-gray-300">
-            {t('career.hero.subtitle')}
+            {content?.overview?.description || t('career.hero.subtitle')}
           </p>
         </div>
       </section>
@@ -106,7 +107,7 @@ export default function Career({ listings }: Props) {
                     </div>
                     <Link
                       href={`/career/${job.slug}`}
-                      className="mt-4 md:mt-0 inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
+                      className="mt-4 md:mt-0 inline-flex items-center text-primary hover:text-primary-dark font-medium"
                     >
                       {t('career.viewDetails')}
                       <ArrowRight className="ml-2" size={18} />
@@ -126,10 +127,10 @@ export default function Career({ listings }: Props) {
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              {t('career.openApplication.title')}
+              {content?.open_application?.title || t('career.openApplication.title')}
             </h2>
             <p className="text-lg text-gray-600 mb-8">
-              {t('career.openApplication.description')}
+              {content?.open_application?.description || t('career.openApplication.description')}
             </p>
 
             {submitted ? (
@@ -143,7 +144,7 @@ export default function Career({ listings }: Props) {
             ) : !showApplicationForm ? (
               <button
                 onClick={() => setShowApplicationForm(true)}
-                className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors"
+                className="inline-flex items-center px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-md font-medium transition-colors"
               >
                 {t('career.openApplication.button')}
                 <ArrowRight className="ml-2" size={20} />
@@ -165,7 +166,7 @@ export default function Career({ listings }: Props) {
                       name="name"
                       required
                       maxLength={255}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -177,7 +178,7 @@ export default function Career({ listings }: Props) {
                       name="email"
                       required
                       maxLength={255}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -189,7 +190,7 @@ export default function Career({ listings }: Props) {
                       name="phone"
                       required
                       maxLength={50}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -201,7 +202,7 @@ export default function Career({ listings }: Props) {
                       name="job_title"
                       required
                       maxLength={255}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -213,7 +214,7 @@ export default function Career({ listings }: Props) {
                       name="cv"
                       required
                       accept=".pdf,application/pdf"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
                     />
                     <p className="text-xs text-gray-500 mt-1">
                       {t('career.form.cvHint')}
@@ -222,7 +223,7 @@ export default function Career({ listings }: Props) {
                   <button
                     type="submit"
                     disabled={processing}
-                    className="w-full inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-md font-medium transition-colors"
+                    className="w-full inline-flex items-center justify-center px-6 py-3 bg-primary hover:bg-primary-dark disabled:bg-primary/60 text-white rounded-md font-medium transition-colors"
                   >
                     {processing ? t('career.form.submitting') : t('career.form.submit')}
                     <Send className="ml-2" size={18} />

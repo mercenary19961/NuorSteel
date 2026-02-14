@@ -4,7 +4,8 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import { Plus, Pencil, Trash2, GripVertical, X } from 'lucide-react';
-import type { TimelineEvent } from '@/types';
+import UndoButton from '@/Components/Admin/UndoButton';
+import type { TimelineEvent, UndoMeta } from '@/types';
 
 interface FormData {
   year: string;
@@ -28,9 +29,11 @@ const emptyForm: FormData = {
 
 interface Props {
   events: TimelineEvent[];
+  undoMeta?: UndoMeta | null;
+  undoModelId?: string | null;
 }
 
-export default function Timeline({ events }: Props) {
+export default function Timeline({ events, undoMeta, undoModelId }: Props) {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
@@ -117,13 +120,18 @@ export default function Timeline({ events }: Props) {
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Timeline Events</h1>
-        <button
-          onClick={openCreateForm}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors"
-        >
-          <Plus size={16} />
-          Add Event
-        </button>
+        <div className="flex items-center gap-2">
+          {undoMeta && undoModelId && (
+            <UndoButton modelType="timeline" modelId={undoModelId} undoMeta={undoMeta} />
+          )}
+          <button
+            onClick={openCreateForm}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            <Plus size={16} />
+            Add Event
+          </button>
+        </div>
       </div>
 
       {/* Events List */}

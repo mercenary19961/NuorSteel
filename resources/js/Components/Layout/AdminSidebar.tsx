@@ -13,6 +13,7 @@ import {
   MessageSquare,
   Newspaper,
   Settings,
+  History,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -70,6 +71,7 @@ const navGroups: { label: string; items: NavItem[] }[] = [
     items: [
       { label: 'Settings', path: '/admin/settings', icon: <Settings size={20} />, adminOnly: true },
       { label: 'Users', path: '/admin/users', icon: <Mail size={20} />, adminOnly: true },
+      { label: 'Change Log', path: '/admin/change-log', icon: <History size={20} />, adminOnly: true },
     ],
   },
 ];

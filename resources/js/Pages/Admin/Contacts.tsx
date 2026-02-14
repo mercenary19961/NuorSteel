@@ -6,7 +6,8 @@ import StatusBadge from '@/Components/Admin/StatusBadge';
 import Pagination from '@/Components/Admin/Pagination';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import { Eye, Archive, ArchiveRestore, Trash2, Download, X, Mail } from 'lucide-react';
-import type { PaginatedData, ContactSubmission } from '@/types';
+import UndoButton from '@/Components/Admin/UndoButton';
+import type { PaginatedData, ContactSubmission, UndoMeta } from '@/types';
 
 const TYPE_LABELS: Record<string, string> = {
   vendor: 'Vendor Registration',
@@ -29,9 +30,11 @@ interface Props {
     is_read?: string;
     archived?: string;
   };
+  undoMeta?: UndoMeta | null;
+  undoModelId?: string | null;
 }
 
-export default function Contacts({ submissions, filters }: Props) {
+export default function Contacts({ submissions, filters, undoMeta, undoModelId }: Props) {
   const [viewItem, setViewItem] = useState<ContactSubmission | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ContactSubmission | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -166,6 +169,9 @@ export default function Contacts({ submissions, filters }: Props) {
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Contact Submissions</h1>
+        {undoMeta && undoModelId && (
+          <UndoButton modelType="contact" modelId={undoModelId} undoMeta={undoMeta} />
+        )}
       </div>
 
       {/* Filters */}

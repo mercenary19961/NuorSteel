@@ -3,11 +3,14 @@ import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
+import MediaPicker from '@/Components/Admin/MediaPicker';
 import { ArrowLeft, Plus, Trash2, Image, X } from 'lucide-react';
-import type { Product } from '@/types';
+import UndoButton from '@/Components/Admin/UndoButton';
+import type { Product, Media, UndoMeta } from '@/types';
 
 interface Props {
   item: Product | null;
+  undoMeta?: UndoMeta | null;
 }
 
 interface ProductForm {
@@ -91,16 +94,15 @@ function initSpecs(item: Product | null): SpecForm[] {
   }));
 }
 
-export default function ProductFormPage({ item }: Props) {
+export default function ProductFormPage({ item, undoMeta }: Props) {
   const isEditing = !!item;
 
   const [form, setForm] = useState<ProductForm>(() => initForm(item));
   const [specs, setSpecs] = useState<SpecForm[]>(() => initSpecs(item));
   const [activeTab, setActiveTab] = useState<'details' | 'images' | 'specs'>('details');
   const [removeImageTarget, setRemoveImageTarget] = useState<{ imageId: number } | null>(null);
-  const [newMediaId, setNewMediaId] = useState('');
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [addingImage, setAddingImage] = useState(false);
   const [removingImage, setRemovingImage] = useState(false);
   const [savingSpecs, setSavingSpecs] = useState(false);
 
@@ -121,14 +123,13 @@ export default function ProductFormPage({ item }: Props) {
     }
   };
 
-  const handleAddImage = () => {
-    if (!item || !newMediaId) return;
-    setAddingImage(true);
-    router.post(`/admin/products/${item.id}/images`, { media_id: Number(newMediaId) }, {
-      preserveScroll: true,
-      preserveState: true,
-      onSuccess: () => setNewMediaId(''),
-      onFinish: () => setAddingImage(false),
+  const handleMediaSelect = (selected: Media[]) => {
+    if (!item) return;
+    selected.forEach((media) => {
+      router.post(`/admin/products/${item.id}/images`, { media_id: media.id }, {
+        preserveScroll: true,
+        preserveState: true,
+      });
     });
   };
 
@@ -187,6 +188,11 @@ export default function ProductFormPage({ item }: Props) {
           <h1 className="text-2xl font-bold text-gray-900">
             {isEditing ? 'Edit Product' : 'New Product'}
           </h1>
+          {isEditing && item && (
+            <div className="ml-auto">
+              <UndoButton modelType="product" modelId={item.id} undoMeta={undoMeta ?? null} />
+            </div>
+          )}
         </div>
 
         {/* Tabs (only show images/specs for existing products) */}
@@ -320,23 +326,13 @@ export default function ProductFormPage({ item }: Props) {
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Product Images</h2>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  value={newMediaId}
-                  onChange={(e) => setNewMediaId(e.target.value)}
-                  placeholder="Media ID"
-                  className="w-28 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                />
-                <button
-                  onClick={handleAddImage}
-                  disabled={!newMediaId || addingImage}
-                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50"
-                >
-                  <Plus size={14} />
-                  Add
-                </button>
-              </div>
+              <button
+                onClick={() => setShowMediaPicker(true)}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark"
+              >
+                <Plus size={14} />
+                Add from Media Library
+              </button>
             </div>
 
             {item.images && item.images.length > 0 ? (
@@ -371,7 +367,7 @@ export default function ProductFormPage({ item }: Props) {
             ) : (
               <div className="text-center py-12">
                 <Image size={40} className="mx-auto text-gray-300 mb-3" />
-                <p className="text-gray-500 text-sm">No images yet. Add images using media IDs from the Media Library.</p>
+                <p className="text-gray-500 text-sm">No images yet. Click 'Add from Media Library' to get started.</p>
               </div>
             )}
           </div>
@@ -505,6 +501,15 @@ export default function ProductFormPage({ item }: Props) {
           loading={removingImage}
           onConfirm={handleRemoveImage}
           onCancel={() => setRemoveImageTarget(null)}
+        />
+
+        <MediaPicker
+          open={showMediaPicker}
+          onClose={() => setShowMediaPicker(false)}
+          onSelect={handleMediaSelect}
+          multiple={true}
+          typeFilter="image"
+          title="Add Product Images"
         />
       </div>
     </AdminLayout>

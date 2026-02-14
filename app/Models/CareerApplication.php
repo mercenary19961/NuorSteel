@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property int $id
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class CareerApplication extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'career_listing_id',
         'name',

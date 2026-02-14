@@ -6,9 +6,10 @@ import PublicLayout from '@/Layouts/PublicLayout';
 interface Props {
   timeline: { id: number; year: string; title: string; description: string | null; image: string | null }[];
   governance: { id: number; title: string; file_url: string }[];
+  content: Record<string, Record<string, string>>;
 }
 
-export default function About({ timeline, governance }: Props) {
+export default function About({ timeline, governance, content }: Props) {
   const { t } = useTranslation();
 
   return (
@@ -32,10 +33,10 @@ export default function About({ timeline, governance }: Props) {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              {t('about.overview.title')}
+              {content?.overview?.title || t('about.overview.title')}
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed">
-              {t('about.overview.description')}
+              {content?.overview?.description || t('about.overview.description')}
             </p>
           </div>
         </div>
@@ -47,18 +48,18 @@ export default function About({ timeline, governance }: Props) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                {t('about.vision.title')}
+                {content?.vision?.title || t('about.vision.title')}
               </h2>
               <p className="text-gray-600 leading-relaxed">
-                {t('about.vision.description')}
+                {content?.vision?.description || t('about.vision.description')}
               </p>
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                {t('about.mission.title')}
+                {content?.mission?.title || t('about.mission.title')}
               </h2>
               <p className="text-gray-600 leading-relaxed">
-                {t('about.mission.description')}
+                {content?.mission?.description || t('about.mission.description')}
               </p>
             </div>
           </div>
@@ -69,7 +70,7 @@ export default function About({ timeline, governance }: Props) {
       <section className="py-16 lg:py-24">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
-            {t('about.timeline.title')}
+            {content?.timeline?.title || t('about.timeline.title')}
           </h2>
           <div className="max-w-3xl mx-auto">
             {timeline.length > 0 ? (
@@ -88,7 +89,7 @@ export default function About({ timeline, governance }: Props) {
                         )}
                       </div>
                     </div>
-                    <div className="absolute left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold z-10">
+                    <div className="absolute left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold z-10">
                       {event.year}
                     </div>
                     <div className="w-5/12" />
@@ -107,10 +108,10 @@ export default function About({ timeline, governance }: Props) {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              {t('about.governance.title')}
+              {content?.governance?.title || t('about.governance.title')}
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed mb-8">
-              {t('about.governance.description')}
+              {content?.governance?.description || t('about.governance.description')}
             </p>
             {governance.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

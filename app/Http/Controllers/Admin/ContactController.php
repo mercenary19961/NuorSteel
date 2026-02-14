@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ContactSubmission;
+use App\Services\UndoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -12,6 +13,10 @@ use Inertia\Response;
 
 class ContactController extends Controller
 {
+    public function __construct(
+        protected UndoService $undoService,
+    ) {}
+
     public function index(Request $request): Response
     {
         $query = ContactSubmission::query();
@@ -30,6 +35,9 @@ class ContactController extends Controller
             $query->notArchived();
         }
 
+        $lastId = session('undo_contact_last_id');
+        $undoMeta = $lastId ? $this->undoService->getUndoMeta('contact', $lastId) : null;
+
         return Inertia::render('Admin/Contacts', [
             'submissions' => $query->ordered()->paginate(15)->withQueryString(),
             'stats' => [
@@ -41,6 +49,8 @@ class ContactController extends Controller
                     ->pluck('count', 'request_type'),
             ],
             'filters' => $request->only(['request_type', 'is_read', 'archived']),
+            'undoMeta' => $undoMeta,
+            'undoModelId' => $undoMeta ? (string) $lastId : null,
         ]);
     }
 
@@ -70,9 +80,8 @@ class ContactController extends Controller
     {
         $submission = ContactSubmission::findOrFail($id);
 
-        if ($submission->file_path) {
-            Storage::delete($submission->file_path);
-        }
+        $this->undoService->saveDeleteState('contact', $submission->id);
+        session()->put('undo_contact_last_id', $submission->id);
 
         $submission->delete();
 

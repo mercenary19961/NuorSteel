@@ -2,17 +2,19 @@ import { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Save, Settings as SettingsIcon } from 'lucide-react';
-import type { Setting } from '@/types';
+import UndoButton from '@/Components/Admin/UndoButton';
+import type { Setting, UndoMeta } from '@/types';
 
 interface Props {
   settings: Record<string, Setting[]>;
+  undoMeta: UndoMeta | null;
 }
 
 function isLongText(value: string | null): boolean {
   return !!value && value.length > 100;
 }
 
-export default function Settings({ settings }: Props) {
+export default function Settings({ settings, undoMeta }: Props) {
   const [editedValues, setEditedValues] = useState<Record<string, string>>(() => {
     const values: Record<string, string> = {};
     Object.values(settings).flat().forEach((setting) => {
@@ -71,14 +73,17 @@ export default function Settings({ settings }: Props) {
             <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
             <p className="text-sm text-gray-500 mt-1">Manage site configuration</p>
           </div>
-          <button
-            onClick={handleSave}
-            disabled={!hasChanges || saving}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 disabled:opacity-50"
-          >
-            <Save size={16} />
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
+          <div className="flex items-center gap-3">
+            <UndoButton modelType="settings" modelId="all" undoMeta={undoMeta} />
+            <button
+              onClick={handleSave}
+              disabled={!hasChanges || saving}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 disabled:opacity-50"
+            >
+              <Save size={16} />
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
         </div>
 
         <div className="space-y-6">

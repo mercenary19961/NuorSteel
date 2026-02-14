@@ -15,9 +15,10 @@ interface CertificateItem {
 
 interface Props {
   certificates: CertificateItem[];
+  content: Record<string, Record<string, string>>;
 }
 
-export default function Quality({ certificates }: Props) {
+export default function Quality({ certificates, content }: Props) {
   const { t } = useTranslation();
 
   return (
@@ -41,10 +42,10 @@ export default function Quality({ certificates }: Props) {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              {t('quality.overview.title')}
+              {content?.overview?.title || t('quality.overview.title')}
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed">
-              {t('quality.overview.description')}
+              {content?.overview?.description || t('quality.overview.description')}
             </p>
           </div>
         </div>
@@ -87,10 +88,10 @@ export default function Quality({ certificates }: Props) {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">
-              {t('quality.certifications.title')}
+              {content?.certifications?.title || t('quality.certifications.title')}
             </h2>
             <p className="text-lg text-gray-600 text-center mb-12">
-              {t('quality.certifications.description')}
+              {content?.certifications?.description || t('quality.certifications.description')}
             </p>
             {certificates.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -105,8 +106,8 @@ export default function Quality({ certificates }: Props) {
                     {cert.thumbnail ? (
                       <img src={cert.thumbnail} alt={cert.title} className="w-12 h-12 object-cover rounded" />
                     ) : (
-                      <div className="w-12 h-12 bg-blue-100 rounded flex items-center justify-center shrink-0">
-                        <Download className="text-blue-600" size={20} />
+                      <div className="w-12 h-12 bg-primary/10 rounded flex items-center justify-center shrink-0">
+                        <Download className="text-primary" size={20} />
                       </div>
                     )}
                     <div className="min-w-0">

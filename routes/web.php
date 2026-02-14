@@ -10,6 +10,7 @@ use App\Http\Controllers\Public\CareerController;
 use App\Http\Controllers\Public\ContactController;
 use App\Http\Controllers\Public\NewsletterController;
 use App\Http\Controllers\Public\LocaleController;
+use App\Http\Controllers\MediaServeController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\SiteContentController as AdminContentController;
@@ -22,6 +23,8 @@ use App\Http\Controllers\Admin\ContactController as AdminContactController;
 use App\Http\Controllers\Admin\NewsletterController as AdminNewsletterController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\UndoController as AdminUndoController;
+use App\Http\Controllers\Admin\ChangeLogController as AdminChangeLogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,6 +48,9 @@ Route::post('/contact', [ContactController::class, 'store'])->name('contact.stor
 Route::post('/career/apply', [CareerController::class, 'apply'])->name('career.apply')->middleware('throttle:5,10');
 Route::post('/career/{slug}/apply', [CareerController::class, 'apply'])->name('career.apply-job')->middleware('throttle:5,10');
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe')->middleware('throttle:5,10');
+
+// Media serve (public access to uploaded files)
+Route::get('/media/{id}', [MediaServeController::class, 'show'])->name('media.serve')->where('id', '[0-9]+');
 
 // Locale switch
 Route::post('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
@@ -76,6 +82,11 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::put('/content/{id}', [AdminContentController::class, 'update'])->name('content.update');
     Route::put('/content', [AdminContentController::class, 'bulkUpdate'])->name('content.bulk-update');
 
+    // Undo (reusable across all admin sections)
+    Route::get('/undo/{model}/{id}', [AdminUndoController::class, 'status'])->name('undo.status');
+    Route::post('/undo/{model}/{id}', [AdminUndoController::class, 'restore'])->name('undo.restore');
+    Route::delete('/undo/{model}/{id}', [AdminUndoController::class, 'clear'])->name('undo.clear');
+
     // Timeline
     Route::get('/timeline', [AdminTimelineController::class, 'index'])->name('timeline.index');
     Route::post('/timeline', [AdminTimelineController::class, 'store'])->name('timeline.store');
@@ -85,7 +96,12 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
     // Media
     Route::get('/media', [AdminMediaController::class, 'index'])->name('media.index');
+    Route::get('/media/json', [AdminMediaController::class, 'jsonIndex'])->name('media.json');
+    Route::post('/media/json', [AdminMediaController::class, 'storeJson'])->name('media.store-json');
     Route::post('/media', [AdminMediaController::class, 'store'])->name('media.store');
+    Route::post('/media/folders', [AdminMediaController::class, 'createFolder'])->name('media.create-folder');
+    Route::put('/media/folders', [AdminMediaController::class, 'renameFolder'])->name('media.rename-folder');
+    Route::delete('/media/folders', [AdminMediaController::class, 'deleteFolder'])->name('media.delete-folder');
     Route::put('/media/{id}', [AdminMediaController::class, 'update'])->name('media.update');
     Route::delete('/media/{id}', [AdminMediaController::class, 'destroy'])->name('media.destroy');
 
@@ -149,5 +165,10 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::put('/users/{id}', [AdminUserController::class, 'update'])->name('users.update');
         Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
         Route::post('/users/{id}/toggle', [AdminUserController::class, 'toggleStatus'])->name('users.toggle');
+
+        // Change Log
+        Route::get('/change-log', [AdminChangeLogController::class, 'index'])->name('change-log.index');
+        Route::post('/change-log/{id}/revert', [AdminChangeLogController::class, 'revert'])->name('change-log.revert');
+        Route::delete('/change-log/{id}', [AdminChangeLogController::class, 'destroy'])->name('change-log.destroy');
     });
 });

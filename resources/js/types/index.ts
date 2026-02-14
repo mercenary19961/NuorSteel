@@ -86,6 +86,41 @@ export interface Media {
   created_at: string;
 }
 
+export interface MediaUsage {
+  type: string;
+  name: string;
+  url: string;
+}
+
+// Undo
+export interface UndoFieldChange {
+  field: string;
+  label: string;
+  old: string;
+  new: string;
+}
+
+export interface UndoMeta {
+  available: boolean;
+  saved_at: string;
+  saved_by: number;
+  changes: UndoFieldChange[];
+}
+
+// Change Log
+export interface ChangeLog {
+  id: number;
+  model_type: string;
+  model_id: string;
+  changes: UndoFieldChange[];
+  changed_by: number;
+  user?: Pick<User, 'id' | 'name'>;
+  created_at: string;
+  reverted_at: string | null;
+  reverted_by: number | null;
+  reverter?: Pick<User, 'id' | 'name'> | null;
+}
+
 // Products
 export interface Product {
   id: number;
@@ -244,7 +279,7 @@ export interface SiteContent {
   key: string;
   content_en: string;
   content_ar: string;
-  content_type: "text" | "textarea" | "html";
+  type: "text" | "textarea" | "html";
 }
 
 // Settings

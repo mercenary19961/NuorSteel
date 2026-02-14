@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\TimelineEvent;
+use App\Services\UndoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,12 +12,21 @@ use Inertia\Response;
 
 class TimelineController extends Controller
 {
+    public function __construct(
+        protected UndoService $undoService,
+    ) {}
+
     public function index(): Response
     {
         $events = TimelineEvent::with('image')->ordered()->get();
 
+        $lastId = session('undo_timeline_last_id');
+        $undoMeta = $lastId ? $this->undoService->getUndoMeta('timeline', $lastId) : null;
+
         return Inertia::render('Admin/Timeline', [
             'events' => $events,
+            'undoMeta' => $undoMeta,
+            'undoModelId' => $undoMeta ? (string) $lastId : null,
         ]);
     }
 
@@ -65,6 +75,10 @@ class TimelineController extends Controller
     public function destroy(int $id): RedirectResponse
     {
         $event = TimelineEvent::findOrFail($id);
+
+        $this->undoService->saveDeleteState('timeline', $event->id);
+        session()->put('undo_timeline_last_id', $event->id);
+
         $event->delete();
 
         return redirect()->back()->with('success', 'Timeline event deleted successfully.');

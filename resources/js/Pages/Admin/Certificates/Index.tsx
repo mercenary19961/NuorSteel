@@ -6,7 +6,8 @@ import StatusBadge from '@/Components/Admin/StatusBadge';
 import Pagination from '@/Components/Admin/Pagination';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
-import type { Certificate, PaginatedData } from '@/types';
+import UndoButton from '@/Components/Admin/UndoButton';
+import type { Certificate, PaginatedData, UndoMeta } from '@/types';
 
 const CATEGORY_LABELS: Record<string, string> = {
   esg: 'ESG',
@@ -17,9 +18,11 @@ const CATEGORY_LABELS: Record<string, string> = {
 interface Props {
   certificates: PaginatedData<Certificate>;
   filters: { category?: string; active?: string };
+  undoMeta?: UndoMeta | null;
+  undoModelId?: string | null;
 }
 
-export default function CertificatesIndex({ certificates, filters }: Props) {
+export default function CertificatesIndex({ certificates, filters, undoMeta, undoModelId }: Props) {
   const [deleteTarget, setDeleteTarget] = useState<Certificate | null>(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -94,13 +97,18 @@ export default function CertificatesIndex({ certificates, filters }: Props) {
       <div>
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Certificates</h1>
-          <Link
-            href="/admin/certificates/create"
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors"
-          >
-            <Plus size={16} />
-            Add Certificate
-          </Link>
+          <div className="flex items-center gap-2">
+            {undoMeta && undoModelId && (
+              <UndoButton modelType="certificate" modelId={undoModelId} undoMeta={undoMeta} />
+            )}
+            <Link
+              href="/admin/certificates/create"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors"
+            >
+              <Plus size={16} />
+              Add Certificate
+            </Link>
+          </div>
         </div>
 
         {/* Category Filter */}

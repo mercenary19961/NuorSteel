@@ -6,7 +6,8 @@ import StatusBadge from '@/Components/Admin/StatusBadge';
 import Pagination from '@/Components/Admin/Pagination';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import { Download, Trash2, Eye, X } from 'lucide-react';
-import type { PaginatedData, CareerApplication } from '@/types';
+import UndoButton from '@/Components/Admin/UndoButton';
+import type { PaginatedData, CareerApplication, UndoMeta } from '@/types';
 
 interface Props {
   applications: PaginatedData<CareerApplication>;
@@ -15,9 +16,11 @@ interface Props {
     listing_id?: string;
     open_only?: string;
   };
+  undoMeta?: UndoMeta | null;
+  undoModelId?: string | null;
 }
 
-export default function Applications({ applications, filters }: Props) {
+export default function Applications({ applications, filters, undoMeta, undoModelId }: Props) {
   const [viewItem, setViewItem] = useState<CareerApplication | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<CareerApplication | null>(null);
   const [notes, setNotes] = useState('');
@@ -121,6 +124,9 @@ export default function Applications({ applications, filters }: Props) {
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Applications</h1>
+        {undoMeta && undoModelId && (
+          <UndoButton modelType="application" modelId={undoModelId} undoMeta={undoMeta} />
+        )}
       </div>
 
       {/* Filters */}

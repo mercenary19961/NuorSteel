@@ -2,30 +2,94 @@ import { useState, useEffect } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
-import { ChevronDown, ChevronRight, Save } from 'lucide-react';
-import type { SiteContent } from '@/types';
+import UndoButton from '@/Components/Admin/UndoButton';
+import { ChevronDown, ChevronRight, Save, Eye, ExternalLink, Maximize2, Minimize2, MousePointerClick, Home, Building2, Recycle, ShieldCheck, Briefcase, Award, Mail, type LucideIcon } from 'lucide-react';
+import type { SiteContent, UndoMeta } from '@/types';
 
-const PAGE_LABELS: Record<string, string> = {
-  home: 'Home',
-  about: 'About Us',
-  recycling: 'Recycling',
-  quality: 'Quality',
-  career: 'Career',
-  certificates: 'Certificates',
-  contact: 'Contact',
+const PAGE_CONFIG: Record<string, { label: string; labelAr: string; icon: LucideIcon }> = {
+  home: { label: 'Home', labelAr: 'الرئيسية', icon: Home },
+  about: { label: 'About Us', labelAr: 'من نحن', icon: Building2 },
+  recycling: { label: 'Recycling', labelAr: 'إعادة التدوير', icon: Recycle },
+  quality: { label: 'Quality', labelAr: 'الجودة', icon: ShieldCheck },
+  career: { label: 'Career', labelAr: 'الوظائف', icon: Briefcase },
+  certificates: { label: 'Certificates', labelAr: 'الشهادات', icon: Award },
+  contact: { label: 'Contact', labelAr: 'تواصل معنا', icon: Mail },
+};
+
+const SECTION_LABELS: Record<string, string> = {
+  hero: 'القسم الرئيسي',
+  features: 'المميزات',
+  about: 'من نحن',
+  products: 'المنتجات',
+  certificates: 'الشهادات',
+  newsletter: 'النشرة الإخبارية',
+  cta: 'دعوة للتواصل',
+  overview: 'نظرة عامة',
+  vision: 'الرؤية',
+  mission: 'المهمة',
+  timeline: 'المسيرة',
+  governance: 'الحوكمة',
+  process: 'العملية',
+  certifications: 'الاعتمادات',
+  esg: 'البيئة والمجتمع والحوكمة',
+  quality: 'الجودة',
+  open_application: 'تقديم طلب مفتوح',
+  form: 'النموذج',
+};
+
+const KEY_LABELS: Record<string, string> = {
+  title: 'العنوان',
+  subtitle: 'العنوان الفرعي',
+  description: 'الوصف',
+  cta_text: 'نص الزر',
+  button: 'الزر',
+  submit_text: 'نص الإرسال',
+  success_message: 'رسالة النجاح',
+  quality_title: 'عنوان الجودة',
+  quality_description: 'وصف الجودة',
+  sustainability_title: 'عنوان الاستدامة',
+  sustainability_description: 'وصف الاستدامة',
+  certified_title: 'عنوان المنتجات المعتمدة',
+  certified_description: 'وصف المنتجات المعتمدة',
+};
+
+// Section display order per page (matches website layout)
+const SECTION_ORDER: Record<string, string[]> = {
+  home: ['hero', 'about', 'features', 'products', 'certificates', 'cta', 'newsletter'],
+  about: ['overview', 'vision', 'mission', 'timeline', 'governance'],
+  recycling: ['overview', 'process'],
+  quality: ['overview', 'certifications'],
+  certificates: ['overview', 'esg', 'quality', 'governance'],
+  career: ['overview', 'open_application'],
+  contact: ['overview', 'form'],
+};
+
+const PAGE_URLS: Record<string, string> = {
+  home: '/',
+  about: '/about',
+  recycling: '/about/recycling',
+  quality: '/quality',
+  career: '/career',
+  certificates: '/certificates',
+  contact: '/contact',
 };
 
 interface Props {
   content: Record<string, SiteContent[]>;
+  undoMeta: UndoMeta | null;
 }
 
-export default function Content({ content: contentByPage }: Props) {
+export default function Content({ content: contentByPage, undoMeta }: Props) {
   const [expandedPages, setExpandedPages] = useState<Set<string>>(new Set());
   const [editedItems, setEditedItems] = useState<
     Record<number, { content_en: string; content_ar: string }>
   >({});
   const [hasChanges, setHasChanges] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [previewPage, setPreviewPage] = useState('home');
+  const [iframeKey, setIframeKey] = useState(0);
+  const [previewExpanded, setPreviewExpanded] = useState(false);
+  const [previewInteractive, setPreviewInteractive] = useState(false);
 
   // Reset edited items when data changes (after successful save / page reload)
   useEffect(() => {
@@ -38,10 +102,19 @@ export default function Content({ content: contentByPage }: Props) {
   const togglePage = (page: string) => {
     setExpandedPages((prev) => {
       const next = new Set(prev);
-      if (next.has(page)) next.delete(page);
-      else next.add(page);
+      if (next.has(page)) {
+        next.delete(page);
+      } else {
+        next.add(page);
+        setPreviewPage(page);
+      }
       return next;
     });
+  };
+
+  const selectPage = (page: string) => {
+    setExpandedPages(new Set([page]));
+    setPreviewPage(page);
   };
 
   const getItemValue = (item: SiteContent, field: 'content_en' | 'content_ar') => {
@@ -78,19 +151,32 @@ export default function Content({ content: contentByPage }: Props) {
       onSuccess: () => {
         setEditedItems({});
         setHasChanges(false);
+        setIframeKey((k) => k + 1);
       },
     });
   };
 
-  // Group content items by section within each page
-  const groupBySection = (items: SiteContent[]) => {
+  // Group content items by section within each page, ordered to match website layout
+  const groupBySection = (page: string, items: SiteContent[]) => {
     const sections: Record<string, SiteContent[]> = {};
     for (const item of items) {
       if (!sections[item.section]) sections[item.section] = [];
       sections[item.section].push(item);
     }
-    return sections;
+    const order = SECTION_ORDER[page];
+    if (!order) return sections;
+    const ordered: Record<string, SiteContent[]> = {};
+    for (const key of order) {
+      if (sections[key]) ordered[key] = sections[key];
+    }
+    // Append any sections not in the order list
+    for (const key of Object.keys(sections)) {
+      if (!ordered[key]) ordered[key] = sections[key];
+    }
+    return ordered;
   };
+
+  const previewUrl = PAGE_URLS[previewPage] || '/';
 
   return (
     <AdminLayout>
@@ -98,14 +184,17 @@ export default function Content({ content: contentByPage }: Props) {
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Site Content</h1>
-        <button
-          onClick={handleSave}
-          disabled={!hasChanges || saving}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
-        >
-          <Save size={16} />
-          {saving ? 'Saving...' : 'Save Changes'}
-        </button>
+        <div className="flex items-center gap-3">
+          <UndoButton modelType="site_content" modelId="all" undoMeta={undoMeta} />
+          <button
+            onClick={handleSave}
+            disabled={!hasChanges || saving}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
+          >
+            <Save size={16} />
+            {saving ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
       </div>
 
       {hasChanges && (
@@ -114,56 +203,158 @@ export default function Content({ content: contentByPage }: Props) {
         </div>
       )}
 
-      <div className="space-y-2">
+      {/* Quick page selector */}
+      <div className="flex flex-wrap gap-2 mb-4">
         {pages.map((page) => {
-          const isExpanded = expandedPages.has(page);
-          const items = contentByPage[page];
-          const sections = groupBySection(items);
-
+          const config = PAGE_CONFIG[page];
+          const isActive = expandedPages.has(page) && expandedPages.size === 1;
+          const Icon = config?.icon;
           return (
-            <div key={page} className="bg-white rounded-xl border border-gray-200">
-              <button
-                onClick={() => togglePage(page)}
-                className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    {PAGE_LABELS[page] || page}
-                  </h2>
-                  <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
-                    {items.length} items
-                  </span>
-                </div>
-              </button>
-
-              {isExpanded && (
-                <div className="px-6 pb-6 space-y-6">
-                  {Object.entries(sections).map(([section, sectionItems]) => (
-                    <div key={section}>
-                      <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b border-gray-100 pb-2">
-                        {section}
-                      </h3>
-                      <div className="space-y-4">
-                        {sectionItems.map((item) => (
-                          <BilingualEditor
-                            key={item.id}
-                            label={`${item.key} (${item.content_type})`}
-                            valueEn={getItemValue(item, 'content_en')}
-                            valueAr={getItemValue(item, 'content_ar')}
-                            onChangeEn={(v) => handleChange(item, 'content_en', v)}
-                            onChangeAr={(v) => handleChange(item, 'content_ar', v)}
-                            type={item.content_type}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <button
+              key={page}
+              onClick={() => selectPage(page)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+                isActive
+                  ? 'bg-primary text-white border-primary'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-primary hover:text-primary'
+              }`}
+            >
+              {Icon && <Icon size={14} />}
+              {config?.label || page}
+            </button>
           );
         })}
+      </div>
+
+      <div className="flex gap-6">
+        {/* Left: Editor */}
+        <div className={`w-full space-y-2 min-w-0 transition-all duration-300 ${previewExpanded ? 'xl:w-[30%]' : 'xl:w-[55%]'}`}>
+          {pages.map((page) => {
+            const isExpanded = expandedPages.has(page);
+            const items = contentByPage[page];
+            const sections = groupBySection(page, items);
+
+            return (
+              <div key={page} className="bg-white rounded-xl border border-gray-200">
+                <button
+                  onClick={() => togglePage(page)}
+                  className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                    {PAGE_CONFIG[page] && (() => {
+                      const Icon = PAGE_CONFIG[page].icon;
+                      return <Icon size={18} className="text-gray-400" />;
+                    })()}
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      {PAGE_CONFIG[page]?.label || page}
+                    </h2>
+                    <span className="text-xs text-gray-400" dir="rtl">
+                      {PAGE_CONFIG[page]?.labelAr}
+                    </span>
+                    <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+                      {items.length} items
+                    </span>
+                  </div>
+                  {previewPage === page && (
+                    <span className="hidden xl:flex items-center gap-1 text-xs text-primary">
+                      <Eye size={14} />
+                      Preview
+                    </span>
+                  )}
+                </button>
+
+                {isExpanded && (
+                  <div className="px-6 pb-6 space-y-6">
+                    {Object.entries(sections).map(([section, sectionItems]) => (
+                      <div key={section}>
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b border-gray-100 pb-2 flex items-center gap-2">
+                          {section}
+                          {SECTION_LABELS[section] && (
+                            <span className="text-xs text-gray-400 font-normal normal-case" dir="rtl">{SECTION_LABELS[section]}</span>
+                          )}
+                        </h3>
+                        <div className="space-y-4">
+                          {sectionItems.map((item) => (
+                            <BilingualEditor
+                              key={item.id}
+                              label={`${item.key}${KEY_LABELS[item.key] ? ` / ${KEY_LABELS[item.key]}` : ''} (${item.type})`}
+                              valueEn={getItemValue(item, 'content_en')}
+                              valueAr={getItemValue(item, 'content_ar')}
+                              onChangeEn={(v) => handleChange(item, 'content_en', v)}
+                              onChangeAr={(v) => handleChange(item, 'content_ar', v)}
+                              type={item.type}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Right: Live Preview */}
+        <div className={`hidden xl:block transition-all duration-300 ${previewExpanded ? 'xl:w-[70%]' : 'xl:w-[45%]'}`}>
+          <div className="sticky top-24">
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden" style={{ height: 'calc(100vh - 8rem)' }}>
+              {/* Preview header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50">
+                <div className="flex items-center gap-2">
+                  <Eye size={16} className="text-gray-500" />
+                  <span className="text-sm font-medium text-gray-700">
+                    {PAGE_CONFIG[previewPage]?.label || previewPage}
+                  </span>
+                  <span className="text-xs text-gray-400">{previewUrl}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPreviewExpanded((v) => !v)}
+                    className="text-gray-400 hover:text-primary transition-colors"
+                    title={previewExpanded ? 'Collapse preview' : 'Expand preview'}
+                  >
+                    {previewExpanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                  </button>
+                  <a
+                    href={previewUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-primary transition-colors"
+                    title="Open in new tab"
+                  >
+                    <ExternalLink size={14} />
+                  </a>
+                </div>
+              </div>
+              {/* Iframe with scroll-trap overlay */}
+              <div
+                className="relative"
+                style={{ height: 'calc(100% - 3rem)' }}
+                onMouseLeave={() => setPreviewInteractive(false)}
+              >
+                {!previewInteractive && (
+                  <div
+                    className="absolute inset-0 z-10 cursor-pointer bg-black/10"
+                    onClick={() => setPreviewInteractive(true)}
+                  >
+                    <div className="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 bg-gray-900/70 text-white text-xs rounded-full">
+                      <MousePointerClick size={12} />
+                      Click to interact with preview
+                    </div>
+                  </div>
+                )}
+                <iframe
+                  key={iframeKey}
+                  src={previewUrl}
+                  className="w-full h-full border-0"
+                  title={`Preview: ${PAGE_CONFIG[previewPage]?.label || previewPage}`}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </AdminLayout>
   );
