@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Media;
+use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -44,11 +46,42 @@ class MediaController extends Controller
             ->groupBy('folder')
             ->pluck('count', 'folder');
 
+        // Build usage map for the current page of media items
+        $mediaIds = $media->pluck('id');
+
+        $usageMap = [];
+
+        // Products using these media as featured image
+        $featuredProducts = Product::whereIn('featured_image_id', $mediaIds)
+            ->get(['id', 'name_en', 'featured_image_id']);
+        foreach ($featuredProducts as $product) {
+            $usageMap[$product->featured_image_id][] = [
+                'type' => 'Product Featured Image',
+                'name' => $product->name_en,
+                'url' => "/admin/products/{$product->id}/edit",
+            ];
+        }
+
+        // Product gallery images using these media
+        $galleryImages = ProductImage::whereIn('media_id', $mediaIds)
+            ->with('product:id,name_en')
+            ->get();
+        foreach ($galleryImages as $pi) {
+            if ($pi->product) {
+                $usageMap[$pi->media_id][] = [
+                    'type' => 'Product Gallery',
+                    'name' => $pi->product->name_en,
+                    'url' => "/admin/products/{$pi->product->id}/edit",
+                ];
+            }
+        }
+
         return Inertia::render('Admin/Media', [
             'media' => $media,
             'folders' => $allFolders,
             'folderCounts' => $folderCounts,
             'filters' => $request->only(['folder', 'type']),
+            'mediaUsage' => $usageMap,
         ]);
     }
 

@@ -20,17 +20,19 @@ import {
   FolderPen,
   AlertTriangle,
   FolderInput,
+  Link2,
 } from 'lucide-react';
-import type { Media, PaginatedData } from '@/types';
+import type { Media, MediaUsage, PaginatedData } from '@/types';
 
 interface Props {
   media: PaginatedData<Media>;
   folders: string[];
   folderCounts: Record<string, number>;
   filters: { folder?: string; type?: string };
+  mediaUsage: Record<number, MediaUsage[]>;
 }
 
-export default function MediaPage({ media, folders, folderCounts, filters }: Props) {
+export default function MediaPage({ media, folders, folderCounts, filters, mediaUsage }: Props) {
   // ---------------------------------------------------------------------------
   // State
   // ---------------------------------------------------------------------------
@@ -441,9 +443,9 @@ export default function MediaPage({ media, folders, folderCounts, filters }: Pro
                 {items.map((item) => (
                   <div
                     key={item.id}
-                    className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+                    className="group relative bg-white rounded-xl border border-gray-200 hover:shadow-md transition-shadow"
                   >
-                    <div className="aspect-square bg-gray-100 flex items-center justify-center relative">
+                    <div className="aspect-square bg-gray-100 flex items-center justify-center relative rounded-t-xl overflow-hidden">
                       {item.mime_type.startsWith('image/') ? (
                         <img
                           src={item.url}
@@ -481,7 +483,44 @@ export default function MediaPage({ media, folders, folderCounts, filters }: Pro
                     </div>
                     <div className="p-2">
                       <p className="text-xs text-gray-700 truncate">{item.original_filename}</p>
-                      <p className="text-xs text-gray-400">{formatSize(item.size)}</p>
+                      <div className="flex items-center justify-between mt-0.5">
+                        <p className="text-xs text-gray-400">{formatSize(item.size)}</p>
+                        {mediaUsage[item.id] && mediaUsage[item.id].length > 0 && (
+                          <div className="group/usage relative">
+                            <span className="flex items-center gap-1 text-xs text-emerald-600 cursor-help">
+                              <Link2 size={11} />
+                              {mediaUsage[item.id].length}
+                            </span>
+                            {/* Tooltip */}
+                            <div className="absolute bottom-full right-0 mb-1.5 hidden group-hover/usage:block z-20 w-52">
+                              <div className="bg-gray-900 text-white text-xs rounded-lg p-2.5 shadow-lg">
+                                <p className="font-medium mb-1.5 text-gray-300">Used in:</p>
+                                <ul className="space-y-1">
+                                  {mediaUsage[item.id].map((u, i) => (
+                                    <li key={i} className="flex items-start gap-1.5">
+                                      <span className="text-gray-400 shrink-0">&bull;</span>
+                                      <span>
+                                        <a
+                                          href={u.url}
+                                          className="text-primary-light hover:underline"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            e.preventDefault();
+                                            router.visit(u.url);
+                                          }}
+                                        >
+                                          {u.name}
+                                        </a>
+                                        <span className="text-gray-400 block text-[10px]">{u.type}</span>
+                                      </span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}

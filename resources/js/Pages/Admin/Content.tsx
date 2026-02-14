@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
+import UndoButton from '@/Components/Admin/UndoButton';
 import { ChevronDown, ChevronRight, Save, Eye, ExternalLink, Maximize2, Minimize2, MousePointerClick, Home, Building2, Recycle, ShieldCheck, Briefcase, Award, Mail, type LucideIcon } from 'lucide-react';
-import type { SiteContent } from '@/types';
+import type { SiteContent, UndoMeta } from '@/types';
 
 const PAGE_CONFIG: Record<string, { label: string; labelAr: string; icon: LucideIcon }> = {
   home: { label: 'Home', labelAr: 'الرئيسية', icon: Home },
@@ -75,9 +76,10 @@ const PAGE_URLS: Record<string, string> = {
 
 interface Props {
   content: Record<string, SiteContent[]>;
+  undoMeta: UndoMeta | null;
 }
 
-export default function Content({ content: contentByPage }: Props) {
+export default function Content({ content: contentByPage, undoMeta }: Props) {
   const [expandedPages, setExpandedPages] = useState<Set<string>>(new Set());
   const [editedItems, setEditedItems] = useState<
     Record<number, { content_en: string; content_ar: string }>
@@ -182,14 +184,17 @@ export default function Content({ content: contentByPage }: Props) {
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Site Content</h1>
-        <button
-          onClick={handleSave}
-          disabled={!hasChanges || saving}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
-        >
-          <Save size={16} />
-          {saving ? 'Saving...' : 'Save Changes'}
-        </button>
+        <div className="flex items-center gap-3">
+          <UndoButton modelType="site_content" modelId="all" undoMeta={undoMeta} />
+          <button
+            onClick={handleSave}
+            disabled={!hasChanges || saving}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
+          >
+            <Save size={16} />
+            {saving ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
       </div>
 
       {hasChanges && (

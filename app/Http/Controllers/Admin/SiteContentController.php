@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SiteContent;
+use App\Services\UndoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,12 +12,17 @@ use Inertia\Response;
 
 class SiteContentController extends Controller
 {
+    public function __construct(
+        protected UndoService $undoService,
+    ) {}
+
     public function index(): Response
     {
         $content = SiteContent::all()->groupBy('page');
 
         return Inertia::render('Admin/Content', [
             'content' => $content,
+            'undoMeta' => $this->undoService->getUndoMeta('site_content', 'all'),
         ]);
     }
 
@@ -46,8 +52,41 @@ class SiteContentController extends Controller
             'contents.*.content_ar' => 'nullable|string',
         ]);
 
-        $userId = $request->user()->id;
+        // Snapshot current state before applying changes
+        $ids = collect($request->contents)->pluck('id')->all();
+        $currentItems = SiteContent::whereIn('id', $ids)->get()->keyBy('id');
 
+        $oldData = [];
+        $newData = [];
+        foreach ($request->contents as $contentData) {
+            $id = $contentData['id'];
+            $current = $currentItems[$id] ?? null;
+            if (!$current) {
+                continue;
+            }
+
+            $label = ucfirst($current->page) . ' > ' . ucfirst($current->section) . ' > ' . ucfirst(str_replace('_', ' ', $current->key));
+
+            $oldData[$id] = [
+                'content_en' => $current->content_en ?? '',
+                'content_ar' => $current->content_ar ?? '',
+                'label' => $label,
+            ];
+            $newData[$id] = [
+                'content_en' => $contentData['content_en'] ?? '',
+                'content_ar' => $contentData['content_ar'] ?? '',
+                'label' => $label,
+            ];
+        }
+
+        $hasChanges = $this->undoService->saveState('site_content', 'all', $oldData, $newData);
+
+        if (!$hasChanges) {
+            return redirect()->back()->with('success', 'No changes detected.');
+        }
+
+        // Apply changes
+        $userId = $request->user()->id;
         foreach ($request->contents as $contentData) {
             SiteContent::where('id', $contentData['id'])->update([
                 'content_en' => $contentData['content_en'] ?? null,

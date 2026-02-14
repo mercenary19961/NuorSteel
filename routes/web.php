@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\ContactController as AdminContactController;
 use App\Http\Controllers\Admin\NewsletterController as AdminNewsletterController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\UndoController as AdminUndoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -79,6 +80,11 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/content', [AdminContentController::class, 'index'])->name('content.index');
     Route::put('/content/{id}', [AdminContentController::class, 'update'])->name('content.update');
     Route::put('/content', [AdminContentController::class, 'bulkUpdate'])->name('content.bulk-update');
+
+    // Undo (reusable across all admin sections)
+    Route::get('/undo/{model}/{id}', [AdminUndoController::class, 'status'])->name('undo.status');
+    Route::post('/undo/{model}/{id}', [AdminUndoController::class, 'restore'])->name('undo.restore');
+    Route::delete('/undo/{model}/{id}', [AdminUndoController::class, 'clear'])->name('undo.clear');
 
     // Timeline
     Route::get('/timeline', [AdminTimelineController::class, 'index'])->name('timeline.index');

@@ -86,6 +86,27 @@ export interface Media {
   created_at: string;
 }
 
+export interface MediaUsage {
+  type: string;
+  name: string;
+  url: string;
+}
+
+// Undo
+export interface UndoFieldChange {
+  field: string;
+  label: string;
+  old: string;
+  new: string;
+}
+
+export interface UndoMeta {
+  available: boolean;
+  saved_at: string;
+  saved_by: number;
+  changes: UndoFieldChange[];
+}
+
 // Products
 export interface Product {
   id: number;

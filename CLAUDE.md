@@ -252,6 +252,33 @@ About Us | Products | Quality | Career | Certificates | Contact
 
 ---
 
+## Code Quality Checklist
+
+After writing or modifying any controller, service, or model method, verify these before finishing:
+
+### Data Access Consistency
+
+- If a model has a dedicated method (e.g. `Setting::set()`, `Media::storeFile()`), **always use it** — never bypass with raw `::update()` or `::create()` queries. This includes undo/restore flows, seeders, and tests.
+- When the same data is written in multiple places (create, update, restore, import), all paths must go through the same model method.
+- **Never use `auth()` helper** — always use `Auth::id()` / `Auth::user()` via `use Illuminate\Support\Facades\Auth`. The `auth()` helper triggers Intelephense errors.
+
+### Return Values & Guard Clauses
+
+- If a service method returns a meaningful value (bool, count, status), **always use it**. Don't call-and-ignore.
+- Guard against no-op operations — if nothing changed, short-circuit early with appropriate feedback instead of running writes and reporting success.
+
+### Query Efficiency
+
+- Never query inside a loop (`foreach` + `::where()->first()`). Batch-fetch with `whereIn()` or `pluck()` before the loop.
+- For paginated views, only query related data for the current page's IDs, not the entire table.
+
+### Undo/Restore Flows
+
+- Restore operations must use the same model methods as normal updates (to preserve `updated_by`, events, cache invalidation, etc.).
+- Always verify undo state exists before attempting restore. Clear undo state after successful restore.
+
+---
+
 ## Security (CRITICAL)
 
 Security is extremely important for this project. Every code change must consider security implications. Follow these rules strictly:
