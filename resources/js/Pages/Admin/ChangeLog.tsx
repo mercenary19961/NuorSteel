@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import Pagination from '@/Components/Admin/Pagination';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
-import { ChevronDown, ChevronUp, Undo2, ArrowRight, RotateCcw } from 'lucide-react';
-import type { PaginatedData, ChangeLog as ChangeLogType, UndoFieldChange, User } from '@/types';
+import CustomSelect from '@/Components/Admin/CustomSelect';
+import { ChevronDown, ChevronUp, Undo2, ArrowRight, RotateCcw, Trash2 } from 'lucide-react';
+import type { PageProps, PaginatedData, ChangeLog as ChangeLogType, UndoFieldChange, User } from '@/types';
 
 const SECTION_COLORS: Record<string, string> = {
   settings: 'bg-purple-100 text-purple-700',
@@ -23,21 +24,29 @@ interface Props {
   filters: {
     model_type?: string;
     changed_by?: string;
+    period?: string;
   };
 }
 
 export default function ChangeLog({ logs, users, sectionLabels, filters }: Props) {
+  const { auth } = usePage<PageProps>().props;
+  const isAdmin = auth.user?.role === 'admin';
+
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [revertTarget, setRevertTarget] = useState<ChangeLogType | null>(null);
   const [reverting, setReverting] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<ChangeLogType | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const modelType = filters.model_type ?? '';
   const changedBy = filters.changed_by ?? '';
+  const period = filters.period ?? '';
 
   const applyFilters = (overrides: Record<string, string | undefined>) => {
     const params: Record<string, string | undefined> = {
       model_type: modelType || undefined,
       changed_by: changedBy || undefined,
+      period: period || undefined,
       ...overrides,
     };
 
@@ -56,6 +65,7 @@ export default function ChangeLog({ logs, users, sectionLabels, filters }: Props
     const params: Record<string, string | undefined> = {
       model_type: modelType || undefined,
       changed_by: changedBy || undefined,
+      period: period || undefined,
     };
     const cleanParams: Record<string, string> = {};
     Object.entries(params).forEach(([key, val]) => {
@@ -65,6 +75,16 @@ export default function ChangeLog({ logs, users, sectionLabels, filters }: Props
     router.get('/admin/change-log', { ...cleanParams, page }, {
       preserveState: true,
       preserveScroll: true,
+    });
+  };
+
+  const handleDelete = () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    router.delete(`/admin/change-log/${deleteTarget.id}`, {
+      preserveScroll: true,
+      onSuccess: () => setDeleteTarget(null),
+      onFinish: () => setDeleting(false),
     });
   };
 
@@ -131,27 +151,40 @@ export default function ChangeLog({ logs, users, sectionLabels, filters }: Props
 
       {/* Filters */}
       <div className="flex items-center gap-3 mb-4 flex-wrap">
-        <select
+        <CustomSelect
           value={modelType}
-          onChange={(e) => applyFilters({ model_type: e.target.value || undefined })}
-          className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-        >
-          <option value="">All Sections</option>
-          {Object.entries(sectionLabels).map(([key, label]) => (
-            <option key={key} value={key}>{label}</option>
-          ))}
-        </select>
+          onChange={(val) => applyFilters({ model_type: val || undefined })}
+          placeholder="All Sections"
+          options={[
+            { value: '', label: 'All Sections' },
+            ...Object.entries(sectionLabels).map(([key, label]) => ({ value: key, label })),
+          ]}
+          className="w-44"
+        />
 
-        <select
+        <CustomSelect
           value={changedBy}
-          onChange={(e) => applyFilters({ changed_by: e.target.value || undefined })}
-          className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-        >
-          <option value="">All Users</option>
-          {users.map((user) => (
-            <option key={user.id} value={user.id}>{user.name}</option>
-          ))}
-        </select>
+          onChange={(val) => applyFilters({ changed_by: val || undefined })}
+          placeholder="All Users"
+          options={[
+            { value: '', label: 'All Users' },
+            ...users.map((user) => ({ value: String(user.id), label: user.name })),
+          ]}
+          className="w-40"
+        />
+
+        <CustomSelect
+          value={period}
+          onChange={(val) => applyFilters({ period: val || undefined })}
+          placeholder="All Time"
+          options={[
+            { value: '', label: 'All Time' },
+            { value: 'week', label: 'Past Week' },
+            { value: 'month', label: 'Past Month' },
+            { value: 'year', label: 'Past Year' },
+          ]}
+          className="w-36"
+        />
       </div>
 
       {/* Card grid */}
@@ -193,20 +226,31 @@ export default function ChangeLog({ logs, users, sectionLabels, filters }: Props
                     </div>
                   </div>
 
-                  {!isReverted ? (
-                    <button
-                      onClick={() => setRevertTarget(item)}
-                      className="shrink-0 p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-                      title="Revert to previous state"
-                    >
-                      <Undo2 size={14} />
-                    </button>
-                  ) : (
-                    <span className="shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded-full bg-gray-100 text-gray-400">
-                      <RotateCcw size={9} />
-                      Reverted
-                    </span>
-                  )}
+                  <div className="flex items-center gap-1 shrink-0">
+                    {!isReverted ? (
+                      <button
+                        onClick={() => setRevertTarget(item)}
+                        className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                        title="Revert to previous state"
+                      >
+                        <Undo2 size={14} />
+                      </button>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded-full bg-gray-100 text-gray-400">
+                        <RotateCcw size={9} />
+                        Reverted
+                      </span>
+                    )}
+                    {isAdmin && (
+                      <button
+                        onClick={() => setDeleteTarget(item)}
+                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete log entry"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Changes */}
@@ -275,6 +319,17 @@ export default function ChangeLog({ logs, users, sectionLabels, filters }: Props
         loading={reverting}
         onConfirm={handleRevert}
         onCancel={() => setRevertTarget(null)}
+      />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete Log Entry"
+        message="This will permanently delete this change log entry. This action cannot be undone."
+        confirmLabel="Delete"
+        variant="danger"
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
       />
     </AdminLayout>
   );

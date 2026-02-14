@@ -106,8 +106,8 @@ class UndoService
             'model_type' => $modelType,
             'model_id' => (string) $id,
             'changes' => [['field' => 'status', 'label' => 'Record', 'old' => 'Active', 'new' => 'Deleted']],
-            'old_data' => null,
-            'new_data' => null,
+            'old_data' => [],
+            'new_data' => [],
             'changed_by' => Auth::id(),
         ]);
     }

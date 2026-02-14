@@ -169,5 +169,6 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         // Change Log
         Route::get('/change-log', [AdminChangeLogController::class, 'index'])->name('change-log.index');
         Route::post('/change-log/{id}/revert', [AdminChangeLogController::class, 'revert'])->name('change-log.revert');
+        Route::delete('/change-log/{id}', [AdminChangeLogController::class, 'destroy'])->name('change-log.destroy');
     });
 });
