@@ -7,6 +7,8 @@ interface BilingualEditorProps {
   type?: 'text' | 'textarea' | 'html';
   rows?: number;
   required?: boolean;
+  placeholderEn?: string;
+  placeholderAr?: string;
 }
 
 export default function BilingualEditor({
@@ -18,6 +20,8 @@ export default function BilingualEditor({
   type = 'text',
   rows = 4,
   required = false,
+  placeholderEn,
+  placeholderAr,
 }: BilingualEditorProps) {
   const inputClass =
     'w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary';
@@ -40,6 +44,7 @@ export default function BilingualEditor({
               dir="ltr"
               className={inputClass}
               required={required}
+              placeholder={placeholderEn}
             />
           ) : (
             <input
@@ -49,6 +54,7 @@ export default function BilingualEditor({
               dir="ltr"
               className={inputClass}
               required={required}
+              placeholder={placeholderEn}
             />
           )}
         </div>
@@ -64,6 +70,7 @@ export default function BilingualEditor({
               dir="rtl"
               className={inputClass}
               required={required}
+              placeholder={placeholderAr}
             />
           ) : (
             <input
@@ -73,6 +80,7 @@ export default function BilingualEditor({
               dir="rtl"
               className={inputClass}
               required={required}
+              placeholder={placeholderAr}
             />
           )}
         </div>

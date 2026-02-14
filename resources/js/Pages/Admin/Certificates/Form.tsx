@@ -131,6 +131,8 @@ export default function CertificateForm({ item, undoMeta }: Props) {
             onChangeEn={(v) => setForm((f) => ({ ...f, title_en: v }))}
             onChangeAr={(v) => setForm((f) => ({ ...f, title_ar: v }))}
             required
+            placeholderEn="e.g. ISO 9001 Quality Management"
+            placeholderAr="مثال: شهادة إدارة الجودة ISO 9001"
           />
 
           <div>
@@ -159,6 +161,8 @@ export default function CertificateForm({ item, undoMeta }: Props) {
             onChangeAr={(v) => setForm((f) => ({ ...f, description_ar: v }))}
             type="textarea"
             rows={3}
+            placeholderEn="Brief description of the certificate scope and validity (optional)"
+            placeholderAr="وصف مختصر لنطاق الشهادة وصلاحيتها (اختياري)"
           />
 
           {/* PDF Upload */}
@@ -217,6 +221,7 @@ export default function CertificateForm({ item, undoMeta }: Props) {
                 onChange={(e) => setForm((f) => ({ ...f, issue_date: e.target.value }))}
                 className={inputClass}
               />
+              <p className="text-xs text-gray-400 mt-1">Optional — when the certificate was issued</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
@@ -226,6 +231,7 @@ export default function CertificateForm({ item, undoMeta }: Props) {
                 onChange={(e) => setForm((f) => ({ ...f, expiry_date: e.target.value }))}
                 className={inputClass}
               />
+              <p className="text-xs text-gray-400 mt-1">Optional — leave empty if the certificate does not expire</p>
             </div>
           </div>
 
@@ -239,6 +245,7 @@ export default function CertificateForm({ item, undoMeta }: Props) {
                 onChange={(e) => setForm((f) => ({ ...f, sort_order: Number(e.target.value) }))}
                 className={`${inputClass} max-w-30`}
               />
+              <p className="text-xs text-gray-400 mt-1">Lower numbers appear first</p>
             </div>
             <div className="flex items-end pb-2">
               <label className="flex items-center gap-2 cursor-pointer">
