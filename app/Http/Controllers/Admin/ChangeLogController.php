@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\ChangeLog;
 use App\Models\User;
 use App\Services\UndoService;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -106,10 +105,10 @@ class ChangeLogController extends Controller
         return redirect('/admin/change-log')->with('success', $sectionName . ' reverted successfully.');
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(int $id): RedirectResponse
     {
         ChangeLog::findOrFail($id)->delete();
 
-        return response()->json(['deleted' => true]);
+        return redirect()->back()->with('success', 'Log entry deleted.');
     }
 }

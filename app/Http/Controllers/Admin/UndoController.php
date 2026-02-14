@@ -70,10 +70,10 @@ class UndoController extends Controller
      * DELETE  /admin/undo/{model}/{id}
      * Clear the undo state without restoring.
      */
-    public function clear(string $model, string $id): JsonResponse
+    public function clear(string $model, string $id): RedirectResponse
     {
         $this->undoService->clear($model, $id);
 
-        return response()->json(['cleared' => true]);
+        return redirect()->back();
     }
 }
