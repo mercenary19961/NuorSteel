@@ -104,8 +104,8 @@ export default function Newsletter({ subscribers, stats, filters, undoMeta, undo
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-              <Users size={20} className="text-blue-600" />
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Users size={20} className="text-primary" />
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
@@ -113,8 +113,8 @@ export default function Newsletter({ subscribers, stats, filters, undoMeta, undo
             </div>
           </div>
           <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-              <UserCheck size={20} className="text-green-600" />
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <UserCheck size={20} className="text-primary" />
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
@@ -122,8 +122,8 @@ export default function Newsletter({ subscribers, stats, filters, undoMeta, undo
             </div>
           </div>
           <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
-              <UserX size={20} className="text-red-600" />
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <UserX size={20} className="text-primary" />
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats.inactive}</p>

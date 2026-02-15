@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\CareerApplication;
 use App\Models\CareerListing;
+use App\Models\ContactSubmission;
 use App\Models\Media;
+use App\Models\NewsletterSubscriber;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -204,6 +206,83 @@ class DemoContentSeeder extends Seeder
             $app = CareerApplication::create($data);
             // Stagger created_at dates so they appear in a realistic order
             $app->update(['created_at' => now()->subDays(10 - $i * 2)]);
+        }
+
+        // --- Contact Submissions (4) ---
+        $contacts = [
+            [
+                'name' => 'Mohammed Al-Zahrani',
+                'company' => 'Gulf Construction Co.',
+                'email' => 'mohammed.z@gulfconstruction.example.com',
+                'phone' => '+966 50 111 2233',
+                'country' => 'Saudi Arabia',
+                'request_type' => 'quotation',
+                'subject' => 'Bulk rebar order for residential project',
+                'message' => "We are working on a large residential project in Jeddah and need a quotation for 500 tons of 16mm and 20mm steel rebar.\n\nPlease provide pricing, delivery timeline, and available test certificates.\n\nBest regards,\nMohammed",
+                'is_read' => false,
+                'is_archived' => false,
+            ],
+            [
+                'name' => 'Laura Chen',
+                'company' => 'SteelTrade International',
+                'email' => 'l.chen@steeltrade.example.com',
+                'phone' => '+971 4 555 6789',
+                'country' => 'United Arab Emirates',
+                'request_type' => 'partnership',
+                'subject' => 'Distribution partnership opportunity',
+                'message' => "Dear Nuor Steel team,\n\nWe are a steel trading company based in Dubai and are interested in exploring a distribution partnership for your products in the UAE market.\n\nCould we schedule a call to discuss further?\n\nRegards,\nLaura Chen",
+                'is_read' => true,
+                'is_archived' => false,
+                'read_by' => $adminId,
+            ],
+            [
+                'name' => 'Abdullah Malik',
+                'company' => 'Malik Engineering Services',
+                'email' => 'a.malik@malikeng.example.com',
+                'phone' => '+966 55 444 7788',
+                'country' => 'Saudi Arabia',
+                'request_type' => 'vendor',
+                'subject' => 'Vendor registration request',
+                'message' => "Hello,\n\nWe would like to register as an approved vendor for steel supply. Our company specializes in infrastructure projects and we are looking for reliable steel suppliers.\n\nPlease send us the vendor registration requirements.\n\nThank you,\nAbdullah",
+                'is_read' => false,
+                'is_archived' => false,
+            ],
+            [
+                'name' => 'Nadia Al-Harbi',
+                'company' => 'Green Build KSA',
+                'email' => 'nadia@greenbuild.example.com',
+                'phone' => '+966 53 222 9900',
+                'country' => 'Saudi Arabia',
+                'request_type' => 'sustainability',
+                'subject' => 'EPD certificate inquiry',
+                'message' => "Hi,\n\nWe are a green building consultancy and one of our clients requires EPD-certified steel for a LEED project. Could you provide details on your environmental product declarations?\n\nThanks,\nNadia",
+                'is_read' => true,
+                'is_archived' => true,
+                'read_by' => $adminId,
+            ],
+        ];
+
+        foreach ($contacts as $i => $data) {
+            $contact = ContactSubmission::create($data);
+            $contact->update(['created_at' => now()->subDays(12 - $i * 3)]);
+        }
+
+        // --- Newsletter Subscribers (6) ---
+        $subscribers = [
+            ['email' => 'buyer@steelworks.example.com', 'source' => 'website'],
+            ['email' => 'procurement@buildco.example.com', 'source' => 'website'],
+            ['email' => 'info@arabsteel.example.com', 'source' => 'website'],
+            ['email' => 'john.doe@contractor.example.com', 'source' => 'website'],
+            ['email' => 'supply.chain@megaproject.example.com', 'source' => 'website'],
+            ['email' => 'unsubscribed@oldclient.example.com', 'source' => 'website', 'is_active' => false, 'unsubscribed_at' => now()->subDays(5)],
+        ];
+
+        foreach ($subscribers as $i => $data) {
+            $sub = NewsletterSubscriber::create(array_merge(
+                ['is_active' => true],
+                $data,
+            ));
+            $sub->update(['subscribed_at' => now()->subDays(30 - $i * 4)]);
         }
     }
 }
