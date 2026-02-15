@@ -147,8 +147,7 @@ export default function ProductsIndex({ products, categories, filters, undoMeta,
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
-                      <span className="text-xs text-gray-400">Order: {item.sort_order}</span>
+                    <div className="flex items-center justify-end mt-4 pt-3 border-t border-gray-100">
                       <div className="flex items-center gap-1">
                         <Link
                           href={`/admin/products/${item.id}/edit`}
