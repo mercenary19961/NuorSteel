@@ -8,6 +8,7 @@ use App\Models\Media;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class DemoContentSeeder extends Seeder
@@ -19,6 +20,12 @@ class DemoContentSeeder extends Seeder
 
         // --- Media (4 placeholder images) ---
         $mediaItems = [];
+        $colors = [
+            ['bg' => [180, 60, 30], 'label' => 'Steel Rebar'],
+            ['bg' => [50, 80, 120], 'label' => 'Wire Rod'],
+            ['bg' => [80, 100, 80], 'label' => 'Factory'],
+            ['bg' => [100, 70, 50], 'label' => 'Production'],
+        ];
         $images = [
             ['original_filename' => 'steel-rebar.jpg', 'alt_text_en' => 'Steel rebar bundle', 'alt_text_ar' => 'حزمة حديد تسليح', 'folder' => 'products'],
             ['original_filename' => 'wire-rod-coil.jpg', 'alt_text_en' => 'Wire rod coil', 'alt_text_ar' => 'لفائف أسلاك الحديد', 'folder' => 'products'],
@@ -26,14 +33,43 @@ class DemoContentSeeder extends Seeder
             ['original_filename' => 'production-line.jpg', 'alt_text_en' => 'Steel production line', 'alt_text_ar' => 'خط إنتاج الحديد', 'folder' => 'general'],
         ];
 
-        foreach ($images as $img) {
+        Storage::makeDirectory('media');
+
+        foreach ($images as $i => $img) {
             $filename = Str::random(20) . '.jpg';
+            $path = 'media/' . $filename;
+
+            // Generate a real placeholder JPEG using GD
+            $width = 800;
+            $height = 600;
+            $image = imagecreatetruecolor($width, $height);
+            $bg = $colors[$i]['bg'];
+            $bgColor = imagecolorallocate($image, $bg[0], $bg[1], $bg[2]);
+            imagefill($image, 0, 0, $bgColor);
+
+            // Add label text
+            $white = imagecolorallocate($image, 255, 255, 255);
+            $label = $colors[$i]['label'];
+            $fontSize = 5;
+            $textWidth = imagefontwidth($fontSize) * strlen($label);
+            $textHeight = imagefontheight($fontSize);
+            imagestring($image, $fontSize, (int) (($width - $textWidth) / 2), (int) (($height - $textHeight) / 2), $label, $white);
+
+            // Save to a temp file then store via Storage
+            $tmpFile = tempnam(sys_get_temp_dir(), 'demo_');
+            imagejpeg($image, $tmpFile, 85);
+            imagedestroy($image);
+
+            $fileSize = filesize($tmpFile);
+            Storage::put($path, file_get_contents($tmpFile));
+            unlink($tmpFile);
+
             $mediaItems[] = Media::create([
                 'filename' => $filename,
                 'original_filename' => $img['original_filename'],
-                'path' => 'media/' . $filename,
+                'path' => $path,
                 'mime_type' => 'image/jpeg',
-                'size' => rand(100000, 500000),
+                'size' => $fileSize,
                 'alt_text_en' => $img['alt_text_en'],
                 'alt_text_ar' => $img['alt_text_ar'],
                 'folder' => $img['folder'],
