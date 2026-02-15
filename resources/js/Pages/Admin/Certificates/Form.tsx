@@ -54,6 +54,21 @@ export default function CertificateForm({ item, undoMeta }: Props) {
         }
       : emptyForm,
   );
+  const initialForm = useRef(
+    item
+      ? {
+          title_en: item.title_en,
+          title_ar: item.title_ar,
+          category: item.category,
+          description_en: item.description_en ?? '',
+          description_ar: item.description_ar ?? '',
+          issue_date: item.issue_date ?? '',
+          expiry_date: item.expiry_date ?? '',
+          is_active: item.is_active,
+          sort_order: item.sort_order,
+        }
+      : null,
+  );
   const [file, setFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -98,6 +113,8 @@ export default function CertificateForm({ item, undoMeta }: Props) {
       });
     }
   };
+
+  const isDirty = !isEditing || file !== null || JSON.stringify(form) !== JSON.stringify(initialForm.current);
 
   const inputClass =
     'w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary';
@@ -270,7 +287,7 @@ export default function CertificateForm({ item, undoMeta }: Props) {
             </button>
             <button
               type="submit"
-              disabled={saving}
+              disabled={saving || !isDirty}
               className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50"
             >
               {saving ? 'Saving...' : isEditing ? 'Update Certificate' : 'Create Certificate'}

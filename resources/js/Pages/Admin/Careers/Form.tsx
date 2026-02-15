@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
@@ -60,7 +60,26 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
         }
       : emptyForm,
   );
+  const initialForm = useRef(
+    item
+      ? {
+          title_en: item.title_en,
+          title_ar: item.title_ar,
+          slug: item.slug,
+          description_en: item.description_en,
+          description_ar: item.description_ar,
+          requirements_en: item.requirements_en ?? '',
+          requirements_ar: item.requirements_ar ?? '',
+          location: item.location ?? '',
+          employment_type: item.employment_type,
+          status: item.status,
+          expires_at: item.expires_at ?? '',
+        }
+      : null,
+  );
   const [saving, setSaving] = useState(false);
+
+  const isDirty = !isEditing || JSON.stringify(form) !== JSON.stringify(initialForm.current);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -214,7 +233,7 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
             </button>
             <button
               type="submit"
-              disabled={saving}
+              disabled={saving || !isDirty}
               className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50"
             >
               {saving ? 'Saving...' : isEditing ? 'Update Listing' : 'Create Listing'}

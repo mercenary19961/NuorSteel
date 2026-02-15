@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
@@ -102,7 +102,9 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
   const isEditing = !!item;
 
   const [form, setForm] = useState<ProductForm>(() => initForm(item));
+  const initialForm = useRef(initForm(item));
   const [specs, setSpecs] = useState<SpecForm[]>(() => initSpecs(item));
+  const initialSpecs = useRef(initSpecs(item));
   const [activeTab, setActiveTab] = useState<'details' | 'images' | 'specs'>('details');
   const [featuredImageUrl, setFeaturedImageUrl] = useState<string | null>(
     item?.featured_image?.url ?? null,
@@ -176,6 +178,9 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
   const updateSpec = (index: number, field: keyof SpecForm, value: string | number) => {
     setSpecs(specs.map((s, i) => (i === index ? { ...s, [field]: value } : s)));
   };
+
+  const isDetailsDirty = !isEditing || JSON.stringify(form) !== JSON.stringify(initialForm.current);
+  const isSpecsDirty = !isEditing || JSON.stringify(specs) !== JSON.stringify(initialSpecs.current);
 
   const inputClass =
     'w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary';
@@ -364,7 +369,7 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
               </button>
               <button
                 type="submit"
-                disabled={saving}
+                disabled={saving || !isDetailsDirty}
                 className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50"
               >
                 {saving ? 'Saving...' : isEditing ? 'Update Product' : 'Create Product'}
@@ -440,7 +445,7 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
                 </button>
                 <button
                   onClick={handleSaveSpecs}
-                  disabled={savingSpecs}
+                  disabled={savingSpecs || !isSpecsDirty}
                   className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50"
                 >
                   {savingSpecs ? 'Saving...' : 'Save Specs'}
