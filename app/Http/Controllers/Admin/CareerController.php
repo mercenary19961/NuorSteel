@@ -63,7 +63,6 @@ class CareerController extends Controller
         $request->validate([
             'title_en' => 'required|string|max:255',
             'title_ar' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:career_listings,slug',
             'description_en' => 'required|string',
             'description_ar' => 'required|string',
             'requirements_en' => 'nullable|string',
@@ -75,11 +74,11 @@ class CareerController extends Controller
         ]);
 
         $data = $request->only([
-            'title_en', 'title_ar', 'slug', 'description_en', 'description_ar',
+            'title_en', 'title_ar', 'description_en', 'description_ar',
             'requirements_en', 'requirements_ar', 'location', 'employment_type',
             'status', 'expires_at',
         ]);
-        $data['slug'] = $data['slug'] ?? Str::slug($data['title_en']);
+        $data['slug'] = Str::slug($data['title_en']);
         $data['created_by'] = $request->user()->id;
         $data['updated_by'] = $request->user()->id;
 
@@ -103,7 +102,6 @@ class CareerController extends Controller
         $request->validate([
             'title_en' => 'required|string|max:255',
             'title_ar' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:career_listings,slug,' . $id,
             'description_en' => 'required|string',
             'description_ar' => 'required|string',
             'requirements_en' => 'nullable|string',
@@ -129,7 +127,8 @@ class CareerController extends Controller
             $newData[$field] = (string) ($request->input($field) ?? '');
         }
 
-        $data = $request->only(array_merge($trackedFields, ['slug']));
+        $data = $request->only($trackedFields);
+        $data['slug'] = Str::slug($request->input('title_en'));
         $data['updated_by'] = $request->user()->id;
 
         $hasChanges = $this->undoService->saveState('career', $listing->id, $oldData, $newData);

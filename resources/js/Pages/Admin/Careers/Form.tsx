@@ -10,7 +10,6 @@ import type { CareerListing, UndoMeta } from '@/types';
 interface CareerForm {
   title_en: string;
   title_ar: string;
-  slug: string;
   description_en: string;
   description_ar: string;
   requirements_en: string;
@@ -24,7 +23,6 @@ interface CareerForm {
 const emptyForm: CareerForm = {
   title_en: '',
   title_ar: '',
-  slug: '',
   description_en: '',
   description_ar: '',
   requirements_en: '',
@@ -48,7 +46,6 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
       ? {
           title_en: item.title_en,
           title_ar: item.title_ar,
-          slug: item.slug,
           description_en: item.description_en,
           description_ar: item.description_ar,
           requirements_en: item.requirements_en ?? '',
@@ -65,7 +62,6 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
       ? {
           title_en: item.title_en,
           title_ar: item.title_ar,
-          slug: item.slug,
           description_en: item.description_en,
           description_ar: item.description_ar,
           requirements_en: item.requirements_en ?? '',
@@ -131,18 +127,6 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
             placeholderAr="مثال: مشرف خط الإنتاج"
             required
           />
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
-            <input
-              type="text"
-              value={form.slug}
-              onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
-              placeholder="auto-generated-from-title"
-              className={`${inputClass} max-w-md`}
-            />
-            <p className="text-xs text-gray-400 mt-1">Leave empty to auto-generate.</p>
-          </div>
 
           <BilingualEditor
             label="Description"

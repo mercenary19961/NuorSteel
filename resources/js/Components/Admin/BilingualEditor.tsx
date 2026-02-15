@@ -61,7 +61,7 @@ export default function BilingualEditor({
 
         {/* Arabic (RTL) */}
         <div>
-          <span className="block text-xs text-gray-500 mb-1">{'\u0627\u0644\u0639\u0631\u0628\u064A\u0629'}</span>
+          <span className="block text-xs text-gray-500 mb-1 text-right">{'\u0627\u0644\u0639\u0631\u0628\u064A\u0629'}</span>
           {type === 'textarea' || type === 'html' ? (
             <textarea
               value={valueAr}

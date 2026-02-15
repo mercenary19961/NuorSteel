@@ -17,7 +17,6 @@ interface Props {
 interface ProductForm {
   name_en: string;
   name_ar: string;
-  slug: string;
   short_description_en: string;
   short_description_ar: string;
   description_en: string;
@@ -56,7 +55,6 @@ function initForm(item: Product | null): ProductForm {
     return {
       name_en: '',
       name_ar: '',
-      slug: '',
       short_description_en: '',
       short_description_ar: '',
       description_en: '',
@@ -71,7 +69,6 @@ function initForm(item: Product | null): ProductForm {
   return {
     name_en: item.name_en,
     name_ar: item.name_ar,
-    slug: item.slug,
     short_description_en: item.short_description_en ?? '',
     short_description_ar: item.short_description_ar ?? '',
     description_en: item.description_en ?? '',
@@ -238,18 +235,6 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
               onChangeAr={(v) => setForm((f) => ({ ...f, name_ar: v }))}
               required
             />
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
-              <input
-                type="text"
-                value={form.slug}
-                onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
-                placeholder="auto-generated-from-name"
-                className={`${inputClass} max-w-md`}
-              />
-              <p className="text-xs text-gray-400 mt-1">Leave empty to auto-generate from English name.</p>
-            </div>
 
             <BilingualEditor
               label="Short Description"
