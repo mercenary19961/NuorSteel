@@ -37,6 +37,20 @@ class CareerController extends Controller
         ]);
     }
 
+    public function show(int $id): \Illuminate\Http\JsonResponse
+    {
+        $listing = CareerListing::withCount('applications')->findOrFail($id);
+        $applications = $listing->applications()
+            ->select(['id', 'career_listing_id', 'name', 'email', 'phone', 'job_title', 'status', 'created_at'])
+            ->ordered()
+            ->get();
+
+        return response()->json([
+            'listing' => $listing,
+            'applications' => $applications,
+        ]);
+    }
+
     public function create(): Response
     {
         return Inertia::render('Admin/Careers/Form', [

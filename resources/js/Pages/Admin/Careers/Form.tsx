@@ -127,6 +127,8 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
             valueAr={form.title_ar}
             onChangeEn={(v) => setForm((f) => ({ ...f, title_en: v }))}
             onChangeAr={(v) => setForm((f) => ({ ...f, title_ar: v }))}
+            placeholderEn="e.g. Production Line Supervisor"
+            placeholderAr="مثال: مشرف خط الإنتاج"
             required
           />
 
@@ -148,20 +150,27 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
             valueAr={form.description_ar}
             onChangeEn={(v) => setForm((f) => ({ ...f, description_en: v }))}
             onChangeAr={(v) => setForm((f) => ({ ...f, description_ar: v }))}
+            placeholderEn="Describe the role, responsibilities, and what the candidate will do day-to-day..."
+            placeholderAr="صف الدور والمسؤوليات وما سيقوم به المرشح يومياً..."
             type="textarea"
             rows={5}
             required
           />
 
-          <BilingualEditor
-            label="Requirements"
-            valueEn={form.requirements_en}
-            valueAr={form.requirements_ar}
-            onChangeEn={(v) => setForm((f) => ({ ...f, requirements_en: v }))}
-            onChangeAr={(v) => setForm((f) => ({ ...f, requirements_ar: v }))}
-            type="textarea"
-            rows={4}
-          />
+          <div>
+            <BilingualEditor
+              label="Requirements"
+              valueEn={form.requirements_en}
+              valueAr={form.requirements_ar}
+              onChangeEn={(v) => setForm((f) => ({ ...f, requirements_en: v }))}
+              onChangeAr={(v) => setForm((f) => ({ ...f, requirements_ar: v }))}
+              placeholderEn={"Bachelor's degree in Engineering\n3+ years in steel manufacturing\nStrong communication skills"}
+              placeholderAr={"بكالوريوس في الهندسة\n3+ سنوات خبرة في صناعة الحديد\nمهارات تواصل قوية"}
+              type="textarea"
+              rows={4}
+            />
+            <p className="text-xs text-gray-400 mt-1">Enter one requirement per line. Each line will display as a separate item on the public page.</p>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -173,6 +182,7 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
                 placeholder="e.g. Riyadh, Saudi Arabia"
                 className={inputClass}
               />
+              <p className="text-xs text-gray-400 mt-1">City and country where the job is based.</p>
             </div>
 
             <div>
@@ -193,6 +203,7 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
                   { value: 'contract', label: 'Contract' },
                 ]}
               />
+              <p className="text-xs text-gray-400 mt-1">How the position is contracted.</p>
             </div>
 
             <div>
@@ -210,6 +221,7 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
                   { value: 'closed', label: 'Closed' },
                 ]}
               />
+              <p className="text-xs text-gray-400 mt-1">Only "Open" listings are visible on the website.</p>
             </div>
           </div>
 
@@ -221,6 +233,7 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
               onChange={(e) => setForm((f) => ({ ...f, expires_at: e.target.value }))}
               className={`${inputClass} max-w-xs`}
             />
+            <p className="text-xs text-gray-400 mt-1">The listing will be hidden automatically after this date. Leave empty for no expiry.</p>
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
