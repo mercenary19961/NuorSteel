@@ -172,13 +172,31 @@ class CareerController extends Controller
             $query->openApplications();
         }
 
+        if ($request->filled('period')) {
+            $cutoff = match ($request->period) {
+                '1w' => now()->subWeek(),
+                '1m' => now()->subMonth(),
+                '3m' => now()->subMonths(3),
+                '6m' => now()->subMonths(6),
+                '1y' => now()->subYear(),
+                'older' => null,
+                default => null,
+            };
+
+            if ($request->period === 'older') {
+                $query->where('career_applications.created_at', '<', now()->subYear());
+            } elseif ($cutoff) {
+                $query->where('career_applications.created_at', '>=', $cutoff);
+            }
+        }
+
         // Undo support: check if an application was recently updated
         $lastEditedId = session('undo_application_last_id');
         $undoMeta = $lastEditedId ? $this->undoService->getUndoMeta('application', $lastEditedId) : null;
 
         return Inertia::render('Admin/Applications', [
             'applications' => $query->ordered()->paginate(15)->withQueryString(),
-            'filters' => $request->only(['status', 'listing_id', 'open_only']),
+            'filters' => $request->only(['status', 'listing_id', 'open_only', 'period']),
             'undoMeta' => $undoMeta,
             'undoModelId' => $undoMeta ? (string) $lastEditedId : null,
         ]);

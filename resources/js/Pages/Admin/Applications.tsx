@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
-import DataTable, { type Column } from '@/Components/Admin/DataTable';
 import StatusBadge from '@/Components/Admin/StatusBadge';
 import Pagination from '@/Components/Admin/Pagination';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
-import { Download, Trash2, Eye, X } from 'lucide-react';
+import { Download, Trash2, Eye, X, User, Mail, Phone, Briefcase, Calendar } from 'lucide-react';
 import CustomSelect from '@/Components/Admin/CustomSelect';
 import UndoButton from '@/Components/Admin/UndoButton';
 import type { PaginatedData, CareerApplication, UndoMeta } from '@/types';
@@ -16,10 +15,27 @@ interface Props {
     status?: string;
     listing_id?: string;
     open_only?: string;
+    period?: string;
   };
   undoMeta?: UndoMeta | null;
   undoModelId?: string | null;
 }
+
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+};
+
+const statusColors: Record<string, string> = {
+  new: 'border-t-blue-500',
+  reviewed: 'border-t-yellow-500',
+  shortlisted: 'border-t-green-500',
+  rejected: 'border-t-red-500',
+};
 
 export default function Applications({ applications, filters, undoMeta, undoModelId }: Props) {
   const [viewItem, setViewItem] = useState<CareerApplication | null>(null);
@@ -66,10 +82,10 @@ export default function Applications({ applications, filters, undoMeta, undoMode
     setNotes(item.admin_notes ?? '');
   };
 
-  const handleFilterChange = (status: string) => {
+  const handleFilterChange = (newFilters: Record<string, string | undefined>) => {
     router.get(
       '/admin/applications',
-      { status: status || undefined },
+      { ...filters, ...newFilters, page: 1 },
       { preserveState: true, preserveScroll: true },
     );
   };
@@ -81,43 +97,6 @@ export default function Applications({ applications, filters, undoMeta, undoMode
       { preserveState: true, preserveScroll: true },
     );
   };
-
-  const columns: Column<CareerApplication>[] = [
-    {
-      key: 'name',
-      label: 'Applicant',
-      render: (item) => (
-        <div>
-          <p className="font-medium text-gray-900">{item.name}</p>
-          <p className="text-xs text-gray-500">{item.email}</p>
-        </div>
-      ),
-    },
-    {
-      key: 'job_title',
-      label: 'Applied For',
-      render: (item) => (
-        <div>
-          <p className="text-sm text-gray-700">{item.job_title}</p>
-          {item.career_listing && (
-            <p className="text-xs text-gray-400">{item.career_listing.title_en}</p>
-          )}
-        </div>
-      ),
-    },
-    {
-      key: 'status',
-      label: 'Status',
-      render: (item) => <StatusBadge status={item.status} size="sm" />,
-    },
-    {
-      key: 'created_at',
-      label: 'Date',
-      render: (item) => (
-        <span className="text-sm text-gray-500">{item.created_at}</span>
-      ),
-    },
-  ];
 
   return (
     <AdminLayout>
@@ -134,7 +113,7 @@ export default function Applications({ applications, filters, undoMeta, undoMode
       <div className="flex items-center gap-3 mb-4">
         <CustomSelect
           value={statusFilter}
-          onChange={(val) => handleFilterChange(val)}
+          onChange={(val) => handleFilterChange({ status: val || undefined })}
           placeholder="All Status"
           options={[
             { value: '', label: 'All Status' },
@@ -146,40 +125,108 @@ export default function Applications({ applications, filters, undoMeta, undoMode
           className="w-40"
         />
 
+        <CustomSelect
+          value={filters.period ?? ''}
+          onChange={(val) => handleFilterChange({ period: val || undefined })}
+          placeholder="All Time"
+          options={[
+            { value: '', label: 'All Time' },
+            { value: '1w', label: 'Last Week' },
+            { value: '1m', label: 'Last Month' },
+            { value: '3m', label: 'Last 3 Months' },
+            { value: '6m', label: 'Last 6 Months' },
+            { value: '1y', label: 'Last Year' },
+            { value: 'older', label: 'Older than a Year' },
+          ]}
+          className="w-44"
+        />
+
         <span className="text-sm text-gray-500 ml-auto">
           {applications.total} applications
         </span>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={applications.data}
-        emptyMessage="No applications found."
-        actions={(item) => (
-          <>
-            <button
-              onClick={() => openView(item)}
-              className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+      {/* Application cards */}
+      {applications.data.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-200 px-6 py-12 text-center text-sm text-gray-500">
+          No applications found.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {applications.data.map((item) => (
+            <div
+              key={item.id}
+              className={`bg-white rounded-xl border border-gray-200 border-t-4 ${statusColors[item.status] ?? 'border-t-gray-300'} hover:shadow-md transition-all overflow-hidden flex flex-col`}
             >
-              <Eye size={16} />
-            </button>
-            <a
-              href={`/admin/applications/${item.id}/cv`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-            >
-              <Download size={16} />
-            </a>
-            <button
-              onClick={() => setDeleteTarget(item)}
-              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-            >
-              <Trash2 size={16} />
-            </button>
-          </>
-        )}
-      />
+              <div className="p-4 flex-1 flex flex-col">
+                {/* Header: name + status */}
+                <div className="flex items-start justify-between mb-3">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-gray-900 truncate">{item.name}</h3>
+                    <p className="text-xs text-gray-500 truncate">{item.email}</p>
+                  </div>
+                  <StatusBadge status={item.status} size="sm" />
+                </div>
+
+                {/* Info rows */}
+                <div className="space-y-2 flex-1">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Briefcase size={14} className="text-gray-400 shrink-0" />
+                    <span className="truncate">{item.job_title}</span>
+                  </div>
+                  {item.career_listing && (
+                    <div className="flex items-center gap-2 text-xs text-gray-400">
+                      <span className="shrink-0 w-3.5" />
+                      <span className="truncate">Listing: {item.career_listing.title_en}</span>
+                    </div>
+                  )}
+                  {!item.career_listing && (
+                    <div className="flex items-center gap-2 text-xs text-orange-500">
+                      <span className="shrink-0 w-3.5" />
+                      <span>Open application</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Phone size={14} className="text-gray-400 shrink-0" />
+                    <span className="truncate">{item.phone}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Calendar size={14} className="text-gray-400 shrink-0" />
+                    <span>{formatDate(item.created_at)}</span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center justify-end mt-4 pt-3 border-t border-gray-100 gap-1">
+                  <button
+                    onClick={() => openView(item)}
+                    className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                    title="View details"
+                  >
+                    <Eye size={16} />
+                  </button>
+                  <a
+                    href={`/admin/applications/${item.id}/cv`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                    title="Download CV"
+                  >
+                    <Download size={16} />
+                  </a>
+                  <button
+                    onClick={() => setDeleteTarget(item)}
+                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Delete"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {applications.last_page > 1 && (
         <div className="mt-4">
