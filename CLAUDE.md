@@ -27,22 +27,27 @@
 - [x] Rate limiting on login and public POST endpoints
 - [x] File storage in private directory
 - [x] Database seeders
-- [x] HandleInertiaRequests middleware (shares auth, locale, flash, ziggy)
+- [x] HandleInertiaRequests middleware (shares auth, locale, flash, ziggy, siteSettings)
+- [x] UndoService + ChangeLog service (soft-delete, undo, persistent change tracking)
+- [x] Demo data seeders (contacts, newsletter, career applications)
 
 ### Admin Panel Frontend (DONE)
 - [x] Login page with Inertia form
-- [x] Admin layout with sidebar (active state via `usePage().url`)
+- [x] Admin layout with responsive sidebar (mobile overlay + hamburger toggle)
 - [x] Dashboard with stats
 - [x] Content editor (bilingual side-by-side EN/AR)
 - [x] Timeline events CRUD (drag-and-drop reorder)
-- [x] Media library (upload, grid, folder/type filter)
-- [x] Products CRUD (3-tab form: details/images/specs)
-- [x] Certificates CRUD (PDF upload)
-- [x] Careers CRUD + Applications inbox (status workflow)
-- [x] Contact submissions inbox (read/archive/filters)
-- [x] Newsletter management (admin-only, stats, export)
-- [x] Settings page (admin-only, grouped key-value editor)
+- [x] Media library (upload, grid, folder/type filter, folder management)
+- [x] Products CRUD (half-width card grid, featured image picker, CustomSelect dropdowns)
+- [x] Certificates CRUD (category-folder navigation, PDF viewer modal)
+- [x] Careers CRUD (card grid with detail modal) + Applications inbox (card grid with time filters)
+- [x] Contact submissions inbox (read/archive/filters, archived rows highlighted)
+- [x] Newsletter management (admin-only, stats, export, demo data)
+- [x] Settings page (admin-only, contact + email groups, two-column layout, email tag UI)
 - [x] Users page (admin-only, CRUD with self-protection)
+- [x] Change Log page (persistent change tracking, card layout, time filters, revert/delete)
+- [x] Undo system (soft-delete with undo across all admin sections via UndoService)
+- [x] Form UX: update buttons disabled until changes detected, placeholders and helper hints
 
 ### Public Pages Frontend (DONE)
 - [x] PublicLayout (Header + Footer + children)
@@ -75,18 +80,30 @@
 - [x] JSON-LD schema markup added (`resources/views/partials/structured-data.blade.php`)
 - [x] Schemas: Organization, WebSite, SiteNavigationElement, FAQPage
 - [x] Included in `app.blade.php` via `@include('partials.structured-data')`
-- [ ] **TODO: Replace PLACEHOLDER values** with real company details before going live:
+- [x] Phone, email, LinkedIn URL driven by `Setting::get()` (editable from admin Settings)
+- [ ] **TODO: Replace remaining PLACEHOLDER values** before going live:
   - Address (street, city, region, postal code)
-  - Phone number
-  - LinkedIn URL
   - Number of employees
   - FAQ answers (city name)
   - OG image path
 
+### Settings Wired to Site (DONE)
+- [x] Contact settings (phone, email, address EN/AR, LinkedIn URL) drive Footer, Contact page, and SEO structured data
+- [x] `siteSettings` shared globally via Inertia middleware (`HandleInertiaRequests.php`)
+- [x] Locale-aware address (switches between `company_address_en` and `company_address_ar`)
+- [x] Email recipients (contact + career) configurable with tag/chip UI in admin Settings
+- [x] Unused settings groups removed (general, social, media) — only contact + email remain
+- [x] Seeder cleans up deprecated settings rows on re-run
+
+### Demo Data (DONE)
+- [x] Contact submissions demo seeder
+- [x] Newsletter subscribers demo seeder
+- [x] Career applications demo content seeder
+
 ### Remaining
 - [ ] LinkedIn API integration (homepage feed)
 - [ ] Code splitting (chunk >500kB)
-- [ ] Structured data placeholders (see above)
+- [ ] Structured data remaining placeholders (see above)
 - [ ] Testing & deployment
 
 ---
@@ -117,7 +134,9 @@ About Us | Products | Quality | Career | Certificates | Contact
 - Image upload with **cropping tool**
 - **Simple active/inactive** toggle (no draft workflow)
 - **Basic audit logging** (created_by, updated_by fields)
-- Products have **image gallery** (multiple images)
+- Products have **image gallery** (multiple images) + **featured image** picker
+- **Undo system**: Soft-delete with undo button across all admin sections (`UndoService`)
+- **Change Log**: Persistent change tracking with time filters, card layout, revert/delete (`/admin/change-log`)
 
 ### Recycling Page
 - Lives at `/about/recycling` (sub-page under About Us)
@@ -227,6 +246,7 @@ About Us | Products | Quality | Career | Certificates | Contact
 /admin/newsletter       → Subscriber management (admin only)
 /admin/settings         → Site settings (admin only)
 /admin/users            → User management (admin only)
+/admin/change-log       → Change log with revert/delete (admin only)
 ```
 
 ---
@@ -349,6 +369,7 @@ Security is extremely important for this project. Every code change must conside
 - **Forms with files**: Use native `FormData` + `forceFormData: true`
 - **Routing**: Server-driven via `routes/web.php` — no client-side router
 - **Auth state**: `usePage<PageProps>().props.auth.user` (shared by middleware)
+- **Site settings**: `usePage<PageProps>().props.siteSettings` (phone, email, address, LinkedIn — shared by middleware)
 - **Styling**: TailwindCSS v4 with custom `primary` color
 - **Icons**: Lucide React
 - **i18n**: react-i18next with EN/AR translation files (bundled, not HTTP-loaded)
@@ -368,6 +389,7 @@ resources/views/app.blade.php  → Root Blade template (@inertia)
 app/Http/Controllers/Public/   → Public Inertia controllers
 app/Http/Controllers/Admin/    → Admin Inertia controllers
 app/Http/Controllers/Auth/     → Login/logout controller
+app/Services/                  → UndoService, ChangeLogService
 routes/web.php                 → All routes (public + admin)
 ```
 
@@ -395,7 +417,7 @@ routes/web.php                 → All routes (public + admin)
 - ~~Projects section~~ (replaced with Certificates)
 - ~~Auto language detection~~ (manual toggle only)
 - ~~Draft/publish workflow~~ (simple active/inactive)
-- ~~Full audit log~~ (basic created_by/updated_by only)
+- ~~Full audit log~~ (replaced by Change Log system with revert support)
 - ~~Standalone React SPA~~ (migrated to Inertia.js)
 - ~~API routes / Sanctum tokens~~ (replaced with session auth)
 
