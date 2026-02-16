@@ -19,7 +19,7 @@ class SettingController extends Controller
     public function index(): Response
     {
         return Inertia::render('Admin/Settings', [
-            'settings' => Setting::all()->groupBy('group'),
+            'settings' => Setting::whereIn('group', ['contact', 'email'])->get()->groupBy('group'),
             'undoMeta' => $this->undoService->getUndoMeta('settings', 'all'),
         ]);
     }

@@ -21,11 +21,6 @@ class ContactController extends Controller
 
         return Inertia::render('Public/Contact', [
             'content' => SiteContent::getPage('contact', $locale),
-            'settings' => [
-                'phone' => Setting::get('company_phone'),
-                'email' => Setting::get('company_email'),
-                'address' => Setting::get($locale === 'ar' ? 'company_address_ar' : 'company_address_en'),
-            ],
         ]);
     }
 

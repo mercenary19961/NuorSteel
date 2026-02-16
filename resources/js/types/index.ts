@@ -19,6 +19,12 @@ export interface PageProps {
     success?: string;
     error?: string;
   };
+  siteSettings: {
+    phone: string;
+    email: string;
+    address: string;
+    linkedin_url: string;
+  };
   ziggy: {
     url: string;
     port: number | null;

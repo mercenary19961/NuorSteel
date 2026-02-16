@@ -229,6 +229,7 @@ export default function Contacts({ submissions, filters, undoMeta, undoModelId }
         columns={columns}
         data={submissions.data}
         emptyMessage="No contact submissions found."
+        rowClassName={(item) => item.is_archived ? 'bg-amber-50/50' : ''}
         actions={(item) => (
           <>
             <button

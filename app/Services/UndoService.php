@@ -411,15 +411,13 @@ class UndoService
     {
         return match ($modelType) {
             'settings' => [
-                'site_name' => ['label' => 'Site Name'],
-                'site_description' => ['label' => 'Site Description'],
-                'contact_email' => ['label' => 'Contact Email'],
-                'contact_phone' => ['label' => 'Contact Phone'],
-                'contact_address' => ['label' => 'Contact Address'],
+                'company_phone' => ['label' => 'Company Phone'],
+                'company_email' => ['label' => 'Company Email'],
+                'company_address_en' => ['label' => 'Address (EN)'],
+                'company_address_ar' => ['label' => 'Address (AR)'],
+                'linkedin_url' => ['label' => 'LinkedIn URL'],
                 'contact_recipients' => ['label' => 'Contact Recipients'],
                 'career_recipients' => ['label' => 'Career Recipients'],
-                'linkedin_url' => ['label' => 'LinkedIn URL'],
-                'media_custom_folders' => ['label' => 'Media Custom Folders'],
             ],
             'product' => [
                 'name_en' => ['label' => 'Name (EN)'],

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
@@ -40,6 +41,15 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
+            ],
+            'siteSettings' => fn () => [
+                'phone' => Setting::get('company_phone', ''),
+                'email' => Setting::get('company_email', ''),
+                'address' => Setting::get(
+                    session('locale', 'en') === 'ar' ? 'company_address_ar' : 'company_address_en',
+                    ''
+                ),
+                'linkedin_url' => Setting::get('linkedin_url', ''),
             ],
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),
