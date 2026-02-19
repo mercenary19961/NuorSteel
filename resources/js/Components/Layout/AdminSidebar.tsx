@@ -101,9 +101,9 @@ export default function AdminSidebar({ collapsed, mobileOpen, onToggle, onMobile
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 bg-gray-900 text-white transition-all duration-300 flex flex-col ${
-          mobileOpen ? 'w-64' : collapsed ? 'w-16' : 'w-64'
-        } ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
+        className={`fixed inset-y-0 left-0 z-40 bg-gray-900 text-white transition-all duration-300 flex flex-col overflow-x-hidden w-64 ${
+          collapsed ? 'lg:w-16' : 'lg:w-64'
+        } ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
       >
         {/* Logo */}
         <div className="flex items-center h-16 px-4 border-b border-gray-800">

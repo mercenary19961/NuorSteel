@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { usePage, router } from '@inertiajs/react';
 import type { PageProps } from '@/types';
 import AdminSidebar from '@/Components/Layout/AdminSidebar';
@@ -17,10 +17,20 @@ export default function AdminLayout({ children }: Props) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(globalSidebarCollapsed);
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  // Reset mobile sidebar state when viewport reaches desktop size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) setMobileOpen(false);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleToggle = () => {
     const next = !sidebarCollapsed;
     setSidebarCollapsed(next);
     globalSidebarCollapsed = next;
+    setMobileOpen(false);
   };
 
   const handleLogout = () => {
