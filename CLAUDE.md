@@ -51,7 +51,7 @@
 
 ### Public Pages Frontend (DONE)
 - [x] PublicLayout (Header + Footer + children)
-- [x] Home page (full-viewport hero, framer-motion animations, bottom nav links, features, products, CTA)
+- [x] Home page (full-viewport hero, framer-motion animations, bottom nav links, interactive core values, products, CTA)
 - [x] About page (overview, vision, mission, timeline)
 - [x] Recycling page (sub-page under About)
 - [x] Products listing + Product detail page
@@ -70,6 +70,10 @@
 - [x] framer-motion for all hero animations + mobile menu `AnimatePresence`
 - [x] `useScrollDirection` custom hook (`resources/js/hooks/useScrollDirection.ts`)
 - [x] `HeroBottomLinks` component (`resources/js/Components/Public/HeroBottomLinks.tsx`)
+- [x] Homepage sections: About Us, Vision & Mission, Vision 2030, interactive Core Values, Products, LinkedIn, CTA
+- [x] Core Values: interactive tabbed section with overlaid icon buttons on image placeholder
+- [x] All sections dark-themed (gray-800 → gray-950 gradient flow)
+- [x] Language defaults to English always (no localStorage persistence)
 
 ### Inertia Migration (DONE)
 - [x] Inertia.js infrastructure (packages, Vite config, root template, entry point)
@@ -129,7 +133,7 @@
 
 ### Remaining
 - [ ] LinkedIn API integration (homepage feed)
-- [ ] Real images for hero background and bottom link hover panels (currently gradient placeholders)
+- [ ] Real images for hero background, bottom link hover panels, and core values section (currently gradient placeholders)
 - [ ] Logo image for header (currently text-only)
 - [ ] Code splitting (chunk >500kB)
 - [ ] Structured data remaining placeholders (see above)
@@ -490,4 +494,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-02-21 — based on commit `9779206` (*feat: enhance homepage content, add smooth scrolling, and implement framer-motion for animations*)
+> **Last updated:** 2026-02-21 — based on commit `b46fa90` (*feat: update site content seeder with core values, vision, and mission sections; enhance Arabic and English translations*)
