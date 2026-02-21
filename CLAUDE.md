@@ -10,7 +10,7 @@
 **Type:** Corporate industrial website with admin CMS
 **Stack:** Laravel 12 + Inertia.js + React 19 + TypeScript
 **Database:** MySQL
-**Architecture:** Single-service monolith (Laravel serves everything via Inertia)
+**Architecture:** Single-service monolith (Laravel serves everything via Inertia) with SSR
 **Branch:** `construction_phase`
 
 ---
@@ -100,11 +100,28 @@
 - [x] Newsletter subscribers demo seeder
 - [x] Career applications demo content seeder
 
+### SSR — Server-Side Rendering (DONE)
+- [x] SSR entry point (`resources/js/ssr.tsx`) using `@inertiajs/react/server`
+- [x] Client entry (`app.tsx`) switched from `createRoot` to `hydrateRoot`
+- [x] Vite config updated with SSR entry (`ssr: 'resources/js/ssr.tsx'`)
+- [x] Published `config/inertia.php` with SSR toggle (`INERTIA_SSR_ENABLED` env var)
+- [x] Build script updated: `vite build && vite build --ssr` (outputs to `bootstrap/ssr/`)
+- [x] Browser API guards added (`typeof window !== 'undefined'`) in bootstrap.ts, i18n/index.ts, LanguageContext.tsx
+- [x] `/bootstrap/ssr` added to `.gitignore`
+
+### Deployment Infrastructure (IN PROGRESS)
+- [x] Railway project set up (PHP 8.2 + Node 22 via Railpack)
+- [x] MySQL service provisioned on Railway
+- [x] `trustProxies` middleware configured for Railway HTTPS (`bootstrap/app.php`)
+- [ ] Railway environment variables (DB credentials, APP_KEY, APP_URL)
+- [ ] Run migrations + seeders on Railway
+- [ ] Enable SSR on Railway (start Node SSR server alongside PHP)
+
 ### Remaining
 - [ ] LinkedIn API integration (homepage feed)
 - [ ] Code splitting (chunk >500kB)
 - [ ] Structured data remaining placeholders (see above)
-- [ ] Testing & deployment
+- [ ] Final testing & go-live
 
 ---
 
@@ -360,10 +377,13 @@ Security is extremely important for this project. Every code change must conside
   - Admin: `admin@nuorsteel.com` / `password`
   - Editor: `editor@nuorsteel.com` / `password`
 - **Admin dashboard**: `http://localhost:8000/admin/login`
-- **Build**: `npm run build` (outputs to `public/build/`)
+- **Build**: `npm run build` (outputs client to `public/build/` + SSR to `bootstrap/ssr/`)
+- **SSR in dev**: Not active — `npm run dev` uses CSR only. SSR applies to production builds
+- **SSR toggle**: Set `INERTIA_SSR_ENABLED=false` in `.env` to disable SSR even in production
 
 ### Frontend Architecture
 - **Framework**: Inertia.js — bridges Laravel controllers to React page components
+- **Rendering**: SSR via `@inertiajs/react/server` + `hydrateRoot` on client
 - **Data flow**: Controllers pass data as props via `Inertia::render('Page/Name', [...props])`
 - **Mutations**: `router.post/put/delete()` with `preserveScroll`, `onSuccess`, `onFinish`
 - **Forms with files**: Use native `FormData` + `forceFormData: true`
@@ -374,6 +394,7 @@ Security is extremely important for this project. Every code change must conside
 - **Icons**: Lucide React
 - **i18n**: react-i18next with EN/AR translation files (bundled, not HTTP-loaded)
 - **Flash messages**: Server redirects with `->with('success', '...')`, rendered by FlashMessages component via toast
+- **SSR safety**: All `window`/`document`/`localStorage` access guarded with `typeof window !== 'undefined'`
 
 ### Key File Locations
 ```
@@ -384,8 +405,11 @@ resources/js/Components/       → Shared components (Layout/, Admin/)
 resources/js/types/            → TypeScript interfaces
 resources/js/i18n/             → Translation files (en.ts, ar.ts)
 resources/js/contexts/         → LanguageContext
-resources/js/app.tsx           → Inertia entry point
+resources/js/app.tsx           → Client entry point (hydrateRoot)
+resources/js/ssr.tsx           → SSR entry point (createServer)
 resources/views/app.blade.php  → Root Blade template (@inertia)
+config/inertia.php             → Inertia SSR config
+bootstrap/app.php              → Middleware config (trustProxies, web stack)
 app/Http/Controllers/Public/   → Public Inertia controllers
 app/Http/Controllers/Admin/    → Admin Inertia controllers
 app/Http/Controllers/Auth/     → Login/logout controller
@@ -394,9 +418,13 @@ routes/web.php                 → All routes (public + admin)
 ```
 
 ### Deployment (Railway)
-- Single service — Nixpacks auto-detects Laravel + Node.js
+- Single service — Railpack builder with PHP 8.2 + Node 22
 - Build: `composer install && npm install && npm run build && php artisan migrate --force`
-- `npm run build` outputs to `public/build/` (laravel-vite-plugin default)
+- `npm run build` outputs client to `public/build/` + SSR bundle to `bootstrap/ssr/ssr.js`
+- **SSR in production**: Requires running `node bootstrap/ssr/ssr.js` alongside PHP (port 13714)
+- **Proxy**: Railway terminates SSL — `trustProxies(at: '*')` in `bootstrap/app.php` ensures HTTPS URLs
+- **SSR toggle**: `INERTIA_SSR_ENABLED=true/false` env var controls whether Laravel calls the SSR server
+- **Staging URL**: `https://nuorsteel-website-production.up.railway.app`
 
 ### LinkedIn Integration
 - Method: LinkedIn API (requires Developer App approval)
@@ -427,3 +455,7 @@ routes/web.php                 → All routes (public + admin)
 
 - Full specification: [docs/WEBSITE_SPECIFICATION.md](docs/WEBSITE_SPECIFICATION.md)
 - This context file: [CLAUDE.md](CLAUDE.md)
+
+---
+
+> **Last updated:** 2026-02-21 — based on commit `d5c6636` (*feat: add trustProxies middleware configuration*)
