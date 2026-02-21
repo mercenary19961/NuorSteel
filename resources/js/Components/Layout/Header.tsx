@@ -31,15 +31,12 @@ export default function Header({ transparent = false }: HeaderProps) {
   };
 
   // Visual state
-  const showSolidBg = !transparent || !isAtTop;
   const isHidden = !isAtTop && scrollDirection === 'down' && !mobileMenuOpen;
 
   // Color classes based on mode
-  const bgClass = !showSolidBg
+  const bgClass = transparent
     ? 'bg-transparent border-b border-white/20'
-    : transparent
-      ? 'bg-gray-900/80 backdrop-blur-md shadow-lg border-b border-white/10'
-      : 'bg-white shadow-sm border-b border-gray-200';
+    : 'bg-white shadow-sm border-b border-gray-200';
 
   const textColor = transparent ? 'text-white' : 'text-gray-900';
   const navLinkBase = transparent

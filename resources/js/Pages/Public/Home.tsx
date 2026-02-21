@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowRight, Shield, Recycle, Award, Linkedin, ExternalLink } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ArrowRight, ShieldCheck, Leaf, Lightbulb, TrendingUp, Linkedin, ExternalLink } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import HeroBottomLinks from '@/Components/Public/HeroBottomLinks';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -43,6 +44,39 @@ export default function Home({ content_en, content_ar, featured_products, linked
   const { t } = useTranslation();
   const { language } = useLanguage();
   const content = language === 'ar' ? content_ar : content_en;
+
+  const coreValues = [
+    {
+      key: 'quality',
+      icon: ShieldCheck,
+      title: content?.core_values?.quality_title || t('home.coreValues.quality.title'),
+      description: content?.core_values?.quality_description || t('home.coreValues.quality.description'),
+      position: 'top-[12%] right-[10%]',
+    },
+    {
+      key: 'sustainability',
+      icon: Leaf,
+      title: content?.core_values?.sustainability_title || t('home.coreValues.sustainability.title'),
+      description: content?.core_values?.sustainability_description || t('home.coreValues.sustainability.description'),
+      position: 'top-[35%] left-[8%]',
+    },
+    {
+      key: 'innovation',
+      icon: Lightbulb,
+      title: content?.core_values?.innovation_title || t('home.coreValues.innovation.title'),
+      description: content?.core_values?.innovation_description || t('home.coreValues.innovation.description'),
+      position: 'bottom-[25%] left-[30%]',
+    },
+    {
+      key: 'strategicGrowth',
+      icon: TrendingUp,
+      title: content?.core_values?.strategic_growth_title || t('home.coreValues.strategicGrowth.title'),
+      description: content?.core_values?.strategic_growth_description || t('home.coreValues.strategicGrowth.description'),
+      position: 'bottom-[8%] right-[15%]',
+    },
+  ];
+
+  const [activeValue, setActiveValue] = useState(0);
 
   const scrollToFooter = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -97,18 +131,18 @@ export default function Home({ content_en, content_ar, featured_products, linked
       </section>
 
       {/* About Section */}
-      <section id="section-about" className="py-16 lg:py-24">
+      <section id="section-about" className="py-16 lg:py-24 bg-linear-to-b from-gray-800 to-gray-900">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
+            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
               {content?.about?.title || t('home.about.title')}
             </h2>
-            <p className="text-lg text-gray-600 mb-8">
+            <p className="text-lg text-white/80 mb-8">
               {content?.about?.description || t('home.about.description')}
             </p>
             <Link
               href="/about"
-              className="inline-flex items-center text-primary hover:text-primary-dark font-medium"
+              className="inline-flex items-center text-primary hover:text-primary/80 font-medium"
             >
               {t('home.about.learnMore')}
               <ArrowRight className="ml-2" size={18} />
@@ -117,45 +151,107 @@ export default function Home({ content_en, content_ar, featured_products, linked
         </div>
       </section>
 
-      {/* Features / Core Values Section */}
-      <section id="section-core-values" className="py-16 lg:py-24 bg-gray-50">
+      {/* Vision & Mission Section */}
+      <section className="py-16 lg:py-24 bg-linear-to-b from-gray-900 to-gray-950">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 text-center mb-12">
-            {content?.features?.title || t('home.features.title')}
+          <h2 className="text-3xl lg:text-4xl font-bold text-white text-center mb-12">
+            {content?.vision_mission?.title || t('home.visionMission.title')}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-sm text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="text-primary" size={32} />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">
-                {content?.features?.quality_title || t('home.features.quality.title')}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <div className="bg-white/10 backdrop-blur-sm p-8 rounded-lg border border-white/10">
+              <h3 className="text-xl font-semibold text-white mb-4">
+                {content?.vision_mission?.vision_title || t('home.visionMission.visionTitle')}
               </h3>
-              <p className="text-gray-600">
-                {content?.features?.quality_description || t('home.features.quality.description')}
+              <p className="text-white/70 leading-relaxed">
+                {content?.vision_mission?.vision_description || t('home.visionMission.visionDescription')}
               </p>
             </div>
-            <div className="bg-white p-8 rounded-lg shadow-sm text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Recycle className="text-green-600" size={32} />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">
-                {content?.features?.sustainability_title || t('home.features.sustainability.title')}
+            <div className="bg-white/10 backdrop-blur-sm p-8 rounded-lg border border-white/10">
+              <h3 className="text-xl font-semibold text-white mb-4">
+                {content?.vision_mission?.mission_title || t('home.visionMission.missionTitle')}
               </h3>
-              <p className="text-gray-600">
-                {content?.features?.sustainability_description || t('home.features.sustainability.description')}
+              <p className="text-white/70 leading-relaxed">
+                {content?.vision_mission?.mission_description || t('home.visionMission.missionDescription')}
               </p>
             </div>
-            <div className="bg-white p-8 rounded-lg shadow-sm text-center">
-              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="text-yellow-600" size={32} />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">
-                {content?.features?.certified_title || t('home.features.certified.title')}
-              </h3>
-              <p className="text-gray-600">
-                {content?.features?.certified_description || t('home.features.certified.description')}
-              </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Vision 2030 Section */}
+      <section className="py-16 lg:py-24 bg-gray-900 text-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto space-y-6">
+            <p className="text-lg leading-relaxed text-white/90">
+              {content?.vision2030?.paragraph1 || t('home.vision2030.paragraph1')}
+            </p>
+            <p className="text-lg leading-relaxed text-white/90">
+              {content?.vision2030?.paragraph2 || t('home.vision2030.paragraph2')}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Core Values Section */}
+      <section id="section-core-values" className="py-16 lg:py-24 bg-gray-950">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Text Content */}
+            <div>
+              <h2 className="text-3xl lg:text-4xl font-bold text-white mb-10">
+                {content?.core_values?.title || t('home.coreValues.title')}
+              </h2>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeValue}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <h3 className="text-2xl font-semibold text-primary mb-4">
+                    {coreValues[activeValue].title}
+                  </h3>
+                  <p className="text-lg text-white/70 leading-relaxed">
+                    {coreValues[activeValue].description}
+                  </p>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Right: Image with Overlaid Buttons */}
+            <div className="relative aspect-4/3 rounded-xl overflow-hidden">
+              {/* Gradient Placeholder */}
+              <div className="absolute inset-0 bg-linear-to-br from-gray-700 via-gray-600 to-gray-500" />
+
+              {/* Overlay Buttons */}
+              {coreValues.map((value, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveValue(index)}
+                  className={`absolute flex flex-col items-center gap-1.5 group transition-all duration-300 ${value.position}`}
+                >
+                  <div
+                    className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      activeValue === index
+                        ? 'bg-primary ring-4 ring-primary/30 scale-110'
+                        : 'bg-white/20 backdrop-blur-sm hover:bg-white/30'
+                    }`}
+                  >
+                    <value.icon
+                      size={24}
+                      className={activeValue === index ? 'text-white' : 'text-white/80'}
+                    />
+                  </div>
+                  <span
+                    className={`text-xs font-medium whitespace-nowrap transition-colors duration-300 ${
+                      activeValue === index ? 'text-primary' : 'text-white/60'
+                    }`}
+                  >
+                    {value.title}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
         </div>
