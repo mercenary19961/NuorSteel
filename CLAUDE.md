@@ -51,7 +51,7 @@
 
 ### Public Pages Frontend (DONE)
 - [x] PublicLayout (Header + Footer + children)
-- [x] Home page (hero, features, products, CTA)
+- [x] Home page (full-viewport hero, framer-motion animations, bottom nav links, features, products, CTA)
 - [x] About page (overview, vision, mission, timeline)
 - [x] Recycling page (sub-page under About)
 - [x] Products listing + Product detail page
@@ -60,6 +60,16 @@
 - [x] Job detail page (job info + application form)
 - [x] Certificates page
 - [x] Contact page (form with file upload)
+
+### Homepage Redesign (DONE)
+- [x] Header: transparent overlay on homepage, solid white on other pages, fixed positioning
+- [x] Header: smart scroll behavior (hides on scroll down, shows on scroll up)
+- [x] Hero: full-viewport (`h-screen`), gradient placeholder bg, staggered entrance animations
+- [x] Hero: H1 left-aligned, "Contact Us" link scrolls to footer, RTL-aware arrow
+- [x] Hero bottom links: 3 interactive links (About Us, Core Values, Sustainability) with hover image-reveal
+- [x] framer-motion for all hero animations + mobile menu `AnimatePresence`
+- [x] `useScrollDirection` custom hook (`resources/js/hooks/useScrollDirection.ts`)
+- [x] `HeroBottomLinks` component (`resources/js/Components/Public/HeroBottomLinks.tsx`)
 
 ### Inertia Migration (DONE)
 - [x] Inertia.js infrastructure (packages, Vite config, root template, entry point)
@@ -119,6 +129,8 @@
 
 ### Remaining
 - [ ] LinkedIn API integration (homepage feed)
+- [ ] Real images for hero background and bottom link hover panels (currently gradient placeholders)
+- [ ] Logo image for header (currently text-only)
 - [ ] Code splitting (chunk >500kB)
 - [ ] Structured data remaining placeholders (see above)
 - [ ] Final testing & go-live
@@ -133,10 +145,11 @@
 - Header text: "Nuor Steel Industry Company"
 - Browser title format: "Nuor Steel | {Page Name}"
 
-### Navigation (6 items)
+### Navigation (5 items in navbar)
 ```
-About Us | Products | Quality | Career | Certificates | Contact
+About Us | Products | Quality | Career | Certificates
 ```
+- "Contact" was removed from the navbar — contact info lives in the footer
 
 ### CMS Approach
 - **Hybrid model**: Fixed page structure + editable content + CRUD for data
@@ -314,6 +327,23 @@ After writing or modifying any controller, service, or model method, verify thes
 - Restore operations must use the same model methods as normal updates (to preserve `updated_by`, events, cache invalidation, etc.).
 - Always verify undo state exists before attempting restore. Clear undo state after successful restore.
 
+### CMS Content vs i18n (Bilingual Pattern)
+
+- **CMS content always wins over i18n fallbacks.** The pattern `content?.section?.key || t('fallback.key')` means the database value overrides the translation file. If you change text in `en.ts`/`ar.ts` but the `site_content` table has the old value, **the old value still shows**.
+- **When changing display text:** update BOTH the i18n files (`resources/js/i18n/en.ts`, `ar.ts`) AND the `SiteContentSeeder.php`, then re-run the seeder (`php artisan db:seed --class=SiteContentSeeder`). The admin CMS editor at `/admin/content` also writes to the same table.
+- **Bilingual content for instant language switching:** To avoid a flash of stale content when toggling language, pass BOTH locales from the controller (`content_en` + `content_ar`) and let the client pick using `useLanguage()`. This avoids waiting for a server round-trip. See `HomeController` + `Home.tsx` for the pattern:
+  ```php
+  // Controller: pass both
+  'content_en' => SiteContent::getPage('home', 'en'),
+  'content_ar' => SiteContent::getPage('home', 'ar'),
+  ```
+  ```tsx
+  // Component: pick based on client language
+  const { language } = useLanguage();
+  const content = language === 'ar' ? content_ar : content_en;
+  ```
+- **Apply this pattern to ALL public page controllers** that pass CMS content, not just Home.
+
 ---
 
 ## Security (CRITICAL)
@@ -390,8 +420,9 @@ Security is extremely important for this project. Every code change must conside
 - **Routing**: Server-driven via `routes/web.php` — no client-side router
 - **Auth state**: `usePage<PageProps>().props.auth.user` (shared by middleware)
 - **Site settings**: `usePage<PageProps>().props.siteSettings` (phone, email, address, LinkedIn — shared by middleware)
-- **Styling**: TailwindCSS v4 with custom `primary` color
+- **Styling**: TailwindCSS v4 with custom `primary` color, Inter font
 - **Icons**: Lucide React
+- **Animations**: framer-motion (isolated in `vendor-motion` Vite chunk)
 - **i18n**: react-i18next with EN/AR translation files (bundled, not HTTP-loaded)
 - **Flash messages**: Server redirects with `->with('success', '...')`, rendered by FlashMessages component via toast
 - **SSR safety**: All `window`/`document`/`localStorage` access guarded with `typeof window !== 'undefined'`
@@ -401,7 +432,8 @@ Security is extremely important for this project. Every code change must conside
 resources/js/Pages/Public/     → Public page components (10 pages)
 resources/js/Pages/Admin/      → Admin page components (16 pages)
 resources/js/Layouts/          → PublicLayout, AdminLayout
-resources/js/Components/       → Shared components (Layout/, Admin/)
+resources/js/Components/       → Shared components (Layout/, Admin/, Public/)
+resources/js/hooks/            → Custom hooks (useScrollDirection)
 resources/js/types/            → TypeScript interfaces
 resources/js/i18n/             → Translation files (en.ts, ar.ts)
 resources/js/contexts/         → LanguageContext
@@ -458,4 +490,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-02-21 — based on commit `d5c6636` (*feat: add trustProxies middleware configuration*)
+> **Last updated:** 2026-02-21 — based on commit `9779206` (*feat: enhance homepage content, add smooth scrolling, and implement framer-motion for animations*)

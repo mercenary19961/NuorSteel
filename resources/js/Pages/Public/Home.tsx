@@ -4,6 +4,7 @@ import { ArrowRight, Shield, Recycle, Award, Linkedin, ExternalLink } from 'luci
 import { motion } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import HeroBottomLinks from '@/Components/Public/HeroBottomLinks';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface LinkedinPost {
   id: number;
@@ -13,8 +14,11 @@ interface LinkedinPost {
   posted_at: string;
 }
 
+type ContentMap = Record<string, Record<string, string>>;
+
 interface Props {
-  content: Record<string, Record<string, string>>;
+  content_en: ContentMap;
+  content_ar: ContentMap;
   featured_products: { id: number; name: string; slug: string; short_description: string | null; image: string | null }[];
   linkedin_posts: LinkedinPost[];
 }
@@ -35,8 +39,10 @@ const itemVariants = {
   },
 };
 
-export default function Home({ content, featured_products, linkedin_posts }: Props) {
+export default function Home({ content_en, content_ar, featured_products, linkedin_posts }: Props) {
   const { t } = useTranslation();
+  const { language } = useLanguage();
+  const content = language === 'ar' ? content_ar : content_en;
 
   const scrollToFooter = (e: React.MouseEvent) => {
     e.preventDefault();
