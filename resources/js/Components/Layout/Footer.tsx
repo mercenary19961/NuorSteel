@@ -1,9 +1,11 @@
-import { Link, useForm } from '@inertiajs/react';
+import { Link, useForm, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import type { PageProps } from '@/types';
 
 export default function Footer() {
   const { t } = useTranslation();
+  const { siteSettings } = usePage<PageProps>().props;
   const currentYear = new Date().getFullYear();
   const { data, setData, post, processing, reset, wasSuccessful } = useForm({
     email: '',
@@ -27,15 +29,17 @@ export default function Footer() {
             <p className="text-gray-400 text-sm mb-4">
               {t('footer.description')}
             </p>
-            <a
-              href="https://linkedin.com/company/nuorsteel"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center text-gray-400 hover:text-white transition-colors"
-            >
-              <Linkedin size={20} className="mr-2" />
-              {t('footer.followLinkedIn')}
-            </a>
+            {siteSettings.linkedin_url && (
+              <a
+                href={siteSettings.linkedin_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center text-gray-400 hover:text-white transition-colors"
+              >
+                <Linkedin size={20} className="mr-2" />
+                {t('footer.followLinkedIn')}
+              </a>
+            )}
           </div>
 
           {/* Quick Links */}
@@ -76,20 +80,24 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-start text-sm text-gray-400">
                 <MapPin size={16} className="mr-2 mt-0.5 shrink-0" />
-                <span>{t('footer.address')}</span>
+                <span>{siteSettings.address || t('footer.address')}</span>
               </li>
-              <li className="flex items-center text-sm text-gray-400">
-                <Phone size={16} className="mr-2 shrink-0" />
-                <a href="tel:+966XXXXXXXX" className="hover:text-white transition-colors">
-                  +966 XX XXX XXXX
-                </a>
-              </li>
-              <li className="flex items-center text-sm text-gray-400">
-                <Mail size={16} className="mr-2 shrink-0" />
-                <a href="mailto:info@nuorsteel.com" className="hover:text-white transition-colors">
-                  info@nuorsteel.com
-                </a>
-              </li>
+              {siteSettings.phone && (
+                <li className="flex items-center text-sm text-gray-400">
+                  <Phone size={16} className="mr-2 shrink-0" />
+                  <a href={`tel:${siteSettings.phone.replace(/\s/g, '')}`} className="hover:text-white transition-colors">
+                    {siteSettings.phone}
+                  </a>
+                </li>
+              )}
+              {siteSettings.email && (
+                <li className="flex items-center text-sm text-gray-400">
+                  <Mail size={16} className="mr-2 shrink-0" />
+                  <a href={`mailto:${siteSettings.email}`} className="hover:text-white transition-colors">
+                    {siteSettings.email}
+                  </a>
+                </li>
+              )}
             </ul>
           </div>
 

@@ -1,8 +1,9 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { Mail, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import type { PageProps } from '@/types';
 
 const requestTypes = [
   { value: 'vendor', labelKey: 'contact.types.vendor' },
@@ -14,11 +15,11 @@ const requestTypes = [
 ];
 
 interface Props {
-  settings: { phone: string | null; email: string | null; address: string | null };
   content: Record<string, Record<string, string>>;
 }
 
-export default function Contact({ settings, content }: Props) {
+export default function Contact({ content }: Props) {
+  const { siteSettings } = usePage<PageProps>().props;
   const { t } = useTranslation();
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
@@ -85,7 +86,7 @@ export default function Contact({ settings, content }: Props) {
                   </div>
                   <div className="ml-4">
                     <h3 className="font-medium text-gray-900">{t('contact.info.address')}</h3>
-                    <p className="text-gray-600">{settings?.address || 'Riyadh, Saudi Arabia'}</p>
+                    <p className="text-gray-600">{siteSettings.address || 'Riyadh, Saudi Arabia'}</p>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -94,7 +95,7 @@ export default function Contact({ settings, content }: Props) {
                   </div>
                   <div className="ml-4">
                     <h3 className="font-medium text-gray-900">{t('contact.info.phone')}</h3>
-                    <p className="text-gray-600">{settings?.phone || ''}</p>
+                    <p className="text-gray-600">{siteSettings.phone}</p>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -103,7 +104,7 @@ export default function Contact({ settings, content }: Props) {
                   </div>
                   <div className="ml-4">
                     <h3 className="font-medium text-gray-900">{t('contact.info.email')}</h3>
-                    <p className="text-gray-600">{settings?.email || 'info@nuorsteel.com'}</p>
+                    <p className="text-gray-600">{siteSettings.email || 'info@nuorsteel.com'}</p>
                   </div>
                 </div>
               </div>

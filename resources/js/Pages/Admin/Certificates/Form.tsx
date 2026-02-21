@@ -3,6 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
 import { ArrowLeft, Upload, FileText } from 'lucide-react';
+import CustomSelect from '@/Components/Admin/CustomSelect';
 import UndoButton from '@/Components/Admin/UndoButton';
 import type { Certificate, UndoMeta } from '@/types';
 
@@ -53,6 +54,21 @@ export default function CertificateForm({ item, undoMeta }: Props) {
         }
       : emptyForm,
   );
+  const initialForm = useRef(
+    item
+      ? {
+          title_en: item.title_en,
+          title_ar: item.title_ar,
+          category: item.category,
+          description_en: item.description_en ?? '',
+          description_ar: item.description_ar ?? '',
+          issue_date: item.issue_date ?? '',
+          expiry_date: item.expiry_date ?? '',
+          is_active: item.is_active,
+          sort_order: item.sort_order,
+        }
+      : null,
+  );
   const [file, setFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -98,6 +114,8 @@ export default function CertificateForm({ item, undoMeta }: Props) {
     }
   };
 
+  const isDirty = !isEditing || file !== null || JSON.stringify(form) !== JSON.stringify(initialForm.current);
+
   const inputClass =
     'w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary';
 
@@ -130,23 +148,26 @@ export default function CertificateForm({ item, undoMeta }: Props) {
             onChangeEn={(v) => setForm((f) => ({ ...f, title_en: v }))}
             onChangeAr={(v) => setForm((f) => ({ ...f, title_ar: v }))}
             required
+            placeholderEn="e.g. ISO 9001 Quality Management"
+            placeholderAr="مثال: شهادة إدارة الجودة ISO 9001"
           />
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Category <span className="text-red-500">*</span>
             </label>
-            <select
+            <CustomSelect
               value={form.category}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, category: e.target.value as CertForm['category'] }))
+              onChange={(val) =>
+                setForm((f) => ({ ...f, category: val as CertForm['category'] }))
               }
-              className={`${inputClass} max-w-xs`}
-            >
-              <option value="esg">ESG</option>
-              <option value="quality">Quality</option>
-              <option value="governance">Governance</option>
-            </select>
+              options={[
+                { value: 'esg', label: 'ESG' },
+                { value: 'quality', label: 'Quality' },
+                { value: 'governance', label: 'Governance' },
+              ]}
+              className="max-w-xs"
+            />
           </div>
 
           <BilingualEditor
@@ -157,6 +178,8 @@ export default function CertificateForm({ item, undoMeta }: Props) {
             onChangeAr={(v) => setForm((f) => ({ ...f, description_ar: v }))}
             type="textarea"
             rows={3}
+            placeholderEn="Brief description of the certificate scope and validity (optional)"
+            placeholderAr="وصف مختصر لنطاق الشهادة وصلاحيتها (اختياري)"
           />
 
           {/* PDF Upload */}
@@ -215,6 +238,7 @@ export default function CertificateForm({ item, undoMeta }: Props) {
                 onChange={(e) => setForm((f) => ({ ...f, issue_date: e.target.value }))}
                 className={inputClass}
               />
+              <p className="text-xs text-gray-400 mt-1">Optional — when the certificate was issued</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
@@ -224,6 +248,7 @@ export default function CertificateForm({ item, undoMeta }: Props) {
                 onChange={(e) => setForm((f) => ({ ...f, expiry_date: e.target.value }))}
                 className={inputClass}
               />
+              <p className="text-xs text-gray-400 mt-1">Optional — leave empty if the certificate does not expire</p>
             </div>
           </div>
 
@@ -237,6 +262,7 @@ export default function CertificateForm({ item, undoMeta }: Props) {
                 onChange={(e) => setForm((f) => ({ ...f, sort_order: Number(e.target.value) }))}
                 className={`${inputClass} max-w-30`}
               />
+              <p className="text-xs text-gray-400 mt-1">Lower numbers appear first</p>
             </div>
             <div className="flex items-end pb-2">
               <label className="flex items-center gap-2 cursor-pointer">
@@ -261,7 +287,7 @@ export default function CertificateForm({ item, undoMeta }: Props) {
             </button>
             <button
               type="submit"
-              disabled={saving}
+              disabled={saving || !isDirty}
               className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50"
             >
               {saving ? 'Saving...' : isEditing ? 'Update Certificate' : 'Create Certificate'}

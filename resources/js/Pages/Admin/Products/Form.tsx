@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import MediaPicker from '@/Components/Admin/MediaPicker';
-import { ArrowLeft, Plus, Trash2, Image, X } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Image, ImageOff, X } from 'lucide-react';
+import CustomSelect from '@/Components/Admin/CustomSelect';
 import UndoButton from '@/Components/Admin/UndoButton';
 import type { Product, Media, UndoMeta } from '@/types';
 
@@ -16,12 +17,12 @@ interface Props {
 interface ProductForm {
   name_en: string;
   name_ar: string;
-  slug: string;
   short_description_en: string;
   short_description_ar: string;
   description_en: string;
   description_ar: string;
   category: string;
+  featured_image_id: number | null;
   is_active: boolean;
   is_featured: boolean;
   sort_order: number;
@@ -54,12 +55,12 @@ function initForm(item: Product | null): ProductForm {
     return {
       name_en: '',
       name_ar: '',
-      slug: '',
       short_description_en: '',
       short_description_ar: '',
       description_en: '',
       description_ar: '',
       category: '',
+      featured_image_id: null,
       is_active: true,
       is_featured: false,
       sort_order: 0,
@@ -68,12 +69,12 @@ function initForm(item: Product | null): ProductForm {
   return {
     name_en: item.name_en,
     name_ar: item.name_ar,
-    slug: item.slug,
     short_description_en: item.short_description_en ?? '',
     short_description_ar: item.short_description_ar ?? '',
     description_en: item.description_en ?? '',
     description_ar: item.description_ar ?? '',
     category: item.category ?? '',
+    featured_image_id: item.featured_image_id,
     is_active: item.is_active,
     is_featured: item.is_featured,
     sort_order: item.sort_order,
@@ -98,10 +99,16 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
   const isEditing = !!item;
 
   const [form, setForm] = useState<ProductForm>(() => initForm(item));
+  const initialForm = useRef(initForm(item));
   const [specs, setSpecs] = useState<SpecForm[]>(() => initSpecs(item));
+  const initialSpecs = useRef(initSpecs(item));
   const [activeTab, setActiveTab] = useState<'details' | 'images' | 'specs'>('details');
+  const [featuredImageUrl, setFeaturedImageUrl] = useState<string | null>(
+    item?.featured_image?.url ?? null,
+  );
   const [removeImageTarget, setRemoveImageTarget] = useState<{ imageId: number } | null>(null);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [showFeaturedPicker, setShowFeaturedPicker] = useState(false);
   const [saving, setSaving] = useState(false);
   const [removingImage, setRemovingImage] = useState(false);
   const [savingSpecs, setSavingSpecs] = useState(false);
@@ -169,6 +176,9 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
     setSpecs(specs.map((s, i) => (i === index ? { ...s, [field]: value } : s)));
   };
 
+  const isDetailsDirty = !isEditing || JSON.stringify(form) !== JSON.stringify(initialForm.current);
+  const isSpecsDirty = !isEditing || JSON.stringify(specs) !== JSON.stringify(initialSpecs.current);
+
   const inputClass =
     'w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary';
 
@@ -226,18 +236,6 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
               required
             />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
-              <input
-                type="text"
-                value={form.slug}
-                onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
-                placeholder="auto-generated-from-name"
-                className={`${inputClass} max-w-md`}
-              />
-              <p className="text-xs text-gray-400 mt-1">Leave empty to auto-generate from English name.</p>
-            </div>
-
             <BilingualEditor
               label="Short Description"
               valueEn={form.short_description_en}
@@ -257,6 +255,50 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
               type="textarea"
               rows={5}
             />
+
+            {/* Featured Image */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Featured Image</label>
+              {form.featured_image_id && featuredImageUrl ? (
+                <div className="relative inline-block group">
+                  <img
+                    src={featuredImageUrl}
+                    alt="Featured"
+                    className="w-40 h-40 object-cover rounded-lg border border-gray-200"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 rounded-lg transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                    <button
+                      type="button"
+                      onClick={() => setShowFeaturedPicker(true)}
+                      className="p-2 bg-white rounded-full text-gray-700 shadow hover:bg-gray-50"
+                      title="Change image"
+                    >
+                      <Image size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setForm((f) => ({ ...f, featured_image_id: null }));
+                        setFeaturedImageUrl(null);
+                      }}
+                      className="p-2 bg-white rounded-full text-red-500 shadow hover:bg-red-50"
+                      title="Remove image"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowFeaturedPicker(true)}
+                  className="flex items-center gap-3 w-full max-w-sm px-4 py-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-primary/5 transition-colors text-sm text-gray-500"
+                >
+                  <ImageOff size={24} className="text-gray-300 shrink-0" />
+                  <span>Click to select a featured image from the media library</span>
+                </button>
+              )}
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
@@ -312,7 +354,7 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
               </button>
               <button
                 type="submit"
-                disabled={saving}
+                disabled={saving || !isDetailsDirty}
                 className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50"
               >
                 {saving ? 'Saving...' : isEditing ? 'Update Product' : 'Create Product'}
@@ -388,7 +430,7 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
                 </button>
                 <button
                   onClick={handleSaveSpecs}
-                  disabled={savingSpecs}
+                  disabled={savingSpecs || !isSpecsDirty}
                   className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50"
                 >
                   {savingSpecs ? 'Saving...' : 'Save Specs'}
@@ -405,15 +447,16 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
                 {specs.map((spec, index) => (
                   <div key={index} className="border border-gray-200 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-3">
-                      <select
+                      <CustomSelect
                         value={spec.spec_type}
-                        onChange={(e) => updateSpec(index, 'spec_type', e.target.value)}
-                        className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                      >
-                        <option value="chemical">Chemical</option>
-                        <option value="mechanical">Mechanical</option>
-                        <option value="dimensional">Dimensional</option>
-                      </select>
+                        onChange={(val) => updateSpec(index, 'spec_type', val)}
+                        options={[
+                          { value: 'chemical', label: 'Chemical' },
+                          { value: 'mechanical', label: 'Mechanical' },
+                          { value: 'dimensional', label: 'Dimensional' },
+                        ]}
+                        className="w-40"
+                      />
                       <button
                         onClick={() => removeSpec(index)}
                         className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
@@ -510,6 +553,20 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
           multiple={true}
           typeFilter="image"
           title="Add Product Images"
+        />
+
+        <MediaPicker
+          open={showFeaturedPicker}
+          onClose={() => setShowFeaturedPicker(false)}
+          onSelect={(selected) => {
+            if (selected.length > 0) {
+              setForm((f) => ({ ...f, featured_image_id: selected[0].id }));
+              setFeaturedImageUrl(selected[0].url);
+            }
+          }}
+          multiple={false}
+          typeFilter="image"
+          title="Select Featured Image"
         />
       </div>
     </AdminLayout>

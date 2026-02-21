@@ -19,10 +19,10 @@
         "addressCountry": "SA"
     },
     "url": "{{ config('app.url') }}",
-    "telephone": "PLACEHOLDER_PHONE",
-    "email": "info@nuorsteel.com",
+    "telephone": "{{ \App\Models\Setting::get('company_phone', '') }}",
+    "email": "{{ \App\Models\Setting::get('company_email', 'info@nuorsteel.com') }}",
     "sameAs": [
-        "PLACEHOLDER_LINKEDIN_URL"
+        "{{ \App\Models\Setting::get('linkedin_url', '') }}"
     ],
     "industry": "Steel Manufacturing",
     "numberOfEmployees": {
@@ -123,7 +123,7 @@
             "name": "How can I contact Nuor Steel?",
             "acceptedAnswer": {
                 "@@type": "Answer",
-                "text": "You can reach Nuor Steel by email at info@nuorsteel.com or by phone at PLACEHOLDER_PHONE. You can also fill out the contact form on our website."
+                "text": "You can reach Nuor Steel by email at {{ \App\Models\Setting::get('company_email', 'info@nuorsteel.com') }} or by phone at {{ \App\Models\Setting::get('company_phone', '') }}. You can also fill out the contact form on our website."
             }
         }
     ]

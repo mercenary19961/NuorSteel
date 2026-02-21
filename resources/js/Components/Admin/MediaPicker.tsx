@@ -11,6 +11,7 @@ import {
   Loader2,
   ImageIcon,
 } from 'lucide-react';
+import CustomSelect from '@/Components/Admin/CustomSelect';
 import type { Media, PaginatedData } from '@/types';
 
 interface MediaPickerProps {
@@ -235,36 +236,36 @@ export default function MediaPicker({
         {/* ---- Filter bar ---- */}
         <div className="flex flex-wrap items-center gap-3 px-6 py-3 border-b border-gray-100 shrink-0">
           {/* Folder dropdown */}
-          <select
+          <CustomSelect
             value={folder}
-            onChange={(e) => {
-              setFolder(e.target.value);
+            onChange={(val) => {
+              setFolder(val);
               setPage(1);
             }}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-          >
-            <option value="">All Folders</option>
-            {folders.map((f) => (
-              <option key={f} value={f}>
-                {f}
-              </option>
-            ))}
-          </select>
+            placeholder="All Folders"
+            options={[
+              { value: '', label: 'All Folders' },
+              ...folders.map((f) => ({ value: f, label: f })),
+            ]}
+            className="w-40"
+          />
 
           {/* Type dropdown */}
-          <select
+          <CustomSelect
             value={typeFilter ?? type}
-            onChange={(e) => {
-              setType(e.target.value);
+            onChange={(val) => {
+              setType(val);
               setPage(1);
             }}
             disabled={!!typeFilter}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <option value="">All Types</option>
-            <option value="image">Images</option>
-            <option value="pdf">PDFs</option>
-          </select>
+            placeholder="All Types"
+            options={[
+              { value: '', label: 'All Types' },
+              { value: 'image', label: 'Images' },
+              { value: 'pdf', label: 'PDFs' },
+            ]}
+            className="w-32"
+          />
 
           {/* Search input */}
           <div className="relative flex-1 min-w-45">

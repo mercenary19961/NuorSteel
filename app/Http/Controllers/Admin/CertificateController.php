@@ -20,15 +20,20 @@ class CertificateController extends Controller
     {
         $query = Certificate::with('thumbnail');
 
-        if ($request->has('category')) {
+        if ($request->filled('category')) {
             $query->where('category', $request->category);
         }
 
-        if ($request->has('active')) {
+        if ($request->filled('active')) {
             $query->where('is_active', $request->boolean('active'));
         }
 
         $certificates = $query->ordered()->paginate(15);
+
+        $categoryCounts = Certificate::selectRaw('category, count(*) as count')
+            ->groupBy('category')
+            ->pluck('count', 'category')
+            ->toArray();
 
         $lastId = session('undo_certificate_last_id');
         $undoMeta = $lastId ? $this->undoService->getUndoMeta('certificate', $lastId) : null;
@@ -36,6 +41,7 @@ class CertificateController extends Controller
         return Inertia::render('Admin/Certificates/Index', [
             'certificates' => $certificates,
             'filters' => $request->only(['category', 'active']),
+            'categoryCounts' => $categoryCounts,
             'undoMeta' => $undoMeta,
             'undoModelId' => $undoMeta ? (string) $lastId : null,
         ]);
@@ -139,6 +145,15 @@ class CertificateController extends Controller
         $certificate->update($data);
 
         return redirect()->back()->with('success', 'Certificate updated successfully.');
+    }
+
+    public function viewFile(int $id): mixed
+    {
+        $certificate = Certificate::findOrFail($id);
+
+        return Storage::response($certificate->file_path, $certificate->title_en . '.pdf', [
+            'Content-Type' => 'application/pdf',
+        ]);
     }
 
     public function destroy(int $id): RedirectResponse

@@ -123,11 +123,13 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/certificates/{id}/edit', [AdminCertificateController::class, 'edit'])->name('certificates.edit');
     Route::post('/certificates/{id}', [AdminCertificateController::class, 'update'])->name('certificates.update');
     Route::delete('/certificates/{id}', [AdminCertificateController::class, 'destroy'])->name('certificates.destroy');
+    Route::get('/certificates/{id}/file', [AdminCertificateController::class, 'viewFile'])->name('certificates.view-file');
 
     // Careers
     Route::get('/careers', [AdminCareerController::class, 'index'])->name('careers.index');
     Route::get('/careers/create', [AdminCareerController::class, 'create'])->name('careers.create');
     Route::post('/careers', [AdminCareerController::class, 'store'])->name('careers.store');
+    Route::get('/careers/{id}', [AdminCareerController::class, 'show'])->name('careers.show');
     Route::get('/careers/{id}/edit', [AdminCareerController::class, 'edit'])->name('careers.edit');
     Route::put('/careers/{id}', [AdminCareerController::class, 'update'])->name('careers.update');
     Route::delete('/careers/{id}', [AdminCareerController::class, 'destroy'])->name('careers.destroy');

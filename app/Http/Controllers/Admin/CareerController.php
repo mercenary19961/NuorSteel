@@ -37,6 +37,20 @@ class CareerController extends Controller
         ]);
     }
 
+    public function show(int $id): \Illuminate\Http\JsonResponse
+    {
+        $listing = CareerListing::withCount('applications')->findOrFail($id);
+        $applications = $listing->applications()
+            ->select(['id', 'career_listing_id', 'name', 'email', 'phone', 'job_title', 'status', 'created_at'])
+            ->ordered()
+            ->get();
+
+        return response()->json([
+            'listing' => $listing,
+            'applications' => $applications,
+        ]);
+    }
+
     public function create(): Response
     {
         return Inertia::render('Admin/Careers/Form', [
@@ -49,7 +63,6 @@ class CareerController extends Controller
         $request->validate([
             'title_en' => 'required|string|max:255',
             'title_ar' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:career_listings,slug',
             'description_en' => 'required|string',
             'description_ar' => 'required|string',
             'requirements_en' => 'nullable|string',
@@ -61,11 +74,11 @@ class CareerController extends Controller
         ]);
 
         $data = $request->only([
-            'title_en', 'title_ar', 'slug', 'description_en', 'description_ar',
+            'title_en', 'title_ar', 'description_en', 'description_ar',
             'requirements_en', 'requirements_ar', 'location', 'employment_type',
             'status', 'expires_at',
         ]);
-        $data['slug'] = $data['slug'] ?? Str::slug($data['title_en']);
+        $data['slug'] = Str::slug($data['title_en']);
         $data['created_by'] = $request->user()->id;
         $data['updated_by'] = $request->user()->id;
 
@@ -89,7 +102,6 @@ class CareerController extends Controller
         $request->validate([
             'title_en' => 'required|string|max:255',
             'title_ar' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:career_listings,slug,' . $id,
             'description_en' => 'required|string',
             'description_ar' => 'required|string',
             'requirements_en' => 'nullable|string',
@@ -115,7 +127,8 @@ class CareerController extends Controller
             $newData[$field] = (string) ($request->input($field) ?? '');
         }
 
-        $data = $request->only(array_merge($trackedFields, ['slug']));
+        $data = $request->only($trackedFields);
+        $data['slug'] = Str::slug($request->input('title_en'));
         $data['updated_by'] = $request->user()->id;
 
         $hasChanges = $this->undoService->saveState('career', $listing->id, $oldData, $newData);
@@ -158,13 +171,31 @@ class CareerController extends Controller
             $query->openApplications();
         }
 
+        if ($request->filled('period')) {
+            $cutoff = match ($request->period) {
+                '1w' => now()->subWeek(),
+                '1m' => now()->subMonth(),
+                '3m' => now()->subMonths(3),
+                '6m' => now()->subMonths(6),
+                '1y' => now()->subYear(),
+                'older' => null,
+                default => null,
+            };
+
+            if ($request->period === 'older') {
+                $query->where('career_applications.created_at', '<', now()->subYear());
+            } elseif ($cutoff) {
+                $query->where('career_applications.created_at', '>=', $cutoff);
+            }
+        }
+
         // Undo support: check if an application was recently updated
         $lastEditedId = session('undo_application_last_id');
         $undoMeta = $lastEditedId ? $this->undoService->getUndoMeta('application', $lastEditedId) : null;
 
         return Inertia::render('Admin/Applications', [
             'applications' => $query->ordered()->paginate(15)->withQueryString(),
-            'filters' => $request->only(['status', 'listing_id', 'open_only']),
+            'filters' => $request->only(['status', 'listing_id', 'open_only', 'period']),
             'undoMeta' => $undoMeta,
             'undoModelId' => $undoMeta ? (string) $lastEditedId : null,
         ]);

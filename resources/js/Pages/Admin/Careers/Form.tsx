@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
 import { ArrowLeft } from 'lucide-react';
+import CustomSelect from '@/Components/Admin/CustomSelect';
 import UndoButton from '@/Components/Admin/UndoButton';
 import type { CareerListing, UndoMeta } from '@/types';
 
 interface CareerForm {
   title_en: string;
   title_ar: string;
-  slug: string;
   description_en: string;
   description_ar: string;
   requirements_en: string;
@@ -23,7 +23,6 @@ interface CareerForm {
 const emptyForm: CareerForm = {
   title_en: '',
   title_ar: '',
-  slug: '',
   description_en: '',
   description_ar: '',
   requirements_en: '',
@@ -47,7 +46,6 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
       ? {
           title_en: item.title_en,
           title_ar: item.title_ar,
-          slug: item.slug,
           description_en: item.description_en,
           description_ar: item.description_ar,
           requirements_en: item.requirements_en ?? '',
@@ -59,7 +57,25 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
         }
       : emptyForm,
   );
+  const initialForm = useRef(
+    item
+      ? {
+          title_en: item.title_en,
+          title_ar: item.title_ar,
+          description_en: item.description_en,
+          description_ar: item.description_ar,
+          requirements_en: item.requirements_en ?? '',
+          requirements_ar: item.requirements_ar ?? '',
+          location: item.location ?? '',
+          employment_type: item.employment_type,
+          status: item.status,
+          expires_at: item.expires_at ?? '',
+        }
+      : null,
+  );
   const [saving, setSaving] = useState(false);
+
+  const isDirty = !isEditing || JSON.stringify(form) !== JSON.stringify(initialForm.current);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,20 +123,10 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
             valueAr={form.title_ar}
             onChangeEn={(v) => setForm((f) => ({ ...f, title_en: v }))}
             onChangeAr={(v) => setForm((f) => ({ ...f, title_ar: v }))}
+            placeholderEn="e.g. Production Line Supervisor"
+            placeholderAr="مثال: مشرف خط الإنتاج"
             required
           />
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
-            <input
-              type="text"
-              value={form.slug}
-              onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
-              placeholder="auto-generated-from-title"
-              className={`${inputClass} max-w-md`}
-            />
-            <p className="text-xs text-gray-400 mt-1">Leave empty to auto-generate.</p>
-          </div>
 
           <BilingualEditor
             label="Description"
@@ -128,20 +134,27 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
             valueAr={form.description_ar}
             onChangeEn={(v) => setForm((f) => ({ ...f, description_en: v }))}
             onChangeAr={(v) => setForm((f) => ({ ...f, description_ar: v }))}
+            placeholderEn="Describe the role, responsibilities, and what the candidate will do day-to-day..."
+            placeholderAr="صف الدور والمسؤوليات وما سيقوم به المرشح يومياً..."
             type="textarea"
             rows={5}
             required
           />
 
-          <BilingualEditor
-            label="Requirements"
-            valueEn={form.requirements_en}
-            valueAr={form.requirements_ar}
-            onChangeEn={(v) => setForm((f) => ({ ...f, requirements_en: v }))}
-            onChangeAr={(v) => setForm((f) => ({ ...f, requirements_ar: v }))}
-            type="textarea"
-            rows={4}
-          />
+          <div>
+            <BilingualEditor
+              label="Requirements"
+              valueEn={form.requirements_en}
+              valueAr={form.requirements_ar}
+              onChangeEn={(v) => setForm((f) => ({ ...f, requirements_en: v }))}
+              onChangeAr={(v) => setForm((f) => ({ ...f, requirements_ar: v }))}
+              placeholderEn={"Bachelor's degree in Engineering\n3+ years in steel manufacturing\nStrong communication skills"}
+              placeholderAr={"بكالوريوس في الهندسة\n3+ سنوات خبرة في صناعة الحديد\nمهارات تواصل قوية"}
+              type="textarea"
+              rows={4}
+            />
+            <p className="text-xs text-gray-400 mt-1">Enter one requirement per line. Each line will display as a separate item on the public page.</p>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -153,43 +166,46 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
                 placeholder="e.g. Riyadh, Saudi Arabia"
                 className={inputClass}
               />
+              <p className="text-xs text-gray-400 mt-1">City and country where the job is based.</p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Employment Type <span className="text-red-500">*</span>
               </label>
-              <select
+              <CustomSelect
                 value={form.employment_type}
-                onChange={(e) =>
+                onChange={(val) =>
                   setForm((f) => ({
                     ...f,
-                    employment_type: e.target.value as CareerForm['employment_type'],
+                    employment_type: val as CareerForm['employment_type'],
                   }))
                 }
-                className={inputClass}
-              >
-                <option value="full-time">Full-time</option>
-                <option value="part-time">Part-time</option>
-                <option value="contract">Contract</option>
-              </select>
+                options={[
+                  { value: 'full-time', label: 'Full-time' },
+                  { value: 'part-time', label: 'Part-time' },
+                  { value: 'contract', label: 'Contract' },
+                ]}
+              />
+              <p className="text-xs text-gray-400 mt-1">How the position is contracted.</p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Status <span className="text-red-500">*</span>
               </label>
-              <select
+              <CustomSelect
                 value={form.status}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, status: e.target.value as CareerForm['status'] }))
+                onChange={(val) =>
+                  setForm((f) => ({ ...f, status: val as CareerForm['status'] }))
                 }
-                className={inputClass}
-              >
-                <option value="draft">Draft</option>
-                <option value="open">Open</option>
-                <option value="closed">Closed</option>
-              </select>
+                options={[
+                  { value: 'draft', label: 'Draft' },
+                  { value: 'open', label: 'Open' },
+                  { value: 'closed', label: 'Closed' },
+                ]}
+              />
+              <p className="text-xs text-gray-400 mt-1">Only "Open" listings are visible on the website.</p>
             </div>
           </div>
 
@@ -201,6 +217,7 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
               onChange={(e) => setForm((f) => ({ ...f, expires_at: e.target.value }))}
               className={`${inputClass} max-w-xs`}
             />
+            <p className="text-xs text-gray-400 mt-1">The listing will be hidden automatically after this date. Leave empty for no expiry.</p>
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
@@ -213,7 +230,7 @@ export default function CareerFormPage({ item, undoMeta }: Props) {
             </button>
             <button
               type="submit"
-              disabled={saving}
+              disabled={saving || !isDirty}
               className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50"
             >
               {saving ? 'Saving...' : isEditing ? 'Update Listing' : 'Create Listing'}

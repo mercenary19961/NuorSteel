@@ -20,7 +20,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
     const [language, setLanguageState] = useState<Language>(() => {
         // Initialize from Inertia shared props or localStorage
-        const stored = localStorage.getItem('language');
+        const stored = typeof window !== 'undefined' ? localStorage.getItem('language') : null;
         return (stored === 'ar' ? 'ar' : locale || 'en') as Language;
     });
 

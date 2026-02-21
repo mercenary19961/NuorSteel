@@ -6,8 +6,18 @@ import StatusBadge from '@/Components/Admin/StatusBadge';
 import Pagination from '@/Components/Admin/Pagination';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import { Eye, Archive, ArchiveRestore, Trash2, Download, X, Mail } from 'lucide-react';
+import CustomSelect from '@/Components/Admin/CustomSelect';
 import UndoButton from '@/Components/Admin/UndoButton';
 import type { PaginatedData, ContactSubmission, UndoMeta } from '@/types';
+
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+};
 
 const TYPE_LABELS: Record<string, string> = {
   vendor: 'Vendor Registration',
@@ -158,7 +168,7 @@ export default function Contacts({ submissions, filters, undoMeta, undoModelId }
       key: 'created_at',
       label: 'Date',
       render: (item) => (
-        <span className="text-sm text-gray-500">{item.created_at}</span>
+        <span className="text-sm text-gray-500">{formatDate(item.created_at)}</span>
       ),
     },
   ];
@@ -176,26 +186,28 @@ export default function Contacts({ submissions, filters, undoMeta, undoModelId }
 
       {/* Filters */}
       <div className="flex items-center gap-3 mb-4 flex-wrap">
-        <select
+        <CustomSelect
           value={requestType}
-          onChange={(e) => applyFilters({ request_type: e.target.value || undefined })}
-          className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-        >
-          <option value="">All Types</option>
-          {Object.entries(TYPE_LABELS).map(([key, label]) => (
-            <option key={key} value={key}>{label}</option>
-          ))}
-        </select>
+          onChange={(val) => applyFilters({ request_type: val || undefined })}
+          placeholder="All Types"
+          options={[
+            { value: '', label: 'All Types' },
+            ...Object.entries(TYPE_LABELS).map(([key, label]) => ({ value: key, label })),
+          ]}
+          className="w-48"
+        />
 
-        <select
+        <CustomSelect
           value={readFilter}
-          onChange={(e) => applyFilters({ is_read: e.target.value || undefined })}
-          className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-        >
-          <option value="">All</option>
-          <option value="false">Unread</option>
-          <option value="true">Read</option>
-        </select>
+          onChange={(val) => applyFilters({ is_read: val || undefined })}
+          placeholder="All"
+          options={[
+            { value: '', label: 'All' },
+            { value: 'false', label: 'Unread' },
+            { value: 'true', label: 'Read' },
+          ]}
+          className="w-32"
+        />
 
         <button
           onClick={() => applyFilters({ archived: showArchived ? undefined : '1' })}
@@ -217,10 +229,12 @@ export default function Contacts({ submissions, filters, undoMeta, undoModelId }
         columns={columns}
         data={submissions.data}
         emptyMessage="No contact submissions found."
+        rowClassName={(item) => item.is_archived ? 'bg-amber-50/50' : ''}
         actions={(item) => (
           <>
             <button
               onClick={() => openView(item)}
+              title="View details"
               className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
             >
               <Eye size={16} />
@@ -228,6 +242,7 @@ export default function Contacts({ submissions, filters, undoMeta, undoModelId }
             {showArchived ? (
               <button
                 onClick={() => handleUnarchive(item.id)}
+                title="Unarchive"
                 className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
               >
                 <ArchiveRestore size={16} />
@@ -235,6 +250,7 @@ export default function Contacts({ submissions, filters, undoMeta, undoModelId }
             ) : (
               <button
                 onClick={() => handleArchive(item.id)}
+                title="Archive"
                 className="p-2 text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
               >
                 <Archive size={16} />
@@ -242,6 +258,7 @@ export default function Contacts({ submissions, filters, undoMeta, undoModelId }
             )}
             <button
               onClick={() => setDeleteTarget(item)}
+              title="Delete"
               className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             >
               <Trash2 size={16} />
@@ -284,11 +301,11 @@ export default function Contacts({ submissions, filters, undoMeta, undoModelId }
                   <p className="text-xs text-gray-500">Company</p>
                   <p className="text-sm text-gray-700">{viewItem.company}</p>
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs text-gray-500">Email</p>
-                  <a href={`mailto:${viewItem.email}`} className="text-sm text-primary hover:underline flex items-center gap-1">
-                    <Mail size={12} />
-                    {viewItem.email}
+                  <a href={`mailto:${viewItem.email}`} className="text-sm text-primary hover:underline flex items-center gap-1 min-w-0" title={viewItem.email}>
+                    <Mail size={12} className="shrink-0" />
+                    <span className="truncate">{viewItem.email}</span>
                   </a>
                 </div>
                 <div>

@@ -1,17 +1,37 @@
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { usePage, router } from '@inertiajs/react';
 import type { PageProps } from '@/types';
 import AdminSidebar from '@/Components/Layout/AdminSidebar';
-import { LogOut, User as UserIcon } from 'lucide-react';
+import { LogOut, User as UserIcon, Menu } from 'lucide-react';
 
 interface Props {
   children: ReactNode;
 }
 
+// Persist sidebar collapsed state across Inertia navigations
+let globalSidebarCollapsed = false;
+
 export default function AdminLayout({ children }: Props) {
   const { props } = usePage<PageProps>();
   const user = props.auth.user;
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(globalSidebarCollapsed);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Reset mobile sidebar state when viewport reaches desktop size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) setMobileOpen(false);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const handleToggle = () => {
+    const next = !sidebarCollapsed;
+    setSidebarCollapsed(next);
+    globalSidebarCollapsed = next;
+    setMobileOpen(false);
+  };
 
   const handleLogout = () => {
     router.post('/admin/logout');
@@ -19,15 +39,29 @@ export default function AdminLayout({ children }: Props) {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      {/* Mobile menu button — hidden when sidebar is open */}
+      {!mobileOpen && (
+        <div className="lg:hidden fixed top-4 left-4 z-50">
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="p-2 bg-white rounded-lg shadow-md"
+          >
+            <Menu size={22} />
+          </button>
+        </div>
+      )}
+
       <AdminSidebar
         collapsed={sidebarCollapsed}
-        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileOpen}
+        onToggle={handleToggle}
+        onMobileClose={() => setMobileOpen(false)}
       />
 
       {/* Main content area */}
       <div
         className={`transition-all duration-300 ${
-          sidebarCollapsed ? 'ml-16' : 'ml-64'
+          sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
         }`}
       >
         {/* Top header bar */}

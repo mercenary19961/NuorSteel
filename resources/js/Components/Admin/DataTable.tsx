@@ -15,6 +15,7 @@ interface DataTableProps<T> {
   searchPlaceholder?: string;
   onSearch?: (query: string) => void;
   actions?: (item: T) => React.ReactNode;
+  rowClassName?: (item: T) => string;
   emptyMessage?: string;
   loading?: boolean;
 }
@@ -26,6 +27,7 @@ export default function DataTable<T extends { id: number | string }>({
   searchPlaceholder = 'Search...',
   onSearch,
   actions,
+  rowClassName,
   emptyMessage = 'No data found.',
   loading = false,
 }: DataTableProps<T>) {
@@ -94,7 +96,7 @@ export default function DataTable<T extends { id: number | string }>({
               </tr>
             ) : (
               data.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={item.id} className={`hover:bg-gray-50 transition-colors ${rowClassName?.(item) ?? ''}`}>
                   {columns.map((col) => (
                     <td key={col.key} className="px-4 py-3 text-sm text-gray-700">
                       {col.render

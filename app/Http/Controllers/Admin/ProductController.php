@@ -57,7 +57,6 @@ class ProductController extends Controller
         $request->validate([
             'name_en' => 'required|string|max:255',
             'name_ar' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:products,slug',
             'short_description_en' => 'nullable|string',
             'short_description_ar' => 'nullable|string',
             'description_en' => 'nullable|string',
@@ -70,11 +69,11 @@ class ProductController extends Controller
         ]);
 
         $data = $request->only([
-            'name_en', 'name_ar', 'slug', 'short_description_en', 'short_description_ar',
+            'name_en', 'name_ar', 'short_description_en', 'short_description_ar',
             'description_en', 'description_ar', 'category', 'featured_image_id',
             'is_active', 'is_featured', 'sort_order',
         ]);
-        $data['slug'] = $data['slug'] ?? Str::slug($data['name_en']);
+        $data['slug'] = Str::slug($data['name_en']);
         $data['created_by'] = $request->user()->id;
         $data['updated_by'] = $request->user()->id;
 
@@ -99,7 +98,6 @@ class ProductController extends Controller
         $request->validate([
             'name_en' => 'required|string|max:255',
             'name_ar' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:products,slug,' . $id,
             'short_description_en' => 'nullable|string',
             'short_description_ar' => 'nullable|string',
             'description_en' => 'nullable|string',
@@ -124,7 +122,8 @@ class ProductController extends Controller
             $oldData[$field] = (string) ($product->$field ?? '');
         }
 
-        $data = $request->only(array_merge($trackedFields, ['slug']));
+        $data = $request->only($trackedFields);
+        $data['slug'] = Str::slug($request->input('name_en'));
         $data['updated_by'] = $request->user()->id;
 
         $newData = ['id' => $product->id];

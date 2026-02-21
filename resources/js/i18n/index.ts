@@ -27,9 +27,11 @@ i18n
 
 // Update document direction when language changes
 i18n.on('languageChanged', (lng) => {
-    document.documentElement.lang = lng;
-    document.documentElement.dir = lng === 'ar' ? 'rtl' : 'ltr';
-    localStorage.setItem('language', lng);
+    if (typeof window !== 'undefined') {
+        document.documentElement.lang = lng;
+        document.documentElement.dir = lng === 'ar' ? 'rtl' : 'ltr';
+        localStorage.setItem('language', lng);
+    }
 });
 
 export default i18n;
