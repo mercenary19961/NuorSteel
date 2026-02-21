@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowRight, Shield, Recycle, Award, Linkedin, ExternalLink } from 'lucide-react';
+import { motion } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
+import HeroBottomLinks from '@/Components/Public/HeroBottomLinks';
 
 interface LinkedinPost {
   id: number;
@@ -17,36 +19,79 @@ interface Props {
   linkedin_posts: LinkedinPost[];
 }
 
+const heroVariants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.2, delayChildren: 0.3 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: 'easeOut' as const },
+  },
+};
+
 export default function Home({ content, featured_products, linkedin_posts }: Props) {
   const { t } = useTranslation();
 
+  const scrollToFooter = (e: React.MouseEvent) => {
+    e.preventDefault();
+    document.getElementById('site-footer')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <PublicLayout>
+    <PublicLayout transparentHeader>
       <Head title="Home" />
 
-      {/* Hero Section */}
-      <section className="bg-linear-to-br from-gray-900 to-gray-800 text-white py-20 lg:py-32">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl lg:text-6xl font-bold mb-6">
-              {content?.hero?.title || t('home.hero.title')}
-            </h1>
-            <p className="text-xl text-gray-300 mb-8">
-              {content?.hero?.subtitle || t('home.hero.subtitle')}
-            </p>
-            <Link
-              href="/contact"
-              className="inline-flex items-center px-6 py-3 bg-primary hover:bg-primary-dark rounded-md font-medium transition-colors"
+      {/* Hero Section — Full Viewport */}
+      <section className="relative h-screen flex flex-col justify-between overflow-hidden">
+        {/* Background + Overlay */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-linear-to-br from-gray-900 via-gray-800 to-gray-700" />
+          <div className="absolute inset-0 bg-black/30" />
+        </div>
+
+        {/* Main Content */}
+        <div className="relative z-10 flex-1 flex items-center">
+          <div className="container mx-auto px-4">
+            <motion.div
+              className="max-w-3xl"
+              variants={heroVariants}
+              initial="hidden"
+              animate="visible"
             >
-              {content?.hero?.cta_text || t('home.hero.cta')}
-              <ArrowRight className="ml-2" size={20} />
-            </Link>
+              <motion.h1
+                variants={itemVariants}
+                className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-tight"
+              >
+                {content?.hero?.title || t('home.hero.title')}
+              </motion.h1>
+
+              <motion.a
+                variants={itemVariants}
+                href="#site-footer"
+                onClick={scrollToFooter}
+                className="inline-flex items-center mt-8 text-white/70 hover:text-white text-lg group transition-colors duration-200"
+              >
+                {t('home.hero.contactLink')}
+                <ArrowRight className="ltr:ml-2 rtl:mr-2 rtl:rotate-180 group-hover:ltr:translate-x-1 group-hover:rtl:-translate-x-1 transition-transform duration-200" size={20} />
+              </motion.a>
+            </motion.div>
           </div>
+        </div>
+
+        {/* Bottom Navigation Links */}
+        <div className="relative z-10">
+          <HeroBottomLinks />
         </div>
       </section>
 
       {/* About Section */}
-      <section className="py-16 lg:py-24">
+      <section id="section-about" className="py-16 lg:py-24">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
@@ -66,8 +111,8 @@ export default function Home({ content, featured_products, linkedin_posts }: Pro
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-16 lg:py-24 bg-gray-50">
+      {/* Features / Core Values Section */}
+      <section id="section-core-values" className="py-16 lg:py-24 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 text-center mb-12">
             {content?.features?.title || t('home.features.title')}
@@ -159,7 +204,7 @@ export default function Home({ content, featured_products, linkedin_posts }: Pro
       </section>
 
       {/* LinkedIn Feed Section */}
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section id="section-sustainability" className="py-16 lg:py-24 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <div className="w-16 h-16 bg-[#0A66C2] rounded-full flex items-center justify-center mx-auto mb-4">

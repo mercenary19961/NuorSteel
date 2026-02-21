@@ -11,7 +11,7 @@ class SiteContentSeeder extends Seeder
     {
         $contents = [
             // Home Page
-            ['page' => 'home', 'section' => 'hero', 'key' => 'title', 'content_en' => 'Leading Steel Manufacturing Excellence', 'content_ar' => 'التميز الرائد في صناعة الحديد', 'type' => 'text'],
+            ['page' => 'home', 'section' => 'hero', 'key' => 'title', 'content_en' => "Powering Saudi Arabia's Industrial Future", 'content_ar' => 'ندعم المستقبل الصــناعي للمملكة العربية السعودية', 'type' => 'text'],
             ['page' => 'home', 'section' => 'hero', 'key' => 'subtitle', 'content_en' => 'Quality steel products for a sustainable future', 'content_ar' => 'منتجات حديدية عالية الجودة لمستقبل مستدام', 'type' => 'text'],
             ['page' => 'home', 'section' => 'hero', 'key' => 'cta_text', 'content_en' => 'Get in Touch', 'content_ar' => 'تواصل معنا', 'type' => 'text'],
 

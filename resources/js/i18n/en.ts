@@ -12,9 +12,15 @@ const en = {
   },
   home: {
     hero: {
-      title: "Leading Steel Manufacturing Excellence",
+      title: "Powering Saudi Arabia's Industrial Future",
       subtitle: "Quality steel products for a sustainable future",
       cta: "Get in Touch",
+      contactLink: "Contact Us",
+      bottomLinks: {
+        about: "About Us",
+        coreValues: "Core Values",
+        sustainability: "Sustainability",
+      },
     },
     about: {
       title: "About Nuor Steel",
