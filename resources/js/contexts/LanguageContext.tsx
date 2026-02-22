@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { router, usePage } from '@inertiajs/react';
-import type { PageProps } from '@/types';
+import { router } from '@inertiajs/react';
 
 type Language = 'en' | 'ar';
 
@@ -16,13 +15,8 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
     const { i18n } = useTranslation();
-    const { locale } = usePage<PageProps>().props;
 
-    const [language, setLanguageState] = useState<Language>(() => {
-        // Initialize from Inertia shared props or localStorage
-        const stored = typeof window !== 'undefined' ? localStorage.getItem('language') : null;
-        return (stored === 'ar' ? 'ar' : locale || 'en') as Language;
-    });
+    const [language, setLanguageState] = useState<Language>('en');
 
     const isRTL = language === 'ar';
 
@@ -30,7 +24,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
         document.documentElement.lang = language;
         i18n.changeLanguage(language);
-        localStorage.setItem('language', language);
     }, [language, isRTL, i18n]);
 
     const toggleLanguage = () => {

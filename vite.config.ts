@@ -39,6 +39,9 @@ export default defineConfig({
                         if (id.includes('react-hook-form') || id.includes('@hookform') || id.includes('zod')) {
                             return 'vendor-forms';
                         }
+                        if (id.includes('framer-motion')) {
+                            return 'vendor-motion';
+                        }
                     }
                 },
             },

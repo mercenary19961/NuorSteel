@@ -10,7 +10,7 @@
 **Type:** Corporate industrial website with admin CMS
 **Stack:** Laravel 12 + Inertia.js + React 19 + TypeScript
 **Database:** MySQL
-**Architecture:** Single-service monolith (Laravel serves everything via Inertia)
+**Architecture:** Single-service monolith (Laravel serves everything via Inertia) with SSR
 **Branch:** `construction_phase`
 
 ---
@@ -51,7 +51,7 @@
 
 ### Public Pages Frontend (DONE)
 - [x] PublicLayout (Header + Footer + children)
-- [x] Home page (hero, features, products, CTA)
+- [x] Home page (full-viewport hero, framer-motion animations, bottom nav links, interactive core values, products, CTA)
 - [x] About page (overview, vision, mission, timeline)
 - [x] Recycling page (sub-page under About)
 - [x] Products listing + Product detail page
@@ -60,6 +60,21 @@
 - [x] Job detail page (job info + application form)
 - [x] Certificates page
 - [x] Contact page (form with file upload)
+
+### Homepage Redesign (DONE)
+- [x] Header: transparent overlay on homepage, solid white on other pages, fixed positioning
+- [x] Header: smart scroll behavior (hides on scroll down, shows on scroll up)
+- [x] Hero: full-viewport (`h-screen`), gradient placeholder bg, staggered entrance animations
+- [x] Hero: H1 left-aligned, "Contact Us" link scrolls to footer, RTL-aware arrow
+- [x] Hero bottom links: 3 interactive links (About Us, Core Values, Sustainability) with hover image-reveal
+- [x] framer-motion for all hero animations + mobile menu `AnimatePresence`
+- [x] `useScrollDirection` custom hook (`resources/js/hooks/useScrollDirection.ts`)
+- [x] `HeroBottomLinks` component (`resources/js/Components/Public/HeroBottomLinks.tsx`)
+- [x] Homepage sections: About Us, Vision & Mission, Vision 2030, interactive Core Values, Products, LinkedIn, CTA
+- [x] Core Values: interactive tabbed section with overlaid icon buttons on image placeholder
+- [x] Products: two interactive panels (TMT Bars / Billets) with hover expand, color overlay fade, and angled clip-path divider (lg+)
+- [x] All sections dark-themed (gray-800 → gray-950 gradient flow)
+- [x] Language defaults to English always (no localStorage persistence)
 
 ### Inertia Migration (DONE)
 - [x] Inertia.js infrastructure (packages, Vite config, root template, entry point)
@@ -100,11 +115,30 @@
 - [x] Newsletter subscribers demo seeder
 - [x] Career applications demo content seeder
 
+### SSR — Server-Side Rendering (DONE)
+- [x] SSR entry point (`resources/js/ssr.tsx`) using `@inertiajs/react/server`
+- [x] Client entry (`app.tsx`) uses conditional hydration (`hydrateRoot` when SSR content exists, `createRoot` in dev)
+- [x] Vite config updated with SSR entry (`ssr: 'resources/js/ssr.tsx'`)
+- [x] Published `config/inertia.php` with SSR toggle (`INERTIA_SSR_ENABLED` env var)
+- [x] Build script updated: `vite build && vite build --ssr` (outputs to `bootstrap/ssr/`)
+- [x] Browser API guards added (`typeof window !== 'undefined'`) in bootstrap.ts, i18n/index.ts, LanguageContext.tsx
+- [x] `/bootstrap/ssr` added to `.gitignore`
+
+### Deployment Infrastructure (IN PROGRESS)
+- [x] Railway project set up (PHP 8.2 + Node 22 via Railpack)
+- [x] MySQL service provisioned on Railway
+- [x] `trustProxies` middleware configured for Railway HTTPS (`bootstrap/app.php`)
+- [ ] Railway environment variables (DB credentials, APP_KEY, APP_URL)
+- [ ] Run migrations + seeders on Railway
+- [ ] Enable SSR on Railway (start Node SSR server alongside PHP)
+
 ### Remaining
 - [ ] LinkedIn API integration (homepage feed)
+- [ ] Real images for hero background, bottom link hover panels, core values section, and product panels (currently gradient placeholders)
+- [ ] Logo image for header (currently text-only)
 - [ ] Code splitting (chunk >500kB)
 - [ ] Structured data remaining placeholders (see above)
-- [ ] Testing & deployment
+- [ ] Final testing & go-live
 
 ---
 
@@ -116,10 +150,11 @@
 - Header text: "Nuor Steel Industry Company"
 - Browser title format: "Nuor Steel | {Page Name}"
 
-### Navigation (6 items)
+### Navigation (5 items in navbar)
 ```
-About Us | Products | Quality | Career | Certificates | Contact
+About Us | Products | Quality | Career | Certificates
 ```
+- "Contact" was removed from the navbar — contact info lives in the footer
 
 ### CMS Approach
 - **Hybrid model**: Fixed page structure + editable content + CRUD for data
@@ -297,6 +332,23 @@ After writing or modifying any controller, service, or model method, verify thes
 - Restore operations must use the same model methods as normal updates (to preserve `updated_by`, events, cache invalidation, etc.).
 - Always verify undo state exists before attempting restore. Clear undo state after successful restore.
 
+### CMS Content vs i18n (Bilingual Pattern)
+
+- **CMS content always wins over i18n fallbacks.** The pattern `content?.section?.key || t('fallback.key')` means the database value overrides the translation file. If you change text in `en.ts`/`ar.ts` but the `site_content` table has the old value, **the old value still shows**.
+- **When changing display text:** update BOTH the i18n files (`resources/js/i18n/en.ts`, `ar.ts`) AND the `SiteContentSeeder.php`, then re-run the seeder (`php artisan db:seed --class=SiteContentSeeder`). The admin CMS editor at `/admin/content` also writes to the same table.
+- **Bilingual content for instant language switching:** To avoid a flash of stale content when toggling language, pass BOTH locales from the controller (`content_en` + `content_ar`) and let the client pick using `useLanguage()`. This avoids waiting for a server round-trip. See `HomeController` + `Home.tsx` for the pattern:
+  ```php
+  // Controller: pass both
+  'content_en' => SiteContent::getPage('home', 'en'),
+  'content_ar' => SiteContent::getPage('home', 'ar'),
+  ```
+  ```tsx
+  // Component: pick based on client language
+  const { language } = useLanguage();
+  const content = language === 'ar' ? content_ar : content_en;
+  ```
+- **Apply this pattern to ALL public page controllers** that pass CMS content, not just Home.
+
 ---
 
 ## Security (CRITICAL)
@@ -360,32 +412,41 @@ Security is extremely important for this project. Every code change must conside
   - Admin: `admin@nuorsteel.com` / `password`
   - Editor: `editor@nuorsteel.com` / `password`
 - **Admin dashboard**: `http://localhost:8000/admin/login`
-- **Build**: `npm run build` (outputs to `public/build/`)
+- **Build**: `npm run build` (outputs client to `public/build/` + SSR to `bootstrap/ssr/`)
+- **SSR in dev**: Not active — `npm run dev` uses CSR only. SSR applies to production builds
+- **SSR toggle**: Set `INERTIA_SSR_ENABLED=false` in `.env` to disable SSR even in production
 
 ### Frontend Architecture
 - **Framework**: Inertia.js — bridges Laravel controllers to React page components
+- **Rendering**: SSR via `@inertiajs/react/server` + `hydrateRoot` on client
 - **Data flow**: Controllers pass data as props via `Inertia::render('Page/Name', [...props])`
 - **Mutations**: `router.post/put/delete()` with `preserveScroll`, `onSuccess`, `onFinish`
 - **Forms with files**: Use native `FormData` + `forceFormData: true`
 - **Routing**: Server-driven via `routes/web.php` — no client-side router
 - **Auth state**: `usePage<PageProps>().props.auth.user` (shared by middleware)
 - **Site settings**: `usePage<PageProps>().props.siteSettings` (phone, email, address, LinkedIn — shared by middleware)
-- **Styling**: TailwindCSS v4 with custom `primary` color
+- **Styling**: TailwindCSS v4 with custom `primary` color, Inter font
 - **Icons**: Lucide React
+- **Animations**: framer-motion (isolated in `vendor-motion` Vite chunk)
 - **i18n**: react-i18next with EN/AR translation files (bundled, not HTTP-loaded)
 - **Flash messages**: Server redirects with `->with('success', '...')`, rendered by FlashMessages component via toast
+- **SSR safety**: All `window`/`document`/`localStorage` access guarded with `typeof window !== 'undefined'`
 
 ### Key File Locations
 ```
 resources/js/Pages/Public/     → Public page components (10 pages)
 resources/js/Pages/Admin/      → Admin page components (16 pages)
 resources/js/Layouts/          → PublicLayout, AdminLayout
-resources/js/Components/       → Shared components (Layout/, Admin/)
+resources/js/Components/       → Shared components (Layout/, Admin/, Public/)
+resources/js/hooks/            → Custom hooks (useScrollDirection)
 resources/js/types/            → TypeScript interfaces
 resources/js/i18n/             → Translation files (en.ts, ar.ts)
 resources/js/contexts/         → LanguageContext
-resources/js/app.tsx           → Inertia entry point
+resources/js/app.tsx           → Client entry point (hydrateRoot / createRoot)
+resources/js/ssr.tsx           → SSR entry point (createServer)
 resources/views/app.blade.php  → Root Blade template (@inertia)
+config/inertia.php             → Inertia SSR config
+bootstrap/app.php              → Middleware config (trustProxies, web stack)
 app/Http/Controllers/Public/   → Public Inertia controllers
 app/Http/Controllers/Admin/    → Admin Inertia controllers
 app/Http/Controllers/Auth/     → Login/logout controller
@@ -394,9 +455,13 @@ routes/web.php                 → All routes (public + admin)
 ```
 
 ### Deployment (Railway)
-- Single service — Nixpacks auto-detects Laravel + Node.js
+- Single service — Railpack builder with PHP 8.2 + Node 22
 - Build: `composer install && npm install && npm run build && php artisan migrate --force`
-- `npm run build` outputs to `public/build/` (laravel-vite-plugin default)
+- `npm run build` outputs client to `public/build/` + SSR bundle to `bootstrap/ssr/ssr.js`
+- **SSR in production**: Requires running `node bootstrap/ssr/ssr.js` alongside PHP (port 13714)
+- **Proxy**: Railway terminates SSL — `trustProxies(at: '*')` in `bootstrap/app.php` ensures HTTPS URLs
+- **SSR toggle**: `INERTIA_SSR_ENABLED=true/false` env var controls whether Laravel calls the SSR server
+- **Staging URL**: `https://nuorsteel-website-production.up.railway.app`
 
 ### LinkedIn Integration
 - Method: LinkedIn API (requires Developer App approval)
@@ -427,3 +492,7 @@ routes/web.php                 → All routes (public + admin)
 
 - Full specification: [docs/WEBSITE_SPECIFICATION.md](docs/WEBSITE_SPECIFICATION.md)
 - This context file: [CLAUDE.md](CLAUDE.md)
+
+---
+
+> **Last updated:** 2026-02-22 — based on commit `513d3e3` (*feat: redesign products section with interactive hover panels and update product data*)

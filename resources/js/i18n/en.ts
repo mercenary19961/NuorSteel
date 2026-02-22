@@ -12,34 +12,63 @@ const en = {
   },
   home: {
     hero: {
-      title: "Leading Steel Manufacturing Excellence",
+      title: "Powering Saudi Arabia's Industrial Future",
       subtitle: "Quality steel products for a sustainable future",
       cta: "Get in Touch",
+      contactLink: "Contact Us",
+      bottomLinks: {
+        about: "About Us",
+        coreValues: "Core Values",
+        sustainability: "Sustainability",
+      },
     },
     about: {
       title: "About Nuor Steel",
-      description: "Nuor Steel Industry Company is a leading manufacturer of high-quality steel products, committed to excellence and sustainability.",
+      description: "Nuor Steel Industry Company is a leading Saudi steel manufacturer founded in 2010 in Al Kharj Industrial City. As a fully integrated producer of steel billets and TMT rebars, it supports national infrastructure and industrial growth aligned with Saudi Vision 2030.",
       learnMore: "Learn More",
     },
-    features: {
-      title: "Why Choose Us",
+    visionMission: {
+      title: "Vision & Mission",
+      visionTitle: "Vision",
+      visionDescription: "To be the leading producer and marketer of high-quality steel products in the Middle East, setting benchmarks for quality, reliability, and sustainability.",
+      missionTitle: "Mission",
+      missionDescription: "To be the most trusted provider of construction materials in Saudi Arabia and the leading TMT bar brand in the Middle East, powered by innovation, uncompromising quality, and continuous improvement.",
+    },
+    vision2030: {
+      paragraph1: "Nuor Steel Industry Company supports Saudi Vision 2030 by strengthening local industrial capabilities and advancing the localization of critical construction materials. As a fully integrated steel manufacturer, Nuor Steel is positioned to support giga and mega-projects through reliable supply, consistent quality, and national-scale production.",
+      paragraph2: "As a proud member of the \"Made in Saudi\" program, Nuor Steel contributes to local value creation and the growth of a competitive, globally respected Saudi industrial sector.",
+    },
+    coreValues: {
+      title: "Core Values",
       quality: {
-        title: "Quality Assurance",
-        description: "ISO certified manufacturing processes ensuring consistent product quality.",
+        title: "Quality",
+        description: "We maintain the highest quality standards through strict inspections and continuous improvement, delivering reliable and consistent steel products.",
       },
       sustainability: {
         title: "Sustainability",
-        description: "Committed to environmental responsibility through recycling and efficient processes.",
+        description: "We operate with a strong commitment to environmental responsibility by minimizing emissions, improving energy efficiency, and prioritizing material recycling in line with international best practices.",
       },
-      certified: {
-        title: "Certified Products",
-        description: "Full compliance with international standards and certifications.",
+      innovation: {
+        title: "Innovation",
+        description: "We embrace advanced technologies and digital solutions to optimize our processes and develop efficient, future-ready steel solutions.",
+      },
+      strategicGrowth: {
+        title: "Strategic Growth",
+        description: "We focus on sustainable, long-term growth by building strong partnerships and aligning our expansion with national and regional development objectives.",
       },
     },
     products: {
       title: "Our Products",
       subtitle: "Discover our range of high-quality steel products",
       viewAll: "View All Products",
+      tmtBars: {
+        title: "TMT Bars",
+        description: "Thermo-Mechanically Treated reinforcement steel bars manufactured to BS 4449:2005, Grade B500B standards. Available in 8mm to 32mm diameters for residential, commercial, and infrastructure projects.",
+      },
+      billets: {
+        title: "Billets",
+        description: "High-quality steel billets produced through Electric Arc Furnace steelmaking and continuous casting. The essential semi-finished feedstock for rolling mills, manufactured to strict chemical and dimensional specifications.",
+      },
     },
     linkedin: {
       title: "Latest from LinkedIn",

@@ -14,10 +14,9 @@ class HomeController extends Controller
 {
     public function index(): Response
     {
-        $locale = session('locale', 'en');
-
         return Inertia::render('Public/Home', [
-            'content' => SiteContent::getPage('home', $locale),
+            'content_en' => SiteContent::getPage('home', 'en'),
+            'content_ar' => SiteContent::getPage('home', 'ar'),
             'featured_products' => Product::active()
                 ->featured()
                 ->ordered()

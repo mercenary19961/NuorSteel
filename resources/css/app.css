@@ -19,6 +19,11 @@
     --color-foreground: #0f172a;
 }
 
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
 /* Base styles */
 body {
     margin: 0;
