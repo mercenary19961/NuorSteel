@@ -127,7 +127,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       <Head title="Home" />
 
       {/* Hero Section — Full Viewport */}
-      <section className="relative h-screen flex flex-col justify-between overflow-hidden">
+      <section id="section-hero" className="relative h-screen flex flex-col justify-between overflow-hidden">
         {/* Background + Overlay */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-linear-to-br from-gray-900 via-gray-800 to-gray-700" />
@@ -191,7 +191,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* Vision & Mission Section */}
-      <section className="py-16 lg:py-24 bg-linear-to-b from-gray-900 to-gray-950">
+      <section id="section-vision-mission" className="py-16 lg:py-24 bg-linear-to-b from-gray-900 to-gray-950">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl lg:text-4xl font-bold text-white text-center mb-12">
             {content?.vision_mission?.title || t('home.visionMission.title')}
@@ -218,7 +218,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* Vision 2030 Section */}
-      <section className="py-16 lg:py-24 bg-gray-900 text-white">
+      <section id="section-vision-2030" className="py-16 lg:py-24 bg-gray-900 text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto space-y-6">
             <p className="text-lg leading-relaxed text-white/90">
@@ -297,7 +297,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* Products Showcase */}
-      <section className="overflow-hidden">
+      <section id="section-products" className="overflow-hidden">
         <div className="flex flex-col lg:flex-row min-h-100 lg:min-h-137.5 lg:bg-white/20">
           {/* TMT Bars */}
           <Link
@@ -368,7 +368,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* LinkedIn Feed Section */}
-      <section id="section-sustainability" className="py-16 lg:py-24 bg-gray-900">
+      <section id="section-linkedin" className="py-16 lg:py-24 bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
             {/* Left column: info + controls (flips to right in RTL) */}
@@ -452,25 +452,6 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
               )}
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 lg:py-24 bg-primary text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-6">
-            {content?.cta?.title || t('home.cta.title')}
-          </h2>
-          <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-            {content?.cta?.description || t('home.cta.description')}
-          </p>
-          <Link
-            href="/contact"
-            className="inline-flex items-center px-8 py-4 bg-white text-primary hover:bg-gray-100 rounded-md font-medium transition-colors"
-          >
-            {content?.cta?.button || t('home.cta.button')}
-            <ArrowRight className="ml-2" size={20} />
-          </Link>
         </div>
       </section>
     </PublicLayout>
