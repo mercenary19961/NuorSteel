@@ -72,6 +72,7 @@
 - [x] `HeroBottomLinks` component (`resources/js/Components/Public/HeroBottomLinks.tsx`)
 - [x] Homepage sections: About Us, Vision & Mission, Vision 2030, interactive Core Values, Products, LinkedIn, CTA
 - [x] Core Values: interactive tabbed section with overlaid icon buttons on image placeholder
+- [x] Products: two interactive panels (TMT Bars / Billets) with hover expand, color overlay fade, and angled clip-path divider (lg+)
 - [x] All sections dark-themed (gray-800 → gray-950 gradient flow)
 - [x] Language defaults to English always (no localStorage persistence)
 
@@ -116,7 +117,7 @@
 
 ### SSR — Server-Side Rendering (DONE)
 - [x] SSR entry point (`resources/js/ssr.tsx`) using `@inertiajs/react/server`
-- [x] Client entry (`app.tsx`) switched from `createRoot` to `hydrateRoot`
+- [x] Client entry (`app.tsx`) uses conditional hydration (`hydrateRoot` when SSR content exists, `createRoot` in dev)
 - [x] Vite config updated with SSR entry (`ssr: 'resources/js/ssr.tsx'`)
 - [x] Published `config/inertia.php` with SSR toggle (`INERTIA_SSR_ENABLED` env var)
 - [x] Build script updated: `vite build && vite build --ssr` (outputs to `bootstrap/ssr/`)
@@ -133,7 +134,7 @@
 
 ### Remaining
 - [ ] LinkedIn API integration (homepage feed)
-- [ ] Real images for hero background, bottom link hover panels, and core values section (currently gradient placeholders)
+- [ ] Real images for hero background, bottom link hover panels, core values section, and product panels (currently gradient placeholders)
 - [ ] Logo image for header (currently text-only)
 - [ ] Code splitting (chunk >500kB)
 - [ ] Structured data remaining placeholders (see above)
@@ -441,7 +442,7 @@ resources/js/hooks/            → Custom hooks (useScrollDirection)
 resources/js/types/            → TypeScript interfaces
 resources/js/i18n/             → Translation files (en.ts, ar.ts)
 resources/js/contexts/         → LanguageContext
-resources/js/app.tsx           → Client entry point (hydrateRoot)
+resources/js/app.tsx           → Client entry point (hydrateRoot / createRoot)
 resources/js/ssr.tsx           → SSR entry point (createServer)
 resources/views/app.blade.php  → Root Blade template (@inertia)
 config/inertia.php             → Inertia SSR config
@@ -494,4 +495,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-02-21 — based on commit `b46fa90` (*feat: update site content seeder with core values, vision, and mission sections; enhance Arabic and English translations*)
+> **Last updated:** 2026-02-22 — based on commit `513d3e3` (*feat: redesign products section with interactive hover panels and update product data*)
