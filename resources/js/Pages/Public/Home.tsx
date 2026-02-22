@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowRight, ChevronLeft, ChevronRight, ShieldCheck, Leaf, Lightbulb, TrendingUp, Linkedin } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import HeroBottomLinks from '@/Components/Public/HeroBottomLinks';
+import RadialOrbitalTimeline from '@/Components/ui/radial-orbital-timeline';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface LinkedinPost {
@@ -46,38 +47,53 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
   const { language } = useLanguage();
   const content = language === 'ar' ? content_ar : content_en;
 
-  const coreValues = [
+  const coreValuesData = [
     {
-      key: 'quality',
-      icon: ShieldCheck,
+      id: 1,
       title: content?.core_values?.quality_title || t('home.coreValues.quality.title'),
-      description: content?.core_values?.quality_description || t('home.coreValues.quality.description'),
-      position: 'top-[12%] right-[10%]',
+      date: '',
+      content: content?.core_values?.quality_description || t('home.coreValues.quality.description'),
+      category: 'Quality',
+      icon: ShieldCheck,
+      relatedIds: [2, 4],
+      status: 'completed' as const,
+      energy: 100,
     },
     {
-      key: 'sustainability',
-      icon: Leaf,
+      id: 2,
       title: content?.core_values?.sustainability_title || t('home.coreValues.sustainability.title'),
-      description: content?.core_values?.sustainability_description || t('home.coreValues.sustainability.description'),
-      position: 'top-[35%] left-[8%]',
+      date: '',
+      content: content?.core_values?.sustainability_description || t('home.coreValues.sustainability.description'),
+      category: 'Sustainability',
+      icon: Leaf,
+      relatedIds: [1, 3],
+      status: 'completed' as const,
+      energy: 95,
     },
     {
-      key: 'innovation',
-      icon: Lightbulb,
+      id: 3,
       title: content?.core_values?.innovation_title || t('home.coreValues.innovation.title'),
-      description: content?.core_values?.innovation_description || t('home.coreValues.innovation.description'),
-      position: 'bottom-[25%] left-[30%]',
+      date: '',
+      content: content?.core_values?.innovation_description || t('home.coreValues.innovation.description'),
+      category: 'Innovation',
+      icon: Lightbulb,
+      relatedIds: [2, 4],
+      status: 'completed' as const,
+      energy: 90,
     },
     {
-      key: 'strategicGrowth',
-      icon: TrendingUp,
+      id: 4,
       title: content?.core_values?.strategic_growth_title || t('home.coreValues.strategicGrowth.title'),
-      description: content?.core_values?.strategic_growth_description || t('home.coreValues.strategicGrowth.description'),
-      position: 'bottom-[8%] right-[15%]',
+      date: '',
+      content: content?.core_values?.strategic_growth_description || t('home.coreValues.strategicGrowth.description'),
+      category: 'Growth',
+      icon: TrendingUp,
+      relatedIds: [1, 3],
+      status: 'completed' as const,
+      energy: 85,
     },
   ];
 
-  const [activeValue, setActiveValue] = useState(0);
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
   const [linkedinIndex, setLinkedinIndex] = useState(0);
   const [iframeHeight, setIframeHeight] = useState(600);
@@ -234,65 +250,13 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       {/* Core Values Section */}
       <section id="section-core-values" className="py-16 lg:py-24 bg-gray-950">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left: Text Content */}
-            <div>
-              <h2 className="text-3xl lg:text-4xl font-bold text-white mb-10">
-                {content?.core_values?.title || t('home.coreValues.title')}
-              </h2>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeValue}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <h3 className="text-2xl font-semibold text-primary mb-4">
-                    {coreValues[activeValue].title}
-                  </h3>
-                  <p className="text-lg text-white/70 leading-relaxed">
-                    {coreValues[activeValue].description}
-                  </p>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            {/* Right: Image with Overlaid Buttons */}
-            <div className="relative aspect-4/3 rounded-xl overflow-hidden">
-              {/* Gradient Placeholder */}
-              <div className="absolute inset-0 bg-linear-to-br from-gray-700 via-gray-600 to-gray-500" />
-
-              {/* Overlay Buttons */}
-              {coreValues.map((value, index) => (
-                <button
-                  key={index}
-                  onClick={() => setActiveValue(index)}
-                  className={`absolute flex flex-col items-center gap-1.5 group transition-all duration-300 ${value.position}`}
-                >
-                  <div
-                    className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
-                      activeValue === index
-                        ? 'bg-primary ring-4 ring-primary/30 scale-110'
-                        : 'bg-white/20 backdrop-blur-sm hover:bg-white/30'
-                    }`}
-                  >
-                    <value.icon
-                      size={24}
-                      className={activeValue === index ? 'text-white' : 'text-white/80'}
-                    />
-                  </div>
-                  <span
-                    className={`text-xs font-medium whitespace-nowrap transition-colors duration-300 ${
-                      activeValue === index ? 'text-primary' : 'text-white/60'
-                    }`}
-                  >
-                    {value.title}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
+          <h2 className="text-3xl lg:text-4xl font-bold text-white text-center mb-4">
+            {content?.core_values?.title || t('home.coreValues.title')}
+          </h2>
+          <p className="text-lg text-white/60 text-center mb-8 max-w-2xl mx-auto">
+            {t('home.coreValues.subtitle', 'Click on any node to explore our core values')}
+          </p>
+          <RadialOrbitalTimeline timelineData={coreValuesData} />
         </div>
       </section>
 

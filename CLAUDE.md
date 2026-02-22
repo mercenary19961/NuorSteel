@@ -492,6 +492,7 @@ routes/web.php                 → All routes (public + admin)
 
 - Full specification: [docs/WEBSITE_SPECIFICATION.md](docs/WEBSITE_SPECIFICATION.md)
 - This context file: [CLAUDE.md](CLAUDE.md)
+- Core Values V1 backup: [docs/core-values-v1-backup.md](docs/core-values-v1-backup.md) — original two-column layout with overlaid icon buttons
 
 ---
 
