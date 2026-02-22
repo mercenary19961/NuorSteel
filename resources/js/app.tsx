@@ -4,7 +4,7 @@ import './i18n';
 
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import { hydrateRoot } from 'react-dom/client';
+import { createRoot, hydrateRoot } from 'react-dom/client';
 import type { ComponentType, ReactNode } from 'react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { ToastProvider } from '@/contexts/ToastContext';
@@ -28,7 +28,7 @@ createInertiaApp({
         import.meta.glob<{ default: ComponentType }>('./Pages/**/*.tsx'),
     ),
     setup({ el, App, props }) {
-        hydrateRoot(el,
+        const appElement = (
             <App {...props}>
                 {({ Component, props: pageProps, key }) => (
                     <Providers>
@@ -37,5 +37,11 @@ createInertiaApp({
                 )}
             </App>
         );
+
+        if (el.hasChildNodes()) {
+            hydrateRoot(el, appElement);
+        } else {
+            createRoot(el).render(appElement);
+        }
     },
 });

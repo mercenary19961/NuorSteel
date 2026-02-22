@@ -40,7 +40,7 @@ const itemVariants = {
   },
 };
 
-export default function Home({ content_en, content_ar, featured_products, linkedin_posts }: Props) {
+export default function Home({ content_en, content_ar, linkedin_posts }: Props) {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const content = language === 'ar' ? content_ar : content_en;
@@ -77,6 +77,7 @@ export default function Home({ content_en, content_ar, featured_products, linked
   ];
 
   const [activeValue, setActiveValue] = useState(0);
+  const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
 
   const scrollToFooter = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -257,51 +258,74 @@ export default function Home({ content_en, content_ar, featured_products, linked
         </div>
       </section>
 
-      {/* Products Preview */}
-      <section className="py-16 lg:py-24">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              {content?.products?.title || t('home.products.title')}
-            </h2>
-            <p className="text-lg text-gray-600">
-              {content?.products?.subtitle || t('home.products.subtitle')}
-            </p>
-          </div>
-          {featured_products.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {featured_products.map((product) => (
-                <Link
-                  key={product.id}
-                  href={`/products/${product.slug}`}
-                  className="group bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
-                >
-                  <div className="aspect-video bg-gray-100 flex items-center justify-center overflow-hidden">
-                    {product.image ? (
-                      <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                    ) : (
-                      <span className="text-gray-400 text-sm">{product.name}</span>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-900">{product.name}</h3>
-                    {product.short_description && (
-                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">{product.short_description}</p>
-                    )}
-                  </div>
-                </Link>
-              ))}
+      {/* Products Showcase */}
+      <section className="overflow-hidden">
+        <div className="flex flex-col lg:flex-row min-h-100 lg:min-h-137.5 lg:bg-white/20">
+          {/* TMT Bars */}
+          <Link
+            href="/products/tmt-bars"
+            className="relative z-10 flex-1 overflow-hidden cursor-pointer group lg:[clip-path:polygon(0_0,calc(100%-3px)_0,calc(100%-3rem-3px)_100%,0_100%)]"
+            style={{
+              flex: hoveredProduct === 0 ? 1.4 : hoveredProduct === 1 ? 0.6 : 1,
+              transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+            onMouseEnter={() => setHoveredProduct(0)}
+            onMouseLeave={() => setHoveredProduct(null)}
+          >
+            {/* Background placeholder (replace with real image later) */}
+            <div className="absolute inset-0 bg-linear-to-br from-slate-600 via-slate-500 to-slate-400" />
+            {/* Color Overlay */}
+            <div
+              className="absolute inset-0 bg-blue-900/60 transition-opacity duration-600"
+              style={{ opacity: hoveredProduct === 0 ? 0 : 1 }}
+            />
+            {/* Content */}
+            <div className="relative z-10 h-full flex flex-col justify-center items-center p-8 lg:p-12 text-white text-center min-h-87.5 lg:min-h-0">
+              <h3 className="text-3xl lg:text-4xl font-bold mb-4">
+                {t('home.products.tmtBars.title')}
+              </h3>
+              <p className="text-sm lg:text-base text-white/80 max-w-md leading-relaxed">
+                {t('home.products.tmtBars.description')}
+              </p>
+              <span className="mt-6 inline-flex items-center text-sm font-medium text-white/60 group-hover:text-white transition-colors duration-300">
+                {t('products.viewDetails')}
+                <ArrowRight className="ltr:ml-2 rtl:mr-2 rtl:rotate-180" size={16} />
+              </span>
             </div>
-          )}
-          <div className="text-center">
-            <Link
-              href="/products"
-              className="inline-flex items-center px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-md font-medium transition-colors"
-            >
-              {t('home.products.viewAll')}
-              <ArrowRight className="ml-2" size={20} />
-            </Link>
-          </div>
+          </Link>
+
+          {/* Billets */}
+          <Link
+            href="/products/billets"
+            className="relative flex-1 overflow-hidden cursor-pointer group lg:-ml-12 lg:[clip-path:polygon(calc(3rem+3px)_0,100%_0,100%_100%,3px_100%)]"
+            style={{
+              flex: hoveredProduct === 1 ? 1.4 : hoveredProduct === 0 ? 0.6 : 1,
+              transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+            onMouseEnter={() => setHoveredProduct(1)}
+            onMouseLeave={() => setHoveredProduct(null)}
+          >
+            {/* Background placeholder (replace with real image later) */}
+            <div className="absolute inset-0 bg-linear-to-br from-gray-700 via-gray-600 to-gray-500" />
+            {/* Color Overlay */}
+            <div
+              className="absolute inset-0 bg-red-900/60 transition-opacity duration-600"
+              style={{ opacity: hoveredProduct === 1 ? 0 : 1 }}
+            />
+            {/* Content */}
+            <div className="relative z-10 h-full flex flex-col justify-center items-center p-8 lg:p-12 text-white text-center min-h-87.5 lg:min-h-0">
+              <h3 className="text-3xl lg:text-4xl font-bold mb-4">
+                {t('home.products.billets.title')}
+              </h3>
+              <p className="text-sm lg:text-base text-white/80 max-w-md leading-relaxed">
+                {t('home.products.billets.description')}
+              </p>
+              <span className="mt-6 inline-flex items-center text-sm font-medium text-white/60 group-hover:text-white transition-colors duration-300">
+                {t('products.viewDetails')}
+                <ArrowRight className="ltr:ml-2 rtl:mr-2 rtl:rotate-180" size={16} />
+              </span>
+            </div>
+          </Link>
         </div>
       </section>
 

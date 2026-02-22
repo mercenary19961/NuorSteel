@@ -61,6 +61,14 @@ const en = {
       title: "Our Products",
       subtitle: "Discover our range of high-quality steel products",
       viewAll: "View All Products",
+      tmtBars: {
+        title: "TMT Bars",
+        description: "Thermo-Mechanically Treated reinforcement steel bars manufactured to BS 4449:2005, Grade B500B standards. Available in 8mm to 32mm diameters for residential, commercial, and infrastructure projects.",
+      },
+      billets: {
+        title: "Billets",
+        description: "High-quality steel billets produced through Electric Arc Furnace steelmaking and continuous casting. The essential semi-finished feedstock for rolling mills, manufactured to strict chemical and dimensional specifications.",
+      },
     },
     linkedin: {
       title: "Latest from LinkedIn",
