@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             SettingsSeeder::class,
             SiteContentSeeder::class,
             DemoContentSeeder::class,
+            LinkedinPostSeeder::class,
         ]);
     }
 }

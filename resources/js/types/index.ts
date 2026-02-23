@@ -277,6 +277,18 @@ export interface NewsletterSubscriber {
   unsubscribed_at: string | null;
 }
 
+// LinkedIn Posts
+export interface LinkedinPost {
+  id: number;
+  post_id: string;
+  content: string;
+  image_url: string | null;
+  post_url: string;
+  posted_at: string;
+  is_active: boolean;
+  sort_order: number;
+}
+
 // Site Content
 export interface SiteContent {
   id: number;

@@ -7,15 +7,7 @@ import PublicLayout from '@/Layouts/PublicLayout';
 import HeroBottomLinks from '@/Components/Public/HeroBottomLinks';
 import RadialOrbitalTimeline from '@/Components/ui/radial-orbital-timeline';
 import { useLanguage } from '@/contexts/LanguageContext';
-
-interface LinkedinPost {
-  id: number;
-  post_id: string;
-  content: string;
-  image_url: string | null;
-  post_url: string;
-  posted_at: string;
-}
+import type { LinkedinPost } from '@/types';
 
 type ContentMap = Record<string, Record<string, string>>;
 

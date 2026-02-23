@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\UndoController as AdminUndoController;
 use App\Http\Controllers\Admin\ChangeLogController as AdminChangeLogController;
+use App\Http\Controllers\Admin\LinkedinPostController as AdminLinkedinPostController;
 
 /*
 |--------------------------------------------------------------------------
@@ -139,6 +140,14 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::put('/applications/{id}', [AdminCareerController::class, 'updateApplication'])->name('applications.update');
     Route::get('/applications/{id}/cv', [AdminCareerController::class, 'downloadCv'])->name('applications.download-cv');
     Route::delete('/applications/{id}', [AdminCareerController::class, 'deleteApplication'])->name('applications.destroy');
+
+    // LinkedIn Posts
+    Route::get('/linkedin-posts', [AdminLinkedinPostController::class, 'index'])->name('linkedin-posts.index');
+    Route::post('/linkedin-posts', [AdminLinkedinPostController::class, 'store'])->name('linkedin-posts.store');
+    Route::put('/linkedin-posts/{id}', [AdminLinkedinPostController::class, 'update'])->name('linkedin-posts.update');
+    Route::delete('/linkedin-posts/{id}', [AdminLinkedinPostController::class, 'destroy'])->name('linkedin-posts.destroy');
+    Route::post('/linkedin-posts/{id}/toggle', [AdminLinkedinPostController::class, 'toggleVisibility'])->name('linkedin-posts.toggle');
+    Route::post('/linkedin-posts/reorder', [AdminLinkedinPostController::class, 'reorder'])->name('linkedin-posts.reorder');
 
     // Contacts
     Route::get('/contacts', [AdminContactController::class, 'index'])->name('contacts.index');
