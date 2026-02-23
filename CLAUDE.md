@@ -70,10 +70,12 @@
 - [x] framer-motion for all hero animations + mobile menu `AnimatePresence`
 - [x] `useScrollDirection` custom hook (`resources/js/hooks/useScrollDirection.ts`)
 - [x] `HeroBottomLinks` component (`resources/js/Components/Public/HeroBottomLinks.tsx`)
-- [x] Homepage sections: About Us, Vision & Mission, Vision 2030, interactive Core Values, Products, LinkedIn, CTA
-- [x] Core Values: interactive tabbed section with overlaid icon buttons on image placeholder
+- [x] Homepage sections: About Us, Vision & Mission, Vision 2030, interactive Core Values, Products, LinkedIn, CTA — each with `id` for scroll navigation
+- [x] Core Values V2: RadialOrbitalTimeline component with orbital animation and rotating value cards (`resources/js/Components/ui/radial-orbital-timeline.tsx`)
 - [x] Products: two interactive panels (TMT Bars / Billets) with hover expand, color overlay fade, and angled clip-path divider (lg+)
 - [x] All sections dark-themed (gray-800 → gray-950 gradient flow)
+- [x] LinkedIn feed: auto-rotating carousel with dot indicators, improved iframe sizing
+- [x] UI primitive components: Badge, Button, Card (`resources/js/Components/ui/`)
 - [x] Language defaults to English always (no localStorage persistence)
 
 ### Inertia Migration (DONE)
@@ -428,6 +430,7 @@ Security is extremely important for this project. Every code change must conside
 - **Styling**: TailwindCSS v4 with custom `primary` color, Inter font
 - **Icons**: Lucide React
 - **Animations**: framer-motion (isolated in `vendor-motion` Vite chunk)
+- **UI primitives**: Badge, Button, Card components in `resources/js/Components/ui/` (uses `@radix-ui/react-slot` for polymorphic `asChild`)
 - **i18n**: react-i18next with EN/AR translation files (bundled, not HTTP-loaded)
 - **Flash messages**: Server redirects with `->with('success', '...')`, rendered by FlashMessages component via toast
 - **SSR safety**: All `window`/`document`/`localStorage` access guarded with `typeof window !== 'undefined'`
@@ -437,7 +440,7 @@ Security is extremely important for this project. Every code change must conside
 resources/js/Pages/Public/     → Public page components (10 pages)
 resources/js/Pages/Admin/      → Admin page components (16 pages)
 resources/js/Layouts/          → PublicLayout, AdminLayout
-resources/js/Components/       → Shared components (Layout/, Admin/, Public/)
+resources/js/Components/       → Shared components (Layout/, Admin/, Public/, ui/)
 resources/js/hooks/            → Custom hooks (useScrollDirection)
 resources/js/types/            → TypeScript interfaces
 resources/js/i18n/             → Translation files (en.ts, ar.ts)
@@ -496,4 +499,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-02-22 — based on commit `513d3e3` (*feat: redesign products section with interactive hover panels and update product data*)
+> **Last updated:** 2026-02-23 — based on commit `8aca12f` (*feat: implement RadialOrbitalTimeline component and update core values section*)
