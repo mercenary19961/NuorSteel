@@ -372,13 +372,13 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
 
             {/* Right column: post embed (flips to left in RTL) */}
             <div
-              className="lg:w-3/5 w-full"
+              className="lg:w-3/5 w-full flex justify-center"
               onMouseEnter={() => setLinkedinPaused(true)}
               onMouseLeave={() => setLinkedinPaused(false)}
             >
               {linkedin_posts.length > 0 ? (
-                <>
-                  <div className="relative shadow-lg shadow-black/20 border-2 border-gray-900 transition-[height] duration-300" style={{ height: `${iframeHeight}px` }}>
+                <div className="w-full max-w-126">
+                  <div className="relative rounded-xl overflow-hidden shadow-2xl shadow-black/30 ring-1 ring-white/10 transition-[height] duration-300" style={{ height: `${iframeHeight}px` }}>
                     {linkedin_posts.map((post, i) => (
                       <iframe
                         key={post.post_id}
@@ -393,14 +393,14 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
                     ))}
                   </div>
                   {linkedin_posts.length > 1 && (
-                    <div className="h-1 bg-white/10 mt-3 rounded-full overflow-hidden">
+                    <div className="h-1 bg-white/10 mt-4 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-[#0A66C2] rounded-full transition-[width] duration-500 ease-in-out"
                         style={{ width: `${((linkedinIndex + 1) / linkedin_posts.length) * 100}%` }}
                       />
                     </div>
                   )}
-                </>
+                </div>
               ) : (
                 <div className="text-center py-12">
                   <p className="text-white/50">{t('home.linkedin.noPosts')}</p>
