@@ -52,7 +52,7 @@
 ### Public Pages Frontend (DONE)
 - [x] PublicLayout (Header + Footer + children)
 - [x] Home page (full-viewport hero, framer-motion animations, bottom nav links, interactive core values, products, CTA)
-- [x] About page (overview, vision, mission, timeline)
+- [x] About page (overview, vision, mission, capabilities scroll-stack, timeline)
 - [x] Recycling page (sub-page under About)
 - [x] Products listing + Product detail page
 - [x] Quality page
@@ -77,7 +77,17 @@
 - [x] LinkedIn feed: auto-rotating carousel with dot indicators, improved iframe sizing, RTL-aware chevron arrows
 - [x] LinkedIn section uses CSS logical properties (`text-start`, `ms-0`/`me-auto`) for RTL support
 - [x] UI primitive components: Badge, Button, Card (`resources/js/Components/ui/`)
+- [x] ScrollStack component: scroll-triggered stacking card animation (`resources/js/Components/ui/scroll-stack.tsx`)
 - [x] Language defaults to English always (no localStorage persistence)
+
+### About Page Enhancements (DONE)
+- [x] Capabilities section with ScrollStack animation (5 cards: Integrated Manufacturing, Advanced Technology, Large-Scale Supply, Quality Assurance, Customization)
+- [x] ScrollStack uses sticky viewport + progress-based animation (window scroll mode)
+- [x] Cards slide up from below viewport with ease-out cubic easing, stack with scale-down effect
+- [x] Heading centered as absolute overlay, covered by cards as they enter
+- [x] Lenis smooth scroll library added (used for container scroll mode, not window scroll to avoid hijacking page scroll)
+- [x] `vendor-lenis` Vite chunk for code splitting
+- [x] i18n translations for all capabilities (EN + AR)
 
 ### Inertia Migration (DONE)
 - [x] Inertia.js infrastructure (packages, Vite config, root template, entry point)
@@ -439,8 +449,9 @@ Security is extremely important for this project. Every code change must conside
 - **Site settings**: `usePage<PageProps>().props.siteSettings` (phone, email, address, LinkedIn — shared by middleware)
 - **Styling**: TailwindCSS v4 with custom `primary` color, Inter font
 - **Icons**: Lucide React
-- **Animations**: framer-motion (isolated in `vendor-motion` Vite chunk)
-- **UI primitives**: Badge, Button, Card components in `resources/js/Components/ui/` (uses `@radix-ui/react-slot` for polymorphic `asChild`)
+- **Animations**: framer-motion (isolated in `vendor-motion` Vite chunk), ScrollStack (sticky viewport + progress-based, isolated in `vendor-lenis` chunk)
+- **Smooth scroll**: Lenis library for ScrollStack container mode (window scroll mode uses native scroll events to avoid hijacking page scroll)
+- **UI primitives**: Badge, Button, Card, ScrollStack components in `resources/js/Components/ui/` (uses `@radix-ui/react-slot` for polymorphic `asChild`)
 - **i18n**: react-i18next with EN/AR translation files (bundled, not HTTP-loaded)
 - **Flash messages**: Server redirects with `->with('success', '...')`, rendered by FlashMessages component via toast
 - **SSR safety**: All `window`/`document`/`localStorage` access guarded with `typeof window !== 'undefined'`
@@ -452,6 +463,7 @@ resources/js/Pages/Admin/      → Admin page components (17 pages)
 resources/js/Layouts/          → PublicLayout, AdminLayout
 resources/js/Components/       → Shared components (Layout/, Admin/, Public/, ui/)
 resources/js/hooks/            → Custom hooks (useScrollDirection)
+resources/css/scroll-stack.css → ScrollStack GPU-accelerated card CSS
 resources/js/types/            → TypeScript interfaces
 resources/js/i18n/             → Translation files (en.ts, ar.ts)
 resources/js/contexts/         → LanguageContext
@@ -510,4 +522,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-02-24 — based on commit `db795c1` (*fix: improve RTL support for products clip-path, LinkedIn section, and carousel arrows*)
+> **Last updated:** 2026-02-24 — based on commit `261901e` (*feat: add capabilities section and integrate Lenis for smooth scrolling*)
