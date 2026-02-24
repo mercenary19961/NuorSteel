@@ -72,9 +72,10 @@
 - [x] `HeroBottomLinks` component (`resources/js/Components/Public/HeroBottomLinks.tsx`)
 - [x] Homepage sections: About Us, Vision & Mission, Vision 2030, interactive Core Values, Products, LinkedIn, CTA — each with `id` for scroll navigation
 - [x] Core Values V2: RadialOrbitalTimeline component with orbital animation and rotating value cards (`resources/js/Components/ui/radial-orbital-timeline.tsx`)
-- [x] Products: two interactive panels (TMT Bars / Billets) with hover expand, color overlay fade, and angled clip-path divider (lg+)
+- [x] Products: two interactive panels (TMT Bars / Billets) with hover expand, color overlay fade, and RTL-aware angled clip-path divider (lg+)
 - [x] All sections dark-themed (gray-800 → gray-950 gradient flow)
-- [x] LinkedIn feed: auto-rotating carousel with dot indicators, improved iframe sizing
+- [x] LinkedIn feed: auto-rotating carousel with dot indicators, improved iframe sizing, RTL-aware chevron arrows
+- [x] LinkedIn section uses CSS logical properties (`text-start`, `ms-0`/`me-auto`) for RTL support
 - [x] UI primitive components: Badge, Button, Card (`resources/js/Components/ui/`)
 - [x] Language defaults to English always (no localStorage persistence)
 
@@ -134,8 +135,16 @@
 - [ ] Run migrations + seeders on Railway
 - [ ] Enable SSR on Railway (start Node SSR server alongside PHP)
 
+### LinkedIn Admin Management (DONE)
+- [x] Manual CMS for LinkedIn posts (replaces API-based sync)
+- [x] Admin page at `/admin/linkedin-posts` — add posts by pasting embed code or URL
+- [x] Toggle visibility, reorder, delete with undo support
+- [x] Removed `SyncLinkedinPosts` command and `LinkedinService` (API approach dropped)
+- [x] Added `is_visible` column to `linkedin_cache` table via migration
+- [x] `LinkedinPostSeeder` seeds real Nuor Steel LinkedIn posts
+- [x] Admin sidebar updated with LinkedIn Posts link
+
 ### Remaining
-- [ ] LinkedIn API integration (homepage feed)
 - [ ] Real images for hero background, bottom link hover panels, core values section, and product panels (currently gradient placeholders)
 - [ ] Logo image for header (currently text-only)
 - [ ] Code splitting (chunk >500kB)
@@ -284,6 +293,7 @@ About Us | Products | Quality | Career | Certificates
 /admin/settings         → Site settings (admin only)
 /admin/users            → User management (admin only)
 /admin/change-log       → Change log with revert/delete (admin only)
+/admin/linkedin-posts   → LinkedIn posts management
 ```
 
 ---
@@ -438,7 +448,7 @@ Security is extremely important for this project. Every code change must conside
 ### Key File Locations
 ```
 resources/js/Pages/Public/     → Public page components (10 pages)
-resources/js/Pages/Admin/      → Admin page components (16 pages)
+resources/js/Pages/Admin/      → Admin page components (17 pages)
 resources/js/Layouts/          → PublicLayout, AdminLayout
 resources/js/Components/       → Shared components (Layout/, Admin/, Public/, ui/)
 resources/js/hooks/            → Custom hooks (useScrollDirection)
@@ -467,10 +477,11 @@ routes/web.php                 → All routes (public + admin)
 - **Staging URL**: `https://nuorsteel-website-production.up.railway.app`
 
 ### LinkedIn Integration
-- Method: LinkedIn API (requires Developer App approval)
-- Sync: Every 6 hours via scheduled task
-- Display: 5 latest posts on homepage
-- Fallback: "Follow us on LinkedIn" link
+- Method: **Manual CMS** (admin pastes embed code or URL — no API needed)
+- Admin page: `/admin/linkedin-posts` (CRUD with visibility toggle, reorder, undo)
+- Display: Auto-rotating carousel on homepage with dot indicators
+- Controller: `Admin/LinkedinPostController.php`
+- Seeder: `LinkedinPostSeeder` (real Nuor Steel posts)
 
 ### Image Processing
 - Client-side cropping on upload
@@ -499,4 +510,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-02-23 — based on commit `8aca12f` (*feat: implement RadialOrbitalTimeline component and update core values section*)
+> **Last updated:** 2026-02-24 — based on commit `db795c1` (*fix: improve RTL support for products clip-path, LinkedIn section, and carousel arrows*)
