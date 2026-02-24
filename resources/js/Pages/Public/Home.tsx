@@ -258,10 +258,15 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
           {/* TMT Bars */}
           <Link
             href="/products/tmt-bars"
-            className="relative z-10 flex-1 overflow-hidden cursor-pointer group lg:[clip-path:polygon(0_0,calc(100%-3px)_0,calc(100%-3rem-3px)_100%,0_100%)]"
+            className="relative z-10 flex-1 overflow-hidden cursor-pointer group"
             style={{
               flex: hoveredProduct === 0 ? 1.4 : hoveredProduct === 1 ? 0.6 : 1,
               transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+              clipPath: typeof window !== 'undefined' && window.innerWidth >= 1024
+                ? language === 'ar'
+                  ? 'polygon(3px 0, 100% 0, 100% 100%, calc(3rem + 3px) 100%)'
+                  : 'polygon(0 0, calc(100% - 3px) 0, calc(100% - 3rem - 3px) 100%, 0 100%)'
+                : undefined,
             }}
             onMouseEnter={() => setHoveredProduct(0)}
             onMouseLeave={() => setHoveredProduct(null)}
@@ -291,10 +296,15 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
           {/* Billets */}
           <Link
             href="/products/billets"
-            className="relative flex-1 overflow-hidden cursor-pointer group lg:-ml-12 lg:[clip-path:polygon(calc(3rem+3px)_0,100%_0,100%_100%,3px_100%)]"
+            className="relative flex-1 overflow-hidden cursor-pointer group lg:-ms-12"
             style={{
               flex: hoveredProduct === 1 ? 1.4 : hoveredProduct === 0 ? 0.6 : 1,
               transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+              clipPath: typeof window !== 'undefined' && window.innerWidth >= 1024
+                ? language === 'ar'
+                  ? 'polygon(0 0, calc(100% - 3rem - 3px) 0, calc(100% - 3px) 100%, 0 100%)'
+                  : 'polygon(calc(3rem + 3px) 0, 100% 0, 100% 100%, 3px 100%)'
+                : undefined,
             }}
             onMouseEnter={() => setHoveredProduct(1)}
             onMouseLeave={() => setHoveredProduct(null)}
@@ -328,8 +338,8 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
             {/* Left column: info + controls (flips to right in RTL) */}
-            <div className="lg:w-2/5 text-center lg:ltr:text-left lg:rtl:text-right">
-              <div className="w-16 h-16 bg-[#0A66C2] rounded-full flex items-center justify-center mx-auto lg:ltr:mx-0 lg:rtl:ms-auto lg:rtl:me-0 mb-6">
+            <div className="lg:w-2/5 text-center lg:text-start">
+              <div className="w-16 h-16 bg-[#0A66C2] rounded-full flex items-center justify-center mx-auto lg:ms-0 lg:me-auto mb-6">
                 <Linkedin className="text-white" size={32} />
               </div>
               <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
@@ -340,12 +350,12 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
               </p>
 
               {linkedin_posts.length > 1 && (
-                <div className="flex items-center gap-4 justify-center lg:ltr:justify-start lg:rtl:justify-end mb-8">
+                <div className="flex items-center gap-4 justify-center lg:justify-start mb-8">
                   <button
                     onClick={() => goToLinkedinPost('prev')}
                     className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
                   >
-                    <ChevronLeft size={20} />
+                    <ChevronLeft className="rtl:rotate-180" size={20} />
                   </button>
                   <span className="text-white/50 text-sm">
                     {linkedinIndex + 1} / {linkedin_posts.length}
@@ -354,7 +364,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
                     onClick={() => goToLinkedinPost('next')}
                     className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
                   >
-                    <ChevronRight size={20} />
+                    <ChevronRight className="rtl:rotate-180" size={20} />
                   </button>
                 </div>
               )}

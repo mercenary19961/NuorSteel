@@ -40,6 +40,7 @@ const en = {
     },
     coreValues: {
       title: "Core Values",
+      subtitle: "Click on any node to explore our core values",
       quality: {
         title: "Quality",
         description: "We maintain the highest quality standards through strict inspections and continuous improvement, delivering reliable and consistent steel products.",
