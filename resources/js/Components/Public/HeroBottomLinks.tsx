@@ -39,12 +39,12 @@ export default function HeroBottomLinks() {
             {/* Image reveal container */}
             <div className="relative h-24 sm:h-32 overflow-hidden mb-2 rounded-sm">
               <div
-                className={`absolute inset-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out bg-gradient-to-t ${gradients[index]}`}
+                className={`absolute inset-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out bg-linear-to-t ${gradients[index]}`}
               />
             </div>
 
             {/* Line */}
-            <div className="h-[2px] bg-white/30 group-hover:bg-primary transition-colors duration-300" />
+            <div className="h-0.5 bg-white/30 group-hover:bg-primary transition-colors duration-300" />
 
             {/* Label */}
             <p className="text-white/60 group-hover:text-white text-xs sm:text-sm mt-3 uppercase tracking-widest transition-colors duration-300 font-medium">

@@ -108,6 +108,30 @@ const en = {
       title: "Governance",
       description: "Our commitment to ethical business practices and transparent governance.",
     },
+    capabilities: {
+      title: "Our Capabilities",
+      subtitle: "Comprehensive steel manufacturing capabilities to support your projects",
+      integratedManufacturing: {
+        title: "Integrated Steel Manufacturing",
+        description: "Fully integrated production of steel billets and TMT rebars, ensuring full control over quality, consistency, and traceability from raw material to finished product.",
+      },
+      advancedTechnology: {
+        title: "Advanced Production Technology",
+        description: "Modern manufacturing facilities equipped with advanced rolling, casting, and thermo-mechanical treatment systems to deliver high-performance steel products.",
+      },
+      largeScaleSupply: {
+        title: "Large-Scale Project Supply",
+        description: "Proven capability to support national and mega-projects with reliable volumes, consistent quality, and dependable delivery schedules.",
+      },
+      qualityAssurance: {
+        title: "Quality Assurance & Testing",
+        description: "In-house laboratories and rigorous testing procedures covering chemical, mechanical, and dimensional properties in compliance with Saudi and international standards.",
+      },
+      customization: {
+        title: "Customization & Technical Support",
+        description: "Ability to provide tailored grades, dimensions, and technical assistance to meet project-specific and engineering requirements.",
+      },
+    },
   },
   products: {
     hero: {

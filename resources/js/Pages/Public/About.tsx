@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Head } from '@inertiajs/react';
 import { Download } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import CapabilitiesSection from '@/Components/Public/CapabilitiesSection';
 
 interface Props {
   timeline: { id: number; year: string; title: string; description: string | null; image: string | null }[];
@@ -65,6 +66,9 @@ export default function About({ timeline, governance, content }: Props) {
           </div>
         </div>
       </section>
+
+      {/* Capabilities */}
+      <CapabilitiesSection />
 
       {/* Timeline */}
       <section className="py-16 lg:py-24">
