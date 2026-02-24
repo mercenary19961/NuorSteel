@@ -89,7 +89,15 @@ const en = {
     },
     overview: {
       title: "Company Overview",
-      description: "Nuor Steel Industry Company is dedicated to manufacturing premium quality steel products while maintaining the highest standards of environmental responsibility and workplace safety.",
+      description: "Nuor Steel Industry Company is a leading Saudi steel manufacturer established in 2010 and headquartered in Al Kharj Industrial City. Originally founded as a steel trading business, Nuor Steel has evolved into a fully integrated steel producer with advanced manufacturing facilities specializing in the production of high-quality steel billets and TMT steel rebars.",
+    },
+    intro: {
+      segment1: "Nuor Steel Industry Company is a",
+      highlight1: "leading Saudi steel manufacturer",
+      segment2: "established in 2010 and headquartered in Al Kharj Industrial City. Originally founded as a steel trading business, Nuor Steel has evolved into a",
+      highlight2: "fully integrated steel producer",
+      segment3: "with advanced manufacturing facilities specializing in the production of",
+      highlight3: "high-quality steel billets and TMT steel rebars.",
     },
     vision: {
       title: "Our Vision",

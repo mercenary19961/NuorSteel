@@ -1,8 +1,10 @@
 import { useTranslation } from 'react-i18next';
+import { useRef } from 'react';
 import { Head } from '@inertiajs/react';
 import { Download } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import CapabilitiesSection from '@/Components/Public/CapabilitiesSection';
+import { TimelineContent } from '@/Components/ui/timeline-animation';
 
 interface Props {
   timeline: { id: number; year: string; title: string; description: string | null; image: string | null }[];
@@ -12,34 +14,82 @@ interface Props {
 
 export default function About({ timeline, governance, content }: Props) {
   const { t } = useTranslation();
+  const introRef = useRef<HTMLDivElement>(null);
+
+  const revealVariants = {
+    visible: (i: number) => ({
+      y: 0,
+      opacity: 1,
+      filter: 'blur(0px)',
+      transition: { delay: i * 1.5, duration: 0.7 },
+    }),
+    hidden: {
+      filter: 'blur(10px)',
+      y: 40,
+      opacity: 0,
+    },
+  };
+
+  const textVariants = {
+    visible: (i: number) => ({
+      filter: 'blur(0px)',
+      opacity: 1,
+      transition: { delay: i * 0.3, duration: 0.7 },
+    }),
+    hidden: {
+      filter: 'blur(10px)',
+      opacity: 0,
+    },
+  };
 
   return (
     <PublicLayout>
       <Head title="About Us" />
 
-      {/* Hero Section */}
-      <section className="bg-linear-to-br from-gray-900 to-gray-800 text-white py-16 lg:py-24">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl lg:text-5xl font-bold mb-4">
-            {t('about.hero.title')}
-          </h1>
-          <p className="text-xl text-gray-300">
-            {t('about.hero.subtitle')}
-          </p>
-        </div>
-      </section>
+      {/* SEO h1 — visually hidden */}
+      <h1 className="sr-only">{t('about.hero.title')}</h1>
 
-      {/* Overview */}
-      <section className="py-16 lg:py-24">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              {content?.overview?.title || t('about.overview.title')}
-            </h2>
-            <p className="text-lg text-gray-600 leading-relaxed">
-              {content?.overview?.description || t('about.overview.description')}
-            </p>
-          </div>
+      {/* About Intro — animated large text with highlighted keywords */}
+      <section className="bg-linear-to-br from-gray-900 to-gray-800 text-white py-20 lg:py-32">
+        <div className="max-w-6xl mx-auto px-4" ref={introRef}>
+          <TimelineContent
+            as="p"
+            animationNum={0}
+            timelineRef={introRef}
+            customVariants={revealVariants}
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl leading-[120%]! font-semibold text-white"
+          >
+            {t('about.intro.segment1')}{' '}
+            <TimelineContent
+              as="span"
+              animationNum={1}
+              timelineRef={introRef}
+              customVariants={textVariants}
+              className="text-primary border-2 border-primary/50 inline-block border-dotted px-2 rounded-md"
+            >
+              {t('about.intro.highlight1')}
+            </TimelineContent>{' '}
+            {t('about.intro.segment2')}{' '}
+            <TimelineContent
+              as="span"
+              animationNum={2}
+              timelineRef={introRef}
+              customVariants={textVariants}
+              className="text-sky-400 border-2 border-sky-400/50 inline-block border-dotted px-2 rounded-md"
+            >
+              {t('about.intro.highlight2')}
+            </TimelineContent>{' '}
+            {t('about.intro.segment3')}{' '}
+            <TimelineContent
+              as="span"
+              animationNum={3}
+              timelineRef={introRef}
+              customVariants={textVariants}
+              className="text-emerald-400 border-2 border-emerald-400/50 inline-block border-dotted px-2 rounded-md"
+            >
+              {t('about.intro.highlight3')}
+            </TimelineContent>
+          </TimelineContent>
         </div>
       </section>
 
