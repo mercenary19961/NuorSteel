@@ -131,7 +131,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
   };
 
   return (
-    <PublicLayout transparentHeader>
+    <PublicLayout>
       <Head title="Home" />
 
       {/* Hero Section — Full Viewport */}

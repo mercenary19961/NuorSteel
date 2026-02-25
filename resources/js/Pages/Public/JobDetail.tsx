@@ -63,9 +63,9 @@ export default function JobDetail({ job }: Props) {
       <Head title={job.title} />
 
       {/* Breadcrumb */}
-      <div className="bg-gray-50 border-b border-gray-200">
-        <div className="container mx-auto px-4 py-4">
-          <Link href="/career" className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700">
+      <div className="bg-linear-to-br from-gray-900 to-gray-800 pt-32 lg:pt-44 pb-8">
+        <div className="container mx-auto px-4">
+          <Link href="/career" className="inline-flex items-center text-sm text-gray-300 hover:text-white">
             <ArrowLeft size={16} className="mr-1" />
             {t('career.backToCareers')}
           </Link>

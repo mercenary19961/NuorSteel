@@ -20,19 +20,14 @@ export default function RecyclingPage({ content }: Props) {
     <PublicLayout>
       <Head title="Recycling" />
 
-      {/* Breadcrumb */}
-      <div className="bg-gray-50 border-b border-gray-200">
-        <div className="container mx-auto px-4 py-4">
-          <Link href="/about" className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700">
+      {/* Hero Section */}
+      <section className="bg-linear-to-br from-green-900 to-green-800 text-white pt-32 lg:pt-44 pb-16 lg:pb-24">
+        <div className="container mx-auto px-4">
+          {/* Breadcrumb */}
+          <Link href="/about" className="inline-flex items-center text-sm text-green-200 hover:text-white mb-8">
             <ArrowLeft size={16} className="mr-1" />
             {t('recycling.backToAbout')}
           </Link>
-        </div>
-      </div>
-
-      {/* Hero Section */}
-      <section className="bg-linear-to-br from-green-900 to-green-800 text-white py-16 lg:py-24">
-        <div className="container mx-auto px-4">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center">
               <Recycle size={28} />
