@@ -65,7 +65,8 @@
 - [x] Header: transparent overlay on all pages, fixed positioning
 - [x] Header: visible at top of page, hides on scroll (no show-on-scroll-up)
 - [x] Hero: full-viewport (`h-screen`), gradient placeholder bg, staggered entrance animations
-- [x] Hero: H1 left-aligned, "Contact Us" link scrolls to footer, RTL-aware arrow
+- [x] Hero: H1 with multi-line typewriter effect — types lines simultaneously, then cycles keywords with delete/retype animation (`resources/js/Components/ui/typewriter.tsx`)
+- [x] Hero: "Contact Us" link fades in after typewriter completes, scrolls to footer + triggers orange glow on contact info (phone/email) for 10s
 - [x] Hero bottom links: 3 interactive links (About Us, Core Values, Sustainability) with hover image-reveal
 - [x] framer-motion for all hero animations + mobile menu `AnimatePresence`
 - [x] `useScrollDirection` custom hook (`resources/js/hooks/useScrollDirection.ts`)
@@ -455,7 +456,7 @@ Security is extremely important for this project. Every code change must conside
 - **Icons**: Lucide React
 - **Animations**: framer-motion (isolated in `vendor-motion` Vite chunk), ScrollStack (sticky viewport + progress-based, isolated in `vendor-lenis` chunk)
 - **Smooth scroll**: Lenis library for ScrollStack container mode (window scroll mode uses native scroll events to avoid hijacking page scroll)
-- **UI primitives**: Badge, Button, Card, ScrollStack, TimelineContent components in `resources/js/Components/ui/` (uses `@radix-ui/react-slot` for polymorphic `asChild`)
+- **UI primitives**: Badge, Button, Card, ScrollStack, TimelineContent, HeroTypewriter components in `resources/js/Components/ui/` (uses `@radix-ui/react-slot` for polymorphic `asChild`)
 - **i18n**: react-i18next with EN/AR translation files (bundled, not HTTP-loaded)
 - **Flash messages**: Server redirects with `->with('success', '...')`, rendered by FlashMessages component via toast
 - **SSR safety**: All `window`/`document`/`localStorage` access guarded with `typeof window !== 'undefined'`
@@ -526,4 +527,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-02-25 — based on commit `259b12a` (*feat: unify transparent header across all public pages and hide on scroll*)
+> **Last updated:** 2026-02-25 — based on commit `e60640b` (*feat: add typewriter hero effect and footer contact glow on scroll*)
