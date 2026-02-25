@@ -125,12 +125,14 @@ const en = {
     },
     timeline: {
       title: "Our Journey",
-      loading: "Loading timeline...",
-      empty: "No timeline events yet.",
-    },
-    governance: {
-      title: "Governance",
-      description: "Our commitment to ethical business practices and transparent governance.",
+      events: [
+        { year: "Apr 2010", description: "Started our First Trading Business." },
+        { year: "May 2014", description: "Started Installing Melt Shops." },
+        { year: "Aug 2016", description: "Started Manufacturing our own Billets." },
+        { year: "Sept 2020", description: "Started Installing our Rolling Mills." },
+        { year: "2023", description: "Start production of rebar TMT Bars." },
+        { year: "Present", description: "One of the best steel manufacturers in the sector." },
+      ],
     },
     capabilities: {
       title: "Our Capabilities",
