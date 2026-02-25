@@ -4,6 +4,7 @@ import { Head } from '@inertiajs/react';
 import { Download } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import CapabilitiesSection from '@/Components/Public/CapabilitiesSection';
+import VisionMissionSection from '@/Components/Public/VisionMissionSection';
 import { TimelineContent } from '@/Components/ui/timeline-animation';
 
 interface Props {
@@ -94,28 +95,7 @@ export default function About({ timeline, governance, content }: Props) {
       </section>
 
       {/* Vision & Mission */}
-      <section className="py-16 lg:py-24 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                {content?.vision?.title || t('about.vision.title')}
-              </h2>
-              <p className="text-gray-600 leading-relaxed">
-                {content?.vision?.description || t('about.vision.description')}
-              </p>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                {content?.mission?.title || t('about.mission.title')}
-              </h2>
-              <p className="text-gray-600 leading-relaxed">
-                {content?.mission?.description || t('about.mission.description')}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <VisionMissionSection />
 
       {/* Capabilities */}
       <CapabilitiesSection />

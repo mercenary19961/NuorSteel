@@ -102,13 +102,26 @@ const en = {
       segment3: "with advanced manufacturing facilities specializing in the production of",
       highlight3: "high-quality steel billets and TMT steel rebars.",
     },
-    vision: {
-      title: "Our Vision",
-      description: "To be the leading steel manufacturer in the region, recognized for quality, innovation, and sustainability.",
-    },
-    mission: {
-      title: "Our Mission",
-      description: "To deliver high-quality steel products that meet international standards while contributing to sustainable development and customer satisfaction.",
+    visionMission: {
+      title: "Vision & Mission",
+      established: {
+        title: "Established",
+        year: "2010",
+        description: "Pioneering steel manufacturing in Al Kharj Industrial City since day one.",
+      },
+      vision: {
+        title: "Vision",
+        description: "To be the leading producer and marketer of high-quality steel products in the Middle East, setting benchmarks for quality, reliability, and sustainability.",
+      },
+      mission: {
+        title: "Mission",
+        description: "To be the most trusted provider of construction materials in Saudi Arabia and the leading TMT bar brand in the Middle East, powered by innovation, uncompromising quality, and continuous improvement.",
+      },
+      employees: {
+        title: "Employees",
+        count: "200+",
+        description: "Skilled professionals driving excellence across our operations.",
+      },
     },
     timeline: {
       title: "Our Journey",
