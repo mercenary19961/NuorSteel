@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { Linkedin, Mail, Phone, MapPin } from 'lucide-react';
@@ -7,9 +8,21 @@ export default function Footer() {
   const { t } = useTranslation();
   const { siteSettings } = usePage<PageProps>().props;
   const currentYear = new Date().getFullYear();
+  const [highlightContact, setHighlightContact] = useState(false);
   const { data, setData, post, processing, reset, wasSuccessful } = useForm({
     email: '',
   });
+
+  // Listen for highlight-contact event from hero "Contact Us" click
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handler = () => {
+      setHighlightContact(true);
+      setTimeout(() => setHighlightContact(false), 10000);
+    };
+    window.addEventListener('highlight-contact', handler);
+    return () => window.removeEventListener('highlight-contact', handler);
+  }, []);
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,7 +96,13 @@ export default function Footer() {
                 <span>{siteSettings.address || t('footer.address')}</span>
               </li>
               {siteSettings.phone && (
-                <li className="flex items-center text-sm text-gray-400">
+                <li
+                  className={`flex items-center text-sm transition-all duration-700 ${
+                    highlightContact
+                      ? 'text-white [text-shadow:0_0_12px_rgba(255,122,0,0.8),0_0_24px_rgba(255,122,0,0.4)]'
+                      : 'text-gray-400'
+                  }`}
+                >
                   <Phone size={16} className="mr-2 shrink-0" />
                   <a href={`tel:${siteSettings.phone.replace(/\s/g, '')}`} className="hover:text-white transition-colors">
                     {siteSettings.phone}
@@ -91,7 +110,13 @@ export default function Footer() {
                 </li>
               )}
               {siteSettings.email && (
-                <li className="flex items-center text-sm text-gray-400">
+                <li
+                  className={`flex items-center text-sm transition-all duration-700 ${
+                    highlightContact
+                      ? 'text-white [text-shadow:0_0_12px_rgba(255,122,0,0.8),0_0_24px_rgba(255,122,0,0.4)]'
+                      : 'text-gray-400'
+                  }`}
+                >
                   <Mail size={16} className="mr-2 shrink-0" />
                   <a href={`mailto:${siteSettings.email}`} className="hover:text-white transition-colors">
                     {siteSettings.email}

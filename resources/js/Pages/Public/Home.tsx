@@ -114,7 +114,10 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
 
   const scrollToFooter = (e: React.MouseEvent) => {
     e.preventDefault();
-    document.getElementById('site-footer')?.scrollIntoView({ behavior: 'smooth' });
+    const footer = document.getElementById('site-footer');
+    footer?.scrollIntoView({ behavior: 'smooth' });
+    // Dispatch highlight event after scroll completes (~800ms for smooth scroll)
+    setTimeout(() => window.dispatchEvent(new CustomEvent('highlight-contact')), 900);
   };
 
   return (
