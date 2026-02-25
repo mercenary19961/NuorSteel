@@ -1,19 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowRight, ShieldCheck, Leaf, Lightbulb, TrendingUp, Linkedin, ExternalLink } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, ChevronLeft, ChevronRight, ShieldCheck, Leaf, Lightbulb, TrendingUp, Linkedin } from 'lucide-react';
+import { motion } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import HeroBottomLinks from '@/Components/Public/HeroBottomLinks';
+import RadialOrbitalTimeline from '@/Components/ui/radial-orbital-timeline';
+import { HeroTypewriter } from '@/Components/ui/typewriter';
 import { useLanguage } from '@/contexts/LanguageContext';
-
-interface LinkedinPost {
-  id: number;
-  content: string;
-  image_url: string | null;
-  post_url: string;
-  posted_at: string;
-}
+import type { LinkedinPost } from '@/types';
 
 type ContentMap = Record<string, Record<string, string>>;
 
@@ -24,60 +19,98 @@ interface Props {
   linkedin_posts: LinkedinPost[];
 }
 
-const heroVariants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.2, delayChildren: 0.3 },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: 'easeOut' as const },
-  },
-};
 
 export default function Home({ content_en, content_ar, linkedin_posts }: Props) {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const content = language === 'ar' ? content_ar : content_en;
 
-  const coreValues = [
+  const coreValuesData = [
     {
-      key: 'quality',
-      icon: ShieldCheck,
+      id: 1,
       title: content?.core_values?.quality_title || t('home.coreValues.quality.title'),
-      description: content?.core_values?.quality_description || t('home.coreValues.quality.description'),
-      position: 'top-[12%] right-[10%]',
+      date: '',
+      content: content?.core_values?.quality_description || t('home.coreValues.quality.description'),
+      category: 'Quality',
+      icon: ShieldCheck,
+      relatedIds: [2, 4],
+      status: 'completed' as const,
+      energy: 100,
     },
     {
-      key: 'sustainability',
-      icon: Leaf,
+      id: 2,
       title: content?.core_values?.sustainability_title || t('home.coreValues.sustainability.title'),
-      description: content?.core_values?.sustainability_description || t('home.coreValues.sustainability.description'),
-      position: 'top-[35%] left-[8%]',
+      date: '',
+      content: content?.core_values?.sustainability_description || t('home.coreValues.sustainability.description'),
+      category: 'Sustainability',
+      icon: Leaf,
+      relatedIds: [1, 3],
+      status: 'completed' as const,
+      energy: 95,
     },
     {
-      key: 'innovation',
-      icon: Lightbulb,
+      id: 3,
       title: content?.core_values?.innovation_title || t('home.coreValues.innovation.title'),
-      description: content?.core_values?.innovation_description || t('home.coreValues.innovation.description'),
-      position: 'bottom-[25%] left-[30%]',
+      date: '',
+      content: content?.core_values?.innovation_description || t('home.coreValues.innovation.description'),
+      category: 'Innovation',
+      icon: Lightbulb,
+      relatedIds: [2, 4],
+      status: 'completed' as const,
+      energy: 90,
     },
     {
-      key: 'strategicGrowth',
-      icon: TrendingUp,
+      id: 4,
       title: content?.core_values?.strategic_growth_title || t('home.coreValues.strategicGrowth.title'),
-      description: content?.core_values?.strategic_growth_description || t('home.coreValues.strategicGrowth.description'),
-      position: 'bottom-[8%] right-[15%]',
+      date: '',
+      content: content?.core_values?.strategic_growth_description || t('home.coreValues.strategicGrowth.description'),
+      category: 'Growth',
+      icon: TrendingUp,
+      relatedIds: [1, 3],
+      status: 'completed' as const,
+      energy: 85,
     },
   ];
 
-  const [activeValue, setActiveValue] = useState(0);
+  const [typingDone, setTypingDone] = useState(false);
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
+  const [linkedinIndex, setLinkedinIndex] = useState(0);
+  const [iframeHeight, setIframeHeight] = useState(600);
+  const [linkedinPaused, setLinkedinPaused] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    setIframeHeight(600);
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== 'https://www.linkedin.com') return;
+      try {
+        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        if (data && typeof data.height === 'number' && data.height > 0) {
+          setIframeHeight(data.height);
+        }
+      } catch { /* ignore non-JSON messages */ }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [linkedinIndex]);
+
+  // Auto-rotate LinkedIn posts every 15 seconds (pauses on hover)
+  useEffect(() => {
+    if (typeof window === 'undefined' || linkedin_posts.length <= 1 || linkedinPaused) return;
+    const timer = setInterval(() => {
+      setLinkedinIndex((prev) => (prev + 1) % linkedin_posts.length);
+    }, 15000);
+    return () => clearInterval(timer);
+  }, [linkedin_posts.length, linkedinPaused]);
+
+  // Reset progress bar on manual navigation
+  const goToLinkedinPost = (direction: 'prev' | 'next') => {
+    setLinkedinIndex((prev) =>
+      direction === 'prev'
+        ? (prev - 1 + linkedin_posts.length) % linkedin_posts.length
+        : (prev + 1) % linkedin_posts.length
+    );
+  };
 
   const scrollToFooter = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -85,11 +118,11 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
   };
 
   return (
-    <PublicLayout transparentHeader>
+    <PublicLayout>
       <Head title="Home" />
 
       {/* Hero Section — Full Viewport */}
-      <section className="relative h-screen flex flex-col justify-between overflow-hidden">
+      <section id="section-hero" className="relative h-screen flex flex-col justify-between overflow-hidden">
         {/* Background + Overlay */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-linear-to-br from-gray-900 via-gray-800 to-gray-700" />
@@ -99,21 +132,24 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         {/* Main Content */}
         <div className="relative z-10 flex-1 flex items-center">
           <div className="container mx-auto px-4">
-            <motion.div
-              className="max-w-3xl"
-              variants={heroVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <motion.h1
-                variants={itemVariants}
-                className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-tight"
-              >
-                {content?.hero?.title || t('home.hero.title')}
-              </motion.h1>
+            <div className="max-w-3xl">
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-tight">
+                <HeroTypewriter
+                  key={language}
+                  lines={[t('home.hero.line1'), t('home.hero.line2')]}
+                  cycleWords={t('home.hero.typewriterWords').split(',')}
+                  cycleClassName="text-primary"
+                  speed={60}
+                  deleteSpeed={40}
+                  cycleDelay={5000}
+                  onTypingComplete={() => setTypingDone(true)}
+                />
+              </h1>
 
               <motion.a
-                variants={itemVariants}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: typingDone ? 1 : 0, y: typingDone ? 0 : 20 }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
                 href="#site-footer"
                 onClick={scrollToFooter}
                 className="inline-flex items-center mt-8 text-white/70 hover:text-white text-lg group transition-colors duration-200"
@@ -121,7 +157,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
                 {t('home.hero.contactLink')}
                 <ArrowRight className="ltr:ml-2 rtl:mr-2 rtl:rotate-180 group-hover:ltr:translate-x-1 group-hover:rtl:-translate-x-1 transition-transform duration-200" size={20} />
               </motion.a>
-            </motion.div>
+            </div>
           </div>
         </div>
 
@@ -153,7 +189,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* Vision & Mission Section */}
-      <section className="py-16 lg:py-24 bg-linear-to-b from-gray-900 to-gray-950">
+      <section id="section-vision-mission" className="py-16 lg:py-24 bg-linear-to-b from-gray-900 to-gray-950">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl lg:text-4xl font-bold text-white text-center mb-12">
             {content?.vision_mission?.title || t('home.visionMission.title')}
@@ -180,7 +216,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* Vision 2030 Section */}
-      <section className="py-16 lg:py-24 bg-gray-900 text-white">
+      <section id="section-vision-2030" className="py-16 lg:py-24 bg-gray-900 text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto space-y-6">
             <p className="text-lg leading-relaxed text-white/90">
@@ -196,78 +232,31 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       {/* Core Values Section */}
       <section id="section-core-values" className="py-16 lg:py-24 bg-gray-950">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left: Text Content */}
-            <div>
-              <h2 className="text-3xl lg:text-4xl font-bold text-white mb-10">
-                {content?.core_values?.title || t('home.coreValues.title')}
-              </h2>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeValue}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <h3 className="text-2xl font-semibold text-primary mb-4">
-                    {coreValues[activeValue].title}
-                  </h3>
-                  <p className="text-lg text-white/70 leading-relaxed">
-                    {coreValues[activeValue].description}
-                  </p>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            {/* Right: Image with Overlaid Buttons */}
-            <div className="relative aspect-4/3 rounded-xl overflow-hidden">
-              {/* Gradient Placeholder */}
-              <div className="absolute inset-0 bg-linear-to-br from-gray-700 via-gray-600 to-gray-500" />
-
-              {/* Overlay Buttons */}
-              {coreValues.map((value, index) => (
-                <button
-                  key={index}
-                  onClick={() => setActiveValue(index)}
-                  className={`absolute flex flex-col items-center gap-1.5 group transition-all duration-300 ${value.position}`}
-                >
-                  <div
-                    className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
-                      activeValue === index
-                        ? 'bg-primary ring-4 ring-primary/30 scale-110'
-                        : 'bg-white/20 backdrop-blur-sm hover:bg-white/30'
-                    }`}
-                  >
-                    <value.icon
-                      size={24}
-                      className={activeValue === index ? 'text-white' : 'text-white/80'}
-                    />
-                  </div>
-                  <span
-                    className={`text-xs font-medium whitespace-nowrap transition-colors duration-300 ${
-                      activeValue === index ? 'text-primary' : 'text-white/60'
-                    }`}
-                  >
-                    {value.title}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
+          <h2 className="text-3xl lg:text-4xl font-bold text-white text-center mb-4">
+            {content?.core_values?.title || t('home.coreValues.title')}
+          </h2>
+          <p className="text-lg text-white/60 text-center mb-8 max-w-2xl mx-auto">
+            {t('home.coreValues.subtitle', 'Click on any node to explore our core values')}
+          </p>
+          <RadialOrbitalTimeline timelineData={coreValuesData} />
         </div>
       </section>
 
       {/* Products Showcase */}
-      <section className="overflow-hidden">
+      <section id="section-products" className="overflow-hidden">
         <div className="flex flex-col lg:flex-row min-h-100 lg:min-h-137.5 lg:bg-white/20">
           {/* TMT Bars */}
           <Link
             href="/products/tmt-bars"
-            className="relative z-10 flex-1 overflow-hidden cursor-pointer group lg:[clip-path:polygon(0_0,calc(100%-3px)_0,calc(100%-3rem-3px)_100%,0_100%)]"
+            className="relative z-10 flex-1 overflow-hidden cursor-pointer group"
             style={{
               flex: hoveredProduct === 0 ? 1.4 : hoveredProduct === 1 ? 0.6 : 1,
               transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+              clipPath: typeof window !== 'undefined' && window.innerWidth >= 1024
+                ? language === 'ar'
+                  ? 'polygon(3px 0, 100% 0, 100% 100%, calc(3rem + 3px) 100%)'
+                  : 'polygon(0 0, calc(100% - 3px) 0, calc(100% - 3rem - 3px) 100%, 0 100%)'
+                : undefined,
             }}
             onMouseEnter={() => setHoveredProduct(0)}
             onMouseLeave={() => setHoveredProduct(null)}
@@ -297,10 +286,15 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
           {/* Billets */}
           <Link
             href="/products/billets"
-            className="relative flex-1 overflow-hidden cursor-pointer group lg:-ml-12 lg:[clip-path:polygon(calc(3rem+3px)_0,100%_0,100%_100%,3px_100%)]"
+            className="relative flex-1 overflow-hidden cursor-pointer group lg:-ms-12"
             style={{
               flex: hoveredProduct === 1 ? 1.4 : hoveredProduct === 0 ? 0.6 : 1,
               transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+              clipPath: typeof window !== 'undefined' && window.innerWidth >= 1024
+                ? language === 'ar'
+                  ? 'polygon(0 0, calc(100% - 3rem - 3px) 0, calc(100% - 3px) 100%, 0 100%)'
+                  : 'polygon(calc(3rem + 3px) 0, 100% 0, 100% 100%, 3px 100%)'
+                : undefined,
             }}
             onMouseEnter={() => setHoveredProduct(1)}
             onMouseLeave={() => setHoveredProduct(null)}
@@ -330,83 +324,90 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* LinkedIn Feed Section */}
-      <section id="section-sustainability" className="py-16 lg:py-24 bg-gray-50">
+      <section id="section-linkedin" className="py-16 lg:py-24 bg-gray-900">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <div className="w-16 h-16 bg-[#0A66C2] rounded-full flex items-center justify-center mx-auto mb-4">
-              <Linkedin className="text-white" size={32} />
-            </div>
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              {t('home.linkedin.title')}
-            </h2>
-            <p className="text-lg text-gray-600">
-              {t('home.linkedin.subtitle')}
-            </p>
-          </div>
+          <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
+            {/* Left column: info + controls (flips to right in RTL) */}
+            <div className="lg:w-2/5 text-center lg:text-start">
+              <div className="w-16 h-16 bg-[#0A66C2] rounded-full flex items-center justify-center mx-auto lg:ms-0 lg:me-auto mb-6">
+                <Linkedin className="text-white" size={32} />
+              </div>
+              <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+                {t('home.linkedin.title')}
+              </h2>
+              <p className="text-lg text-white/60 mb-8">
+                {t('home.linkedin.subtitle')}
+              </p>
 
-          {linkedin_posts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto mb-8">
-              {linkedin_posts.slice(0, 3).map((post) => (
-                <a
-                  key={post.id}
-                  href={post.post_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
-                >
-                  {post.image_url && (
-                    <div className="aspect-video bg-gray-100 overflow-hidden">
-                      <img src={post.image_url} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+              {linkedin_posts.length > 1 && (
+                <div className="flex items-center gap-4 justify-center lg:justify-start mb-8">
+                  <button
+                    onClick={() => goToLinkedinPost('prev')}
+                    className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                  >
+                    <ChevronLeft className="rtl:rotate-180" size={20} />
+                  </button>
+                  <span className="text-white/50 text-sm">
+                    {linkedinIndex + 1} / {linkedin_posts.length}
+                  </span>
+                  <button
+                    onClick={() => goToLinkedinPost('next')}
+                    className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                  >
+                    <ChevronRight className="rtl:rotate-180" size={20} />
+                  </button>
+                </div>
+              )}
+
+              <a
+                href="https://www.linkedin.com/company/nuorsteel"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-6 py-3 bg-[#0A66C2] hover:bg-[#004182] text-white rounded-md font-medium transition-colors"
+              >
+                {t('footer.followLinkedIn')}
+                <Linkedin className="ltr:ml-2 rtl:mr-2" size={18} />
+              </a>
+            </div>
+
+            {/* Right column: post embed (flips to left in RTL) */}
+            <div
+              className="lg:w-3/5 w-full flex justify-center"
+              onMouseEnter={() => setLinkedinPaused(true)}
+              onMouseLeave={() => setLinkedinPaused(false)}
+            >
+              {linkedin_posts.length > 0 ? (
+                <div className="w-full max-w-126">
+                  <div className="relative rounded-xl overflow-hidden shadow-2xl shadow-black/30 ring-1 ring-white/10 transition-[height] duration-300" style={{ height: `${iframeHeight}px` }}>
+                    {linkedin_posts.map((post, i) => (
+                      <iframe
+                        key={post.post_id}
+                        src={`https://www.linkedin.com/embed/feed/update/${post.post_id}`}
+                        width="100%"
+                        height="100%"
+                        allowFullScreen
+                        style={{ border: 'none' }}
+                        title="LinkedIn post"
+                        className={`absolute inset-0 w-full h-full transition-opacity duration-500 ${i === linkedinIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+                      />
+                    ))}
+                  </div>
+                  {linkedin_posts.length > 1 && (
+                    <div className="h-1 bg-white/10 mt-4 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-[#0A66C2] rounded-full transition-[width] duration-500 ease-in-out"
+                        style={{ width: `${((linkedinIndex + 1) / linkedin_posts.length) * 100}%` }}
+                      />
                     </div>
                   )}
-                  <div className="p-5">
-                    <p className="text-gray-700 text-sm line-clamp-4 mb-3">
-                      {post.content}
-                    </p>
-                    <div className="flex items-center justify-between text-xs text-gray-400">
-                      <span>{new Date(post.posted_at).toLocaleDateString()}</span>
-                      <ExternalLink size={14} />
-                    </div>
-                  </div>
-                </a>
-              ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-white/50">{t('home.linkedin.noPosts')}</p>
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="text-center mb-8">
-              <p className="text-gray-500 mb-4">{t('home.linkedin.noPosts')}</p>
-            </div>
-          )}
-
-          <div className="text-center">
-            <a
-              href="https://www.linkedin.com/company/nuorsteel"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-6 py-3 bg-[#0A66C2] hover:bg-[#004182] text-white rounded-md font-medium transition-colors"
-            >
-              {t('footer.followLinkedIn')}
-              <Linkedin className="ml-2" size={18} />
-            </a>
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 lg:py-24 bg-primary text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-6">
-            {content?.cta?.title || t('home.cta.title')}
-          </h2>
-          <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-            {content?.cta?.description || t('home.cta.description')}
-          </p>
-          <Link
-            href="/contact"
-            className="inline-flex items-center px-8 py-4 bg-white text-primary hover:bg-gray-100 rounded-md font-medium transition-colors"
-          >
-            {content?.cta?.button || t('home.cta.button')}
-            <ArrowRight className="ml-2" size={20} />
-          </Link>
         </div>
       </section>
     </PublicLayout>

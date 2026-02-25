@@ -13,6 +13,9 @@ const en = {
   home: {
     hero: {
       title: "Powering Saudi Arabia's Industrial Future",
+      line1: "Powering Saudi",
+      line2: "Arabia's Industrial",
+      typewriterWords: "Future,Growth,Strength,Vision",
       subtitle: "Quality steel products for a sustainable future",
       cta: "Get in Touch",
       contactLink: "Contact Us",
@@ -40,6 +43,7 @@ const en = {
     },
     coreValues: {
       title: "Core Values",
+      subtitle: "Click on any node to explore our core values",
       quality: {
         title: "Quality",
         description: "We maintain the highest quality standards through strict inspections and continuous improvement, delivering reliable and consistent steel products.",
@@ -88,7 +92,15 @@ const en = {
     },
     overview: {
       title: "Company Overview",
-      description: "Nuor Steel Industry Company is dedicated to manufacturing premium quality steel products while maintaining the highest standards of environmental responsibility and workplace safety.",
+      description: "Nuor Steel Industry Company is a leading Saudi steel manufacturer established in 2010 and headquartered in Al Kharj Industrial City. Originally founded as a steel trading business, Nuor Steel has evolved into a fully integrated steel producer with advanced manufacturing facilities specializing in the production of high-quality steel billets and TMT steel rebars.",
+    },
+    intro: {
+      segment1: "Nuor Steel Industry Company is a",
+      highlight1: "leading Saudi steel manufacturer",
+      segment2: "established in 2010 and headquartered in Al Kharj Industrial City. Originally founded as a steel trading business, Nuor Steel has evolved into a",
+      highlight2: "fully integrated steel producer",
+      segment3: "with advanced manufacturing facilities specializing in the production of",
+      highlight3: "high-quality steel billets and TMT steel rebars.",
     },
     vision: {
       title: "Our Vision",
@@ -106,6 +118,30 @@ const en = {
     governance: {
       title: "Governance",
       description: "Our commitment to ethical business practices and transparent governance.",
+    },
+    capabilities: {
+      title: "Our Capabilities",
+      subtitle: "Comprehensive steel manufacturing capabilities to support your projects",
+      integratedManufacturing: {
+        title: "Integrated Steel Manufacturing",
+        description: "Fully integrated production of steel billets and TMT rebars, ensuring full control over quality, consistency, and traceability from raw material to finished product.",
+      },
+      advancedTechnology: {
+        title: "Advanced Production Technology",
+        description: "Modern manufacturing facilities equipped with advanced rolling, casting, and thermo-mechanical treatment systems to deliver high-performance steel products.",
+      },
+      largeScaleSupply: {
+        title: "Large-Scale Project Supply",
+        description: "Proven capability to support national and mega-projects with reliable volumes, consistent quality, and dependable delivery schedules.",
+      },
+      qualityAssurance: {
+        title: "Quality Assurance & Testing",
+        description: "In-house laboratories and rigorous testing procedures covering chemical, mechanical, and dimensional properties in compliance with Saudi and international standards.",
+      },
+      customization: {
+        title: "Customization & Technical Support",
+        description: "Ability to provide tailored grades, dimensions, and technical assistance to meet project-specific and engineering requirements.",
+      },
     },
   },
   products: {

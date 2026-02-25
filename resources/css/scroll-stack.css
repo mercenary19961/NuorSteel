@@ -1,0 +1,16 @@
+/* ScrollStack — GPU-accelerated card transforms */
+.scroll-stack-card {
+  transform-origin: top center;
+  will-change: transform, filter;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  position: relative;
+}
+
+/* Sentinel element for pin release calculation */
+.scroll-stack-end {
+  width: 100%;
+  height: 1px;
+}

@@ -11,6 +11,7 @@ import {
   Users as UsersIcon,
   Mail,
   MessageSquare,
+  Linkedin,
   Newspaper,
   Settings,
   History,
@@ -45,6 +46,7 @@ const navGroups: { label: string; items: NavItem[] }[] = [
       { label: 'Site Content', path: '/admin/content', icon: <FileText size={20} /> },
       { label: 'Timeline', path: '/admin/timeline', icon: <Clock size={20} /> },
       { label: 'Media Library', path: '/admin/media', icon: <Image size={20} /> },
+      { label: 'LinkedIn Posts', path: '/admin/linkedin-posts', icon: <Linkedin size={20} /> },
     ],
   },
   {

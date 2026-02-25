@@ -4,14 +4,13 @@ import Footer from '@/Components/Layout/Footer';
 
 interface Props {
   children: ReactNode;
-  transparentHeader?: boolean;
 }
 
-export default function PublicLayout({ children, transparentHeader = false }: Props) {
+export default function PublicLayout({ children }: Props) {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header transparent={transparentHeader} />
-      <main className={`grow ${!transparentHeader ? 'pt-16 lg:pt-20' : ''}`}>
+      <Header />
+      <main className="grow">
         {children}
       </main>
       <Footer />

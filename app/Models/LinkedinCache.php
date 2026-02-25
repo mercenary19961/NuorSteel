@@ -18,6 +18,8 @@ class LinkedinCache extends Model
         'post_url',
         'posted_at',
         'synced_at',
+        'is_active',
+        'sort_order',
     ];
 
     protected function casts(): array
@@ -25,46 +27,22 @@ class LinkedinCache extends Model
         return [
             'posted_at' => 'datetime',
             'synced_at' => 'datetime',
+            'is_active' => 'boolean',
         ];
     }
 
-    public function scopeRecentPosts(Builder $query, int $limit = 5): Builder
+    public function scopeActive(Builder $query): Builder
     {
-        return $query->orderByDesc('posted_at')->limit($limit);
+        return $query->where('is_active', true);
     }
 
     public function scopeOrdered(Builder $query): Builder
     {
-        return $query->orderByDesc('posted_at');
-    }
-
-    public static function syncPost(array $data): static
-    {
-        return static::updateOrCreate(
-            ['post_id' => $data['post_id']],
-            [
-                'content' => $data['content'],
-                'image_url' => $data['image_url'] ?? null,
-                'post_url' => $data['post_url'],
-                'posted_at' => $data['posted_at'],
-                'synced_at' => now(),
-            ]
-        );
+        return $query->orderBy('sort_order')->orderByDesc('posted_at');
     }
 
     public static function getLatestPosts(int $limit = 5)
     {
-        return static::recentPosts($limit)->get();
-    }
-
-    public static function needsSync(int $hoursThreshold = 6): bool
-    {
-        $lastSync = static::max('synced_at');
-
-        if (!$lastSync) {
-            return true;
-        }
-
-        return now()->diffInHours($lastSync) >= $hoursThreshold;
+        return static::active()->ordered()->limit($limit)->get();
     }
 }

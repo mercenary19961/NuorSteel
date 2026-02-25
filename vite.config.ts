@@ -42,6 +42,9 @@ export default defineConfig({
                         if (id.includes('framer-motion')) {
                             return 'vendor-motion';
                         }
+                        if (id.includes('lenis')) {
+                            return 'vendor-lenis';
+                        }
                     }
                 },
             },

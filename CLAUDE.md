@@ -52,7 +52,7 @@
 ### Public Pages Frontend (DONE)
 - [x] PublicLayout (Header + Footer + children)
 - [x] Home page (full-viewport hero, framer-motion animations, bottom nav links, interactive core values, products, CTA)
-- [x] About page (overview, vision, mission, timeline)
+- [x] About page (animated intro with highlighted keywords, vision, mission, capabilities scroll-stack, timeline)
 - [x] Recycling page (sub-page under About)
 - [x] Products listing + Product detail page
 - [x] Quality page
@@ -62,19 +62,36 @@
 - [x] Contact page (form with file upload)
 
 ### Homepage Redesign (DONE)
-- [x] Header: transparent overlay on homepage, solid white on other pages, fixed positioning
-- [x] Header: smart scroll behavior (hides on scroll down, shows on scroll up)
+- [x] Header: transparent overlay on all pages, fixed positioning
+- [x] Header: visible at top of page, hides on scroll (no show-on-scroll-up)
 - [x] Hero: full-viewport (`h-screen`), gradient placeholder bg, staggered entrance animations
 - [x] Hero: H1 left-aligned, "Contact Us" link scrolls to footer, RTL-aware arrow
 - [x] Hero bottom links: 3 interactive links (About Us, Core Values, Sustainability) with hover image-reveal
 - [x] framer-motion for all hero animations + mobile menu `AnimatePresence`
 - [x] `useScrollDirection` custom hook (`resources/js/hooks/useScrollDirection.ts`)
 - [x] `HeroBottomLinks` component (`resources/js/Components/Public/HeroBottomLinks.tsx`)
-- [x] Homepage sections: About Us, Vision & Mission, Vision 2030, interactive Core Values, Products, LinkedIn, CTA
-- [x] Core Values: interactive tabbed section with overlaid icon buttons on image placeholder
-- [x] Products: two interactive panels (TMT Bars / Billets) with hover expand, color overlay fade, and angled clip-path divider (lg+)
+- [x] Homepage sections: About Us, Vision & Mission, Vision 2030, interactive Core Values, Products, LinkedIn, CTA — each with `id` for scroll navigation
+- [x] Core Values V2: RadialOrbitalTimeline component with orbital animation and rotating value cards (`resources/js/Components/ui/radial-orbital-timeline.tsx`)
+- [x] Products: two interactive panels (TMT Bars / Billets) with hover expand, color overlay fade, and RTL-aware angled clip-path divider (lg+)
 - [x] All sections dark-themed (gray-800 → gray-950 gradient flow)
+- [x] LinkedIn feed: auto-rotating carousel with dot indicators, improved iframe sizing, RTL-aware chevron arrows
+- [x] LinkedIn section uses CSS logical properties (`text-start`, `ms-0`/`me-auto`) for RTL support
+- [x] UI primitive components: Badge, Button, Card (`resources/js/Components/ui/`)
+- [x] ScrollStack component: scroll-triggered stacking card animation (`resources/js/Components/ui/scroll-stack.tsx`)
 - [x] Language defaults to English always (no localStorage persistence)
+
+### About Page Enhancements (DONE)
+- [x] Intro section: animated large text with scroll-triggered reveal (TimelineContent + framer-motion `useInView`)
+- [x] Highlighted keywords with colored dotted borders (primary, sky-400, emerald-400)
+- [x] Segmented i18n keys for highlighted text (`about.intro.segment1/highlight1/...`)
+- [x] SEO-safe visually hidden `<h1>` using `sr-only` class
+- [x] Capabilities section with ScrollStack animation (5 cards: Integrated Manufacturing, Advanced Technology, Large-Scale Supply, Quality Assurance, Customization)
+- [x] ScrollStack uses sticky viewport + progress-based animation (window scroll mode)
+- [x] Cards slide up from below viewport with ease-out cubic easing, stack with scale-down effect
+- [x] Heading centered as absolute overlay, covered by cards as they enter
+- [x] Lenis smooth scroll library added (used for container scroll mode, not window scroll to avoid hijacking page scroll)
+- [x] `vendor-lenis` Vite chunk for code splitting
+- [x] i18n translations for all capabilities (EN + AR)
 
 ### Inertia Migration (DONE)
 - [x] Inertia.js infrastructure (packages, Vite config, root template, entry point)
@@ -132,8 +149,16 @@
 - [ ] Run migrations + seeders on Railway
 - [ ] Enable SSR on Railway (start Node SSR server alongside PHP)
 
+### LinkedIn Admin Management (DONE)
+- [x] Manual CMS for LinkedIn posts (replaces API-based sync)
+- [x] Admin page at `/admin/linkedin-posts` — add posts by pasting embed code or URL
+- [x] Toggle visibility, reorder, delete with undo support
+- [x] Removed `SyncLinkedinPosts` command and `LinkedinService` (API approach dropped)
+- [x] Added `is_visible` column to `linkedin_cache` table via migration
+- [x] `LinkedinPostSeeder` seeds real Nuor Steel LinkedIn posts
+- [x] Admin sidebar updated with LinkedIn Posts link
+
 ### Remaining
-- [ ] LinkedIn API integration (homepage feed)
 - [ ] Real images for hero background, bottom link hover panels, core values section, and product panels (currently gradient placeholders)
 - [ ] Logo image for header (currently text-only)
 - [ ] Code splitting (chunk >500kB)
@@ -282,6 +307,7 @@ About Us | Products | Quality | Career | Certificates
 /admin/settings         → Site settings (admin only)
 /admin/users            → User management (admin only)
 /admin/change-log       → Change log with revert/delete (admin only)
+/admin/linkedin-posts   → LinkedIn posts management
 ```
 
 ---
@@ -427,7 +453,9 @@ Security is extremely important for this project. Every code change must conside
 - **Site settings**: `usePage<PageProps>().props.siteSettings` (phone, email, address, LinkedIn — shared by middleware)
 - **Styling**: TailwindCSS v4 with custom `primary` color, Inter font
 - **Icons**: Lucide React
-- **Animations**: framer-motion (isolated in `vendor-motion` Vite chunk)
+- **Animations**: framer-motion (isolated in `vendor-motion` Vite chunk), ScrollStack (sticky viewport + progress-based, isolated in `vendor-lenis` chunk)
+- **Smooth scroll**: Lenis library for ScrollStack container mode (window scroll mode uses native scroll events to avoid hijacking page scroll)
+- **UI primitives**: Badge, Button, Card, ScrollStack, TimelineContent components in `resources/js/Components/ui/` (uses `@radix-ui/react-slot` for polymorphic `asChild`)
 - **i18n**: react-i18next with EN/AR translation files (bundled, not HTTP-loaded)
 - **Flash messages**: Server redirects with `->with('success', '...')`, rendered by FlashMessages component via toast
 - **SSR safety**: All `window`/`document`/`localStorage` access guarded with `typeof window !== 'undefined'`
@@ -435,10 +463,11 @@ Security is extremely important for this project. Every code change must conside
 ### Key File Locations
 ```
 resources/js/Pages/Public/     → Public page components (10 pages)
-resources/js/Pages/Admin/      → Admin page components (16 pages)
+resources/js/Pages/Admin/      → Admin page components (17 pages)
 resources/js/Layouts/          → PublicLayout, AdminLayout
-resources/js/Components/       → Shared components (Layout/, Admin/, Public/)
+resources/js/Components/       → Shared components (Layout/, Admin/, Public/, ui/)
 resources/js/hooks/            → Custom hooks (useScrollDirection)
+resources/css/scroll-stack.css → ScrollStack GPU-accelerated card CSS
 resources/js/types/            → TypeScript interfaces
 resources/js/i18n/             → Translation files (en.ts, ar.ts)
 resources/js/contexts/         → LanguageContext
@@ -464,10 +493,11 @@ routes/web.php                 → All routes (public + admin)
 - **Staging URL**: `https://nuorsteel-website-production.up.railway.app`
 
 ### LinkedIn Integration
-- Method: LinkedIn API (requires Developer App approval)
-- Sync: Every 6 hours via scheduled task
-- Display: 5 latest posts on homepage
-- Fallback: "Follow us on LinkedIn" link
+- Method: **Manual CMS** (admin pastes embed code or URL — no API needed)
+- Admin page: `/admin/linkedin-posts` (CRUD with visibility toggle, reorder, undo)
+- Display: Auto-rotating carousel on homepage with dot indicators
+- Controller: `Admin/LinkedinPostController.php`
+- Seeder: `LinkedinPostSeeder` (real Nuor Steel posts)
 
 ### Image Processing
 - Client-side cropping on upload
@@ -492,7 +522,8 @@ routes/web.php                 → All routes (public + admin)
 
 - Full specification: [docs/WEBSITE_SPECIFICATION.md](docs/WEBSITE_SPECIFICATION.md)
 - This context file: [CLAUDE.md](CLAUDE.md)
+- Core Values V1 backup: [docs/core-values-v1-backup.md](docs/core-values-v1-backup.md) — original two-column layout with overlaid icon buttons
 
 ---
 
-> **Last updated:** 2026-02-22 — based on commit `513d3e3` (*feat: redesign products section with interactive hover panels and update product data*)
+> **Last updated:** 2026-02-25 — based on commit `259b12a` (*feat: unify transparent header across all public pages and hide on scroll*)

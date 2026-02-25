@@ -15,7 +15,7 @@ export default function Products({ products }: Props) {
       <Head title="Products" />
 
       {/* Hero Section */}
-      <section className="bg-linear-to-br from-gray-900 to-gray-800 text-white py-16 lg:py-24">
+      <section className="bg-linear-to-br from-gray-900 to-gray-800 text-white pt-32 lg:pt-44 pb-16 lg:pb-24">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl lg:text-5xl font-bold mb-4">
             {t('products.hero.title')}
