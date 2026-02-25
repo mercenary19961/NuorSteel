@@ -52,7 +52,7 @@
 ### Public Pages Frontend (DONE)
 - [x] PublicLayout (Header + Footer + children)
 - [x] Home page (full-viewport hero, framer-motion animations, bottom nav links, interactive core values, products, CTA)
-- [x] About page (overview, vision, mission, capabilities scroll-stack, timeline)
+- [x] About page (animated intro with highlighted keywords, vision, mission, capabilities scroll-stack, timeline)
 - [x] Recycling page (sub-page under About)
 - [x] Products listing + Product detail page
 - [x] Quality page
@@ -62,8 +62,8 @@
 - [x] Contact page (form with file upload)
 
 ### Homepage Redesign (DONE)
-- [x] Header: transparent overlay on homepage, solid white on other pages, fixed positioning
-- [x] Header: smart scroll behavior (hides on scroll down, shows on scroll up)
+- [x] Header: transparent overlay on all pages, fixed positioning
+- [x] Header: visible at top of page, hides on scroll (no show-on-scroll-up)
 - [x] Hero: full-viewport (`h-screen`), gradient placeholder bg, staggered entrance animations
 - [x] Hero: H1 left-aligned, "Contact Us" link scrolls to footer, RTL-aware arrow
 - [x] Hero bottom links: 3 interactive links (About Us, Core Values, Sustainability) with hover image-reveal
@@ -81,6 +81,10 @@
 - [x] Language defaults to English always (no localStorage persistence)
 
 ### About Page Enhancements (DONE)
+- [x] Intro section: animated large text with scroll-triggered reveal (TimelineContent + framer-motion `useInView`)
+- [x] Highlighted keywords with colored dotted borders (primary, sky-400, emerald-400)
+- [x] Segmented i18n keys for highlighted text (`about.intro.segment1/highlight1/...`)
+- [x] SEO-safe visually hidden `<h1>` using `sr-only` class
 - [x] Capabilities section with ScrollStack animation (5 cards: Integrated Manufacturing, Advanced Technology, Large-Scale Supply, Quality Assurance, Customization)
 - [x] ScrollStack uses sticky viewport + progress-based animation (window scroll mode)
 - [x] Cards slide up from below viewport with ease-out cubic easing, stack with scale-down effect
@@ -451,7 +455,7 @@ Security is extremely important for this project. Every code change must conside
 - **Icons**: Lucide React
 - **Animations**: framer-motion (isolated in `vendor-motion` Vite chunk), ScrollStack (sticky viewport + progress-based, isolated in `vendor-lenis` chunk)
 - **Smooth scroll**: Lenis library for ScrollStack container mode (window scroll mode uses native scroll events to avoid hijacking page scroll)
-- **UI primitives**: Badge, Button, Card, ScrollStack components in `resources/js/Components/ui/` (uses `@radix-ui/react-slot` for polymorphic `asChild`)
+- **UI primitives**: Badge, Button, Card, ScrollStack, TimelineContent components in `resources/js/Components/ui/` (uses `@radix-ui/react-slot` for polymorphic `asChild`)
 - **i18n**: react-i18next with EN/AR translation files (bundled, not HTTP-loaded)
 - **Flash messages**: Server redirects with `->with('success', '...')`, rendered by FlashMessages component via toast
 - **SSR safety**: All `window`/`document`/`localStorage` access guarded with `typeof window !== 'undefined'`
@@ -522,4 +526,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-02-24 — based on commit `261901e` (*feat: add capabilities section and integrate Lenis for smooth scrolling*)
+> **Last updated:** 2026-02-25 — based on commit `259b12a` (*feat: unify transparent header across all public pages and hide on scroll*)
