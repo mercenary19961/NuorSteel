@@ -45,7 +45,7 @@ export default function About() {
       <h1 className="sr-only">{t('about.hero.title')}</h1>
 
       {/* About Intro — animated large text with highlighted keywords */}
-      <section className="bg-linear-to-br from-gray-900 to-gray-800 text-white pt-32 lg:pt-44 pb-20 lg:pb-32">
+      <section className="bg-linear-to-r from-gray-900 to-gray-800 text-white pt-32 lg:pt-44 pb-20 lg:pb-32">
         <div className="max-w-6xl mx-auto px-4" ref={introRef}>
           <TimelineContent
             as="p"

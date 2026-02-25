@@ -52,7 +52,7 @@ export default function CapabilitiesSection() {
   }, []);
 
   return (
-    <section id="section-capabilities" className="bg-linear-to-b from-gray-800 to-gray-900">
+    <section id="section-capabilities" className="bg-linear-to-r from-gray-900 to-gray-800">
       <ScrollStack
         useWindowScroll
         itemStackDistance={isDesktop ? 45 : 30}

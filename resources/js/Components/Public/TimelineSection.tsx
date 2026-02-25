@@ -17,7 +17,7 @@ export default function TimelineSection() {
   ];
 
   return (
-    <section ref={sectionRef} className="py-16 lg:py-24 bg-linear-to-b from-gray-900 to-gray-950 overflow-hidden">
+    <section ref={sectionRef} className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800 overflow-hidden">
       <div className="container mx-auto px-4">
         {/* Section title */}
         <motion.h2
