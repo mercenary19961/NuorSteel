@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import HeroBottomLinks from '@/Components/Public/HeroBottomLinks';
 import RadialOrbitalTimeline from '@/Components/ui/radial-orbital-timeline';
+import { HeroTypewriter } from '@/Components/ui/typewriter';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { LinkedinPost } from '@/types';
 
@@ -18,21 +19,6 @@ interface Props {
   linkedin_posts: LinkedinPost[];
 }
 
-const heroVariants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.2, delayChildren: 0.3 },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: 'easeOut' as const },
-  },
-};
 
 export default function Home({ content_en, content_ar, linkedin_posts }: Props) {
   const { t } = useTranslation();
@@ -86,6 +72,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
     },
   ];
 
+  const [typingDone, setTypingDone] = useState(false);
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
   const [linkedinIndex, setLinkedinIndex] = useState(0);
   const [iframeHeight, setIframeHeight] = useState(600);
@@ -145,21 +132,24 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         {/* Main Content */}
         <div className="relative z-10 flex-1 flex items-center">
           <div className="container mx-auto px-4">
-            <motion.div
-              className="max-w-3xl"
-              variants={heroVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <motion.h1
-                variants={itemVariants}
-                className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-tight"
-              >
-                {content?.hero?.title || t('home.hero.title')}
-              </motion.h1>
+            <div className="max-w-3xl">
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-tight">
+                <HeroTypewriter
+                  key={language}
+                  lines={[t('home.hero.line1'), t('home.hero.line2')]}
+                  cycleWords={t('home.hero.typewriterWords').split(',')}
+                  cycleClassName="text-primary"
+                  speed={60}
+                  deleteSpeed={40}
+                  cycleDelay={5000}
+                  onTypingComplete={() => setTypingDone(true)}
+                />
+              </h1>
 
               <motion.a
-                variants={itemVariants}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: typingDone ? 1 : 0, y: typingDone ? 0 : 20 }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
                 href="#site-footer"
                 onClick={scrollToFooter}
                 className="inline-flex items-center mt-8 text-white/70 hover:text-white text-lg group transition-colors duration-200"
@@ -167,7 +157,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
                 {t('home.hero.contactLink')}
                 <ArrowRight className="ltr:ml-2 rtl:mr-2 rtl:rotate-180 group-hover:ltr:translate-x-1 group-hover:rtl:-translate-x-1 transition-transform duration-200" size={20} />
               </motion.a>
-            </motion.div>
+            </div>
           </div>
         </div>
 
