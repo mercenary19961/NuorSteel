@@ -198,10 +198,12 @@ const en = {
   },
   career: {
     hero: {
+      label: "Careers",
       title: "Join Our Team",
       subtitle: "Build your career with Nuor Steel",
     },
     openPositions: "Open Positions",
+    listingsSubtitle: "Explore current opportunities and find your place at Nuor Steel.",
     viewDetails: "View Details",
     noPositions: "No open positions at the moment.",
     openApplication: {

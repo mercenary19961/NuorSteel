@@ -18,15 +18,21 @@ class CareerController extends Controller
 {
     public function index(): Response
     {
-        $locale = session('locale', 'en');
-
         $listings = CareerListing::open()
             ->ordered()
             ->get()
             ->map(fn($listing) => [
                 'id' => $listing->id,
                 'title' => $listing->title,
+                'title_en' => $listing->title_en,
+                'title_ar' => $listing->title_ar,
                 'slug' => $listing->slug,
+                'description' => $listing->description,
+                'description_en' => $listing->description_en,
+                'description_ar' => $listing->description_ar,
+                'requirements' => $listing->requirements,
+                'requirements_en' => $listing->requirements_en,
+                'requirements_ar' => $listing->requirements_ar,
                 'location' => $listing->location,
                 'employment_type' => $listing->employment_type,
                 'expires_at' => $listing->expires_at?->format('Y-m-d'),
@@ -34,7 +40,8 @@ class CareerController extends Controller
             ]);
 
         return Inertia::render('Public/Career', [
-            'content' => SiteContent::getPage('career', $locale),
+            'content_en' => SiteContent::getPage('career', 'en'),
+            'content_ar' => SiteContent::getPage('career', 'ar'),
             'listings' => $listings,
         ]);
     }
