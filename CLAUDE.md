@@ -52,7 +52,7 @@
 ### Public Pages Frontend (DONE)
 - [x] PublicLayout (Header + Footer + children)
 - [x] Home page (full-viewport hero, framer-motion animations, bottom nav links, interactive core values, products, CTA)
-- [x] About page (animated intro with highlighted keywords, vision, mission, capabilities scroll-stack, timeline)
+- [x] About page (animated intro with highlighted keywords, vision, mission, capabilities scroll-stack, timeline, no governance)
 - [x] Recycling page (sub-page under About)
 - [x] Products listing + Product detail page
 - [x] Quality page
@@ -93,6 +93,10 @@
 - [x] Lenis smooth scroll library added (used for container scroll mode, not window scroll to avoid hijacking page scroll)
 - [x] `vendor-lenis` Vite chunk for code splitting
 - [x] i18n translations for all capabilities (EN + AR)
+- [x] Vision & Mission: 4-card grid with cascading character-by-character color sweep animation (cycles through all cards continuously)
+- [x] Timeline section: horizontal layout with hardcoded i18n events (6 milestones), circular image placeholders, staggered entrance animation (`resources/js/Components/Public/TimelineSection.tsx`)
+- [x] Governance section removed from About page
+- [x] Unified horizontal (left-to-right) gradients across all About sections for seamless transitions (`from-gray-900 to-gray-800`)
 
 ### Inertia Migration (DONE)
 - [x] Inertia.js infrastructure (packages, Vite config, root template, entry point)
