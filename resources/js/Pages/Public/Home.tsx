@@ -7,6 +7,7 @@ import PublicLayout from '@/Layouts/PublicLayout';
 import HeroBottomLinks from '@/Components/Public/HeroBottomLinks';
 import RadialOrbitalTimeline from '@/Components/ui/radial-orbital-timeline';
 import { HeroTypewriter } from '@/Components/ui/typewriter';
+import { MagicCardGrid, MagicCard } from '@/Components/ui/magic-card';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { LinkedinPost } from '@/types';
 
@@ -197,24 +198,28 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
           <h2 className="text-3xl lg:text-4xl font-bold text-white text-center mb-12">
             {content?.vision_mission?.title || t('home.visionMission.title')}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <div className="bg-white/10 backdrop-blur-sm p-8 rounded-lg border border-white/10">
-              <h3 className="text-xl font-semibold text-white mb-4">
-                {content?.vision_mission?.vision_title || t('home.visionMission.visionTitle')}
-              </h3>
-              <p className="text-white/70 leading-relaxed">
-                {content?.vision_mission?.vision_description || t('home.visionMission.visionDescription')}
-              </p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm p-8 rounded-lg border border-white/10">
-              <h3 className="text-xl font-semibold text-white mb-4">
-                {content?.vision_mission?.mission_title || t('home.visionMission.missionTitle')}
-              </h3>
-              <p className="text-white/70 leading-relaxed">
-                {content?.vision_mission?.mission_description || t('home.visionMission.missionDescription')}
-              </p>
-            </div>
-          </div>
+          <MagicCardGrid className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <MagicCard className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10">
+              <div className="relative z-10">
+                <h3 className="text-xl font-semibold text-white mb-4">
+                  {content?.vision_mission?.vision_title || t('home.visionMission.visionTitle')}
+                </h3>
+                <p className="text-white/70 leading-relaxed">
+                  {content?.vision_mission?.vision_description || t('home.visionMission.visionDescription')}
+                </p>
+              </div>
+            </MagicCard>
+            <MagicCard className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10">
+              <div className="relative z-10">
+                <h3 className="text-xl font-semibold text-white mb-4">
+                  {content?.vision_mission?.mission_title || t('home.visionMission.missionTitle')}
+                </h3>
+                <p className="text-white/70 leading-relaxed">
+                  {content?.vision_mission?.mission_description || t('home.visionMission.missionDescription')}
+                </p>
+              </div>
+            </MagicCard>
+          </MagicCardGrid>
         </div>
       </section>
 
