@@ -157,7 +157,7 @@ export default function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
+        <div className="border-t border-gray-800 mt-8 pt-4 pb-0 text-center text-sm text-gray-400">
           <p>
             &copy; {currentYear} {t('company.name')}. {t('footer.allRightsReserved')}
           </p>
