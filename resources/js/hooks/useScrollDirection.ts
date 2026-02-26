@@ -22,14 +22,16 @@ export function useScrollDirection(threshold = 10): ScrollDirectionState {
 
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
+            const atTop = currentScrollY <= 100;
             const diff = currentScrollY - lastScrollY.current;
 
-            if (Math.abs(diff) < threshold) return;
+            // Always update when at top (so header reappears reliably)
+            if (!atTop && Math.abs(diff) < threshold) return;
 
             setState({
                 scrollDirection: diff > 0 ? 'down' : 'up',
                 scrollY: currentScrollY,
-                isAtTop: currentScrollY <= 5,
+                isAtTop: atTop,
             });
 
             lastScrollY.current = currentScrollY;

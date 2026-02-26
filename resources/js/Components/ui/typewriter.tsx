@@ -16,7 +16,7 @@ export function HeroTypewriter({
   cycleWords,
   speed = 60,
   deleteSpeed = 40,
-  cycleDelay = 5000,
+  cycleDelay = 4000,
   cursorChar = '|',
   cycleClassName,
   onTypingComplete,
