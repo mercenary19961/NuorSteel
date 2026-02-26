@@ -247,17 +247,19 @@ export default function RadialOrbitalTimeline({
                 </div>
 
                 {isExpanded && (
-                  <Card className="absolute top-28 left-1/2 -translate-x-1/2 w-48 sm:w-64 bg-black/90 backdrop-blur-lg border-white/30 shadow-xl shadow-primary/10 overflow-visible">
-                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-px h-10 bg-white/50"></div>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm text-white">
-                        {item.title}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-xs text-white/80">
-                      <p>{item.content}</p>
-                    </CardContent>
-                  </Card>
+                  <div className="absolute top-28 left-1/2 -translate-x-1/2">
+                    <Card className="magic-card w-48 sm:w-64 bg-black/90 backdrop-blur-lg border-white/10 shadow-xl shadow-primary/10 overflow-visible">
+                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-px h-10 bg-white/50 z-10"></div>
+                      <CardHeader className="pb-2 relative z-10">
+                        <CardTitle className="text-sm text-white">
+                          {item.title}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="text-xs text-white/80 relative z-10">
+                        <p>{item.content}</p>
+                      </CardContent>
+                    </Card>
+                  </div>
                 )}
               </div>
             );

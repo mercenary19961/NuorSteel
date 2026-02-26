@@ -246,7 +246,9 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
           <p className="text-lg text-white/60 text-center mb-8 max-w-2xl mx-auto">
             {t('home.coreValues.subtitle', 'Click on any node to explore our core values')}
           </p>
-          <RadialOrbitalTimeline timelineData={coreValuesData} />
+          <MagicCardGrid>
+            <RadialOrbitalTimeline timelineData={coreValuesData} />
+          </MagicCardGrid>
         </div>
       </section>
 
