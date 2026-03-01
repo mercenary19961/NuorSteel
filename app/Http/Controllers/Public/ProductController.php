@@ -13,15 +13,53 @@ class ProductController extends Controller
     {
         $products = Product::active()
             ->ordered()
-            ->with('featuredImage')
+            ->with(['featuredImage', 'images.media', 'specifications'])
             ->get()
             ->map(fn($product) => [
                 'id' => $product->id,
-                'name' => $product->name,
+                'name_en' => $product->name_en,
+                'name_ar' => $product->name_ar,
                 'slug' => $product->slug,
-                'short_description' => $product->short_description,
+                'short_description_en' => $product->short_description_en,
+                'short_description_ar' => $product->short_description_ar,
+                'description_en' => $product->description_en,
+                'description_ar' => $product->description_ar,
                 'category' => $product->category,
                 'image' => $product->featuredImage?->url,
+                'images' => $product->images->map(fn($img) => [
+                    'id' => $img->id,
+                    'url' => $img->media?->url,
+                    'alt' => $img->media?->alt_text_en ?? '',
+                ]),
+                'specifications' => [
+                    'chemical' => $product->specifications
+                        ->where('spec_type', 'chemical')
+                        ->sortBy('sort_order')
+                        ->values()
+                        ->map(fn($s) => [
+                            'property_en' => $s->property_en,
+                            'property_ar' => $s->property_ar,
+                            'value' => $s->display_value,
+                        ]),
+                    'mechanical' => $product->specifications
+                        ->where('spec_type', 'mechanical')
+                        ->sortBy('sort_order')
+                        ->values()
+                        ->map(fn($s) => [
+                            'property_en' => $s->property_en,
+                            'property_ar' => $s->property_ar,
+                            'value' => $s->display_value,
+                        ]),
+                    'dimensional' => $product->specifications
+                        ->where('spec_type', 'dimensional')
+                        ->sortBy('sort_order')
+                        ->values()
+                        ->map(fn($s) => [
+                            'property_en' => $s->property_en,
+                            'property_ar' => $s->property_ar,
+                            'value' => $s->display_value,
+                        ]),
+                ],
             ]);
 
         return Inertia::render('Public/Products', [

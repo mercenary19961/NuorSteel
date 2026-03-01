@@ -166,6 +166,108 @@ const en = {
     },
     imagePlaceholder: "Product Image",
     viewDetails: "View Details",
+    exploreMore: "Explore More",
+    backToProducts: "Back to Products",
+    tabs: {
+      overview: "Product Overview",
+      specifications: "Specifications",
+      features: "Features",
+      requestQuote: "Request Quote",
+    },
+    overview: {
+      keyHighlights: "Key Highlights",
+    },
+    requestQuote: {
+      title: "Request a Quote",
+      description: "Interested in this product? Contact us for pricing, availability, and custom specifications tailored to your project requirements.",
+      button: "Get a Quote",
+    },
+    specNote: "Other specifications are possible. Please contact Sales & Marketing for details.",
+    tmtBars: {
+      highlights: [
+        "Manufactured to BS 4449:2005, Grade B500B standards",
+        "Available in diameters from 8mm to 32mm",
+        "SASO compliant for Saudi construction projects",
+        "Superior strength, ductility, and weldability",
+      ],
+      specIcons: {
+        diameterRange: { title: "Diameter Range", value: "8mm - 32mm" },
+        standards: { title: "Standards", value: "BS 4449:2005 Grade B500B" },
+        barLength: { title: "Bar Length", value: "12m standard" },
+      },
+      specTable: {
+        title: "Linear Mass and Number of Bars in Bundles",
+        headers: ["Diameter (mm)", "Nominal Linear Mass Kg/m", "Tolerance in Linear Mass", "Number of 12 m Long Bars in a bundle of nominal weight of 2 Tons"],
+        rows: [
+          ["08", "0.395", "-5%", "422"],
+          ["10", "0.617", "-5%", "270"],
+          ["12", "0.888", "-5%", "188"],
+          ["14", "1.208", "-5%", "138"],
+          ["16", "1.578", "-5%", "106"],
+          ["18", "1.998", "-5%", "83"],
+          ["20", "2.466", "-5%", "68"],
+          ["25", "3.853", "-5%", "43"],
+          ["32", "6.313", "-5%", "26"],
+        ],
+      },
+      features: {
+        thermoMechanical: {
+          title: "Thermo-Mechanical Treatment",
+          description: "Advanced TMT process ensures optimal balance of strength and ductility through controlled cooling.",
+        },
+        ductility: {
+          title: "Superior Ductility",
+          description: "High elongation values ensure safe performance in seismic zones and under dynamic loading.",
+        },
+        weldability: {
+          title: "Excellent Weldability",
+          description: "Low carbon equivalent enables reliable on-site welding without pre-heating.",
+        },
+        corrosionResistance: {
+          title: "Corrosion Resistance",
+          description: "Tempered martensite outer layer provides enhanced resistance to environmental degradation.",
+        },
+      },
+    },
+    billets: {
+      highlights: [
+        "Produced through Electric Arc Furnace (EAF) steelmaking",
+        "Continuous casting for uniform quality",
+        "Available in 100x100mm and 130x130mm cross-sections",
+        "Strict chemical and dimensional specifications",
+      ],
+      specIcons: {
+        crossSection: { title: "Cross-section", value: "100x100 & 130x130 mm" },
+        chemicalControl: { title: "Chemical Control", value: "In-process spectroscopy" },
+        applications: { title: "Applications", value: "Rolling mills & forging" },
+      },
+      specTable: {
+        title: "Chemical Composition % (max)",
+        headers: ["Billet Size (mm)", "C", "SI", "Mn", "P Max", "S Max"],
+        rows: [
+          ["100x100", "0.18-0.40", "0.20-0.40", "0.50-1.20", "0.05", "0.05"],
+          ["130x130", "0.18-0.40", "0.20-0.40", "0.50-1.20", "0.05", "0.05"],
+        ],
+      },
+      features: {
+        eafSteelmaking: {
+          title: "EAF Steelmaking",
+          description: "Electric Arc Furnace technology for efficient melting and precise chemical control.",
+        },
+        continuousCasting: {
+          title: "Continuous Casting",
+          description: "Automated continuous casting process ensures uniform internal structure and surface quality.",
+        },
+        chemicalControl: {
+          title: "Chemical Control",
+          description: "In-process spectroscopy analysis ensures every heat meets target chemical composition.",
+        },
+        dimensionalConsistency: {
+          title: "Dimensional Consistency",
+          description: "Tight tolerances on cross-section dimensions for reliable downstream rolling performance.",
+        },
+      },
+    },
   },
   quality: {
     hero: {
