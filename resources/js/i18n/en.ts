@@ -169,31 +169,40 @@ const en = {
   },
   quality: {
     hero: {
-      title: "Quality Assurance",
-      subtitle: "Committed to excellence in every product",
+      label: "Quality Assurance",
+      title: "Quality & Manufacturing Standards",
+      subtitle: "Engineered precision and consistent performance across every product we deliver.",
     },
-    overview: {
-      title: "Our Quality Standards",
-      description: "We maintain rigorous quality control standards throughout our production process, ensuring every product meets international specifications.",
-    },
-    standards: {
-      title: "Our Standards",
-      iso: {
-        title: "ISO 9001",
-        description: "Certified quality management system",
+    assurance: {
+      label: "Our Approach",
+      title: "Quality & Manufacturing Assurance",
+      intro1: "At Nuor Steel, quality is engineered into every stage of production, from raw material selection to final bar inspection. Our manufacturing process operates under controlled parameters to ensure consistency, compliance, and structural reliability across every delivery.",
+      intro2: "We follow a preventive quality philosophy: defects are not detected after production; they are designed out of the process.",
+      processControl: {
+        title: "Process Control",
+        description: "Each billet and rebar is produced through monitored rolling and cooling parameters to maintain uniform mechanical performance and dimensional accuracy across all batches.",
       },
-      testing: {
-        title: "Rigorous Testing",
-        description: "Comprehensive product testing and validation",
+      labTesting: {
+        title: "Laboratory Testing",
+        description: "Samples are continuously tested for mechanical and chemical properties including yield strength, tensile strength, elongation, and bend performance to verify compliance with applicable standards.",
       },
-      calibration: {
-        title: "Calibrated Equipment",
-        description: "Regularly calibrated testing equipment",
+      dimensionalPrecision: {
+        title: "Dimensional Precision",
+        description: "Bars are manufactured with consistent rib geometry and roundness to guarantee proper concrete bonding and structural stability.",
       },
-    },
-    certifications: {
-      title: "Our Certifications",
-      description: "Our quality management system is certified to international standards.",
+      weldingWorkability: {
+        title: "Welding & Workability Verification",
+        description: "Products are validated for bending and welding performance to ensure safe on-site fabrication without compromising material integrity.",
+      },
+      durability: {
+        title: "Durability Performance",
+        description: "Controlled chemical composition and surface quality support resistance to environmental exposure and long-term structural performance.",
+      },
+      commitment: {
+        title: "Quality Commitment",
+        description: "Every shipment is traceable and documented.",
+      },
+      closing: "Our objective is not only to meet standards but to provide contractors and consultants with confidence that the material will perform as designed throughout the life of the structure.",
     },
   },
   career: {
@@ -206,6 +215,15 @@ const en = {
     listingsSubtitle: "Explore current opportunities and find your place at Nuor Steel.",
     viewDetails: "View Details",
     noPositions: "No open positions at the moment.",
+    employmentType: {
+      "full-time": "Full-time",
+      "part-time": "Part-time",
+      "contract": "Contract",
+      "internship": "Internship",
+    },
+    locations: {
+      "Riyadh, Saudi Arabia": "Riyadh, Saudi Arabia",
+    },
     openApplication: {
       title: "Open Application",
       description: "Don't see a position that fits? Submit your CV and we'll keep it on file for future opportunities.",
