@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Factory, Cpu, Building2, FlaskConical, Wrench } from 'lucide-react';
 import ScrollStack, { ScrollStackItem } from '@/Components/ui/scroll-stack';
+import { MagicCardGrid } from '@/Components/ui/magic-card';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import type { LucideIcon } from 'lucide-react';
 
@@ -53,6 +54,7 @@ export default function CapabilitiesSection() {
 
   return (
     <section id="section-capabilities" className="bg-linear-to-r from-gray-900 to-gray-800">
+      <MagicCardGrid>
       <ScrollStack
         useWindowScroll
         itemStackDistance={isDesktop ? 45 : 30}
@@ -78,9 +80,9 @@ export default function CapabilitiesSection() {
         {capabilities.map(({ icon: Icon, key }) => (
           <ScrollStackItem
             key={key}
-            className="min-h-[55vh] lg:min-h-[50vh] mx-auto max-w-4xl w-[92%] lg:w-[50%] p-6 lg:p-10 rounded-2xl lg:rounded-3xl bg-gray-800 lg:bg-gray-800/95 backdrop-blur-sm border border-white/10 shadow-2xl shadow-black/30 flex items-center"
+            className="magic-card min-h-[55vh] lg:min-h-[50vh] mx-auto max-w-4xl w-[92%] lg:w-[50%] p-6 lg:p-10 rounded-2xl lg:rounded-3xl bg-gray-800 border border-white/10 shadow-2xl shadow-black/30 flex items-center"
           >
-            <div className="w-full">
+            <div className="relative z-10 w-full">
               <div className="flex items-start gap-4 lg:gap-5">
                 <div className="shrink-0 w-12 h-12 lg:w-14 lg:h-14 rounded-xl bg-primary/20 flex items-center justify-center">
                   <Icon className="text-primary" size={isDesktop ? 28 : 24} />
@@ -98,6 +100,7 @@ export default function CapabilitiesSection() {
           </ScrollStackItem>
         ))}
       </ScrollStack>
+      </MagicCardGrid>
     </section>
   );
 }

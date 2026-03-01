@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, useInView } from 'framer-motion';
 import { CalendarDays, Eye, Target, Users } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { MagicCardGrid } from '@/Components/ui/magic-card';
 
 interface CardProps {
   icon: LucideIcon;
@@ -54,12 +55,10 @@ function VisionCard({ icon: Icon, title, highlight, description, large, index, f
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, margin: '-50px' }}
       transition={{ duration: 0.6, delay: index * 0.12, ease: 'easeOut' }}
-      className={`group relative rounded-2xl border border-white/10 bg-gray-800/80 backdrop-blur-sm p-6 lg:p-8 flex flex-col ${
+      className={`magic-card relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 lg:p-8 flex flex-col ${
         large ? 'lg:col-span-1 lg:row-span-1' : ''
       }`}
     >
-      {/* Subtle glow on hover */}
-      <div className="absolute inset-0 rounded-2xl bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
       <div className="relative z-10 flex flex-col h-full">
         <div className="flex items-start justify-between mb-5">
@@ -180,7 +179,7 @@ export default function VisionMissionSection() {
         </motion.h2>
 
         {/* 4-column grid: small | large | large | small */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 max-w-6xl mx-auto lg:grid-rows-1 lg:auto-rows-fr">
+        <MagicCardGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 max-w-6xl mx-auto lg:grid-rows-1 lg:auto-rows-fr">
           {/* Established — smaller */}
           <div className="lg:col-span-1">
             <VisionCard {...cards[0]} sweepActive={activeSweepCard === 0} />
@@ -197,7 +196,7 @@ export default function VisionMissionSection() {
           <div className="lg:col-span-1">
             <VisionCard {...cards[3]} sweepActive={activeSweepCard === 3} />
           </div>
-        </div>
+        </MagicCardGrid>
       </div>
     </section>
   );

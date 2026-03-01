@@ -198,10 +198,12 @@ const ar = {
   },
   career: {
     hero: {
+      label: "الوظائف",
       title: "انضم إلى فريقنا",
       subtitle: "ابنِ مسيرتك المهنية مع نور للحديد",
     },
     openPositions: "الوظائف المتاحة",
+    listingsSubtitle: "استكشف الفرص المتاحة وابحث عن مكانك في شركة نور للحديد.",
     viewDetails: "عرض التفاصيل",
     noPositions: "لا توجد وظائف متاحة حاليًا.",
     openApplication: {

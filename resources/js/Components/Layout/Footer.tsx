@@ -33,7 +33,7 @@ export default function Footer() {
   };
 
   return (
-    <footer id="site-footer" className="bg-gray-900 text-white">
+    <footer id="site-footer" className="bg-linear-to-r from-gray-900 to-gray-800 text-white">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
@@ -157,7 +157,7 @@ export default function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
+        <div className="border-t border-gray-800 mt-8 pt-4 pb-0 text-center text-sm text-gray-400">
           <p>
             &copy; {currentYear} {t('company.name')}. {t('footer.allRightsReserved')}
           </p>
