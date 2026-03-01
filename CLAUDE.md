@@ -55,9 +55,9 @@
 - [x] About page (animated intro with highlighted keywords, vision, mission, capabilities scroll-stack, timeline, no governance)
 - [x] Recycling page (sub-page under About)
 - [x] Products listing + Product detail page
-- [x] Quality page
-- [x] Career page (listings + open application form)
-- [x] Job detail page (job info + application form)
+- [x] Quality page (hero section + magic card assurance cards)
+- [x] Career page (hero section, magic card job listings, job detail modal, open application modal)
+- [x] Job detail page (standalone route kept as direct-link fallback; Career page uses modals)
 - [x] Certificates page
 - [x] Contact page (form with file upload)
 
@@ -74,12 +74,15 @@
 - [x] Homepage sections: About Us, Vision & Mission, Vision 2030, interactive Core Values, Products, LinkedIn, CTA — each with `id` for scroll navigation
 - [x] Core Values V2: RadialOrbitalTimeline component with orbital animation and rotating value cards (`resources/js/Components/ui/radial-orbital-timeline.tsx`)
 - [x] Products: two interactive panels (TMT Bars / Billets) with hover expand, color overlay fade, and RTL-aware angled clip-path divider (lg+)
-- [x] All sections dark-themed (gray-800 → gray-950 gradient flow)
+- [x] All sections use unified left-to-right gradient (`bg-linear-to-r from-gray-900 to-gray-800`)
 - [x] LinkedIn feed: auto-rotating carousel with dot indicators, improved iframe sizing, RTL-aware chevron arrows
 - [x] LinkedIn section uses CSS logical properties (`text-start`, `ms-0`/`me-auto`) for RTL support
 - [x] UI primitive components: Badge, Button, Card (`resources/js/Components/ui/`)
+- [x] MagicCard + MagicCardGrid: animated border glow bento effect (`resources/js/Components/ui/magic-card.tsx` + `magic-card.css`)
+- [x] ScrollToTop: fixed-position button with SVG progress ring, appears at 70% scroll (`resources/js/Components/ui/scroll-to-top.tsx`)
 - [x] ScrollStack component: scroll-triggered stacking card animation (`resources/js/Components/ui/scroll-stack.tsx`)
 - [x] Language defaults to English always (no localStorage persistence)
+- [x] Magic card glow applied to: Home (Vision & Mission, Core Values), About (Vision & Mission, Capabilities), Quality (assurance cards), Career (job listings)
 
 ### About Page Enhancements (DONE)
 - [x] Intro section: animated large text with scroll-triggered reveal (TimelineContent + framer-motion `useInView`)
@@ -97,6 +100,27 @@
 - [x] Timeline section: horizontal layout with hardcoded i18n events (6 milestones), circular image placeholders, staggered entrance animation (`resources/js/Components/Public/TimelineSection.tsx`)
 - [x] Governance section removed from About page
 - [x] Unified horizontal (left-to-right) gradients across all About sections for seamless transitions (`from-gray-900 to-gray-800`)
+
+### Quality Page Redesign (DONE)
+- [x] Full-viewport hero section with decorative diagonal clip-path shape, label + title + subtitle
+- [x] Quality assurance section with MagicCard grid (4 cards: Rigorous Testing, Industry Standards, Continuous Improvement, Traceability)
+- [x] Consistent left-to-right gradient background
+
+### Career Page Redesign (DONE)
+- [x] Full-viewport hero section matching Quality page design pattern
+- [x] Job listings as MagicCard bento grid (icon, title, location/type badges, truncated description)
+- [x] Job detail modal (replaces separate page navigation) with sticky header, description, requirements, application form
+- [x] Open application modal for users without matching job listings
+- [x] Reusable `ApplicationForm` component (shared between job-specific and open application)
+- [x] Job title field auto-filled and read-only when opened from a specific job card
+- [x] Dark-themed thin scrollbar styling on modals (`scrollbar-thin` class)
+- [x] CareerController updated to pass bilingual data (content_en/ar, title_en/ar, description_en/ar, requirements_en/ar)
+- [x] i18n keys added: `career.hero.label`, `career.listingsSubtitle` (EN + AR)
+
+### Site-Wide Visual Consistency (DONE)
+- [x] Unified `bg-linear-to-r from-gray-900 to-gray-800` gradient across all public page sections (Home, About, Quality, Career)
+- [x] Footer gradient updated to match (`bg-linear-to-r from-gray-900 to-gray-800`)
+- [x] ScrollToTop component added to PublicLayout (all public pages)
 
 ### Inertia Migration (DONE)
 - [x] Inertia.js infrastructure (packages, Vite config, root template, entry point)
@@ -460,7 +484,7 @@ Security is extremely important for this project. Every code change must conside
 - **Icons**: Lucide React
 - **Animations**: framer-motion (isolated in `vendor-motion` Vite chunk), ScrollStack (sticky viewport + progress-based, isolated in `vendor-lenis` chunk)
 - **Smooth scroll**: Lenis library for ScrollStack container mode (window scroll mode uses native scroll events to avoid hijacking page scroll)
-- **UI primitives**: Badge, Button, Card, ScrollStack, TimelineContent, HeroTypewriter components in `resources/js/Components/ui/` (uses `@radix-ui/react-slot` for polymorphic `asChild`)
+- **UI primitives**: Badge, Button, Card, ScrollStack, TimelineContent, HeroTypewriter, MagicCard/MagicCardGrid, ScrollToTop components in `resources/js/Components/ui/` (uses `@radix-ui/react-slot` for polymorphic `asChild`)
 - **i18n**: react-i18next with EN/AR translation files (bundled, not HTTP-loaded)
 - **Flash messages**: Server redirects with `->with('success', '...')`, rendered by FlashMessages component via toast
 - **SSR safety**: All `window`/`document`/`localStorage` access guarded with `typeof window !== 'undefined'`
@@ -473,6 +497,7 @@ resources/js/Layouts/          → PublicLayout, AdminLayout
 resources/js/Components/       → Shared components (Layout/, Admin/, Public/, ui/)
 resources/js/hooks/            → Custom hooks (useScrollDirection)
 resources/css/scroll-stack.css → ScrollStack GPU-accelerated card CSS
+resources/css/magic-card.css   → MagicCard border glow CSS
 resources/js/types/            → TypeScript interfaces
 resources/js/i18n/             → Translation files (en.ts, ar.ts)
 resources/js/contexts/         → LanguageContext
@@ -531,4 +556,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-02-25 — based on commit `e60640b` (*feat: add typewriter hero effect and footer contact glow on scroll*)
+> **Last updated:** 2026-03-01 — based on commit `9ddce97` (*feat: unify homepage section backgrounds to left-to-right gradient*)
