@@ -129,8 +129,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       <section id="section-hero" className="relative h-screen flex flex-col justify-between overflow-hidden">
         {/* Background + Overlay */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-linear-to-br from-gray-900 via-gray-800 to-gray-700" />
-          <div className="absolute inset-0 bg-black/30" />
+          <div className="absolute inset-0 bg-linear-to-r from-gray-900 to-gray-800" />
         </div>
 
         {/* Main Content */}
@@ -172,7 +171,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* About Section */}
-      <section id="section-about" className="py-16 lg:py-24 bg-linear-to-b from-gray-800 to-gray-900">
+      <section id="section-about" className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
@@ -193,7 +192,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* Vision & Mission Section */}
-      <section id="section-vision-mission" className="py-16 lg:py-24 bg-linear-to-b from-gray-900 to-gray-950">
+      <section id="section-vision-mission" className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl lg:text-4xl font-bold text-white text-center mb-12">
             {content?.vision_mission?.title || t('home.visionMission.title')}
@@ -224,7 +223,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* Vision 2030 Section */}
-      <section id="section-vision-2030" className="py-16 lg:py-24 bg-gray-900 text-white">
+      <section id="section-vision-2030" className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800 text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto space-y-6">
             <p className="text-lg leading-relaxed text-white/90">
@@ -238,7 +237,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* Core Values Section */}
-      <section id="section-core-values" className="py-16 lg:py-24 bg-gray-950">
+      <section id="section-core-values" className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl lg:text-4xl font-bold text-white text-center mb-4">
             {content?.core_values?.title || t('home.coreValues.title')}
@@ -334,7 +333,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* LinkedIn Feed Section */}
-      <section id="section-linkedin" className="py-16 lg:py-24 bg-gray-900">
+      <section id="section-linkedin" className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
             {/* Left column: info + controls (flips to right in RTL) */}
