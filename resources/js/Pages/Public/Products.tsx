@@ -129,6 +129,7 @@ export default function Products({ products }: Props) {
   const [isLg, setIsLg] = useState(false);
   const detailRef = useRef<HTMLDivElement>(null);
 
+
   const selectedProduct = products.find((p) => p.slug === selectedSlug) ?? products[0];
 
   // Detect lg breakpoint for clip-path
@@ -289,19 +290,19 @@ export default function Products({ products }: Props) {
       <h1 className="sr-only">{t('products.hero.title')}</h1>
 
       {/* Main Split Section */}
-      <section className="relative flex flex-col lg:flex-row min-h-screen overflow-hidden">
+      <section className="relative flex flex-col lg:flex-row min-h-screen overflow-hidden bg-linear-to-r from-gray-900 to-gray-800">
         {/* LEFT PANEL — Featured Product */}
         <div
-          className="relative z-10 overflow-hidden bg-linear-to-r from-gray-900 to-gray-800"
+          className="relative z-10 overflow-hidden lg:bg-linear-to-r lg:from-gray-900 lg:to-gray-800"
           style={{
             flex: leftFlex,
             transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
             clipPath: leftClipPath,
           }}
         >
-          <div className={`h-full flex flex-col lg:flex-row pt-28 lg:pt-0 ${expanded ? 'lg:overflow-hidden' : ''}`}>
+          <div className={`h-full flex flex-col lg:flex-row ${expanded ? 'lg:overflow-hidden' : ''}`}>
             {/* Text Content — left side of the left panel */}
-            <div className={`flex-1 flex flex-col p-8 lg:p-12 xl:ps-16 xl:pe-8 ${expanded ? 'lg:overflow-y-auto scrollbar-thin justify-start pt-28!' : 'justify-center'}`}>
+            <div className={`flex-1 flex flex-col p-8 lg:p-12 xl:ps-16 xl:pe-8 ${expanded ? 'lg:overflow-y-auto scrollbar-thin justify-start pt-28!' : 'justify-center pt-24 lg:pt-0'}`}>
               <AnimatePresence mode="wait">
                 {!expanded ? (
                   /* --- DEFAULT: Hero Content --- */
@@ -336,7 +337,7 @@ export default function Products({ products }: Props) {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="w-full pb-8"
+                    className="w-full lg:max-w-[70%] pb-8"
                   >
                     <h2 className="text-2xl lg:text-3xl xl:text-4xl font-bold text-white mb-6 uppercase tracking-wide">
                       {getName(selectedProduct)}
@@ -355,6 +356,30 @@ export default function Products({ products }: Props) {
                         {renderTabContent()}
                       </motion.div>
                     </AnimatePresence>
+
+                    {/* Mobile: Image + Back button (only visible below lg) */}
+                    <div className="lg:hidden flex items-end justify-between mt-12 pb-4">
+                      <button
+                        onClick={handleBack}
+                        className="inline-flex items-center text-white/70 hover:text-white text-sm font-medium transition-colors cursor-pointer group"
+                      >
+                        <ArrowLeft className="me-2 rtl:rotate-180 group-hover:-translate-x-1 transition-transform" size={16} />
+                        {t('products.backToProducts')}
+                      </button>
+                      <div className="flex items-end justify-end">
+                        {selectedProduct.image ? (
+                          <img
+                            src={selectedProduct.image}
+                            alt={getName(selectedProduct)}
+                            className="max-h-28 w-auto object-contain drop-shadow-2xl"
+                          />
+                        ) : (
+                          <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center">
+                            <Package className="text-white/20" size={24} />
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -365,7 +390,7 @@ export default function Products({ products }: Props) {
 
         {/* Large Product Image — absolutely positioned over both panels, near the diagonal */}
         {!expanded && (
-          <div className="hidden lg:flex absolute z-20 bottom-16 items-end justify-center pointer-events-none" style={{ left: '45%', transform: 'translateX(-50%)' }}>
+          <div className="hidden lg:flex absolute z-20 bottom-16 items-end justify-center pointer-events-none max-w-[30%] -translate-x-1/2 left-[35%] xl:left-[40%] 2xl:left-[45%]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={`img-${selectedSlug}`}
@@ -379,7 +404,7 @@ export default function Products({ products }: Props) {
                   <img
                     src={selectedProduct.image}
                     alt={getName(selectedProduct)}
-                    className="max-h-80 w-auto object-contain drop-shadow-2xl"
+                    className="max-h-36 xl:max-h-44 2xl:max-h-56 w-auto object-contain drop-shadow-2xl"
                   />
                 ) : (
                   <div className="w-48 h-48 rounded-full bg-white/5 flex items-center justify-center">
@@ -391,9 +416,36 @@ export default function Products({ products }: Props) {
           </div>
         )}
 
-        {/* RIGHT PANEL — Product Navigation / Image */}
+        {/* Expanded Product Image — absolutely positioned, bottom-right, floats above the panel */}
+        {expanded && (
+          <div className="hidden lg:flex absolute z-20 bottom-20 right-8 items-end justify-end pointer-events-none">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`expanded-img-${selectedSlug}`}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.4 }}
+              >
+                {selectedProduct.image ? (
+                  <img
+                    src={selectedProduct.image}
+                    alt={getName(selectedProduct)}
+                    className="max-h-48 xl:max-h-60 w-auto object-contain drop-shadow-2xl"
+                  />
+                ) : (
+                  <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center">
+                    <Package className="text-white/20" size={32} />
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        )}
+
+        {/* RIGHT PANEL — Product Navigation / Image (hidden on mobile when expanded) */}
         <div
-          className="relative overflow-hidden bg-linear-to-br from-gray-800 to-gray-700 lg:-ms-100"
+          className={`relative overflow-hidden lg:bg-linear-to-br lg:from-gray-800 lg:to-gray-700 lg:-ms-100 ${expanded ? 'hidden lg:block' : ''}`}
           style={{
             flex: rightFlex,
             transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -408,10 +460,35 @@ export default function Products({ products }: Props) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="h-full flex flex-col items-center p-6 lg:p-8 lg:ps-52"
+                className="h-full flex flex-col items-center p-4 sm:p-6 lg:p-8 lg:ps-52"
               >
-                {/* Navigation arrows — centered in the panel */}
-                <div className="flex-1 flex items-center justify-center gap-3">
+                {/* Mobile: Featured product image filling the space */}
+                <div className="flex-1 flex items-center justify-center pb-20 lg:hidden">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`mobile-img-${selectedSlug}`}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      {selectedProduct.image ? (
+                        <img
+                          src={selectedProduct.image}
+                          alt={getName(selectedProduct)}
+                          className="max-h-52 w-auto object-contain drop-shadow-2xl"
+                        />
+                      ) : (
+                        <div className="w-40 h-40 rounded-full bg-white/5 flex items-center justify-center">
+                          <Package className="text-white/20" size={56} />
+                        </div>
+                      )}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                {/* Desktop: Navigation arrows — centered in the panel */}
+                <div className="flex-1 hidden lg:flex items-center justify-center gap-3">
                   <button
                     onClick={() => {
                       const idx = products.findIndex(p => p.slug === selectedSlug);
@@ -434,13 +511,37 @@ export default function Products({ products }: Props) {
                   </button>
                 </div>
 
+                {/* Mobile navigation arrows — just above thumbnails */}
+                <div className="flex lg:hidden items-center justify-center gap-3 mb-2">
+                  <button
+                    onClick={() => {
+                      const idx = products.findIndex(p => p.slug === selectedSlug);
+                      const prev = (idx - 1 + products.length) % products.length;
+                      handleSelectProduct(products[prev].slug);
+                    }}
+                    className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white/50 transition-colors cursor-pointer"
+                  >
+                    <ArrowLeft className="rtl:rotate-180" size={14} />
+                  </button>
+                  <button
+                    onClick={() => {
+                      const idx = products.findIndex(p => p.slug === selectedSlug);
+                      const next = (idx + 1) % products.length;
+                      handleSelectProduct(products[next].slug);
+                    }}
+                    className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white/50 transition-colors cursor-pointer"
+                  >
+                    <ArrowRight className="rtl:rotate-180" size={14} />
+                  </button>
+                </div>
+
                 {/* Product thumbnails — side by side at bottom */}
-                <div className="flex items-center gap-4 pb-8">
+                <div className="flex items-center justify-center gap-4 lg:gap-4 pb-4 lg:pb-8 w-full max-w-full px-2 lg:px-0">
                   {products.map((product) => (
                     <button
                       key={product.slug}
                       onClick={() => handleSelectProduct(product.slug)}
-                      className={`group relative w-52 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer ${
+                      className={`group relative flex-1 min-w-0 max-w-52 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer ${
                         product.slug === selectedSlug
                           ? 'ring-2 ring-white/40 shadow-2xl shadow-black/30 scale-105'
                           : 'opacity-40 hover:opacity-70 hover:scale-102'
@@ -475,27 +576,12 @@ export default function Products({ products }: Props) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="h-full flex flex-col justify-center items-center p-8 gap-8"
+                className="h-full flex flex-col items-end justify-end p-6 lg:p-8"
               >
-                {/* Product Image — visible in both mobile and desktop */}
-                <div className="flex-1 flex items-center justify-center w-full">
-                  {selectedProduct.image ? (
-                    <img
-                      src={selectedProduct.image}
-                      alt={getName(selectedProduct)}
-                      className="max-w-full max-h-64 lg:max-h-80 object-contain drop-shadow-2xl"
-                    />
-                  ) : (
-                    <div className="w-40 h-40 rounded-full bg-gray-500/30 flex items-center justify-center">
-                      <Package className="text-white/30" size={48} />
-                    </div>
-                  )}
-                </div>
-
-                {/* Back to Products */}
+                {/* Back to Products — bottom-right */}
                 <button
                   onClick={handleBack}
-                  className="inline-flex items-center text-white/70 hover:text-white text-sm font-medium transition-colors cursor-pointer group"
+                  className="inline-flex items-center text-white/70 hover:text-white text-sm font-medium transition-colors cursor-pointer group mb-4"
                 >
                   <ArrowLeft className="me-2 rtl:rotate-180 group-hover:-translate-x-1 transition-transform" size={16} />
                   {t('products.backToProducts')}

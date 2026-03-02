@@ -35,7 +35,7 @@ export default function Header() {
         isHidden ? '-translate-y-full' : 'translate-y-0'
       }`}
     >
-      <div className="container mx-auto px-4">
+      <div className="px-4">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
