@@ -128,7 +128,8 @@ export default function Products({ products }: Props) {
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
   const [isLg, setIsLg] = useState(false);
   const detailRef = useRef<HTMLDivElement>(null);
-
+  const leftPanelRef = useRef<HTMLDivElement>(null);
+  const [panelSize, setPanelSize] = useState({ w: 0, h: 0 });
 
   const selectedProduct = products.find((p) => p.slug === selectedSlug) ?? products[0];
 
@@ -139,6 +140,17 @@ export default function Products({ products }: Props) {
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
+  }, []);
+
+  // Measure left panel for curved clip-path
+  useEffect(() => {
+    if (typeof window === 'undefined' || !leftPanelRef.current) return;
+    const el = leftPanelRef.current;
+    const update = () => setPanelSize({ w: el.offsetWidth, h: el.offsetHeight });
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   // Reset tab when switching product
@@ -177,16 +189,48 @@ export default function Products({ products }: Props) {
     setExpanded(false);
   };
 
-  // Clip-path for left panel — large diagonal angle like ISL reference
-  const leftClipPath = isLg
-    ? language === 'ar'
-      ? 'polygon(25rem 0, 100% 0, 100% 100%, 0 100%)'
-      : 'polygon(0 0, 100% 0, calc(100% - 25rem) 100%, 0 100%)'
-    : undefined;
-
   // Flex values
   const leftFlex = expanded ? 4 : 1.8;
   const rightFlex = 1;
+
+  // Clip-path for left panel — curved diagonal like ISL reference
+  const DIAG_PX = 400; // 25rem in px
+  const CURVE_R = 40;  // curve radius at diagonal endpoints (px) — tweak to adjust
+  const leftClipPath = (() => {
+    if (!isLg) return undefined;
+    const { w: W, h: H } = panelSize;
+    if (W === 0 || H === 0) {
+      // Fallback before measurements
+      return language === 'ar'
+        ? 'polygon(25rem 0, 100% 0, 100% 100%, 0 100%)'
+        : 'polygon(0 0, 100% 0, calc(100% - 25rem) 100%, 0 100%)';
+    }
+    const D = Math.sqrt(DIAG_PX * DIAG_PX + H * H); // diagonal length
+    const R = CURVE_R;
+    // Unit vector along diagonal
+    const dx = DIAG_PX / D;
+    const dy = H / D;
+
+    if (language === 'ar') {
+      // RTL: corners at (DIAG_PX, 0) top and (0, H) bottom
+      const tStartX = DIAG_PX + R;
+      const tEndX = DIAG_PX - dx * R;
+      const tEndY = dy * R;
+      const bStartX = dx * R;
+      const bStartY = H - dy * R;
+      const bEndX = R;
+      return `path('M ${tStartX} 0 L ${W} 0 L ${W} ${H} L ${bEndX} ${H} Q 0 ${H} ${bStartX} ${bStartY} L ${tEndX} ${tEndY} Q ${DIAG_PX} 0 ${tStartX} 0 Z')`;
+    } else {
+      // LTR: corners at (W, 0) top and (W - DIAG_PX, H) bottom
+      const tStartX = W - R;
+      const tEndX = W - dx * R;
+      const tEndY = dy * R;
+      const bStartX = W - DIAG_PX + dx * R;
+      const bStartY = H - dy * R;
+      const bEndX = W - DIAG_PX - R;
+      return `path('M 0 0 L ${tStartX} 0 Q ${W} 0 ${tEndX} ${tEndY} L ${bStartX} ${bStartY} Q ${W - DIAG_PX} ${H} ${bEndX} ${H} L 0 ${H} Z')`;
+    }
+  })();
 
   // --- Render Tab Content ---
   const renderTabContent = () => {
@@ -291,13 +335,21 @@ export default function Products({ products }: Props) {
 
       {/* Main Split Section */}
       <section className="relative flex flex-col lg:flex-row min-h-screen overflow-hidden bg-linear-to-r from-gray-900 to-gray-800">
-        {/* LEFT PANEL — Featured Product */}
+        {/* LEFT PANEL — Featured Product (wrapper for drop-shadow along diagonal) */}
         <div
-          className="relative z-10 overflow-hidden lg:bg-linear-to-r lg:from-gray-900 lg:to-gray-800"
+          className="relative z-10"
           style={{
             flex: leftFlex,
             transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+            filter: isLg ? 'drop-shadow(4px 0px 6px rgba(0, 0, 0, 0.4))' : undefined,
+          }}
+        >
+        <div
+          ref={leftPanelRef}
+          className="h-full overflow-hidden lg:bg-linear-to-r lg:from-gray-900 lg:to-gray-800"
+          style={{
             clipPath: leftClipPath,
+            backgroundSize: isLg ? '100vw 100%' : undefined,
           }}
         >
           <div className={`h-full flex flex-col lg:flex-row ${expanded ? 'lg:overflow-hidden' : ''}`}>
@@ -442,10 +494,11 @@ export default function Products({ products }: Props) {
             </AnimatePresence>
           </div>
         )}
+        </div>
 
         {/* RIGHT PANEL — Product Navigation / Image (hidden on mobile when expanded) */}
         <div
-          className={`relative overflow-hidden lg:bg-linear-to-br lg:from-gray-800 lg:to-gray-700 lg:-ms-100 ${expanded ? 'hidden lg:block' : ''}`}
+          className={`relative overflow-hidden lg:bg-linear-to-br lg:from-gray-800 lg:to-gray-700 lg:-ms-120 ${expanded ? 'hidden lg:block' : ''}`}
           style={{
             flex: rightFlex,
             transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
