@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowRight, ArrowLeft, Ruler, Shield, Package, Zap, Flame, Box, Microscope, Target, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -142,9 +142,10 @@ export default function Products({ products }: Props) {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Measure left panel for curved clip-path
-  useEffect(() => {
-    if (typeof window === 'undefined' || !leftPanelRef.current) return;
+  // Measure left panel for curved clip-path (useLayoutEffect to avoid flash)
+  const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+  useIsomorphicLayoutEffect(() => {
+    if (!leftPanelRef.current) return;
     const el = leftPanelRef.current;
     const update = () => setPanelSize({ w: el.offsetWidth, h: el.offsetHeight });
     update();
