@@ -166,34 +166,145 @@ const en = {
     },
     imagePlaceholder: "Product Image",
     viewDetails: "View Details",
+    exploreMore: "Explore More",
+    backToProducts: "Back to Products",
+    tabs: {
+      overview: "Product Overview",
+      specifications: "Specifications",
+      features: "Features",
+      requestQuote: "Request Quote",
+    },
+    overview: {
+      keyHighlights: "Key Highlights",
+    },
+    requestQuote: {
+      title: "Request a Quote",
+      description: "Interested in this product? Contact us for pricing, availability, and custom specifications tailored to your project requirements.",
+      button: "Get a Quote",
+    },
+    specNote: "Other specifications are possible. Please contact Sales & Marketing for details.",
+    tmtBars: {
+      highlights: [
+        "Manufactured to BS 4449:2005, Grade B500B standards",
+        "Available in diameters from 8mm to 32mm",
+        "SASO compliant for Saudi construction projects",
+        "Superior strength, ductility, and weldability",
+      ],
+      specIcons: {
+        diameterRange: { title: "Diameter Range", value: "8mm - 32mm" },
+        standards: { title: "Standards", value: "BS 4449:2005 Grade B500B" },
+        barLength: { title: "Bar Length", value: "12m standard" },
+      },
+      specTable: {
+        title: "Linear Mass and Number of Bars in Bundles",
+        headers: ["Diameter (mm)", "Nominal Linear Mass Kg/m", "Tolerance in Linear Mass", "Number of 12 m Long Bars in a bundle of nominal weight of 2 Tons"],
+        rows: [
+          ["08", "0.395", "-5%", "422"],
+          ["10", "0.617", "-5%", "270"],
+          ["12", "0.888", "-5%", "188"],
+          ["14", "1.208", "-5%", "138"],
+          ["16", "1.578", "-5%", "106"],
+          ["18", "1.998", "-5%", "83"],
+          ["20", "2.466", "-5%", "68"],
+          ["25", "3.853", "-5%", "43"],
+          ["32", "6.313", "-5%", "26"],
+        ],
+      },
+      features: {
+        thermoMechanical: {
+          title: "Thermo-Mechanical Treatment",
+          description: "Advanced TMT process ensures optimal balance of strength and ductility through controlled cooling.",
+        },
+        ductility: {
+          title: "Superior Ductility",
+          description: "High elongation values ensure safe performance in seismic zones and under dynamic loading.",
+        },
+        weldability: {
+          title: "Excellent Weldability",
+          description: "Low carbon equivalent enables reliable on-site welding without pre-heating.",
+        },
+        corrosionResistance: {
+          title: "Corrosion Resistance",
+          description: "Tempered martensite outer layer provides enhanced resistance to environmental degradation.",
+        },
+      },
+    },
+    billets: {
+      highlights: [
+        "Produced through Electric Arc Furnace (EAF) steelmaking",
+        "Continuous casting for uniform quality",
+        "Available in 100x100mm and 130x130mm cross-sections",
+        "Strict chemical and dimensional specifications",
+      ],
+      specIcons: {
+        crossSection: { title: "Cross-section", value: "100x100 & 130x130 mm" },
+        chemicalControl: { title: "Chemical Control", value: "In-process spectroscopy" },
+        applications: { title: "Applications", value: "Rolling mills & forging" },
+      },
+      specTable: {
+        title: "Chemical Composition % (max)",
+        headers: ["Billet Size (mm)", "C", "SI", "Mn", "P Max", "S Max"],
+        rows: [
+          ["100x100", "0.18-0.40", "0.20-0.40", "0.50-1.20", "0.05", "0.05"],
+          ["130x130", "0.18-0.40", "0.20-0.40", "0.50-1.20", "0.05", "0.05"],
+        ],
+      },
+      features: {
+        eafSteelmaking: {
+          title: "EAF Steelmaking",
+          description: "Electric Arc Furnace technology for efficient melting and precise chemical control.",
+        },
+        continuousCasting: {
+          title: "Continuous Casting",
+          description: "Automated continuous casting process ensures uniform internal structure and surface quality.",
+        },
+        chemicalControl: {
+          title: "Chemical Control",
+          description: "In-process spectroscopy analysis ensures every heat meets target chemical composition.",
+        },
+        dimensionalConsistency: {
+          title: "Dimensional Consistency",
+          description: "Tight tolerances on cross-section dimensions for reliable downstream rolling performance.",
+        },
+      },
+    },
   },
   quality: {
     hero: {
-      title: "Quality Assurance",
-      subtitle: "Committed to excellence in every product",
+      label: "Quality Assurance",
+      title: "Quality & Manufacturing Standards",
+      subtitle: "Engineered precision and consistent performance across every product we deliver.",
     },
-    overview: {
-      title: "Our Quality Standards",
-      description: "We maintain rigorous quality control standards throughout our production process, ensuring every product meets international specifications.",
-    },
-    standards: {
-      title: "Our Standards",
-      iso: {
-        title: "ISO 9001",
-        description: "Certified quality management system",
+    assurance: {
+      label: "Our Approach",
+      title: "Quality & Manufacturing Assurance",
+      intro1: "At Nuor Steel, quality is engineered into every stage of production, from raw material selection to final bar inspection. Our manufacturing process operates under controlled parameters to ensure consistency, compliance, and structural reliability across every delivery.",
+      intro2: "We follow a preventive quality philosophy: defects are not detected after production; they are designed out of the process.",
+      processControl: {
+        title: "Process Control",
+        description: "Each billet and rebar is produced through monitored rolling and cooling parameters to maintain uniform mechanical performance and dimensional accuracy across all batches.",
       },
-      testing: {
-        title: "Rigorous Testing",
-        description: "Comprehensive product testing and validation",
+      labTesting: {
+        title: "Laboratory Testing",
+        description: "Samples are continuously tested for mechanical and chemical properties including yield strength, tensile strength, elongation, and bend performance to verify compliance with applicable standards.",
       },
-      calibration: {
-        title: "Calibrated Equipment",
-        description: "Regularly calibrated testing equipment",
+      dimensionalPrecision: {
+        title: "Dimensional Precision",
+        description: "Bars are manufactured with consistent rib geometry and roundness to guarantee proper concrete bonding and structural stability.",
       },
-    },
-    certifications: {
-      title: "Our Certifications",
-      description: "Our quality management system is certified to international standards.",
+      weldingWorkability: {
+        title: "Welding & Workability Verification",
+        description: "Products are validated for bending and welding performance to ensure safe on-site fabrication without compromising material integrity.",
+      },
+      durability: {
+        title: "Durability Performance",
+        description: "Controlled chemical composition and surface quality support resistance to environmental exposure and long-term structural performance.",
+      },
+      commitment: {
+        title: "Quality Commitment",
+        description: "Every shipment is traceable and documented.",
+      },
+      closing: "Our objective is not only to meet standards but to provide contractors and consultants with confidence that the material will perform as designed throughout the life of the structure.",
     },
   },
   career: {
@@ -206,6 +317,15 @@ const en = {
     listingsSubtitle: "Explore current opportunities and find your place at Nuor Steel.",
     viewDetails: "View Details",
     noPositions: "No open positions at the moment.",
+    employmentType: {
+      "full-time": "Full-time",
+      "part-time": "Part-time",
+      "contract": "Contract",
+      "internship": "Internship",
+    },
+    locations: {
+      "Riyadh, Saudi Arabia": "Riyadh, Saudi Arabia",
+    },
     openApplication: {
       title: "Open Application",
       description: "Don't see a position that fits? Submit your CV and we'll keep it on file for future opportunities.",

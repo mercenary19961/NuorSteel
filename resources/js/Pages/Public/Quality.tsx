@@ -120,7 +120,7 @@ export default function Quality() {
           <div className="max-w-3xl mx-auto text-center">
             <div className="w-12 h-px bg-primary/50 mx-auto mb-8" />
             <p className="text-lg lg:text-xl text-gray-300 leading-relaxed">
-              {t('quality.assurance.closing', 'Our objective is not only to meet standards — but to provide contractors and consultants with confidence that the material will perform as designed throughout the life of the structure.')}
+              {t('quality.assurance.closing', 'Our objective is not only to meet standards but to provide contractors and consultants with confidence that the material will perform as designed throughout the life of the structure.')}
             </p>
           </div>
         </div>

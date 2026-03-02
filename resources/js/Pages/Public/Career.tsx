@@ -171,12 +171,12 @@ export default function Career({ listings, content_en, content_ar }: Props) {
                       {job.location && (
                         <span className="flex items-center gap-1">
                           <MapPin size={14} />
-                          {job.location}
+                          {t(`career.locations.${job.location}`, job.location)}
                         </span>
                       )}
                       <span className="flex items-center gap-1">
                         <Clock size={14} />
-                        {job.employment_type}
+                        {t(`career.employmentType.${job.employment_type}`, job.employment_type)}
                       </span>
                     </div>
                     <p className="text-gray-400 leading-relaxed text-sm grow">
@@ -184,7 +184,7 @@ export default function Career({ listings, content_en, content_ar }: Props) {
                     </p>
                     <div className="mt-5 inline-flex items-center text-primary text-sm font-medium group-hover:gap-2 transition-all">
                       {t('career.viewDetails')}
-                      <ArrowRight size={16} className="ms-1" />
+                      <ArrowRight size={16} className="ms-1 rtl:rotate-180" />
                     </div>
                   </button>
                 </MagicCard>
@@ -241,12 +241,12 @@ export default function Career({ listings, content_en, content_ar }: Props) {
                   {selectedJob.location && (
                     <span className="flex items-center gap-1">
                       <MapPin size={14} />
-                      {selectedJob.location}
+                      {t(`career.locations.${selectedJob.location}`, selectedJob.location)}
                     </span>
                   )}
                   <span className="flex items-center gap-1">
                     <Clock size={14} />
-                    {selectedJob.employment_type}
+                    {t(`career.employmentType.${selectedJob.employment_type}`, selectedJob.employment_type)}
                   </span>
                 </div>
               </div>

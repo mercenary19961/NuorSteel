@@ -31,11 +31,11 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent border-b border-white/20 ${
-        isHidden ? '-translate-y-full' : 'translate-y-0'
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-white/20 ${
+        mobileMenuOpen ? 'bg-gray-900' : 'bg-transparent'
+      } ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}
     >
-      <div className="container mx-auto px-4">
+      <div className="px-4">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
