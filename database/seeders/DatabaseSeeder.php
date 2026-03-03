@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             SiteContentSeeder::class,
             DemoContentSeeder::class,
             LinkedinPostSeeder::class,
+            CertificateSeeder::class,
         ]);
     }
 }

@@ -42,6 +42,7 @@ Route::get('/quality', [QualityController::class, 'index'])->name('quality');
 Route::get('/career', [CareerController::class, 'index'])->name('career.index');
 Route::get('/career/{slug}', [CareerController::class, 'show'])->name('career.show');
 Route::get('/certificates', [CertificateController::class, 'index'])->name('certificates');
+Route::get('/certificates/{id}/file', [CertificateController::class, 'viewFile'])->name('certificates.view-file')->where('id', '[0-9]+');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 
 // Form submissions (rate limited)

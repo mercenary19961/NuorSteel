@@ -5,17 +5,19 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\SiteContent;
 use App\Models\Certificate;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CertificateController extends Controller
 {
     public function index(): Response
     {
-        $locale = session('locale', 'en');
-
         return Inertia::render('Public/Certificates', [
-            'content' => SiteContent::getPage('certificates', $locale),
+            'content_en' => SiteContent::getPage('certificates', 'en'),
+            'content_ar' => SiteContent::getPage('certificates', 'ar'),
             'esg' => Certificate::active()
                 ->esg()
                 ->ordered()
@@ -37,13 +39,29 @@ class CertificateController extends Controller
         ]);
     }
 
+    public function viewFile(int $id): StreamedResponse
+    {
+        $certificate = Certificate::active()->findOrFail($id);
+
+        if (!Storage::exists($certificate->file_path)) {
+            throw new NotFoundHttpException();
+        }
+
+        return Storage::response($certificate->file_path, $certificate->title_en . '.pdf', [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $certificate->title_en . '.pdf"',
+        ]);
+    }
+
     private function formatCertificate(Certificate $certificate): array
     {
         return [
             'id' => $certificate->id,
-            'title' => $certificate->title,
-            'description' => $certificate->description,
-            'file_url' => $certificate->file_url,
+            'title_en' => $certificate->title_en,
+            'title_ar' => $certificate->title_ar,
+            'description_en' => $certificate->description_en,
+            'description_ar' => $certificate->description_ar,
+            'file_url' => route('certificates.view-file', $certificate->id),
             'thumbnail' => $certificate->thumbnail?->url,
             'issue_date' => $certificate->issue_date?->format('Y-m-d'),
             'expiry_date' => $certificate->expiry_date?->format('Y-m-d'),
