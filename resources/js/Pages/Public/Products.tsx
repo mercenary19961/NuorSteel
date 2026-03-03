@@ -184,6 +184,21 @@ export default function Products({ products }: Props) {
 
   const selectedProduct = products.find((p) => p.slug === selectedSlug) ?? products[0];
 
+  // Empty state — no products in the database
+  if (!products.length || !selectedProduct) {
+    return (
+      <PublicLayout>
+        <Head title={t('nav.products')} />
+        <section className="bg-linear-to-r from-gray-900 to-gray-800 text-white min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <Package size={48} className="text-white/10 mx-auto mb-4" />
+            <p className="text-gray-500">{t('products.noProducts', 'No products available.')}</p>
+          </div>
+        </section>
+      </PublicLayout>
+    );
+  }
+
   // Detect lg breakpoint for clip-path
   useEffect(() => {
     if (typeof window === 'undefined') return;
