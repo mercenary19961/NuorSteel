@@ -56,6 +56,16 @@ html[dir="rtl"] body {
     animation: slide-in 0.3s ease-out;
 }
 
+/* Subtle glow pulse for truncated table headers */
+@keyframes pulse-subtle {
+    0%, 100% { text-shadow: 0 0 0 transparent; }
+    50% { text-shadow: 0 0 8px rgba(255, 122, 0, 0.4); }
+}
+
+.animate-pulse-subtle {
+    animation: pulse-subtle 3s ease-in-out infinite;
+}
+
 /* Custom scrollbar — thin, subtle, auto-hiding */
 .scrollbar-thin {
     scrollbar-width: thin;

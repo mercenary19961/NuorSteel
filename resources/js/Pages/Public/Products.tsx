@@ -59,6 +59,28 @@ const featureIcons: Record<string, React.ElementType> = {
 
 // --- Spec Data Table Component ---
 function SpecDataTable({ tableData }: { tableData: { title: string; headers: string[]; rows: string[][] } }) {
+  const [expandedHeader, setExpandedHeader] = useState<number | null>(null);
+  const [truncatedHeaders, setTruncatedHeaders] = useState<Set<number>>(new Set());
+  const headerRefs = useRef<(HTMLSpanElement | null)[]>([]);
+
+  useEffect(() => {
+    if (expandedHeader === null) return;
+    const close = () => setExpandedHeader(null);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, [expandedHeader]);
+
+  // Detect which headers are truncated
+  useEffect(() => {
+    const truncated = new Set<number>();
+    headerRefs.current.forEach((span, i) => {
+      if (span && span.scrollHeight > span.clientHeight + 1) {
+        truncated.add(i);
+      }
+    });
+    setTruncatedHeaders(truncated);
+  }, [tableData.headers]);
+
   return (
     <div className="mb-8">
       <h3 className="text-lg font-semibold text-white mb-4">{tableData.title}</h3>
@@ -67,8 +89,37 @@ function SpecDataTable({ tableData }: { tableData: { title: string; headers: str
           <thead>
             <tr className="bg-white/10">
               {tableData.headers.map((header: string, i: number) => (
-                <th key={i} className="text-start py-3 px-4 text-sm font-semibold text-primary border-b border-white/10">
-                  {header}
+                <th
+                  key={i}
+                  className="text-start py-3 px-4 text-sm font-semibold text-primary border-b border-white/10 max-w-32 relative cursor-pointer select-none"
+                  title={header}
+                  onClick={(e) => { e.stopPropagation(); setExpandedHeader(expandedHeader === i ? null : i); }}
+                >
+                  <span
+                    ref={(el) => { headerRefs.current[i] = el; }}
+                    className={`line-clamp-2 ${truncatedHeaders.has(i) ? 'animate-pulse-subtle' : ''}`}
+                  >{header}</span>
+                  {expandedHeader === i && (
+                    <div className="fixed z-50 px-3 py-2 bg-gray-700 rounded-lg shadow-lg text-white text-xs font-normal whitespace-normal max-w-60 border border-white/10"
+                      style={{ top: 'var(--tooltip-top)', left: 'var(--tooltip-left)' }}
+                      ref={(el) => {
+                        if (!el) return;
+                        const th = el.parentElement;
+                        if (!th) return;
+                        const rect = th.getBoundingClientRect();
+                        const tooltipWidth = el.offsetWidth;
+                        let left = rect.left;
+                        // Keep tooltip within viewport
+                        if (left + tooltipWidth > window.innerWidth - 8) {
+                          left = window.innerWidth - tooltipWidth - 8;
+                        }
+                        el.style.top = `${rect.bottom + 4}px`;
+                        el.style.left = `${Math.max(8, left)}px`;
+                      }}
+                    >
+                      {header}
+                    </div>
+                  )}
                 </th>
               ))}
             </tr>
@@ -471,28 +522,38 @@ export default function Products({ products }: Props) {
 
         {/* Expanded Product Image — absolutely positioned, bottom-right, floats above the panel */}
         {expanded && (
-          <div className="hidden lg:flex absolute z-20 bottom-20 right-8 items-end justify-end pointer-events-none">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`expanded-img-${selectedSlug}`}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.4 }}
-              >
-                {selectedProduct.image ? (
-                  <img
-                    src={selectedProduct.image}
-                    alt={getName(selectedProduct)}
-                    className="max-h-48 xl:max-h-60 w-auto object-contain drop-shadow-2xl"
-                  />
-                ) : (
-                  <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center">
-                    <Package className="text-white/20" size={32} />
-                  </div>
-                )}
-              </motion.div>
-            </AnimatePresence>
+          <div className="hidden lg:flex flex-col items-end absolute z-20 bottom-8 end-[15%] min-[1280px]:end-[12%] min-[1536px]:end-[8%] min-[1800px]:end-[5%]
+">
+            <div className="pointer-events-none">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`expanded-img-${selectedSlug}`}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  {selectedProduct.image ? (
+                    <img
+                      src={selectedProduct.image}
+                      alt={getName(selectedProduct)}
+                      className="max-h-48 xl:max-h-60 w-auto object-contain drop-shadow-2xl"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center">
+                      <Package className="text-white/20" size={32} />
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+            <button
+              onClick={handleBack}
+              className="mt-3 inline-flex items-center text-white/70 hover:text-white text-sm font-medium transition-colors cursor-pointer group"
+            >
+              <ArrowLeft className="me-2 rtl:rotate-180 group-hover:-translate-x-1 transition-transform" size={16} />
+              {t('products.backToProducts')}
+            </button>
           </div>
         )}
         </div>
@@ -514,7 +575,7 @@ export default function Products({ products }: Props) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="h-full flex flex-col items-center p-4 sm:p-6 lg:p-8 lg:ps-52"
+                className="h-full flex flex-col items-center p-4 sm:p-6 lg:p-0"
               >
                 {/* Mobile: Featured product image filling the space */}
                 <div className="flex-1 flex items-center justify-center pb-20 lg:hidden">
@@ -541,30 +602,6 @@ export default function Products({ products }: Props) {
                   </AnimatePresence>
                 </div>
 
-                {/* Desktop: Navigation arrows — centered in the panel */}
-                <div className="flex-1 hidden lg:flex items-center justify-center gap-3">
-                  <button
-                    onClick={() => {
-                      const idx = products.findIndex(p => p.slug === selectedSlug);
-                      const prev = (idx - 1 + products.length) % products.length;
-                      handleSelectProduct(products[prev].slug);
-                    }}
-                    className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white/50 transition-colors cursor-pointer"
-                  >
-                    <ArrowLeft className="rtl:rotate-180" size={16} />
-                  </button>
-                  <button
-                    onClick={() => {
-                      const idx = products.findIndex(p => p.slug === selectedSlug);
-                      const next = (idx + 1) % products.length;
-                      handleSelectProduct(products[next].slug);
-                    }}
-                    className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white/50 transition-colors cursor-pointer"
-                  >
-                    <ArrowRight className="rtl:rotate-180" size={16} />
-                  </button>
-                </div>
-
                 {/* Mobile navigation arrows — just above thumbnails */}
                 <div className="flex lg:hidden items-center justify-center gap-3 mb-2">
                   <button
@@ -589,8 +626,8 @@ export default function Products({ products }: Props) {
                   </button>
                 </div>
 
-                {/* Product thumbnails — side by side at bottom */}
-                <div className="flex items-center justify-center gap-4 lg:gap-4 pb-4 lg:pb-8 w-full max-w-full px-2 lg:px-0">
+                {/* Mobile: Product thumbnails — horizontal at bottom */}
+                <div className="flex lg:hidden items-center justify-center gap-4 pb-4 w-full max-w-full px-2">
                   {products.map((product) => (
                     <button
                       key={product.slug}
@@ -621,27 +658,62 @@ export default function Products({ products }: Props) {
                     </button>
                   ))}
                 </div>
+
+                {/* Desktop: Product thumbnails — stacked vertically, far right, centered */}
+                <div className="hidden lg:flex flex-col items-end justify-center h-full w-full pe-0 lg:pe-10 xl:pe-30 2xl:pe-30 3xl:pe-40 gap-4">
+                  {products.map((product) => (
+                    <button
+                      key={product.slug}
+                      onClick={() => handleSelectProduct(product.slug)}
+                      className={`group relative w-24 xl:w-40 2xl:w-56 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer ${
+                        product.slug === selectedSlug
+                          ? 'ring-2 ring-white/40 shadow-2xl shadow-black/30 scale-105'
+                          : 'opacity-40 hover:opacity-70 hover:scale-102'
+                      }`}
+                    >
+                      <div className="aspect-4/3 bg-gray-800/50 flex items-center justify-center">
+                        {product.image ? (
+                          <img src={product.image} alt={getName(product)} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full bg-linear-to-br from-gray-600 to-gray-500 flex items-center justify-center">
+                            <Package className="text-white/30" size={36} />
+                          </div>
+                        )}
+                      </div>
+                      <div className="absolute bottom-0 inset-x-0 bg-linear-to-t from-black/80 to-transparent px-3 py-2">
+                        <h3 className="text-white font-bold text-xs uppercase tracking-wider text-center">
+                          {getName(product)}
+                        </h3>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Navigation button — positioned at bottom-right, independent of thumbnails */}
+                <div className="hidden lg:flex absolute bottom-8 end-0 pe-10 xl:pe-30 2xl:pe-30 3xl:pe-40">
+                  <button
+                    onClick={() => {
+                      const idx = products.findIndex(p => p.slug === selectedSlug);
+                      const next = (idx + 1) % products.length;
+                      handleSelectProduct(products[next].slug);
+                    }}
+                    className="w-44 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-white/20 text-white/50 hover:text-white hover:border-white/40 transition-colors cursor-pointer text-sm uppercase tracking-wider"
+                  >
+                    {(() => {
+                      const idx = products.findIndex(p => p.slug === selectedSlug);
+                      const next = (idx + 1) % products.length;
+                      const isWrapping = next < idx;
+                      return (
+                        <>
+                          {getName(products[next])}
+                          <ArrowRight className={isWrapping ? '-rotate-90' : 'rotate-90'} size={16} />
+                        </>
+                      );
+                    })()}
+                  </button>
+                </div>
               </motion.div>
-            ) : (
-              /* --- EXPANDED: Product Image + Back Button --- */
-              <motion.div
-                key="expanded-right"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="h-full flex flex-col items-end justify-end p-6 lg:p-8"
-              >
-                {/* Back to Products — bottom-right */}
-                <button
-                  onClick={handleBack}
-                  className="inline-flex items-center text-white/70 hover:text-white text-sm font-medium transition-colors cursor-pointer group mb-4"
-                >
-                  <ArrowLeft className="me-2 rtl:rotate-180 group-hover:-translate-x-1 transition-transform" size={16} />
-                  {t('products.backToProducts')}
-                </button>
-              </motion.div>
-            )}
+            ) : null}
           </AnimatePresence>
         </div>
       </section>
