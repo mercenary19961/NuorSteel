@@ -54,7 +54,7 @@
 - [x] Home page (full-viewport hero, framer-motion animations, bottom nav links, interactive core values, products, CTA)
 - [x] About page (animated intro with highlighted keywords, vision, mission, capabilities scroll-stack, timeline, no governance)
 - [x] Recycling page (sub-page under About)
-- [x] Products listing + Product detail page
+- [x] Products listing (ISL-style angled split layout) + Product detail page
 - [x] Quality page (hero section + magic card assurance cards)
 - [x] Career page (hero section, magic card job listings, job detail modal, open application modal)
 - [x] Job detail page (standalone route kept as direct-link fallback; Career page uses modals)
@@ -73,7 +73,7 @@
 - [x] `HeroBottomLinks` component (`resources/js/Components/Public/HeroBottomLinks.tsx`)
 - [x] Homepage sections: About Us, Vision & Mission, Vision 2030, interactive Core Values, Products, LinkedIn, CTA — each with `id` for scroll navigation
 - [x] Core Values V2: RadialOrbitalTimeline component with orbital animation and rotating value cards (`resources/js/Components/ui/radial-orbital-timeline.tsx`)
-- [x] Products: two interactive panels (TMT Bars / Billets) with hover expand, color overlay fade, and RTL-aware angled clip-path divider (lg+)
+- [x] Products section on homepage links to `/products` page (ISL-style redesign lives on dedicated Products page)
 - [x] All sections use unified left-to-right gradient (`bg-linear-to-r from-gray-900 to-gray-800`)
 - [x] LinkedIn feed: auto-rotating carousel with dot indicators, improved iframe sizing, RTL-aware chevron arrows
 - [x] LinkedIn section uses CSS logical properties (`text-start`, `ms-0`/`me-auto`) for RTL support
@@ -116,6 +116,33 @@
 - [x] Dark-themed thin scrollbar styling on modals (`scrollbar-thin` class)
 - [x] CareerController updated to pass bilingual data (content_en/ar, title_en/ar, description_en/ar, requirements_en/ar)
 - [x] i18n keys added: `career.hero.label`, `career.listingsSubtitle` (EN + AR)
+
+### Products Page Redesign — ISL-Style (DONE)
+- [x] Full-viewport single section with angled diagonal divider (SVG bezier `clip-path: path()`)
+- [x] 60/40 split (default) → 80/20 split (expanded "Explore More" view) with animated flex transition
+- [x] Left panel: featured product hero (name, description, "Explore More" CTA, large product image near diagonal)
+- [x] Left panel expanded: tabbed details — Overview, Specifications, Features, Request Quote
+- [x] Right panel default: stacked product thumbnails with navigation button (fixed `w-44`, directional arrows)
+- [x] Right panel expanded: product image + "Back to Products" button (no thumbnails)
+- [x] Curved diagonal via `clip-path: path()` with SVG quadratic bezier curves (Q commands)
+- [x] Drop-shadow along diagonal edge via wrapper div with `filter: drop-shadow()` (can't apply on same element as clip-path)
+- [x] `useLayoutEffect` (isomorphic SSR-safe) for panel measurement to prevent flash on load
+- [x] `background-size: 100vw 100%` to align gradients across panels and eliminate seam at clip-path curve
+- [x] Right panel overlap (`lg:-ms-120`) to hide seam at diagonal bottom
+- [x] Responsive thumbnail sizes (`w-24 xl:w-40 2xl:w-56`)
+- [x] SpecDataTable component: `line-clamp-2` truncated headers, click-to-expand tooltip (fixed position, viewport-clamped), subtle orange glow pulse animation on truncated headers (`animate-pulse-subtle` in `app.css`)
+- [x] Spec tables hardcoded in i18n: TMT Bars (Linear Mass, 9 rows) + Billets (Chemical Composition, 2 rows)
+- [x] framer-motion `AnimatePresence mode="wait"` for content transitions (hero ↔ detail, tab switching, product switching)
+- [x] Tab underline: `motion.div` with `layoutId="tab-underline"`
+- [x] Mobile: stacked layout without clip-path, panels stack vertically
+- [x] RTL: clip-path mirrors via `language === 'ar'` conditional, CSS logical properties throughout
+- [x] ProductController `index()` updated to pass full bilingual data (both locales)
+- [x] i18n keys added for all product page content (EN + AR): tabs, specs, features, highlights
+
+### Misc Fixes (post-2026-03-01)
+- [x] Header: burger menu background color fix on mobile view
+- [x] Career page: multilingual support enhancements (bilingual i18n keys)
+- [x] Quality page: minor content/translation updates
 
 ### Site-Wide Visual Consistency (DONE)
 - [x] Unified `bg-linear-to-r from-gray-900 to-gray-800` gradient across all public page sections (Home, About, Quality, Career)
@@ -498,6 +525,7 @@ resources/js/Components/       → Shared components (Layout/, Admin/, Public/, 
 resources/js/hooks/            → Custom hooks (useScrollDirection)
 resources/css/scroll-stack.css → ScrollStack GPU-accelerated card CSS
 resources/css/magic-card.css   → MagicCard border glow CSS
+resources/css/app.css          → Global styles (pulse-subtle glow animation)
 resources/js/types/            → TypeScript interfaces
 resources/js/i18n/             → Translation files (en.ts, ar.ts)
 resources/js/contexts/         → LanguageContext
@@ -556,4 +584,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-03-01 — based on commit `9ddce97` (*feat: unify homepage section backgrounds to left-to-right gradient*)
+> **Last updated:** 2026-03-03 — based on commit `341494d` (*feat: add subtle glow pulse animation for truncated table headers*)

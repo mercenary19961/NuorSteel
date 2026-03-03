@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowRight, ArrowLeft, Ruler, Shield, Package, Zap, Flame, Box, Microscope, Target, CheckCircle } from 'lucide-react';
+import { ArrowRight, ArrowLeft, LayoutGrid, Ruler, Shield, Package, Zap, Flame, Box, Microscope, Target, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -59,6 +59,28 @@ const featureIcons: Record<string, React.ElementType> = {
 
 // --- Spec Data Table Component ---
 function SpecDataTable({ tableData }: { tableData: { title: string; headers: string[]; rows: string[][] } }) {
+  const [expandedHeader, setExpandedHeader] = useState<number | null>(null);
+  const [truncatedHeaders, setTruncatedHeaders] = useState<Set<number>>(new Set());
+  const headerRefs = useRef<(HTMLSpanElement | null)[]>([]);
+
+  useEffect(() => {
+    if (expandedHeader === null) return;
+    const close = () => setExpandedHeader(null);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, [expandedHeader]);
+
+  // Detect which headers are truncated
+  useEffect(() => {
+    const truncated = new Set<number>();
+    headerRefs.current.forEach((span, i) => {
+      if (span && span.scrollHeight > span.clientHeight + 1) {
+        truncated.add(i);
+      }
+    });
+    setTruncatedHeaders(truncated);
+  }, [tableData.headers]);
+
   return (
     <div className="mb-8">
       <h3 className="text-lg font-semibold text-white mb-4">{tableData.title}</h3>
@@ -67,8 +89,37 @@ function SpecDataTable({ tableData }: { tableData: { title: string; headers: str
           <thead>
             <tr className="bg-white/10">
               {tableData.headers.map((header: string, i: number) => (
-                <th key={i} className="text-start py-3 px-4 text-sm font-semibold text-primary border-b border-white/10">
-                  {header}
+                <th
+                  key={i}
+                  className="text-start py-3 px-4 text-sm font-semibold text-primary border-b border-white/10 max-w-32 relative cursor-pointer select-none"
+                  title={header}
+                  onClick={(e) => { e.stopPropagation(); setExpandedHeader(expandedHeader === i ? null : i); }}
+                >
+                  <span
+                    ref={(el) => { headerRefs.current[i] = el; }}
+                    className={`line-clamp-2 ${truncatedHeaders.has(i) ? 'animate-pulse-subtle' : ''}`}
+                  >{header}</span>
+                  {expandedHeader === i && (
+                    <div className="fixed z-50 px-3 py-2 bg-gray-700 rounded-lg shadow-lg text-white text-xs font-normal whitespace-normal max-w-60 border border-white/10"
+                      style={{ top: 'var(--tooltip-top)', left: 'var(--tooltip-left)' }}
+                      ref={(el) => {
+                        if (!el) return;
+                        const th = el.parentElement;
+                        if (!th) return;
+                        const rect = th.getBoundingClientRect();
+                        const tooltipWidth = el.offsetWidth;
+                        let left = rect.left;
+                        // Keep tooltip within viewport
+                        if (left + tooltipWidth > window.innerWidth - 8) {
+                          left = window.innerWidth - tooltipWidth - 8;
+                        }
+                        el.style.top = `${rect.bottom + 4}px`;
+                        el.style.left = `${Math.max(8, left)}px`;
+                      }}
+                    >
+                      {header}
+                    </div>
+                  )}
                 </th>
               ))}
             </tr>
@@ -153,6 +204,22 @@ export default function Products({ products }: Props) {
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
+
+  // Delayed attention glow on "Back to Products" button (10s after expanding)
+  const [showAttention, setShowAttention] = useState(false);
+  useEffect(() => {
+    if (!expanded) { setShowAttention(false); return; }
+    const timer = setTimeout(() => setShowAttention(true), 10000);
+    return () => clearTimeout(timer);
+  }, [expanded]);
+
+  // Delayed attention glow on "Explore More" button (10s on hero view)
+  const [showExploreAttention, setShowExploreAttention] = useState(false);
+  useEffect(() => {
+    if (expanded) { setShowExploreAttention(false); return; }
+    const timer = setTimeout(() => setShowExploreAttention(true), 10000);
+    return () => clearTimeout(timer);
+  }, [expanded, selectedSlug]);
 
   // Reset tab when switching product
   useEffect(() => {
@@ -342,7 +409,7 @@ export default function Products({ products }: Props) {
           style={{
             flex: leftFlex,
             transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-            filter: isLg ? 'drop-shadow(4px 0px 6px rgba(0, 0, 0, 0.4))' : undefined,
+            filter: isLg ? `drop-shadow(${language === 'ar' ? '-4px' : '4px'} 0px 6px rgba(0, 0, 0, 0.4))` : undefined,
           }}
         >
         <div
@@ -375,7 +442,11 @@ export default function Products({ products }: Props) {
                     </p>
                     <button
                       onClick={handleExplore}
-                      className="inline-flex items-center px-8 py-3 rounded-full border border-white/30 text-white hover:bg-white/10 transition-all cursor-pointer group"
+                      className={`inline-flex items-center px-8 py-3 rounded-full border text-white transition-all cursor-pointer group ${
+                        showExploreAttention
+                          ? 'border-primary/60 bg-white/10 animate-ring-pulse'
+                          : 'border-white/30 hover:bg-white/10'
+                      }`}
                     >
                       {t('products.exploreMore')}
                       <ArrowRight className="ms-2 rtl:rotate-180 group-hover:translate-x-1 transition-transform" size={18} />
@@ -414,10 +485,11 @@ export default function Products({ products }: Props) {
                     <div className="lg:hidden flex items-end justify-between mt-12 pb-4">
                       <button
                         onClick={handleBack}
-                        className="inline-flex items-center text-white/70 hover:text-white text-sm font-medium transition-colors cursor-pointer group"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/20 text-white/70 hover:text-white hover:border-white/40 hover:bg-white/10 text-xs font-medium transition-all cursor-pointer group"
                       >
-                        <ArrowLeft className="me-2 rtl:rotate-180 group-hover:-translate-x-1 transition-transform" size={16} />
+                        <LayoutGrid size={12} className="text-white/50 group-hover:text-white/70" />
                         {t('products.backToProducts')}
+                        <ArrowRight className="-rotate-90 group-hover:-translate-y-0.5 transition-transform" size={12} />
                       </button>
                       <div className="flex items-end justify-end">
                         {selectedProduct.image ? (
@@ -469,9 +541,30 @@ export default function Products({ products }: Props) {
           </div>
         )}
 
+        {/* Expanded: Back to Products — top-right */}
+        {expanded && (
+          <div className="hidden lg:flex absolute z-20 top-24 end-16 xl:end-24">
+            <motion.button
+              onClick={handleBack}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-medium transition-all cursor-pointer group ${
+                showAttention
+                  ? 'border-primary/60 text-white bg-white/10 animate-ring-pulse'
+                  : 'border-white/20 text-white/70 hover:text-white hover:border-white/40 hover:bg-white/10'
+              }`}
+            >
+              <LayoutGrid size={15} className={showAttention ? 'text-primary' : 'text-white/50 group-hover:text-white/70'} />
+              {t('products.backToProducts')}
+              <ArrowLeft className="rtl:rotate-180 group-hover:-translate-x-1 transition-transform" size={15} />
+            </motion.button>
+          </div>
+        )}
+
         {/* Expanded Product Image — absolutely positioned, bottom-right, floats above the panel */}
         {expanded && (
-          <div className="hidden lg:flex absolute z-20 bottom-20 right-8 items-end justify-end pointer-events-none">
+          <div className="hidden lg:flex absolute z-20 bottom-8 end-[15%] min-[1280px]:end-[12%] min-[1536px]:end-[8%] min-[1800px]:end-[5%] pointer-events-none">
             <AnimatePresence mode="wait">
               <motion.div
                 key={`expanded-img-${selectedSlug}`}
@@ -514,7 +607,7 @@ export default function Products({ products }: Props) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="h-full flex flex-col items-center p-4 sm:p-6 lg:p-8 lg:ps-52"
+                className="h-full flex flex-col items-center p-4 sm:p-6 lg:p-0"
               >
                 {/* Mobile: Featured product image filling the space */}
                 <div className="flex-1 flex items-center justify-center pb-20 lg:hidden">
@@ -541,56 +634,35 @@ export default function Products({ products }: Props) {
                   </AnimatePresence>
                 </div>
 
-                {/* Desktop: Navigation arrows — centered in the panel */}
-                <div className="flex-1 hidden lg:flex items-center justify-center gap-3">
-                  <button
-                    onClick={() => {
-                      const idx = products.findIndex(p => p.slug === selectedSlug);
-                      const prev = (idx - 1 + products.length) % products.length;
-                      handleSelectProduct(products[prev].slug);
-                    }}
-                    className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white/50 transition-colors cursor-pointer"
-                  >
-                    <ArrowLeft className="rtl:rotate-180" size={16} />
-                  </button>
+                {/* Mobile navigation — next product button */}
+                <div className="flex lg:hidden items-center justify-center mb-3">
                   <button
                     onClick={() => {
                       const idx = products.findIndex(p => p.slug === selectedSlug);
                       const next = (idx + 1) % products.length;
                       handleSelectProduct(products[next].slug);
                     }}
-                    className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white/50 transition-colors cursor-pointer"
+                    className="flex items-center justify-center gap-2 px-5 py-2 rounded-full border border-white/20 text-white/50 hover:text-white hover:border-white/40 transition-colors cursor-pointer text-sm uppercase tracking-wider"
                   >
-                    <ArrowRight className="rtl:rotate-180" size={16} />
-                  </button>
-                </div>
-
-                {/* Mobile navigation arrows — just above thumbnails */}
-                <div className="flex lg:hidden items-center justify-center gap-3 mb-2">
-                  <button
-                    onClick={() => {
-                      const idx = products.findIndex(p => p.slug === selectedSlug);
-                      const prev = (idx - 1 + products.length) % products.length;
-                      handleSelectProduct(products[prev].slug);
-                    }}
-                    className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white/50 transition-colors cursor-pointer"
-                  >
-                    <ArrowLeft className="rtl:rotate-180" size={14} />
-                  </button>
-                  <button
-                    onClick={() => {
+                    {(() => {
                       const idx = products.findIndex(p => p.slug === selectedSlug);
                       const next = (idx + 1) % products.length;
-                      handleSelectProduct(products[next].slug);
-                    }}
-                    className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white/50 transition-colors cursor-pointer"
-                  >
-                    <ArrowRight className="rtl:rotate-180" size={14} />
+                      const isWrapping = next < idx;
+                      return (
+                        <>
+                          {getName(products[next])}
+                          {isWrapping
+                            ? <ArrowLeft className="rtl:rotate-180" size={14} />
+                            : <ArrowRight className="rtl:rotate-180" size={14} />
+                          }
+                        </>
+                      );
+                    })()}
                   </button>
                 </div>
 
-                {/* Product thumbnails — side by side at bottom */}
-                <div className="flex items-center justify-center gap-4 lg:gap-4 pb-4 lg:pb-8 w-full max-w-full px-2 lg:px-0">
+                {/* Mobile: Product thumbnails — horizontal at bottom */}
+                <div className="flex lg:hidden items-center justify-center gap-4 pb-4 w-full max-w-full px-2">
                   {products.map((product) => (
                     <button
                       key={product.slug}
@@ -616,32 +688,67 @@ export default function Products({ products }: Props) {
                         </h3>
                       </div>
                       {product.slug === selectedSlug && (
-                        <div className="absolute top-0 inset-x-0 h-0.5 bg-primary" />
+                        <div className="absolute top-0 inset-x-0 h-0.5 bg-primary hidden lg:block" />
                       )}
                     </button>
                   ))}
                 </div>
+
+                {/* Desktop: Product thumbnails — stacked vertically, far right, centered */}
+                <div className="hidden lg:flex flex-col items-end justify-center h-full w-full pe-0 lg:pe-10 xl:pe-30 2xl:pe-30 3xl:pe-40 gap-4">
+                  {products.map((product) => (
+                    <button
+                      key={product.slug}
+                      onClick={() => handleSelectProduct(product.slug)}
+                      className={`group relative w-24 xl:w-40 2xl:w-56 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer ${
+                        product.slug === selectedSlug
+                          ? 'ring-2 ring-white/40 shadow-2xl shadow-black/30 scale-105'
+                          : 'opacity-40 hover:opacity-70 hover:scale-102'
+                      }`}
+                    >
+                      <div className="aspect-4/3 bg-gray-800/50 flex items-center justify-center">
+                        {product.image ? (
+                          <img src={product.image} alt={getName(product)} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full bg-linear-to-br from-gray-600 to-gray-500 flex items-center justify-center">
+                            <Package className="text-white/30" size={36} />
+                          </div>
+                        )}
+                      </div>
+                      <div className="absolute bottom-0 inset-x-0 bg-linear-to-t from-black/80 to-transparent px-3 py-2">
+                        <h3 className="text-white font-bold text-xs uppercase tracking-wider text-center">
+                          {getName(product)}
+                        </h3>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Navigation button — positioned at bottom-right, independent of thumbnails */}
+                <div className="hidden lg:flex absolute bottom-8 end-0 pe-10 xl:pe-30 2xl:pe-30 3xl:pe-40">
+                  <button
+                    onClick={() => {
+                      const idx = products.findIndex(p => p.slug === selectedSlug);
+                      const next = (idx + 1) % products.length;
+                      handleSelectProduct(products[next].slug);
+                    }}
+                    className="w-44 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-white/20 text-white/50 hover:text-white hover:border-white/40 transition-colors cursor-pointer text-sm uppercase tracking-wider"
+                  >
+                    {(() => {
+                      const idx = products.findIndex(p => p.slug === selectedSlug);
+                      const next = (idx + 1) % products.length;
+                      const isWrapping = next < idx;
+                      return (
+                        <>
+                          {getName(products[next])}
+                          <ArrowRight className={isWrapping ? '-rotate-90' : 'rotate-90'} size={16} />
+                        </>
+                      );
+                    })()}
+                  </button>
+                </div>
               </motion.div>
-            ) : (
-              /* --- EXPANDED: Product Image + Back Button --- */
-              <motion.div
-                key="expanded-right"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="h-full flex flex-col items-end justify-end p-6 lg:p-8"
-              >
-                {/* Back to Products — bottom-right */}
-                <button
-                  onClick={handleBack}
-                  className="inline-flex items-center text-white/70 hover:text-white text-sm font-medium transition-colors cursor-pointer group mb-4"
-                >
-                  <ArrowLeft className="me-2 rtl:rotate-180 group-hover:-translate-x-1 transition-transform" size={16} />
-                  {t('products.backToProducts')}
-                </button>
-              </motion.div>
-            )}
+            ) : null}
           </AnimatePresence>
         </div>
       </section>
