@@ -101,8 +101,8 @@ class CertificateSeeder extends Seeder
                 ['file_path' => $data['file_path']],
                 array_merge($data, [
                     'is_active' => true,
-                    'created_by' => 1,
-                    'updated_by' => 1,
+                    'created_by' => null,
+                    'updated_by' => null,
                 ])
             );
         }
