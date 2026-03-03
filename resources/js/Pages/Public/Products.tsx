@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowRight, ArrowLeft, Ruler, Shield, Package, Zap, Flame, Box, Microscope, Target, CheckCircle } from 'lucide-react';
+import { ArrowRight, ArrowLeft, LayoutGrid, Ruler, Shield, Package, Zap, Flame, Box, Microscope, Target, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -205,6 +205,22 @@ export default function Products({ products }: Props) {
     return () => observer.disconnect();
   }, []);
 
+  // Delayed attention glow on "Back to Products" button (10s after expanding)
+  const [showAttention, setShowAttention] = useState(false);
+  useEffect(() => {
+    if (!expanded) { setShowAttention(false); return; }
+    const timer = setTimeout(() => setShowAttention(true), 10000);
+    return () => clearTimeout(timer);
+  }, [expanded]);
+
+  // Delayed attention glow on "Explore More" button (10s on hero view)
+  const [showExploreAttention, setShowExploreAttention] = useState(false);
+  useEffect(() => {
+    if (expanded) { setShowExploreAttention(false); return; }
+    const timer = setTimeout(() => setShowExploreAttention(true), 10000);
+    return () => clearTimeout(timer);
+  }, [expanded, selectedSlug]);
+
   // Reset tab when switching product
   useEffect(() => {
     setActiveTab('overview');
@@ -393,7 +409,7 @@ export default function Products({ products }: Props) {
           style={{
             flex: leftFlex,
             transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-            filter: isLg ? 'drop-shadow(4px 0px 6px rgba(0, 0, 0, 0.4))' : undefined,
+            filter: isLg ? `drop-shadow(${language === 'ar' ? '-4px' : '4px'} 0px 6px rgba(0, 0, 0, 0.4))` : undefined,
           }}
         >
         <div
@@ -426,7 +442,11 @@ export default function Products({ products }: Props) {
                     </p>
                     <button
                       onClick={handleExplore}
-                      className="inline-flex items-center px-8 py-3 rounded-full border border-white/30 text-white hover:bg-white/10 transition-all cursor-pointer group"
+                      className={`inline-flex items-center px-8 py-3 rounded-full border text-white transition-all cursor-pointer group ${
+                        showExploreAttention
+                          ? 'border-primary/60 bg-white/10 animate-ring-pulse'
+                          : 'border-white/30 hover:bg-white/10'
+                      }`}
                     >
                       {t('products.exploreMore')}
                       <ArrowRight className="ms-2 rtl:rotate-180 group-hover:translate-x-1 transition-transform" size={18} />
@@ -465,10 +485,11 @@ export default function Products({ products }: Props) {
                     <div className="lg:hidden flex items-end justify-between mt-12 pb-4">
                       <button
                         onClick={handleBack}
-                        className="inline-flex items-center text-white/70 hover:text-white text-sm font-medium transition-colors cursor-pointer group"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/20 text-white/70 hover:text-white hover:border-white/40 hover:bg-white/10 text-xs font-medium transition-all cursor-pointer group"
                       >
-                        <ArrowLeft className="me-2 rtl:rotate-180 group-hover:-translate-x-1 transition-transform" size={16} />
+                        <LayoutGrid size={12} className="text-white/50 group-hover:text-white/70" />
                         {t('products.backToProducts')}
+                        <ArrowRight className="-rotate-90 group-hover:-translate-y-0.5 transition-transform" size={12} />
                       </button>
                       <div className="flex items-end justify-end">
                         {selectedProduct.image ? (
@@ -520,40 +541,51 @@ export default function Products({ products }: Props) {
           </div>
         )}
 
+        {/* Expanded: Back to Products — top-right */}
+        {expanded && (
+          <div className="hidden lg:flex absolute z-20 top-24 end-16 xl:end-24">
+            <motion.button
+              onClick={handleBack}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-medium transition-all cursor-pointer group ${
+                showAttention
+                  ? 'border-primary/60 text-white bg-white/10 animate-ring-pulse'
+                  : 'border-white/20 text-white/70 hover:text-white hover:border-white/40 hover:bg-white/10'
+              }`}
+            >
+              <LayoutGrid size={15} className={showAttention ? 'text-primary' : 'text-white/50 group-hover:text-white/70'} />
+              {t('products.backToProducts')}
+              <ArrowLeft className="rtl:rotate-180 group-hover:-translate-x-1 transition-transform" size={15} />
+            </motion.button>
+          </div>
+        )}
+
         {/* Expanded Product Image — absolutely positioned, bottom-right, floats above the panel */}
         {expanded && (
-          <div className="hidden lg:flex flex-col items-end absolute z-20 bottom-8 end-[15%] min-[1280px]:end-[12%] min-[1536px]:end-[8%] min-[1800px]:end-[5%]
-">
-            <div className="pointer-events-none">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={`expanded-img-${selectedSlug}`}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  {selectedProduct.image ? (
-                    <img
-                      src={selectedProduct.image}
-                      alt={getName(selectedProduct)}
-                      className="max-h-48 xl:max-h-60 w-auto object-contain drop-shadow-2xl"
-                    />
-                  ) : (
-                    <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center">
-                      <Package className="text-white/20" size={32} />
-                    </div>
-                  )}
-                </motion.div>
-              </AnimatePresence>
-            </div>
-            <button
-              onClick={handleBack}
-              className="mt-3 inline-flex items-center text-white/70 hover:text-white text-sm font-medium transition-colors cursor-pointer group"
-            >
-              <ArrowLeft className="me-2 rtl:rotate-180 group-hover:-translate-x-1 transition-transform" size={16} />
-              {t('products.backToProducts')}
-            </button>
+          <div className="hidden lg:flex absolute z-20 bottom-8 end-[15%] min-[1280px]:end-[12%] min-[1536px]:end-[8%] min-[1800px]:end-[5%] pointer-events-none">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`expanded-img-${selectedSlug}`}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.4 }}
+              >
+                {selectedProduct.image ? (
+                  <img
+                    src={selectedProduct.image}
+                    alt={getName(selectedProduct)}
+                    className="max-h-48 xl:max-h-60 w-auto object-contain drop-shadow-2xl"
+                  />
+                ) : (
+                  <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center">
+                    <Package className="text-white/20" size={32} />
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
         )}
         </div>
@@ -602,27 +634,30 @@ export default function Products({ products }: Props) {
                   </AnimatePresence>
                 </div>
 
-                {/* Mobile navigation arrows — just above thumbnails */}
-                <div className="flex lg:hidden items-center justify-center gap-3 mb-2">
-                  <button
-                    onClick={() => {
-                      const idx = products.findIndex(p => p.slug === selectedSlug);
-                      const prev = (idx - 1 + products.length) % products.length;
-                      handleSelectProduct(products[prev].slug);
-                    }}
-                    className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white/50 transition-colors cursor-pointer"
-                  >
-                    <ArrowLeft className="rtl:rotate-180" size={14} />
-                  </button>
+                {/* Mobile navigation — next product button */}
+                <div className="flex lg:hidden items-center justify-center mb-3">
                   <button
                     onClick={() => {
                       const idx = products.findIndex(p => p.slug === selectedSlug);
                       const next = (idx + 1) % products.length;
                       handleSelectProduct(products[next].slug);
                     }}
-                    className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white/50 transition-colors cursor-pointer"
+                    className="flex items-center justify-center gap-2 px-5 py-2 rounded-full border border-white/20 text-white/50 hover:text-white hover:border-white/40 transition-colors cursor-pointer text-sm uppercase tracking-wider"
                   >
-                    <ArrowRight className="rtl:rotate-180" size={14} />
+                    {(() => {
+                      const idx = products.findIndex(p => p.slug === selectedSlug);
+                      const next = (idx + 1) % products.length;
+                      const isWrapping = next < idx;
+                      return (
+                        <>
+                          {getName(products[next])}
+                          {isWrapping
+                            ? <ArrowLeft className="rtl:rotate-180" size={14} />
+                            : <ArrowRight className="rtl:rotate-180" size={14} />
+                          }
+                        </>
+                      );
+                    })()}
                   </button>
                 </div>
 
@@ -653,7 +688,7 @@ export default function Products({ products }: Props) {
                         </h3>
                       </div>
                       {product.slug === selectedSlug && (
-                        <div className="absolute top-0 inset-x-0 h-0.5 bg-primary" />
+                        <div className="absolute top-0 inset-x-0 h-0.5 bg-primary hidden lg:block" />
                       )}
                     </button>
                   ))}

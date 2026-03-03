@@ -66,6 +66,16 @@ html[dir="rtl"] body {
     animation: pulse-subtle 3s ease-in-out infinite;
 }
 
+/* Ring pulse glow for attention-grabbing buttons */
+@keyframes ring-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 122, 0, 0); }
+    50% { box-shadow: 0 0 12px 4px rgba(255, 122, 0, 0.4); }
+}
+
+.animate-ring-pulse {
+    animation: ring-pulse 2s ease-in-out infinite;
+}
+
 /* Custom scrollbar — thin, subtle, auto-hiding */
 .scrollbar-thin {
     scrollbar-width: thin;
