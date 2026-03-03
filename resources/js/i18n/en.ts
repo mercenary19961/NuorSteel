@@ -365,18 +365,29 @@ const en = {
   },
   certificates: {
     hero: {
+      label: "Certifications",
       title: "Supplier Approvals & Certificates",
-      subtitle: "Our commitment to quality and sustainability",
+      subtitle: "Our commitment to quality and sustainability is backed by internationally recognized certifications and approvals.",
     },
     esg: {
       title: "ESG & Sustainability",
+      description: "Environmental, social, and governance certifications demonstrating our commitment to sustainable practices.",
     },
     quality: {
       title: "Quality Certifications",
+      description: "Industry-standard quality management certifications ensuring excellence in every product.",
     },
     governance: {
       title: "Governance Documents",
+      description: "Corporate governance policies and codes of conduct guiding our operations.",
     },
+    backToCategories: "Back to Categories",
+    download: "Download",
+    viewCertificate: "View Certificate",
+    noCertificates: "No certificates available in this category.",
+    certificates: "Certificates",
+    issued: "Issued",
+    expires: "Expires",
   },
   contact: {
     hero: {
