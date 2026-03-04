@@ -34,7 +34,7 @@ class ContactController extends Controller
             'request_type' => 'required|in:vendor,partnership,careers,sustainability,general,quotation',
             'subject' => 'required|string|max:255',
             'message' => 'required|string|max:2000',
-            'file' => 'nullable|file|mimes:pdf|mimetypes:application/pdf|max:5120',
+            'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|mimetypes:application/pdf,image/jpeg,image/png|max:5120',
         ]);
 
         $filePath = null;

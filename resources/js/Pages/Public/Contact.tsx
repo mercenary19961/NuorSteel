@@ -139,8 +139,9 @@ export default function Contact({ content_en, content_ar }: Props) {
 
     const file = formData.get('file') as File;
     if (file && file.size > 0) {
-      if (file.type !== 'application/pdf') {
-        setFormError(t('contact.form.filePdfOnly'));
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        setFormError(t('contact.form.fileInvalidType'));
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
@@ -347,7 +348,7 @@ export default function Contact({ content_en, content_ar }: Props) {
                     <input
                       type="file"
                       name="file"
-                      accept=".pdf,application/pdf"
+                      accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
                       className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-primary/20 file:text-primary file:text-xs file:font-medium file:cursor-pointer focus:outline-none focus:border-primary/50"
                     />
                     <p className="text-xs text-gray-500 mt-1">

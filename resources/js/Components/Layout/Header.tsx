@@ -19,15 +19,15 @@ export default function Header() {
   const { language, toggleLanguage } = useLanguage();
   const { url } = usePage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { scrollDirection, isAtTop, isIdle } = useScrollDirection();
+  const { scrollDirection, isAtTop, isAtBottom, isIdle } = useScrollDirection();
 
   const isActive = (path: string) => {
     if (path === '/') return url === '/';
     return url.startsWith(path);
   };
 
-  // Hide header when scrolling down or idle for 3s (unless mobile menu is open or at top)
-  const isHidden = !mobileMenuOpen && !isAtTop && (scrollDirection === 'down' || isIdle);
+  // Hide header when scrolling down or idle for 3s (unless mobile menu is open, at top, or at bottom)
+  const isHidden = !mobileMenuOpen && !isAtTop && !isAtBottom && (scrollDirection === 'down' || isIdle);
 
   // Hide Contact CTA when on homepage hero (at top of page)
   const isHomepage = url === '/';
