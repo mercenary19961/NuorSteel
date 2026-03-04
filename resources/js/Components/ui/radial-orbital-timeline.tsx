@@ -28,19 +28,33 @@ export default function RadialOrbitalTimeline({
   const [pulseEffect, setPulseEffect] = useState<Record<number, boolean>>({});
   const [activeNodeId, setActiveNodeId] = useState<number | null>(null);
   const [orbitRadius, setOrbitRadius] = useState<number>(250);
+  const [nodeSize, setNodeSize] = useState<number>(40);
+  const [isLargeScreen, setIsLargeScreen] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const orbitRef = useRef<HTMLDivElement>(null);
   const nodeRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const updateRadius = () => {
-      setOrbitRadius(window.innerWidth < 640 ? 140 : window.innerWidth < 1024 ? 200 : 250);
+    const updateSizes = () => {
+      const w = window.innerWidth;
+      setOrbitRadius(w < 640 ? 140 : w < 1024 ? 200 : w < 1280 ? 280 : 320);
+      setNodeSize(w < 640 ? 40 : w < 1024 ? 40 : 56);
+      setIsLargeScreen(w >= 1024);
     };
-    updateRadius();
-    window.addEventListener('resize', updateRadius);
-    return () => window.removeEventListener('resize', updateRadius);
+    updateSizes();
+    window.addEventListener('resize', updateSizes);
+    return () => window.removeEventListener('resize', updateSizes);
   }, []);
+
+  const isDetailView = activeNodeId !== null && isLargeScreen;
+  const activeItem = activeNodeId !== null
+    ? timelineData.find((item) => item.id === activeNodeId) ?? null
+    : null;
+
+  // Shrink orbit when in detail view
+  const effectiveRadius = isDetailView ? 220 : orbitRadius;
+  const effectiveNodeSize = isDetailView ? 48 : nodeSize;
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === containerRef.current || e.target === orbitRef.current) {
@@ -117,7 +131,7 @@ export default function RadialOrbitalTimeline({
 
   const calculateNodePosition = (index: number, total: number) => {
     const angle = ((index / total) * 360 + rotationAngle) % 360;
-    const radius = orbitRadius;
+    const radius = effectiveRadius;
     const radian = (angle * Math.PI) / 180;
 
     const x = radius * Math.cos(radian);
@@ -137,6 +151,22 @@ export default function RadialOrbitalTimeline({
     return currentItem ? currentItem.relatedIds : [];
   };
 
+  const getTopNodeId = (): number => {
+    const total = timelineData.length;
+    let closestId = timelineData[0].id;
+    let closestDist = Infinity;
+    for (let i = 0; i < total; i++) {
+      const angle = ((i / total) * 360 + rotationAngle) % 360;
+      // Distance to 270° (top), wrapping around 360
+      const dist = Math.min(Math.abs(angle - 270), 360 - Math.abs(angle - 270));
+      if (dist < closestDist) {
+        closestDist = dist;
+        closestId = timelineData[i].id;
+      }
+    }
+    return closestId;
+  };
+
   const isRelatedToActive = (itemId: number): boolean => {
     if (!activeNodeId) return false;
     const relatedItems = getRelatedItems(activeNodeId);
@@ -145,11 +175,20 @@ export default function RadialOrbitalTimeline({
 
   return (
     <div
-      className="w-full h-150 lg:h-175 flex flex-col items-center justify-center overflow-hidden relative"
+      className={`w-full h-150 lg:h-185 xl:h-200 overflow-hidden relative ${
+        isDetailView
+          ? 'flex flex-row items-center'
+          : 'flex flex-col items-center justify-start lg:pt-8'
+      }`}
       ref={containerRef}
       onClick={handleContainerClick}
     >
-      <div className="relative w-full max-w-4xl h-full flex items-center justify-center">
+      {/* Orbit side */}
+      <div
+        className={`relative h-full flex items-center justify-center transition-all duration-700 ${
+          isDetailView ? 'w-1/2 shrink-0' : 'w-full max-w-4xl'
+        }`}
+      >
         <div
           className="absolute w-full h-full flex items-center justify-center"
           ref={orbitRef}
@@ -157,7 +196,22 @@ export default function RadialOrbitalTimeline({
             perspective: "1000px",
           }}
         >
-          <div className="absolute w-16 h-16 rounded-full bg-linear-to-br from-primary via-danger to-primary animate-pulse flex items-center justify-center z-10">
+          <div
+            className={`absolute w-16 h-16 rounded-full bg-linear-to-br from-primary via-danger to-primary animate-pulse flex items-center justify-center z-10 transition-all duration-300 ${
+              isDetailView ? 'cursor-pointer hover:scale-110 hover:shadow-lg hover:shadow-primary/40' : 'cursor-pointer hover:scale-105'
+            }`}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (isDetailView) {
+                setExpandedItems({});
+                setActiveNodeId(null);
+                setPulseEffect({});
+                setAutoRotate(true);
+              } else {
+                toggleItem(getTopNodeId());
+              }
+            }}
+          >
             <div className="absolute w-20 h-20 rounded-full border border-white/20 animate-ping opacity-70"></div>
             <div
               className="absolute w-24 h-24 rounded-full border border-white/10 animate-ping opacity-50"
@@ -167,8 +221,8 @@ export default function RadialOrbitalTimeline({
           </div>
 
           <div
-            className="absolute rounded-full border border-white/10"
-            style={{ width: orbitRadius * 2, height: orbitRadius * 2 }}
+            className="absolute rounded-full border border-white/10 transition-all duration-700"
+            style={{ width: effectiveRadius * 2, height: effectiveRadius * 2 }}
           ></div>
 
           {timelineData.map((item, index) => {
@@ -203,16 +257,16 @@ export default function RadialOrbitalTimeline({
                   }`}
                   style={{
                     background: `radial-gradient(circle, rgba(255,122,0,0.2) 0%, rgba(255,122,0,0) 70%)`,
-                    width: `${item.energy * 0.5 + 40}px`,
-                    height: `${item.energy * 0.5 + 40}px`,
-                    left: `-${(item.energy * 0.5 + 40 - 40) / 2}px`,
-                    top: `-${(item.energy * 0.5 + 40 - 40) / 2}px`,
+                    width: `${item.energy * 0.5 + effectiveNodeSize}px`,
+                    height: `${item.energy * 0.5 + effectiveNodeSize}px`,
+                    left: `-${(item.energy * 0.5) / 2}px`,
+                    top: `-${(item.energy * 0.5) / 2}px`,
                   }}
                 ></div>
 
                 <div
                   className={`
-                  w-10 h-10 rounded-full flex items-center justify-center
+                  rounded-full flex items-center justify-center
                   ${
                     isExpanded
                       ? "bg-primary text-white"
@@ -231,23 +285,26 @@ export default function RadialOrbitalTimeline({
                   transition-all duration-300 transform
                   ${isExpanded ? "scale-150" : ""}
                 `}
+                  style={{ width: effectiveNodeSize, height: effectiveNodeSize }}
                 >
-                  <Icon size={16} />
+                  <Icon size={effectiveNodeSize < 56 ? 16 : 22} />
                 </div>
 
                 <div
                   className={`
-                  absolute top-14 left-1/2 -translate-x-1/2 whitespace-nowrap text-center
-                  text-xs font-semibold tracking-wider
+                  absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-center
+                  font-semibold tracking-wider
                   transition-all duration-300
-                  ${isExpanded ? "text-primary scale-125" : "text-white/70"}
+                  ${isExpanded ? "text-white scale-125" : "text-white/70"}
                 `}
+                  style={{ top: effectiveNodeSize + 16, fontSize: effectiveNodeSize < 56 ? 12 : 13 }}
                 >
                   {item.title}
                 </div>
 
-                {isExpanded && (
-                  <div className="absolute top-28 left-1/2 -translate-x-1/2">
+                {/* Small card below node — mobile/tablet only (detail panel replaces it on lg+) */}
+                {isExpanded && !isDetailView && (
+                  <div className="absolute left-1/2 -translate-x-1/2" style={{ top: effectiveNodeSize + 72 }}>
                     <Card className="magic-card w-48 sm:w-64 bg-black/90 backdrop-blur-lg border-white/10 shadow-xl shadow-primary/10 overflow-visible">
                       <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-px h-10 bg-white/50 z-10"></div>
                       <CardHeader className="pb-2 relative z-10">
@@ -265,6 +322,32 @@ export default function RadialOrbitalTimeline({
             );
           })}
         </div>
+      </div>
+
+      {/* Detail panel — lg+ only */}
+      <div
+        className={`hidden lg:flex items-center transition-all duration-700 overflow-hidden ${
+          isDetailView ? 'w-1/2 opacity-100 px-8 xl:px-12' : 'w-0 opacity-0'
+        }`}
+      >
+        {activeItem && (
+          <div className="max-w-lg">
+            <div className="inline-flex items-center gap-2 mb-4">
+              <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
+                <activeItem.icon size={20} className="text-white" />
+              </div>
+              <span className="text-sm font-medium text-primary uppercase tracking-wider">
+                {activeItem.category}
+              </span>
+            </div>
+            <h3 className="text-2xl xl:text-3xl font-bold text-white mb-4">
+              {activeItem.title}
+            </h3>
+            <p className="text-base xl:text-lg text-white/70 leading-relaxed">
+              {activeItem.content}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

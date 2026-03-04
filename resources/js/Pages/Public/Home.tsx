@@ -239,12 +239,9 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       {/* Core Values Section */}
       <section id="section-core-values" className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl lg:text-4xl font-bold text-white text-center mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-white text-center">
             {content?.core_values?.title || t('home.coreValues.title')}
           </h2>
-          <p className="text-lg text-white/60 text-center mb-8 max-w-2xl mx-auto">
-            {t('home.coreValues.subtitle', 'Click on any node to explore our core values')}
-          </p>
           <MagicCardGrid>
             <RadialOrbitalTimeline timelineData={coreValuesData} />
           </MagicCardGrid>
