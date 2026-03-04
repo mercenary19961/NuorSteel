@@ -4,6 +4,7 @@ interface ScrollDirectionState {
     scrollDirection: 'up' | 'down';
     scrollY: number;
     isAtTop: boolean;
+    isAtBottom: boolean;
     isIdle: boolean;
 }
 
@@ -12,6 +13,7 @@ export function useScrollDirection(threshold = 10, idleTimeout = 3000): ScrollDi
         scrollDirection: 'up',
         scrollY: 0,
         isAtTop: true,
+        isAtBottom: false,
         isIdle: false,
     });
 
@@ -34,15 +36,17 @@ export function useScrollDirection(threshold = 10, idleTimeout = 3000): ScrollDi
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
             const atTop = currentScrollY <= 100;
+            const atBottom = (window.innerHeight + currentScrollY) >= (document.documentElement.scrollHeight - 100);
             const diff = currentScrollY - lastScrollY.current;
 
-            // Always update when at top (so header reappears reliably)
-            if (!atTop && Math.abs(diff) < threshold) return;
+            // Always update when at top or bottom (so header reappears reliably)
+            if (!atTop && !atBottom && Math.abs(diff) < threshold) return;
 
             setState({
                 scrollDirection: diff > 0 ? 'down' : 'up',
                 scrollY: currentScrollY,
                 isAtTop: atTop,
+                isAtBottom: atBottom,
                 isIdle: false,
             });
 

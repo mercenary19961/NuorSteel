@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 
 interface TimelineItem {
@@ -17,6 +17,9 @@ interface RadialOrbitalTimelineProps {
   timelineData: TimelineItem[];
 }
 
+const easeInOutCubic = (t: number) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
 export default function RadialOrbitalTimeline({
   timelineData,
 }: RadialOrbitalTimelineProps) {
@@ -33,6 +36,14 @@ export default function RadialOrbitalTimeline({
   const containerRef = useRef<HTMLDivElement>(null);
   const orbitRef = useRef<HTMLDivElement>(null);
   const nodeRefs = useRef<Record<number, HTMLDivElement | null>>({});
+
+  // Auto-cycle & traveling dot state
+  const [travelDot, setTravelDot] = useState<{
+    fromIndex: number;
+    toIndex: number;
+    progress: number;
+  } | null>(null);
+  const travelAnimRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -56,8 +67,69 @@ export default function RadialOrbitalTimeline({
   const effectiveRadius = isDetailView ? 220 : orbitRadius;
   const effectiveNodeSize = isDetailView ? 48 : nodeSize;
 
+  // Cancel any in-flight traveling dot animation
+  const cancelTravelDot = useCallback(() => {
+    if (travelAnimRef.current) {
+      cancelAnimationFrame(travelAnimRef.current);
+      travelAnimRef.current = null;
+    }
+    setTravelDot(null);
+  }, []);
+
+  // Self-chaining dot cycle (ref avoids useEffect chain and double-trigger)
+  const startCycleRef = useRef<(fromIdx: number, toIdx: number) => void>();
+  startCycleRef.current = (fromIdx: number, toIdx: number) => {
+    cancelTravelDot();
+    const duration = 8000;
+    const startTime = performance.now();
+
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      setTravelDot({ fromIndex: fromIdx, toIndex: toIdx, progress });
+
+      if (progress < 1) {
+        travelAnimRef.current = requestAnimationFrame(animate);
+      } else {
+        travelAnimRef.current = null;
+        setTravelDot(null);
+
+        // Select the target node inline (avoids useEffect → double cycle)
+        const targetId = timelineData[toIdx].id;
+        const newExpanded: Record<number, boolean> = {};
+        timelineData.forEach((item) => { newExpanded[item.id] = item.id === targetId; });
+        setExpandedItems(newExpanded);
+        setActiveNodeId(targetId);
+        setAutoRotate(false);
+
+        const relatedItems = timelineData.find((item) => item.id === targetId)?.relatedIds ?? [];
+        const newPulse: Record<number, boolean> = {};
+        relatedItems.forEach((relId) => { newPulse[relId] = true; });
+        setPulseEffect(newPulse);
+        centerViewOnNode(targetId);
+
+        // Chain to next node
+        const nextIdx = (toIdx + 1) % timelineData.length;
+        startCycleRef.current?.(toIdx, nextIdx);
+      }
+    };
+
+    travelAnimRef.current = requestAnimationFrame(animate);
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (travelAnimRef.current) {
+        cancelAnimationFrame(travelAnimRef.current);
+      }
+    };
+  }, []);
+
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === containerRef.current || e.target === orbitRef.current) {
+      cancelTravelDot();
+
       setExpandedItems({});
       setActiveNodeId(null);
       setPulseEffect({});
@@ -66,36 +138,39 @@ export default function RadialOrbitalTimeline({
   };
 
   const toggleItem = (id: number) => {
-    setExpandedItems((prev) => {
-      const newState = { ...prev };
-      Object.keys(newState).forEach((key) => {
-        if (parseInt(key) !== id) {
-          newState[parseInt(key)] = false;
-        }
-      });
+    cancelTravelDot();
 
-      newState[id] = !prev[id];
-
-      if (!prev[id]) {
-        setActiveNodeId(id);
-        setAutoRotate(false);
-
-        const relatedItems = getRelatedItems(id);
-        const newPulseEffect: Record<number, boolean> = {};
-        relatedItems.forEach((relId) => {
-          newPulseEffect[relId] = true;
-        });
-        setPulseEffect(newPulseEffect);
-
-        centerViewOnNode(id);
-      } else {
-        setActiveNodeId(null);
-        setAutoRotate(true);
-        setPulseEffect({});
-      }
-
-      return newState;
+    const isExpanding = !expandedItems[id];
+    const newState: Record<number, boolean> = {};
+    timelineData.forEach((item) => {
+      newState[item.id] = item.id === id ? isExpanding : false;
     });
+    setExpandedItems(newState);
+
+    if (isExpanding) {
+      setActiveNodeId(id);
+      setAutoRotate(false);
+
+      const relatedItems = getRelatedItems(id);
+      const newPulseEffect: Record<number, boolean> = {};
+      relatedItems.forEach((relId) => {
+        newPulseEffect[relId] = true;
+      });
+      setPulseEffect(newPulseEffect);
+
+      centerViewOnNode(id);
+
+      // Start auto-cycle dot
+      const currentIdx = timelineData.findIndex((item) => item.id === id);
+      if (currentIdx !== -1) {
+        const nextIdx = (currentIdx + 1) % timelineData.length;
+        startCycleRef.current?.(currentIdx, nextIdx);
+      }
+    } else {
+      setActiveNodeId(null);
+      setAutoRotate(true);
+      setPulseEffect({});
+    }
   };
 
   useEffect(() => {
@@ -203,6 +278,8 @@ export default function RadialOrbitalTimeline({
             onClick={(e) => {
               e.stopPropagation();
               if (isDetailView) {
+                cancelTravelDot();
+          
                 setExpandedItems({});
                 setActiveNodeId(null);
                 setPulseEffect({});
@@ -224,6 +301,37 @@ export default function RadialOrbitalTimeline({
             className="absolute rounded-full border border-white/10 transition-all duration-700"
             style={{ width: effectiveRadius * 2, height: effectiveRadius * 2 }}
           ></div>
+
+          {/* Traveling dot */}
+          {travelDot && (() => {
+            const total = timelineData.length;
+            const fromAngle = ((travelDot.fromIndex / total) * 360 + rotationAngle) % 360;
+            let toAngle = ((travelDot.toIndex / total) * 360 + rotationAngle) % 360;
+            // Ensure clockwise: toAngle should be greater than fromAngle
+            let angleDiff = toAngle - fromAngle;
+            if (angleDiff <= 0) angleDiff += 360;
+            const currentAngle = fromAngle + angleDiff * easeInOutCubic(travelDot.progress);
+            const radian = (currentAngle * Math.PI) / 180;
+            const dotX = effectiveRadius * Math.cos(radian);
+            const dotY = effectiveRadius * Math.sin(radian);
+
+            // Fade in during first 1.5s (0–0.1875), fade out during last 3s (0.625–1.0)
+            const p = travelDot.progress;
+            const dotOpacity = p < 0.1875 ? p / 0.1875 : p > 0.625 ? (1 - p) / 0.375 : 1;
+
+            return (
+              <div
+                className="absolute w-3 h-3 rounded-full bg-primary z-150 pointer-events-none transition-none"
+                style={{
+                  left: '50%',
+                  top: '50%',
+                  transform: `translate(calc(-50% + ${dotX}px), calc(-50% + ${dotY}px))`,
+                  opacity: dotOpacity,
+                  boxShadow: '0 0 10px 3px rgba(255,122,0,0.6), 0 0 20px 6px rgba(255,122,0,0.3)',
+                }}
+              />
+            );
+          })()}
 
           {timelineData.map((item, index) => {
             const position = calculateNodePosition(index, timelineData.length);

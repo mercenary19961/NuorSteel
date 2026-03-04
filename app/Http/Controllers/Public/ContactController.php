@@ -17,10 +17,9 @@ class ContactController extends Controller
 {
     public function index(): Response
     {
-        $locale = session('locale', 'en');
-
         return Inertia::render('Public/Contact', [
-            'content' => SiteContent::getPage('contact', $locale),
+            'content_en' => SiteContent::getPage('contact', 'en'),
+            'content_ar' => SiteContent::getPage('contact', 'ar'),
         ]);
     }
 
@@ -28,14 +27,14 @@ class ContactController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'company' => 'required|string|max:255',
+            'company' => 'nullable|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:50',
             'country' => 'required|string|max:100',
             'request_type' => 'required|in:vendor,partnership,careers,sustainability,general,quotation',
             'subject' => 'required|string|max:255',
             'message' => 'required|string|max:2000',
-            'file' => 'nullable|file|mimes:pdf|mimetypes:application/pdf|max:5120',
+            'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|mimetypes:application/pdf,image/jpeg,image/png|max:5120',
         ]);
 
         $filePath = null;
