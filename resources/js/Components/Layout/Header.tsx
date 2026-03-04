@@ -19,15 +19,15 @@ export default function Header() {
   const { language, toggleLanguage } = useLanguage();
   const { url } = usePage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { scrollDirection, isAtTop } = useScrollDirection();
+  const { scrollDirection, isAtTop, isIdle } = useScrollDirection();
 
   const isActive = (path: string) => {
     if (path === '/') return url === '/';
     return url.startsWith(path);
   };
 
-  // Hide header when scrolling down (unless mobile menu is open or at top)
-  const isHidden = scrollDirection === 'down' && !isAtTop && !mobileMenuOpen;
+  // Hide header when scrolling down or idle for 3s (unless mobile menu is open or at top)
+  const isHidden = !mobileMenuOpen && !isAtTop && (scrollDirection === 'down' || isIdle);
 
   return (
     <header
