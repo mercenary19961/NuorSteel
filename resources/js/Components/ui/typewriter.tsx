@@ -28,6 +28,7 @@ export function HeroTypewriter({
   const [cycleWordIndex, setCycleWordIndex] = useState(0);
   const [cycleCharIndex, setCycleCharIndex] = useState(0);
   const [showCursor, setShowCursor] = useState(true);
+  const [isFirstCycle, setIsFirstCycle] = useState(true);
   const completedRef = useRef(false);
 
   // Phase: typing — all lines advance one character per tick simultaneously
@@ -59,9 +60,13 @@ export function HeroTypewriter({
     if (typeof window === 'undefined' || phase !== 'waiting') return;
     if (cycleWords.length <= 1) return;
 
-    const timer = setTimeout(() => setPhase('deleting'), cycleDelay);
+    const delay = isFirstCycle ? cycleDelay : cycleDelay / 2;
+    const timer = setTimeout(() => {
+      setIsFirstCycle(false);
+      setPhase('deleting');
+    }, delay);
     return () => clearTimeout(timer);
-  }, [phase, cycleDelay, cycleWords.length]);
+  }, [phase, cycleDelay, cycleWords.length, isFirstCycle]);
 
   // Phase: deleting — remove characters one by one from the cycle word
   useEffect(() => {

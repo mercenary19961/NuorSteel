@@ -19,24 +19,28 @@ export default function Header() {
   const { language, toggleLanguage } = useLanguage();
   const { url } = usePage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isAtTop } = useScrollDirection();
+  const { scrollDirection, isAtTop, isIdle } = useScrollDirection();
 
   const isActive = (path: string) => {
     if (path === '/') return url === '/';
     return url.startsWith(path);
   };
 
-  // Hide header when scrolled away from top (unless mobile menu is open)
-  const isHidden = !isAtTop && !mobileMenuOpen;
+  // Hide header when scrolling down or idle for 3s (unless mobile menu is open or at top)
+  const isHidden = !mobileMenuOpen && !isAtTop && (scrollDirection === 'down' || isIdle);
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-white/20 ${
-        mobileMenuOpen ? 'bg-gray-900' : 'bg-transparent'
+        mobileMenuOpen
+          ? 'bg-gray-900'
+          : isAtTop
+            ? 'bg-transparent'
+            : 'bg-linear-to-b from-gray-900 to-gray-900/70'
       } ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}
     >
       <div className="px-4">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+        <div className={`flex items-center justify-between transition-all duration-300 ${isAtTop ? 'h-16 lg:h-20' : 'h-12 lg:h-14'}`}>
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <span className="text-xl lg:text-2xl font-bold text-white transition-colors duration-300">
