@@ -58,7 +58,7 @@
 - [x] Quality page (hero section + magic card assurance cards)
 - [x] Career page (hero section, magic card job listings, job detail modal, open application modal)
 - [x] Job detail page (standalone route kept as direct-link fallback; Career page uses modals)
-- [x] Certificates page
+- [x] Certificates page (category MagicCards → certificate grid → PDF viewer modal)
 - [x] Contact page (form with file upload)
 
 ### Homepage Redesign (DONE)
@@ -139,6 +139,24 @@
 - [x] ProductController `index()` updated to pass full bilingual data (both locales)
 - [x] i18n keys added for all product page content (EN + AR): tabs, specs, features, highlights
 
+### Certificates Page Redesign (DONE)
+- [x] Two-level navigation: 3 category MagicCards (ESG, Quality, Governance) → certificate grid (4 per row desktop)
+- [x] PDF viewer modal with iframe (browser-native PDF rendering), download button, dark overlay
+- [x] Public file serving route: `GET /certificates/{id}/file` (serves active certificates only)
+- [x] CertificateController updated for bilingual data (`content_en`/`content_ar`) + `file_view_url`
+- [x] Dark theme matching site design (`bg-linear-to-r from-gray-900 to-gray-800`)
+- [x] AnimatePresence transitions between category view and certificate list
+- [x] i18n keys added for category descriptions, navigation, and modal (EN + AR)
+- [x] Empty state handling for categories with no certificates
+- [x] Products page empty state guard (prevents crash when products table is empty)
+
+### Data Migrations for Production Seeding (DONE)
+- [x] Certificate data migration (`2026_03_03_102243_seed_certificates_data.php`) — seeds 9 PDFs via `DB::table()->updateOrInsert()`
+- [x] Products data migration (`2026_03_03_103058_seed_products_data.php`) — seeds TMT Bars + Billets with 16 specifications
+- [x] Data migrations run automatically via Railpack's `php artisan migrate --force` (no custom start command needed)
+- [x] Certificate PDFs tracked in git (`storage/app/private/certificates/`) via `.gitignore` exceptions
+- [x] CertificateSeeder updated: `created_by`/`updated_by` set to null (avoids FK violation on fresh DB)
+
 ### Misc Fixes (post-2026-03-01)
 - [x] Header: burger menu background color fix on mobile view
 - [x] Career page: multilingual support enhancements (bilingual i18n keys)
@@ -201,8 +219,9 @@
 - [x] Railway project set up (PHP 8.2 + Node 22 via Railpack)
 - [x] MySQL service provisioned on Railway
 - [x] `trustProxies` middleware configured for Railway HTTPS (`bootstrap/app.php`)
-- [ ] Railway environment variables (DB credentials, APP_KEY, APP_URL)
-- [ ] Run migrations + seeders on Railway
+- [x] Railway environment variables (DB credentials, APP_KEY, APP_URL)
+- [x] Data migrations for production seeding (certificates + products) — no custom start command needed
+- [x] Railpack default startup: migrate → storage:link → optimize:clear → optimize → FrankenPHP/Caddy
 - [ ] Enable SSR on Railway (start Node SSR server alongside PHP)
 
 ### LinkedIn Admin Management (DONE)
@@ -343,7 +362,8 @@ About Us | Products | Quality | Career | Certificates
 /quality                → Quality & certifications
 /career                 → Job listings + open application
 /career/{slug}          → Job detail
-/certificates           → Supplier approvals & certificates
+/certificates           → Supplier approvals & certificates (category → grid → PDF modal)
+/certificates/{id}/file → Public PDF file serving (inline, active only)
 /contact                → Get in Touch form
 ```
 
@@ -370,22 +390,20 @@ About Us | Products | Quality | Career | Certificates
 
 ## Certificates Categories
 
-### ESG (Sustainability)
-- EPD
-- HPD
-- NCEC
-- ISO 14001
-- ISO 45001
+### ESG (Sustainability) — 7 certificates
+- EPD (Environmental Product Declaration)
+- HPD (Health Product Declaration)
+- NCEC Certificate
+- ISO 14001 (Environmental Management)
+- ISO 45001 (Occupational Health & Safety)
+- SASO Quality Mark
+- ISO 50001 (Energy Management)
 
-### Quality
-- ISO 9001
-- MTC file
-- SASO test
-- Al Hoty calibration
+### Quality — 1 certificate
+- ISO 9001 (Quality Management System)
 
-### Governance
-- Integrated Policy
-- Code of Conduct
+### Governance — 1 certificate
+- Saudi Made Certificate
 
 ---
 
@@ -545,10 +563,16 @@ routes/web.php                 → All routes (public + admin)
 - Single service — Railpack builder with PHP 8.2 + Node 22
 - Build: `composer install && npm install && npm run build && php artisan migrate --force`
 - `npm run build` outputs client to `public/build/` + SSR bundle to `bootstrap/ssr/ssr.js`
+- **Web server**: FrankenPHP + Caddy (Railpack default)
+- **Startup sequence** (Railpack-generated, do NOT override with Custom Start Command):
+  `migrate --force` → `storage:link` → `optimize:clear` → `optimize` → `frankenphp run`
+- **Essential data**: Seeded via data migrations (not seeders) — runs automatically during `migrate --force`
+- **Pre-deploy limitation**: Railway pre-deploy containers cannot access private network (`mysql.railway.internal`) — use data migrations instead
 - **SSR in production**: Requires running `node bootstrap/ssr/ssr.js` alongside PHP (port 13714)
 - **Proxy**: Railway terminates SSL — `trustProxies(at: '*')` in `bootstrap/app.php` ensures HTTPS URLs
 - **SSR toggle**: `INERTIA_SSR_ENABLED=true/false` env var controls whether Laravel calls the SSR server
 - **Staging URL**: `https://nuorsteel-website-production.up.railway.app`
+- **Certificate PDFs**: Stored in `storage/app/private/certificates/`, tracked in git via `.gitignore` exceptions
 
 ### LinkedIn Integration
 - Method: **Manual CMS** (admin pastes embed code or URL — no API needed)
@@ -584,4 +608,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-03-03 — based on commit `341494d` (*feat: add subtle glow pulse animation for truncated table headers*)
+> **Last updated:** 2026-03-04 — based on commit `d7d4ec4` (*feat: add empty state handling for products and seed products data migration*)
