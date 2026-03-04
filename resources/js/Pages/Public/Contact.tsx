@@ -85,7 +85,7 @@ function RequestTypeSelect({
       </button>
 
       {open && (
-        <ul className="absolute z-50 mt-1 w-full max-h-60 overflow-auto bg-gray-900 border border-white/10 rounded-lg shadow-xl shadow-black/40 py-1">
+        <ul className="absolute z-50 mt-1 w-full max-h-60 overflow-auto scrollbar-thin bg-gray-900 border border-white/10 rounded-lg shadow-xl shadow-black/40 py-1">
           {requestTypes.map((option) => {
             const isSelected = option.value === value;
             return (
@@ -166,7 +166,7 @@ export default function Contact({ content_en, content_ar }: Props) {
       <Head title="Contact" />
 
       {/* Contact Content */}
-      <section className="bg-linear-to-r from-gray-900 to-gray-800 text-white pt-32 lg:pt-44 pb-24 lg:pb-32 min-h-screen">
+      <section className="bg-linear-to-r from-gray-900 to-gray-800 text-white pt-24 lg:pt-32 pb-24 lg:pb-32 min-h-screen">
         <div className="container mx-auto px-4">
           {/* Page header */}
           <div className="max-w-2xl mb-12 lg:mb-16">

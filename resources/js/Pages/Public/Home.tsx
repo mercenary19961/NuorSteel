@@ -148,7 +148,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
               >
                 <Link
                   href="/contact"
-                  className="inline-flex items-center mt-8 text-white/70 hover:text-white text-lg group transition-colors duration-200"
+                  className="inline-flex items-center mt-8 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 text-base group transition-all duration-300"
                 >
                   {t('home.hero.contactLink')}
                   <ArrowRight className="ltr:ml-2 rtl:mr-2 rtl:rotate-180 group-hover:ltr:translate-x-1 group-hover:rtl:-translate-x-1 transition-transform duration-200" size={20} />

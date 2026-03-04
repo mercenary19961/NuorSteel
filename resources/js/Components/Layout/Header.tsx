@@ -29,6 +29,10 @@ export default function Header() {
   // Hide header when scrolling down or idle for 3s (unless mobile menu is open or at top)
   const isHidden = !mobileMenuOpen && !isAtTop && (scrollDirection === 'down' || isIdle);
 
+  // Hide Contact CTA when on homepage hero (at top of page)
+  const isHomepage = url === '/';
+  const showContactCta = !(isHomepage && isAtTop);
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-white/20 ${
@@ -63,8 +67,18 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Language Toggle & Mobile Menu */}
-          <div className="flex items-center gap-4">
+          {/* Contact CTA + Language Toggle + Mobile Menu */}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/contact"
+              className={`hidden lg:inline-flex items-center px-4 py-1.5 text-sm font-semibold rounded-md transition-all duration-300 ${
+                isActive('/contact')
+                  ? 'bg-primary text-white shadow-lg shadow-primary/25'
+                  : 'bg-primary/90 text-white hover:bg-primary hover:shadow-lg hover:shadow-primary/25'
+              } ${showContactCta ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
+            >
+              {t('nav.contact')}
+            </Link>
             <button
               onClick={toggleLanguage}
               className="px-3 py-1.5 text-sm font-medium border border-white/30 text-white hover:bg-white/10 rounded-md transition-colors duration-200"
@@ -109,6 +123,17 @@ export default function Header() {
                       {t(item.labelKey)}
                     </Link>
                   ))}
+                  <Link
+                    href="/contact"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`mx-4 mt-2 px-4 py-2.5 text-sm font-semibold rounded-md text-center transition-colors ${
+                      isActive('/contact')
+                        ? 'bg-primary text-white'
+                        : 'bg-primary/90 text-white hover:bg-primary'
+                    }`}
+                  >
+                    {t('nav.contact')}
+                  </Link>
                 </div>
               </div>
             </motion.nav>
