@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Head, router, usePage } from '@inertiajs/react';
-import { Mail, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, CheckCircle, ChevronDown, Check } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { PageProps } from '@/types';
 
 const requestTypes = [
@@ -15,20 +16,123 @@ const requestTypes = [
 ];
 
 interface Props {
-  content: Record<string, Record<string, string>>;
+  content_en: Record<string, Record<string, string>>;
+  content_ar: Record<string, Record<string, string>>;
 }
 
-export default function Contact({ content }: Props) {
-  const { siteSettings } = usePage<PageProps>().props;
+function RequestTypeSelect({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+}) {
   const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const selected = requestTypes.find((o) => o.value === value);
+
+  useEffect(() => {
+    if (!open) return;
+    const handle = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handle);
+    return () => document.removeEventListener('mousedown', handle);
+  }, [open]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setOpen((p) => !p);
+    } else if (e.key === 'Escape') {
+      setOpen(false);
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!open) { setOpen(true); return; }
+      const idx = requestTypes.findIndex((o) => o.value === value);
+      const next = e.key === 'ArrowDown'
+        ? Math.min(idx + 1, requestTypes.length - 1)
+        : Math.max(idx - 1, 0);
+      onChange(requestTypes[next].value);
+    }
+  };
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((p) => !p)}
+        onKeyDown={handleKeyDown}
+        className={`
+          w-full flex items-center justify-between gap-2 px-4 py-2.5 text-sm rounded-lg transition-colors text-start cursor-pointer
+          ${open
+            ? 'bg-white/5 border border-primary/50 ring-1 ring-primary/30'
+            : 'bg-white/5 border border-white/10 hover:border-white/20'
+          }
+        `}
+      >
+        <span className={selected ? 'text-white' : 'text-gray-500'}>
+          {selected ? t(selected.labelKey) : placeholder}
+        </span>
+        <ChevronDown
+          size={16}
+          className={`shrink-0 text-gray-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+
+      {open && (
+        <ul className="absolute z-50 mt-1 w-full max-h-60 overflow-auto bg-gray-900 border border-white/10 rounded-lg shadow-xl shadow-black/40 py-1">
+          {requestTypes.map((option) => {
+            const isSelected = option.value === value;
+            return (
+              <li
+                key={option.value}
+                onClick={() => { onChange(option.value); setOpen(false); }}
+                className={`
+                  flex items-center justify-between gap-2 px-4 py-2.5 text-sm cursor-pointer transition-colors
+                  ${isSelected
+                    ? 'bg-primary/10 text-primary font-medium'
+                    : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                  }
+                `}
+              >
+                <span>{t(option.labelKey)}</span>
+                {isSelected && <Check size={14} className="shrink-0 text-primary" />}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {/* Hidden input for form submission */}
+      <input type="hidden" name="request_type" value={value} />
+    </div>
+  );
+}
+
+export default function Contact({ content_en, content_ar }: Props) {
+  const { siteSettings } = usePage<PageProps>().props;
+  const { language } = useLanguage();
+  const { t } = useTranslation();
+  const content = language === 'ar' ? content_ar : content_en;
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
   const [processing, setProcessing] = useState(false);
+  const [requestType, setRequestType] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormError('');
+
+    if (!requestType) {
+      setFormError(t('contact.form.selectTypeRequired', 'Please select a type of request.'));
+      return;
+    }
 
     const form = e.currentTarget;
     const formData = new FormData(form);
@@ -54,57 +158,65 @@ export default function Contact({ content }: Props) {
     });
   };
 
+  const inputClasses =
+    'w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30';
+
   return (
     <PublicLayout>
       <Head title="Contact" />
 
-      {/* Hero Section */}
-      <section className="bg-linear-to-br from-gray-900 to-gray-800 text-white pt-32 lg:pt-44 pb-16 lg:pb-24">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl lg:text-5xl font-bold mb-4">
-            {content?.overview?.title || t('contact.hero.title')}
-          </h1>
-          <p className="text-xl text-gray-300">
-            {content?.overview?.description || t('contact.hero.subtitle')}
-          </p>
-        </div>
-      </section>
-
       {/* Contact Content */}
-      <section className="py-16 lg:py-24">
+      <section className="bg-linear-to-r from-gray-900 to-gray-800 text-white pt-32 lg:pt-44 pb-24 lg:pb-32 min-h-screen">
         <div className="container mx-auto px-4">
+          {/* Page header */}
+          <div className="max-w-2xl mb-12 lg:mb-16">
+            <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
+              {t('contact.hero.title', 'Get in Touch')}
+            </p>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-4">
+              {content?.overview?.title || t('contact.hero.title')}
+            </h1>
+            <p className="text-lg text-gray-400 leading-relaxed">
+              {content?.overview?.description || t('contact.hero.subtitle')}
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Contact Info */}
             <div className="lg:col-span-1">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
                 {t('contact.info.title')}
-              </h2>
-              <div className="space-y-6">
-                <div className="flex items-start">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+              </p>
+              <div className="space-y-4">
+                <div className="bg-white/5 border border-white/10 rounded-xl p-5 flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                     <MapPin className="text-primary" size={20} />
                   </div>
-                  <div className="ml-4">
-                    <h3 className="font-medium text-gray-900">{t('contact.info.address')}</h3>
-                    <p className="text-gray-600">{siteSettings.address || 'Riyadh, Saudi Arabia'}</p>
+                  <div>
+                    <h3 className="font-medium text-white text-sm mb-1">{t('contact.info.address')}</h3>
+                    <p className="text-gray-400 text-sm">{siteSettings.address || 'Riyadh, Saudi Arabia'}</p>
                   </div>
                 </div>
-                <div className="flex items-start">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                <div className="bg-white/5 border border-white/10 rounded-xl p-5 flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                     <Phone className="text-primary" size={20} />
                   </div>
-                  <div className="ml-4">
-                    <h3 className="font-medium text-gray-900">{t('contact.info.phone')}</h3>
-                    <p className="text-gray-600">{siteSettings.phone}</p>
+                  <div>
+                    <h3 className="font-medium text-white text-sm mb-1">{t('contact.info.phone')}</h3>
+                    <a href={`tel:${siteSettings.phone}`} className="text-gray-400 text-sm hover:text-primary transition-colors">
+                      {siteSettings.phone}
+                    </a>
                   </div>
                 </div>
-                <div className="flex items-start">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                <div className="bg-white/5 border border-white/10 rounded-xl p-5 flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                     <Mail className="text-primary" size={20} />
                   </div>
-                  <div className="ml-4">
-                    <h3 className="font-medium text-gray-900">{t('contact.info.email')}</h3>
-                    <p className="text-gray-600">{siteSettings.email || 'info@nuorsteel.com'}</p>
+                  <div>
+                    <h3 className="font-medium text-white text-sm mb-1">{t('contact.info.email')}</h3>
+                    <a href={`mailto:${siteSettings.email || 'info@nuorsteel.com'}`} className="text-gray-400 text-sm hover:text-primary transition-colors">
+                      {siteSettings.email || 'info@nuorsteel.com'}
+                    </a>
                   </div>
                 </div>
               </div>
@@ -112,30 +224,30 @@ export default function Contact({ content }: Props) {
 
             {/* Contact Form */}
             <div className="lg:col-span-2">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
                 {t('contact.form.title')}
-              </h2>
+              </p>
 
               {submitted ? (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-                  <CheckCircle size={48} className="mx-auto text-green-600 mb-4" />
-                  <h3 className="text-lg font-medium text-green-800 mb-2">
+                <div className="bg-green-950/30 border border-green-500/20 rounded-xl p-8 text-center">
+                  <CheckCircle size={48} className="mx-auto text-green-400 mb-4" />
+                  <h3 className="text-lg font-medium text-green-300 mb-2">
                     {t('contact.form.successTitle')}
                   </h3>
-                  <p className="text-green-600">
+                  <p className="text-green-400/80">
                     {content?.form?.success_message || t('contact.form.successMessage')}
                   </p>
                 </div>
               ) : (
-                <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+                <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
                   {formError && (
-                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+                    <div className="p-3 bg-red-950/30 border border-red-500/20 rounded-lg text-sm text-red-300">
                       {formError}
                     </div>
                   )}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 mb-1">
                         {t('contact.form.name')} *
                       </label>
                       <input
@@ -143,23 +255,22 @@ export default function Contact({ content }: Props) {
                         name="name"
                         required
                         maxLength={255}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className={inputClasses}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {t('contact.form.company')} *
+                      <label className="block text-sm font-medium text-gray-300 mb-1">
+                        {t('contact.form.company')}
                       </label>
                       <input
                         type="text"
                         name="company"
-                        required
                         maxLength={255}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className={inputClasses}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 mb-1">
                         {t('contact.form.email')} *
                       </label>
                       <input
@@ -167,11 +278,11 @@ export default function Contact({ content }: Props) {
                         name="email"
                         required
                         maxLength={255}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className={inputClasses}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 mb-1">
                         {t('contact.form.phone')} *
                       </label>
                       <input
@@ -179,11 +290,11 @@ export default function Contact({ content }: Props) {
                         name="phone"
                         required
                         maxLength={50}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className={inputClasses}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 mb-1">
                         {t('contact.form.country')} *
                       </label>
                       <input
@@ -191,29 +302,22 @@ export default function Contact({ content }: Props) {
                         name="country"
                         required
                         maxLength={100}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className={inputClasses}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 mb-1">
                         {t('contact.form.requestType')} *
                       </label>
-                      <select
-                        name="request_type"
-                        required
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
-                      >
-                        <option value="">{t('contact.form.selectType')}</option>
-                        {requestTypes.map((type) => (
-                          <option key={type.value} value={type.value}>
-                            {t(type.labelKey)}
-                          </option>
-                        ))}
-                      </select>
+                      <RequestTypeSelect
+                        value={requestType}
+                        onChange={setRequestType}
+                        placeholder={t('contact.form.selectType')}
+                      />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
                       {t('contact.form.subject')} *
                     </label>
                     <input
@@ -221,11 +325,11 @@ export default function Contact({ content }: Props) {
                       name="subject"
                       required
                       maxLength={255}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className={inputClasses}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
                       {t('contact.form.message')} *
                     </label>
                     <textarea
@@ -233,18 +337,18 @@ export default function Contact({ content }: Props) {
                       required
                       rows={5}
                       maxLength={2000}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                      className={`${inputClasses} resize-none`}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
                       {t('contact.form.file')}
                     </label>
                     <input
                       type="file"
                       name="file"
                       accept=".pdf,application/pdf"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-primary/20 file:text-primary file:text-xs file:font-medium file:cursor-pointer focus:outline-none focus:border-primary/50"
                     />
                     <p className="text-xs text-gray-500 mt-1">
                       {t('contact.form.fileHint')}
@@ -253,10 +357,10 @@ export default function Contact({ content }: Props) {
                   <button
                     type="submit"
                     disabled={processing}
-                    className="inline-flex items-center px-6 py-3 bg-primary hover:bg-primary-dark disabled:bg-primary/60 text-white rounded-md font-medium transition-colors"
+                    className="inline-flex items-center px-6 py-3 bg-primary hover:bg-primary/90 disabled:bg-primary/40 text-white rounded-lg font-medium transition-colors cursor-pointer"
                   >
                     {processing ? t('contact.form.sending') : (content?.form?.submit_text || t('contact.form.submit'))}
-                    <Send className="ml-2" size={18} />
+                    <Send className="ms-2" size={18} />
                   </button>
                 </form>
               )}

@@ -113,14 +113,6 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
     );
   };
 
-  const scrollToFooter = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const footer = document.getElementById('site-footer');
-    footer?.scrollIntoView({ behavior: 'smooth' });
-    // Dispatch highlight event after scroll completes (~800ms for smooth scroll)
-    setTimeout(() => window.dispatchEvent(new CustomEvent('highlight-contact')), 900);
-  };
-
   return (
     <PublicLayout>
       <Head title="Home" />
@@ -149,17 +141,19 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
                 />
               </h1>
 
-              <motion.a
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: typingDone ? 1 : 0, y: typingDone ? 0 : 20 }}
                 transition={{ duration: 0.6, ease: 'easeOut' }}
-                href="#site-footer"
-                onClick={scrollToFooter}
-                className="inline-flex items-center mt-8 text-white/70 hover:text-white text-lg group transition-colors duration-200"
               >
-                {t('home.hero.contactLink')}
-                <ArrowRight className="ltr:ml-2 rtl:mr-2 rtl:rotate-180 group-hover:ltr:translate-x-1 group-hover:rtl:-translate-x-1 transition-transform duration-200" size={20} />
-              </motion.a>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center mt-8 text-white/70 hover:text-white text-lg group transition-colors duration-200"
+                >
+                  {t('home.hero.contactLink')}
+                  <ArrowRight className="ltr:ml-2 rtl:mr-2 rtl:rotate-180 group-hover:ltr:translate-x-1 group-hover:rtl:-translate-x-1 transition-transform duration-200" size={20} />
+                </Link>
+              </motion.div>
             </div>
           </div>
         </div>
