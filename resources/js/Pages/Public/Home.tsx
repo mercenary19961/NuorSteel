@@ -144,7 +144,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
                   cycleClassName="text-primary"
                   speed={60}
                   deleteSpeed={40}
-                  cycleDelay={5000}
+                  cycleDelay={3000}
                   onTypingComplete={() => setTypingDone(true)}
                 />
               </h1>
