@@ -63,16 +63,16 @@
 
 ### Homepage Redesign (DONE)
 - [x] Header: transparent overlay on all pages, fixed positioning
-- [x] Header: visible at top of page, hides on scroll (no show-on-scroll-up)
+- [x] Header: visible at top, hides on scroll down or after 3s idle (shows on scroll up), compact height when scrolled, gradient bg when not at top
 - [x] Hero: full-viewport (`h-screen`), gradient placeholder bg, staggered entrance animations
-- [x] Hero: H1 with multi-line typewriter effect — types lines simultaneously, then cycles keywords with delete/retype animation (`resources/js/Components/ui/typewriter.tsx`)
+- [x] Hero: H1 with multi-line typewriter effect — types lines simultaneously, then cycles keywords with delete/retype animation, longer first-cycle delay (`resources/js/Components/ui/typewriter.tsx`)
 - [x] Hero: "Contact Us" link fades in after typewriter completes, scrolls to footer + triggers orange glow on contact info (phone/email) for 10s
 - [x] Hero bottom links: 3 interactive links (About Us, Core Values, Sustainability) with hover image-reveal
 - [x] framer-motion for all hero animations + mobile menu `AnimatePresence`
-- [x] `useScrollDirection` custom hook (`resources/js/hooks/useScrollDirection.ts`)
+- [x] `useScrollDirection` custom hook with idle state detection (`resources/js/hooks/useScrollDirection.ts`)
 - [x] `HeroBottomLinks` component (`resources/js/Components/Public/HeroBottomLinks.tsx`)
 - [x] Homepage sections: About Us, Vision & Mission, Vision 2030, interactive Core Values, Products, LinkedIn, CTA — each with `id` for scroll navigation
-- [x] Core Values V2: RadialOrbitalTimeline component with orbital animation and rotating value cards (`resources/js/Components/ui/radial-orbital-timeline.tsx`)
+- [x] Core Values V2: RadialOrbitalTimeline component with orbital animation, rotating value cards, responsive node sizes, and detail panel on lg+ screens (`resources/js/Components/ui/radial-orbital-timeline.tsx`)
 - [x] Products section on homepage links to `/products` page (ISL-style redesign lives on dedicated Products page)
 - [x] All sections use unified left-to-right gradient (`bg-linear-to-r from-gray-900 to-gray-800`)
 - [x] LinkedIn feed: auto-rotating carousel with dot indicators, improved iframe sizing, RTL-aware chevron arrows
@@ -153,14 +153,20 @@
 ### Data Migrations for Production Seeding (DONE)
 - [x] Certificate data migration (`2026_03_03_102243_seed_certificates_data.php`) — seeds 9 PDFs via `DB::table()->updateOrInsert()`
 - [x] Products data migration (`2026_03_03_103058_seed_products_data.php`) — seeds TMT Bars + Billets with 16 specifications
+- [x] LinkedIn posts data migration (`2026_03_04_120000_seed_linkedin_posts_data.php`) — seeds 5 real Nuor Steel LinkedIn posts
 - [x] Data migrations run automatically via Railpack's `php artisan migrate --force` (no custom start command needed)
 - [x] Certificate PDFs tracked in git (`storage/app/private/certificates/`) via `.gitignore` exceptions
 - [x] CertificateSeeder updated: `created_by`/`updated_by` set to null (avoids FK violation on fresh DB)
 
-### Misc Fixes (post-2026-03-01)
+### Misc Fixes & Enhancements (post-2026-03-01)
 - [x] Header: burger menu background color fix on mobile view
+- [x] Header: improved scroll behavior — hides on scroll down or 3s idle, shows on scroll up, compact height + gradient bg when scrolled
 - [x] Career page: multilingual support enhancements (bilingual i18n keys)
 - [x] Quality page: minor content/translation updates
+- [x] Typewriter: first cycle delay longer than subsequent cycles (3s first, 1.5s after)
+- [x] RadialOrbitalTimeline: responsive node sizes (larger on desktop), detail panel slides in on lg+ when node selected, orbit shrinks in detail view, center node clickable (opens top node / closes detail view)
+- [x] Core values subtitle removed from homepage (cleaner layout)
+- [x] `useScrollDirection` hook: added `isIdle` state with configurable timeout (default 3s)
 
 ### Site-Wide Visual Consistency (DONE)
 - [x] Unified `bg-linear-to-r from-gray-900 to-gray-800` gradient across all public page sections (Home, About, Quality, Career)
@@ -220,7 +226,7 @@
 - [x] MySQL service provisioned on Railway
 - [x] `trustProxies` middleware configured for Railway HTTPS (`bootstrap/app.php`)
 - [x] Railway environment variables (DB credentials, APP_KEY, APP_URL)
-- [x] Data migrations for production seeding (certificates + products) — no custom start command needed
+- [x] Data migrations for production seeding (certificates, products, LinkedIn posts) — no custom start command needed
 - [x] Railpack default startup: migrate → storage:link → optimize:clear → optimize → FrankenPHP/Caddy
 - [ ] Enable SSR on Railway (start Node SSR server alongside PHP)
 
@@ -566,7 +572,7 @@ routes/web.php                 → All routes (public + admin)
 - **Web server**: FrankenPHP + Caddy (Railpack default)
 - **Startup sequence** (Railpack-generated, do NOT override with Custom Start Command):
   `migrate --force` → `storage:link` → `optimize:clear` → `optimize` → `frankenphp run`
-- **Essential data**: Seeded via data migrations (not seeders) — runs automatically during `migrate --force`
+- **Essential data**: Seeded via data migrations (certificates, products, LinkedIn posts) — runs automatically during `migrate --force`
 - **Pre-deploy limitation**: Railway pre-deploy containers cannot access private network (`mysql.railway.internal`) — use data migrations instead
 - **SSR in production**: Requires running `node bootstrap/ssr/ssr.js` alongside PHP (port 13714)
 - **Proxy**: Railway terminates SSL — `trustProxies(at: '*')` in `bootstrap/app.php` ensures HTTPS URLs
@@ -608,4 +614,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-03-04 — based on commit `d7d4ec4` (*feat: add empty state handling for products and seed products data migration*)
+> **Last updated:** 2026-03-04 — based on commit `5103294` (*feat: add migration to seed LinkedIn posts data into the database*)
