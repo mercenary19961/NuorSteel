@@ -71,7 +71,7 @@ export default function Header() {
           <div className="flex items-center gap-3">
             <Link
               href="/contact"
-              className={`hidden lg:inline-flex items-center px-4 py-1.5 text-sm font-semibold rounded-md transition-all duration-300 ${
+              className={`hidden lg:inline-flex items-center px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-300 ${
                 isActive('/contact')
                   ? 'bg-primary text-white shadow-lg shadow-primary/25'
                   : 'bg-primary/90 text-white hover:bg-primary hover:shadow-lg hover:shadow-primary/25'
