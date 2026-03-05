@@ -22,7 +22,7 @@ const en = {
       bottomLinks: {
         about: "About Us",
         coreValues: "Core Values",
-        sustainability: "Sustainability",
+        news: "News",
       },
     },
     about: {

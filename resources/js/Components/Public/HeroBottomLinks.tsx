@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 const links = [
   { labelKey: 'home.hero.bottomLinks.about', targetId: 'section-about' },
   { labelKey: 'home.hero.bottomLinks.coreValues', targetId: 'section-core-values' },
-  { labelKey: 'home.hero.bottomLinks.sustainability', targetId: 'section-sustainability' },
+  { labelKey: 'home.hero.bottomLinks.news', targetId: 'section-linkedin' },
 ];
 
 // Placeholder gradient colors for each link's hover image
