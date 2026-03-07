@@ -44,10 +44,12 @@
                     <div class="field-value">{{ $submission->name }}</div>
                 </div>
 
+                @if($submission->company)
                 <div class="field">
                     <div class="field-label">Company</div>
                     <div class="field-value">{{ $submission->company }}</div>
                 </div>
+                @endif
 
                 <div class="field">
                     <div class="field-label">Email</div>

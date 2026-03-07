@@ -253,7 +253,7 @@ export interface CareerApplication {
 export interface ContactSubmission {
   id: number;
   name: string;
-  company: string;
+  company: string | null;
   email: string;
   phone: string;
   country: string;
@@ -261,7 +261,6 @@ export interface ContactSubmission {
   subject: string;
   message: string;
   file_path: string | null;
-  file_url: string | null;
   is_read: boolean;
   is_archived: boolean;
   read_by: number | null;
@@ -331,7 +330,7 @@ export interface DashboardRecentApplication {
 export interface DashboardRecentContact {
   id: number;
   name: string;
-  company: string;
+  company: string | null;
   subject: string;
   request_type: string;
   is_read: boolean;
