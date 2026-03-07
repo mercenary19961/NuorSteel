@@ -3,33 +3,31 @@ import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
 import UndoButton from '@/Components/Admin/UndoButton';
-import { ChevronDown, ChevronRight, Save, Eye, ExternalLink, Maximize2, Minimize2, MousePointerClick, Home, Building2, Recycle, ShieldCheck, Briefcase, Award, Mail, type LucideIcon } from 'lucide-react';
+import { ChevronDown, ChevronRight, Save, Eye, ExternalLink, Maximize2, Minimize2, MousePointerClick, Home, Building2, ShieldCheck, Briefcase, Award, Mail, Package, type LucideIcon } from 'lucide-react';
 import type { SiteContent, UndoMeta } from '@/types';
 
 const PAGE_CONFIG: Record<string, { label: string; labelAr: string; icon: LucideIcon }> = {
   home: { label: 'Home', labelAr: 'الرئيسية', icon: Home },
   about: { label: 'About Us', labelAr: 'من نحن', icon: Building2 },
-  recycling: { label: 'Recycling', labelAr: 'إعادة التدوير', icon: Recycle },
+  products: { label: 'Products', labelAr: 'المنتجات', icon: Package },
   quality: { label: 'Quality', labelAr: 'الجودة', icon: ShieldCheck },
-  career: { label: 'Career', labelAr: 'الوظائف', icon: Briefcase },
   certificates: { label: 'Certificates', labelAr: 'الشهادات', icon: Award },
+  career: { label: 'Career', labelAr: 'الوظائف', icon: Briefcase },
   contact: { label: 'Contact', labelAr: 'تواصل معنا', icon: Mail },
 };
 
 const SECTION_LABELS: Record<string, string> = {
   hero: 'القسم الرئيسي',
-  features: 'المميزات',
   about: 'من نحن',
-  products: 'المنتجات',
-  certificates: 'الشهادات',
-  newsletter: 'النشرة الإخبارية',
-  cta: 'دعوة للتواصل',
+  vision_mission: 'الرؤية والرسالة',
+  vision2030: 'رؤية 2030',
+  core_values: 'القيم الأساسية',
   overview: 'نظرة عامة',
   vision: 'الرؤية',
   mission: 'المهمة',
   timeline: 'المسيرة',
   governance: 'الحوكمة',
-  process: 'العملية',
+  products: 'المنتجات',
   certifications: 'الاعتمادات',
   esg: 'البيئة والمجتمع والحوكمة',
   quality: 'الجودة',
@@ -49,15 +47,23 @@ const KEY_LABELS: Record<string, string> = {
   quality_description: 'وصف الجودة',
   sustainability_title: 'عنوان الاستدامة',
   sustainability_description: 'وصف الاستدامة',
-  certified_title: 'عنوان المنتجات المعتمدة',
-  certified_description: 'وصف المنتجات المعتمدة',
+  innovation_title: 'عنوان الابتكار',
+  innovation_description: 'وصف الابتكار',
+  strategic_growth_title: 'عنوان النمو الاستراتيجي',
+  strategic_growth_description: 'وصف النمو الاستراتيجي',
+  vision_title: 'عنوان الرؤية',
+  vision_description: 'وصف الرؤية',
+  mission_title: 'عنوان الرسالة',
+  mission_description: 'وصف الرسالة',
+  paragraph1: 'الفقرة الأولى',
+  paragraph2: 'الفقرة الثانية',
 };
 
 // Section display order per page (matches website layout)
 const SECTION_ORDER: Record<string, string[]> = {
-  home: ['hero', 'about', 'features', 'products', 'certificates', 'cta', 'newsletter'],
+  home: ['about', 'vision_mission', 'vision2030', 'core_values'],
   about: ['overview', 'vision', 'mission', 'timeline', 'governance'],
-  recycling: ['overview', 'process'],
+  products: ['overview'],
   quality: ['overview', 'certifications'],
   certificates: ['overview', 'esg', 'quality', 'governance'],
   career: ['overview', 'open_application'],
@@ -67,10 +73,10 @@ const SECTION_ORDER: Record<string, string[]> = {
 const PAGE_URLS: Record<string, string> = {
   home: '/',
   about: '/about',
-  recycling: '/about/recycling',
+  products: '/products',
   quality: '/quality',
-  career: '/career',
   certificates: '/certificates',
+  career: '/career',
   contact: '/contact',
 };
 
@@ -97,7 +103,12 @@ export default function Content({ content: contentByPage, undoMeta }: Props) {
     setHasChanges(false);
   }, [contentByPage]);
 
-  const pages = Object.keys(contentByPage);
+  const pageConfigOrder = Object.keys(PAGE_CONFIG);
+  const pages = Object.keys(contentByPage).sort((a, b) => {
+    const ai = pageConfigOrder.indexOf(a);
+    const bi = pageConfigOrder.indexOf(b);
+    return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+  });
 
   const togglePage = (page: string) => {
     setExpandedPages((prev) => {
