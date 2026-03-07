@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 const links = [
   { labelKey: 'home.hero.bottomLinks.about', targetId: 'section-about' },
   { labelKey: 'home.hero.bottomLinks.coreValues', targetId: 'section-core-values' },
-  { labelKey: 'home.hero.bottomLinks.sustainability', targetId: 'section-sustainability' },
+  { labelKey: 'home.hero.bottomLinks.news', targetId: 'section-linkedin' },
 ];
 
 // Placeholder gradient colors for each link's hover image
@@ -36,8 +36,8 @@ export default function HeroBottomLinks() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 + index * 0.15, duration: 0.5, ease: 'easeOut' }}
           >
-            {/* Image reveal container */}
-            <div className="relative h-24 sm:h-32 overflow-hidden mb-2 rounded-sm">
+            {/* Image reveal container — hidden on mobile */}
+            <div className="relative hidden sm:block h-32 overflow-hidden mb-2 rounded-sm">
               <div
                 className={`absolute inset-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out bg-linear-to-t ${gradients[index]}`}
               />
@@ -47,7 +47,7 @@ export default function HeroBottomLinks() {
             <div className="h-0.5 bg-white/30 group-hover:bg-primary transition-colors duration-300" />
 
             {/* Label */}
-            <p className="text-white/60 group-hover:text-white text-xs sm:text-sm mt-3 uppercase tracking-widest transition-colors duration-300 font-medium">
+            <p className="text-white/60 sm:group-hover:text-white text-xs sm:text-sm mt-2 sm:mt-3 uppercase tracking-widest transition-colors duration-300 font-medium">
               {t(link.labelKey)}
             </p>
           </motion.div>

@@ -118,14 +118,14 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       <Head title="Home" />
 
       {/* Hero Section — Full Viewport */}
-      <section id="section-hero" className="relative h-screen flex flex-col justify-between overflow-hidden">
+      <section id="section-hero" className="relative min-h-[87svh] lg:h-screen flex flex-col justify-between overflow-hidden">
         {/* Background + Overlay */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-linear-to-r from-gray-900 to-gray-800" />
         </div>
 
         {/* Main Content */}
-        <div className="relative z-10 flex-1 flex items-center">
+        <div className="relative z-10 flex-1 flex items-end pb-8 lg:items-center lg:pb-0">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl">
               <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-tight">
@@ -148,7 +148,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
               >
                 <Link
                   href="/contact"
-                  className="inline-flex items-center mt-8 px-6 py-3 border border-primary text-white hover:bg-primary/10 font-semibold rounded-lg text-base group transition-all duration-300"
+                  className="inline-flex items-center mt-4 lg:mt-8 px-6 py-3 border border-primary text-white hover:bg-primary/10 font-semibold rounded-lg text-base group transition-all duration-300"
                 >
                   {t('home.hero.contactLink')}
                   <ArrowRight className="ltr:ml-2 rtl:mr-2 rtl:rotate-180 group-hover:ltr:translate-x-1 group-hover:rtl:-translate-x-1 transition-transform duration-200" size={20} />
@@ -247,7 +247,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         <div className="flex flex-col lg:flex-row min-h-100 lg:min-h-137.5 lg:bg-white/20">
           {/* TMT Bars */}
           <Link
-            href="/products/tmt-bars"
+            href="/products"
             className="relative z-10 flex-1 overflow-hidden cursor-pointer group"
             style={{
               flex: hoveredProduct === 0 ? 1.4 : hoveredProduct === 1 ? 0.6 : 1,
@@ -285,7 +285,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
 
           {/* Billets */}
           <Link
-            href="/products/billets"
+            href="/products"
             className="relative flex-1 overflow-hidden cursor-pointer group lg:-ms-12"
             style={{
               flex: hoveredProduct === 1 ? 1.4 : hoveredProduct === 0 ? 0.6 : 1,
@@ -329,11 +329,8 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
             {/* Left column: info + controls (flips to right in RTL) */}
             <div className="lg:w-2/5 text-center lg:text-start">
-              <div className="w-16 h-16 bg-[#0A66C2] rounded-full flex items-center justify-center mx-auto lg:ms-0 lg:me-auto mb-6">
-                <Linkedin className="text-white" size={32} />
-              </div>
               <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
-                {t('home.linkedin.title')}
+                {t('home.hero.bottomLinks.news')}
               </h2>
               <p className="text-lg text-white/60 mb-8">
                 {t('home.linkedin.subtitle')}

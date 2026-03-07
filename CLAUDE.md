@@ -59,24 +59,24 @@
 - [x] Career page (hero section, magic card job listings, job detail modal, open application modal)
 - [x] Job detail page (standalone route kept as direct-link fallback; Career page uses modals)
 - [x] Certificates page (category MagicCards → certificate grid → PDF viewer modal)
-- [x] Contact page (form with file upload)
+- [x] Contact page (dark-theme form with file upload, custom RequestTypeSelect dropdown, bilingual content)
 
 ### Homepage Redesign (DONE)
 - [x] Header: transparent overlay on all pages, fixed positioning
 - [x] Header: visible at top, hides on scroll down or after 3s idle (shows on scroll up), compact height when scrolled, gradient bg when not at top
 - [x] Hero: full-viewport (`h-screen`), gradient placeholder bg, staggered entrance animations
 - [x] Hero: H1 with multi-line typewriter effect — types lines simultaneously, then cycles keywords with delete/retype animation, longer first-cycle delay (`resources/js/Components/ui/typewriter.tsx`)
-- [x] Hero: "Contact Us" link fades in after typewriter completes, scrolls to footer + triggers orange glow on contact info (phone/email) for 10s
-- [x] Hero bottom links: 3 interactive links (About Us, Core Values, Sustainability) with hover image-reveal
+- [x] Hero: "Contact Us" outline button fades in after typewriter completes, links directly to `/contact` page
+- [x] Hero bottom links: 3 interactive links (About Us, Core Values, News) with hover image-reveal (image reveal hidden on mobile)
 - [x] framer-motion for all hero animations + mobile menu `AnimatePresence`
 - [x] `useScrollDirection` custom hook with idle state detection (`resources/js/hooks/useScrollDirection.ts`)
 - [x] `HeroBottomLinks` component (`resources/js/Components/Public/HeroBottomLinks.tsx`)
-- [x] Homepage sections: About Us, Vision & Mission, Vision 2030, interactive Core Values, Products, LinkedIn, CTA — each with `id` for scroll navigation
-- [x] Core Values V2: RadialOrbitalTimeline component with orbital animation, rotating value cards, responsive node sizes, and detail panel on lg+ screens (`resources/js/Components/ui/radial-orbital-timeline.tsx`)
+- [x] Homepage sections: About Us, Vision & Mission, Vision 2030, interactive Core Values, Products, News (LinkedIn feed), CTA — each with `id` for scroll navigation
+- [x] Core Values V2: RadialOrbitalTimeline component with orbital animation, rotating value cards, responsive node sizes, detail panel on lg+ screens, and traveling dot auto-cycle with pause on hover (`resources/js/Components/ui/radial-orbital-timeline.tsx`)
 - [x] Products section on homepage links to `/products` page (ISL-style redesign lives on dedicated Products page)
 - [x] All sections use unified left-to-right gradient (`bg-linear-to-r from-gray-900 to-gray-800`)
-- [x] LinkedIn feed: auto-rotating carousel with dot indicators, improved iframe sizing, RTL-aware chevron arrows
-- [x] LinkedIn section uses CSS logical properties (`text-start`, `ms-0`/`me-auto`) for RTL support
+- [x] News (LinkedIn feed): auto-rotating carousel with dot indicators, improved iframe sizing, RTL-aware chevron arrows, section titled "News" (not "LinkedIn")
+- [x] News section uses CSS logical properties (`text-start`, `ms-0`/`me-auto`) for RTL support
 - [x] UI primitive components: Badge, Button, Card (`resources/js/Components/ui/`)
 - [x] MagicCard + MagicCardGrid: animated border glow bento effect (`resources/js/Components/ui/magic-card.tsx` + `magic-card.css`)
 - [x] ScrollToTop: fixed-position button with SVG progress ring, appears at 70% scroll (`resources/js/Components/ui/scroll-to-top.tsx`)
@@ -161,12 +161,24 @@
 ### Misc Fixes & Enhancements (post-2026-03-01)
 - [x] Header: burger menu background color fix on mobile view
 - [x] Header: improved scroll behavior — hides on scroll down or 3s idle, shows on scroll up, compact height + gradient bg when scrolled
+- [x] Header: conditional Contact CTA button — visible in desktop nav (hidden on homepage hero when at top, shows when scrolled or on other pages), also added to mobile menu
+- [x] Header: stays visible at bottom of page (`isAtBottom` check in scroll direction hook)
 - [x] Career page: multilingual support enhancements (bilingual i18n keys)
 - [x] Quality page: minor content/translation updates
 - [x] Typewriter: first cycle delay longer than subsequent cycles (3s first, 1.5s after)
 - [x] RadialOrbitalTimeline: responsive node sizes (larger on desktop), detail panel slides in on lg+ when node selected, orbit shrinks in detail view, center node clickable (opens top node / closes detail view)
+- [x] RadialOrbitalTimeline: traveling dot auto-cycles between nodes (8s per travel, eased with `easeInOutCubic`, fades in/out), pauses on detail panel hover, cancels on manual node click
 - [x] Core values subtitle removed from homepage (cleaner layout)
-- [x] `useScrollDirection` hook: added `isIdle` state with configurable timeout (default 3s)
+- [x] `useScrollDirection` hook: added `isIdle` state with configurable timeout (default 3s), added `isAtBottom` state
+- [x] Contact page: full dark-theme redesign — unified gradient bg, dark form inputs (`bg-white/5`, `border-white/10`), clickable phone/email links, custom `RequestTypeSelect` dropdown with keyboard navigation
+- [x] Contact page: bilingual content support (controller passes `content_en` + `content_ar`, client picks via `useLanguage()`)
+- [x] Contact form: company field changed from required to optional; file upload now accepts PDF, JPG, PNG (was PDF-only)
+- [x] Hero: "Contact Us" link changed from scroll-to-footer anchor to direct `/contact` page link with outline button style (`border border-primary`)
+- [x] Hero bottom links: "Sustainability" renamed to "News" (links to `section-linkedin` instead of `section-sustainability`)
+- [x] Hero bottom links: image reveal hidden on mobile (`hidden sm:block`), text-only cards on small screens
+- [x] Hero: responsive mobile layout — `min-h-[87svh] lg:h-screen`, content aligned to bottom (`items-end pb-8`) on mobile, centered on desktop
+- [x] Home: product cards link to `/products` (generic listing page) instead of product-specific routes
+- [x] Home: LinkedIn section renamed to "News" (removed LinkedIn icon, uses `t('home.hero.bottomLinks.news')` title)
 
 ### Site-Wide Visual Consistency (DONE)
 - [x] Unified `bg-linear-to-r from-gray-900 to-gray-800` gradient across all public page sections (Home, About, Quality, Career)
@@ -256,11 +268,12 @@
 - Header text: "Nuor Steel Industry Company"
 - Browser title format: "Nuor Steel | {Page Name}"
 
-### Navigation (5 items in navbar)
+### Navigation (5 items in navbar + Contact CTA)
 ```
-About Us | Products | Quality | Career | Certificates
+About Us | Products | Quality | Career | Certificates | [Contact Us]
 ```
-- "Contact" was removed from the navbar — contact info lives in the footer
+- Contact CTA button appears in desktop nav (hidden on homepage hero when at top, visible when scrolled or on other pages)
+- Contact also in mobile menu as nav item
 
 ### CMS Approach
 - **Hybrid model**: Fixed page structure + editable content + CRUD for data
@@ -297,14 +310,14 @@ About Us | Products | Quality | Career | Certificates
 ## Contact Form Fields
 
 1. Name (required)
-2. Company (required)
+2. Company (optional)
 3. Email (required)
 4. Phone (required)
 5. Country (required, dropdown)
-6. Type of Request (required, dropdown)
+6. Type of Request (required, custom RequestTypeSelect dropdown with keyboard navigation)
 7. Subject (required)
 8. Message (required, max 2000 chars)
-9. File Upload (optional, PDF, max 5MB)
+9. File Upload (optional, PDF/JPG/PNG, max 5MB)
 
 **Request Types:**
 - Vendor Registration
@@ -507,7 +520,7 @@ Security is extremely important for this project. Every code change must conside
 |------|----------|---------|
 | Images | 5MB | JPEG, PNG, WebP |
 | CVs | 5MB | PDF only |
-| Attachments | 5MB | PDF only |
+| Attachments | 5MB | PDF, JPG, PNG |
 | Certificates | 10MB | PDF |
 
 ### Local Development
@@ -614,4 +627,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-03-04 — based on commit `5103294` (*feat: add migration to seed LinkedIn posts data into the database*)
+> **Last updated:** 2026-03-07 — based on commit `7bf9c72` (*feat: implement pause functionality for travel animation in RadialOrbitalTimeline and update Home links for better navigation*)

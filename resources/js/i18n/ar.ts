@@ -22,7 +22,7 @@ const ar = {
       bottomLinks: {
         about: "من نحن",
         coreValues: "قيمنا الأساسية",
-        sustainability: "الاستدامة",
+        news: "أخبار",
       },
     },
     about: {
