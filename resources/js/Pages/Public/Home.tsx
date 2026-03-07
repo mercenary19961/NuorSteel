@@ -247,7 +247,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         <div className="flex flex-col lg:flex-row min-h-100 lg:min-h-137.5 lg:bg-white/20">
           {/* TMT Bars */}
           <Link
-            href="/products/tmt-bars"
+            href="/products"
             className="relative z-10 flex-1 overflow-hidden cursor-pointer group"
             style={{
               flex: hoveredProduct === 0 ? 1.4 : hoveredProduct === 1 ? 0.6 : 1,
@@ -285,7 +285,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
 
           {/* Billets */}
           <Link
-            href="/products/billets"
+            href="/products"
             className="relative flex-1 overflow-hidden cursor-pointer group lg:-ms-12"
             style={{
               flex: hoveredProduct === 1 ? 1.4 : hoveredProduct === 0 ? 0.6 : 1,
@@ -329,11 +329,8 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
             {/* Left column: info + controls (flips to right in RTL) */}
             <div className="lg:w-2/5 text-center lg:text-start">
-              <div className="w-16 h-16 bg-[#0A66C2] rounded-full flex items-center justify-center mx-auto lg:ms-0 lg:me-auto mb-6">
-                <Linkedin className="text-white" size={32} />
-              </div>
               <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
-                {t('home.linkedin.title')}
+                {t('home.hero.bottomLinks.news')}
               </h2>
               <p className="text-lg text-white/60 mb-8">
                 {t('home.linkedin.subtitle')}

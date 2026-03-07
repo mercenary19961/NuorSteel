@@ -43,6 +43,8 @@ export default function RadialOrbitalTimeline({
     toIndex: number;
     progress: number;
   } | null>(null);
+  const cyclePausedRef = useRef(false);
+  const pauseOffsetRef = useRef(0);
   const travelAnimRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -77,13 +79,24 @@ export default function RadialOrbitalTimeline({
   }, []);
 
   // Self-chaining dot cycle (ref avoids useEffect chain and double-trigger)
-  const startCycleRef = useRef<(fromIdx: number, toIdx: number) => void>();
+  const startCycleRef = useRef<(fromIdx: number, toIdx: number) => void>(undefined);
   startCycleRef.current = (fromIdx: number, toIdx: number) => {
     cancelTravelDot();
+    cyclePausedRef.current = false;
+    pauseOffsetRef.current = 0;
     const duration = 8000;
-    const startTime = performance.now();
+    let startTime = performance.now();
 
     const animate = (now: number) => {
+      if (cyclePausedRef.current) {
+        if (pauseOffsetRef.current === 0) pauseOffsetRef.current = now;
+        travelAnimRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      if (pauseOffsetRef.current > 0) {
+        startTime += now - pauseOffsetRef.current;
+        pauseOffsetRef.current = 0;
+      }
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
       setTravelDot({ fromIndex: fromIdx, toIndex: toIdx, progress });
@@ -437,6 +450,8 @@ export default function RadialOrbitalTimeline({
         className={`hidden lg:flex items-center transition-all duration-700 overflow-hidden ${
           isDetailView ? 'w-1/2 opacity-100 px-8 xl:px-12' : 'w-0 opacity-0'
         }`}
+        onMouseEnter={() => { cyclePausedRef.current = true; }}
+        onMouseLeave={() => { cyclePausedRef.current = false; }}
       >
         {activeItem && (
           <div className="max-w-lg">
