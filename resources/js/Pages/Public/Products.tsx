@@ -331,7 +331,7 @@ export default function Products({ products }: Props) {
             </div>
 
             {/* Spec Highlight Icons */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8">
+            <div className="grid grid-cols-3 gap-6 mt-8">
               {Object.entries(t(`products.${productKey}.specIcons`, { returnObjects: true }) as Record<string, { title: string; value: string }>).map(([key, icon]) => (
                 <div key={key} className="text-center">
                   <div className="w-14 h-14 mx-auto mb-3 border border-white/20 rounded-lg flex items-center justify-center">
