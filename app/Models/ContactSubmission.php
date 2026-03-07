@@ -53,11 +53,6 @@ class ContactSubmission extends Model
         return $this->belongsTo(User::class, 'read_by');
     }
 
-    public function getFileUrlAttribute(): ?string
-    {
-        return $this->file_path ? url('/api/v1/admin/contacts/' . $this->id . '/download-attachment') : null;
-    }
-
     public function hasFile(): bool
     {
         return !empty($this->file_path);

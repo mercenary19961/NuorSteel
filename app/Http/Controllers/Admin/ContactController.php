@@ -96,6 +96,7 @@ class ContactController extends Controller
             abort(404, 'No file attached.');
         }
 
-        return Storage::download($submission->file_path, $submission->name . '_attachment.pdf');
+        $extension = pathinfo($submission->file_path, PATHINFO_EXTENSION) ?: 'pdf';
+        return Storage::download($submission->file_path, $submission->name . '_attachment.' . $extension);
     }
 }

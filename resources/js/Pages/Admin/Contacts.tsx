@@ -145,7 +145,7 @@ export default function Contacts({ submissions, filters, undoMeta, undoModelId }
             <p className={`text-sm ${item.is_read ? 'text-gray-700' : 'font-semibold text-gray-900'}`}>
               {item.name}
             </p>
-            <p className="text-xs text-gray-500">{item.company}</p>
+            {item.company && <p className="text-xs text-gray-500">{item.company}</p>}
           </div>
         </div>
       ),
@@ -297,10 +297,12 @@ export default function Contacts({ submissions, filters, undoMeta, undoModelId }
                   <p className="text-xs text-gray-500">Name</p>
                   <p className="text-sm font-medium text-gray-900">{viewItem.name}</p>
                 </div>
+                {viewItem.company && (
                 <div>
                   <p className="text-xs text-gray-500">Company</p>
                   <p className="text-sm text-gray-700">{viewItem.company}</p>
                 </div>
+                )}
                 <div className="min-w-0">
                   <p className="text-xs text-gray-500">Email</p>
                   <a href={`mailto:${viewItem.email}`} className="text-sm text-primary hover:underline flex items-center gap-1 min-w-0" title={viewItem.email}>

@@ -44,7 +44,7 @@ class ContactController extends Controller
 
         $submission = ContactSubmission::create([
             'name' => trim(strip_tags($request->name)),
-            'company' => trim(strip_tags($request->company)),
+            'company' => $request->company ? trim(strip_tags($request->company)) : null,
             'email' => trim($request->email),
             'phone' => trim(strip_tags($request->phone)),
             'country' => trim(strip_tags($request->country)),
