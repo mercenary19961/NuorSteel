@@ -41,7 +41,8 @@ class Media extends Model
             $media->created_at = now();
         });
 
-        static::deleting(function (Media $media) {
+        // Only delete physical file on permanent (force) delete, not soft delete
+        static::forceDeleting(function (Media $media) {
             Storage::delete($media->path);
         });
     }
