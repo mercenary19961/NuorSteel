@@ -99,7 +99,11 @@ export default function ProductsIndex({ products, categories, filters, undoMeta,
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {products.data.map((item) => {
-              const imageUrl = item.featured_image?.url;
+              const staticImages: Record<string, string> = {
+                'tmt-bars': '/images/products/tmt-bars-desktop.png',
+                'billets': '/images/products/billets-desktop.png',
+              };
+              const imageUrl = staticImages[item.slug] || item.featured_image?.url;
 
               return (
                 <div
@@ -107,7 +111,7 @@ export default function ProductsIndex({ products, categories, filters, undoMeta,
                   className="bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all overflow-hidden flex flex-col"
                 >
                   {/* Image */}
-                  <div className="relative h-48 bg-gray-100">
+                  <div className="relative h-96 bg-gray-100">
                     {imageUrl ? (
                       <img
                         src={imageUrl}
