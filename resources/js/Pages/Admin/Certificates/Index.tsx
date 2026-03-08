@@ -155,7 +155,7 @@ export default function CertificatesIndex({ certificates, filters, categoryCount
                 <p className="text-sm text-gray-400">Click "Add Certificate" to add one.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {certificates.data.map((item) => {
                   const thumbnailUrl = item.thumbnail?.url;
                   const expiryStatus = getExpiryStatus(item.expiry_date);
@@ -165,97 +165,92 @@ export default function CertificatesIndex({ certificates, filters, categoryCount
                       key={item.id}
                       className="bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all overflow-hidden flex flex-col"
                     >
-                      {/* Category color band */}
-                      <div className="h-1.5 bg-primary" />
+                      {/* PDF Preview */}
+                      <div className="relative w-full h-56 bg-gray-50 border-b border-gray-100 overflow-hidden">
+                        {thumbnailUrl ? (
+                          <img
+                            src={thumbnailUrl}
+                            alt={item.title_en}
+                            className="w-full h-full object-contain p-2"
+                          />
+                        ) : (
+                          <iframe
+                            src={`/admin/certificates/${item.id}/file#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+                            className="absolute top-0 left-0 w-[200%] h-[200%] origin-top-left scale-50 pointer-events-none border-0"
+                            title={item.title_en}
+                            tabIndex={-1}
+                          />
+                        )}
+                        {/* Status badge overlay */}
+                        <div className="absolute top-2 right-2">
+                          <StatusBadge
+                            status={item.is_active ? 'active' : 'inactive'}
+                            size="sm"
+                          />
+                        </div>
+                        {/* Expiry badge overlay */}
+                        {(expiryStatus === 'expired' || expiryStatus === 'expiring') && (
+                          <div className="absolute top-2 left-2">
+                            {expiryStatus === 'expired' && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full bg-red-100 text-red-700">
+                                <AlertTriangle size={10} /> Expired
+                              </span>
+                            )}
+                            {expiryStatus === 'expiring' && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full bg-yellow-100 text-yellow-700">
+                                <AlertTriangle size={10} /> Expiring Soon
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
 
-                      <div className="flex flex-1">
-                        {/* Thumbnail / Placeholder */}
-                        <div className="w-36 shrink-0 bg-gray-50 flex items-center justify-center border-r border-gray-100">
-                          {thumbnailUrl ? (
-                            <img
-                              src={thumbnailUrl}
-                              alt={item.title_en}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="flex flex-col items-center gap-2 p-4 text-gray-300">
-                              <FileText size={36} />
-                              <span className="text-[10px] font-medium uppercase tracking-wider">PDF</span>
-                            </div>
+                      {/* Content */}
+                      <div className="flex-1 p-4 flex flex-col min-w-0">
+                        <h3 className="font-semibold text-gray-900 text-sm truncate">
+                          {item.title_en}
+                        </h3>
+                        <p className="text-xs text-gray-500 truncate mt-0.5" dir="rtl">
+                          {item.title_ar}
+                        </p>
+
+                        {/* Dates */}
+                        <div className="flex items-center gap-3 mt-auto pt-3 text-xs text-gray-400">
+                          {item.issue_date && (
+                            <span>Issued: {new Date(item.issue_date).toLocaleDateString()}</span>
+                          )}
+                          {item.expiry_date && (
+                            <span>Expires: {new Date(item.expiry_date).toLocaleDateString()}</span>
+                          )}
+                          {!item.issue_date && !item.expiry_date && (
+                            <span>No dates set</span>
                           )}
                         </div>
 
-                        {/* Content */}
-                        <div className="flex-1 p-4 flex flex-col min-w-0">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="min-w-0 flex-1">
-                              <h3 className="font-semibold text-gray-900 text-base truncate">
-                                {item.title_en}
-                              </h3>
-                              <p className="text-sm text-gray-500 truncate" dir="rtl">
-                                {item.title_ar}
-                              </p>
-                            </div>
-                            <StatusBadge
-                              status={item.is_active ? 'active' : 'inactive'}
-                              size="sm"
-                            />
-                          </div>
-
-                          {/* Expiry badges */}
-                          {(expiryStatus === 'expired' || expiryStatus === 'expiring') && (
-                            <div className="flex items-center gap-2 mt-2">
-                              {expiryStatus === 'expired' && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full bg-red-100 text-red-700">
-                                  <AlertTriangle size={10} /> Expired
-                                </span>
-                              )}
-                              {expiryStatus === 'expiring' && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full bg-yellow-100 text-yellow-700">
-                                  <AlertTriangle size={10} /> Expiring Soon
-                                </span>
-                              )}
-                            </div>
-                          )}
-
-                          {/* Dates */}
-                          <div className="flex items-center gap-4 mt-auto pt-3 text-xs text-gray-400">
-                            {item.issue_date && (
-                              <span>Issued: {new Date(item.issue_date).toLocaleDateString()}</span>
-                            )}
-                            {item.expiry_date && (
-                              <span>Expires: {new Date(item.expiry_date).toLocaleDateString()}</span>
-                            )}
-                            {!item.issue_date && !item.expiry_date && (
-                              <span>No dates set</span>
-                            )}
-                          </div>
-
-                          {/* Actions */}
-                          <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-                            <button
-                              onClick={() => setViewingPdf(item)}
-                              className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary-dark transition-colors"
+                        {/* Actions */}
+                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                          <button
+                            onClick={() => setViewingPdf(item)}
+                            className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary-dark transition-colors cursor-pointer"
+                          >
+                            <Eye size={13} />
+                            View PDF
+                          </button>
+                          <div className="flex items-center gap-1">
+                            <Link
+                              href={`/admin/certificates/${item.id}/edit`}
+                              className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                              title="Edit"
                             >
-                              <Eye size={13} />
-                              View PDF
+                              <Pencil size={16} />
+                            </Link>
+                            <button
+                              onClick={() => setDeleteTarget(item)}
+                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 size={16} />
                             </button>
-                            <div className="flex items-center gap-1">
-                              <Link
-                                href={`/admin/certificates/${item.id}/edit`}
-                                className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
-                                title="Edit"
-                              >
-                                <Pencil size={16} />
-                              </Link>
-                              <button
-                                onClick={() => setDeleteTarget(item)}
-                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                title="Delete"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            </div>
                           </div>
                         </div>
                       </div>
