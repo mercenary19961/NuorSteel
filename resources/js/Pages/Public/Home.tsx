@@ -34,6 +34,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       content: content?.core_values?.quality_description || t('home.coreValues.quality.description'),
       category: 'Quality',
       icon: ShieldCheck,
+      image: '/images/core-values/quality.webp',
       relatedIds: [2, 4],
       status: 'completed' as const,
       energy: 100,
@@ -45,6 +46,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       content: content?.core_values?.sustainability_description || t('home.coreValues.sustainability.description'),
       category: 'Sustainability',
       icon: Leaf,
+      image: '/images/core-values/sustainability.webp',
       relatedIds: [1, 3],
       status: 'completed' as const,
       energy: 95,
@@ -56,6 +58,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       content: content?.core_values?.innovation_description || t('home.coreValues.innovation.description'),
       category: 'Innovation',
       icon: Lightbulb,
+      image: '/images/core-values/innovation.webp',
       relatedIds: [2, 4],
       status: 'completed' as const,
       energy: 90,
@@ -67,6 +70,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       content: content?.core_values?.strategic_growth_description || t('home.coreValues.strategicGrowth.description'),
       category: 'Growth',
       icon: TrendingUp,
+      image: '/images/core-values/strategic-growth.webp',
       relatedIds: [1, 3],
       status: 'completed' as const,
       energy: 85,
@@ -121,7 +125,15 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       <section id="section-hero" className="relative min-h-[87svh] lg:h-screen flex flex-col justify-between overflow-hidden">
         {/* Background + Overlay */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-linear-to-r from-gray-900 to-gray-800" />
+          <picture>
+            <source media="(max-width: 1023px)" srcSet="/images/hero/hero-mobile.png" />
+            <img
+              src="/images/hero/hero-desktop.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </picture>
+          <div className="absolute inset-0 bg-gray-900/60" />
         </div>
 
         {/* Main Content */}
@@ -165,7 +177,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* About Section */}
-      <section id="section-about" className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800">
+      <section id="section-about" className="py-16 lg:py-24 bg-black">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
@@ -186,7 +198,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* Vision & Mission Section */}
-      <section id="section-vision-mission" className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800">
+      <section id="section-vision-mission" className="py-16 lg:py-24 bg-black">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl lg:text-4xl font-bold text-white text-center mb-12">
             {content?.vision_mission?.title || t('home.visionMission.title')}
@@ -217,27 +229,62 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* Vision 2030 Section */}
-      <section id="section-vision-2030" className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800 text-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto space-y-6">
-            <p className="text-lg leading-relaxed text-white/90">
-              {content?.vision2030?.paragraph1 || t('home.vision2030.paragraph1')}
-            </p>
-            <p className="text-lg leading-relaxed text-white/90">
-              {content?.vision2030?.paragraph2 || t('home.vision2030.paragraph2')}
-            </p>
+      <section id="section-vision-2030" className="relative min-h-screen flex flex-col text-white overflow-hidden">
+        {/* Background image */}
+        <picture>
+          <source media="(max-width: 1023px)" srcSet="/images/vision2030/bg-mobile.png" />
+          <img
+            src="/images/vision2030/bg-desktop.png"
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover object-top"
+          />
+        </picture>
+
+        <div className="relative z-10 flex-1 flex flex-col container mx-auto px-4">
+          {/* Mobile: logos centered, then text below */}
+          <div className="lg:hidden flex flex-col items-center pt-12">
+            <div className="flex items-center gap-6">
+              <img src="/images/vision2030/nuor-logo.png" alt="Nuor Steel" className="h-16 object-contain" />
+              <div className="w-px h-12 bg-white/40" />
+              <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" className="h-12 object-contain" />
+            </div>
+            <div className="space-y-6 pt-8">
+              <p className="text-base leading-relaxed text-white/90">
+                {content?.vision2030?.paragraph1 || t('home.vision2030.paragraph1')}
+              </p>
+              <p className="text-base leading-relaxed text-white/90">
+                {content?.vision2030?.paragraph2 || t('home.vision2030.paragraph2')}
+              </p>
+            </div>
+          </div>
+
+          {/* Desktop: text left, logos top-right — same row */}
+          <div className="hidden lg:flex justify-between items-start pt-16">
+            <div className="w-2/5 space-y-6">
+              <p className="text-lg leading-relaxed text-white/90">
+                {content?.vision2030?.paragraph1 || t('home.vision2030.paragraph1')}
+              </p>
+              <p className="text-lg leading-relaxed text-white/90">
+                {content?.vision2030?.paragraph2 || t('home.vision2030.paragraph2')}
+              </p>
+            </div>
+            <div className="flex items-center gap-8">
+              <img src="/images/vision2030/nuor-logo.png" alt="Nuor Steel" className="h-20 object-contain" />
+              <div className="w-px h-14 bg-white/40" />
+              <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" className="h-16 object-contain" />
+            </div>
           </div>
         </div>
       </section>
 
       {/* Core Values Section */}
-      <section id="section-core-values" className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800">
+      <section id="section-core-values" className="py-10 lg:py-16 bg-black">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl lg:text-4xl font-bold text-white text-center">
             {content?.core_values?.title || t('home.coreValues.title')}
           </h2>
           <MagicCardGrid>
-            <RadialOrbitalTimeline timelineData={coreValuesData} />
+            <RadialOrbitalTimeline timelineData={coreValuesData} centerImage="/images/core-values/center.webp" />
           </MagicCardGrid>
         </div>
       </section>
@@ -261,16 +308,19 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             onMouseEnter={() => setHoveredProduct(0)}
             onMouseLeave={() => setHoveredProduct(null)}
           >
-            {/* Background placeholder (replace with real image later) */}
-            <div className="absolute inset-0 bg-linear-to-br from-slate-600 via-slate-500 to-slate-400" />
+            {/* Background image */}
+            <picture>
+              <source media="(max-width: 1023px)" srcSet="/images/products/tmt-bars-mobile.png" />
+              <img src="/images/products/tmt-bars-desktop.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
+            </picture>
             {/* Color Overlay */}
             <div
               className="absolute inset-0 bg-blue-900/60 transition-opacity duration-600"
-              style={{ opacity: hoveredProduct === 0 ? 0 : 1 }}
+              style={{ opacity: hoveredProduct === 0 ? 0.4 : 1 }}
             />
             {/* Content */}
             <div className="relative z-10 h-full flex flex-col justify-center items-center p-8 lg:p-12 text-white text-center min-h-87.5 lg:min-h-0">
-              <h3 className="text-3xl lg:text-4xl font-bold mb-4">
+              <h3 className="text-3xl lg:text-4xl font-bold mb-4 text-primary">
                 {t('home.products.tmtBars.title')}
               </h3>
               <p className="text-sm lg:text-base text-white/80 max-w-md leading-relaxed">
@@ -299,16 +349,19 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             onMouseEnter={() => setHoveredProduct(1)}
             onMouseLeave={() => setHoveredProduct(null)}
           >
-            {/* Background placeholder (replace with real image later) */}
-            <div className="absolute inset-0 bg-linear-to-br from-gray-700 via-gray-600 to-gray-500" />
+            {/* Background image */}
+            <picture>
+              <source media="(max-width: 1023px)" srcSet="/images/products/billets-mobile.png" />
+              <img src="/images/products/billets-desktop.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
+            </picture>
             {/* Color Overlay */}
             <div
               className="absolute inset-0 bg-red-900/60 transition-opacity duration-600"
-              style={{ opacity: hoveredProduct === 1 ? 0 : 1 }}
+              style={{ opacity: hoveredProduct === 1 ? 0.4 : 1 }}
             />
             {/* Content */}
             <div className="relative z-10 h-full flex flex-col justify-center items-center p-8 lg:p-12 text-white text-center min-h-87.5 lg:min-h-0">
-              <h3 className="text-3xl lg:text-4xl font-bold mb-4">
+              <h3 className="text-3xl lg:text-4xl font-bold mb-4 text-primary">
                 {t('home.products.billets.title')}
               </h3>
               <p className="text-sm lg:text-base text-white/80 max-w-md leading-relaxed">
@@ -324,7 +377,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* LinkedIn Feed Section */}
-      <section id="section-linkedin" className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800">
+      <section id="section-linkedin" className="py-16 lg:py-24 bg-black">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
             {/* Left column: info + controls (flips to right in RTL) */}

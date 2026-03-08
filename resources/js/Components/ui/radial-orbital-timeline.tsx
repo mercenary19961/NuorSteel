@@ -8,6 +8,7 @@ interface TimelineItem {
   content: string;
   category: string;
   icon: React.ElementType;
+  image?: string;
   relatedIds: number[];
   status: "completed" | "in-progress" | "pending";
   energy: number;
@@ -15,6 +16,7 @@ interface TimelineItem {
 
 interface RadialOrbitalTimelineProps {
   timelineData: TimelineItem[];
+  centerImage?: string;
 }
 
 const easeInOutCubic = (t: number) =>
@@ -22,6 +24,7 @@ const easeInOutCubic = (t: number) =>
 
 export default function RadialOrbitalTimeline({
   timelineData,
+  centerImage,
 }: RadialOrbitalTimelineProps) {
   const [expandedItems, setExpandedItems] = useState<Record<number, boolean>>(
     {}
@@ -285,7 +288,11 @@ export default function RadialOrbitalTimeline({
           }}
         >
           <div
-            className={`absolute w-16 h-16 rounded-full bg-linear-to-br from-primary via-danger to-primary animate-pulse flex items-center justify-center z-10 transition-all duration-300 ${
+            className={`absolute w-20 h-20 rounded-full flex items-center justify-center z-10 transition-all duration-300 ${
+              centerImage
+                ? 'bg-gray-900'
+                : 'bg-linear-to-br from-primary via-danger to-primary animate-pulse'
+            } ${
               isDetailView ? 'cursor-pointer hover:scale-110 hover:shadow-lg hover:shadow-primary/40' : 'cursor-pointer hover:scale-105'
             }`}
             onClick={(e) => {
@@ -302,12 +309,16 @@ export default function RadialOrbitalTimeline({
               }
             }}
           >
-            <div className="absolute w-20 h-20 rounded-full border border-white/20 animate-ping opacity-70"></div>
+            <div className="absolute w-24 h-24 rounded-full border border-primary/20 animate-ping opacity-70"></div>
             <div
-              className="absolute w-24 h-24 rounded-full border border-white/10 animate-ping opacity-50"
+              className="absolute w-28 h-28 rounded-full border border-primary/10 animate-ping opacity-50"
               style={{ animationDelay: "0.5s" }}
             ></div>
-            <div className="w-8 h-8 rounded-full bg-white/80 backdrop-blur-md"></div>
+            {centerImage ? (
+              <img src={centerImage} alt="" className="w-14 h-14 object-contain" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-white/80 backdrop-blur-md"></div>
+            )}
           </div>
 
           <div
@@ -387,28 +398,39 @@ export default function RadialOrbitalTimeline({
 
                 <div
                   className={`
-                  rounded-full flex items-center justify-center
-                  ${
-                    isExpanded
-                      ? "bg-primary text-white"
-                      : isRelated
-                      ? "bg-primary/50 text-white"
-                      : "bg-black text-white"
-                  }
-                  border-2
-                  ${
-                    isExpanded
-                      ? "border-primary shadow-lg shadow-primary/30"
-                      : isRelated
-                      ? "border-primary animate-pulse"
-                      : "border-white/40"
+                  rounded-full flex items-center justify-center overflow-hidden
+                  ${item.image
+                    ? `${
+                        isExpanded
+                          ? "shadow-lg shadow-primary/30"
+                          : ""
+                      }`
+                    : `${
+                        isExpanded
+                          ? "bg-primary text-white"
+                          : isRelated
+                          ? "bg-primary/50 text-white"
+                          : "bg-black text-white"
+                      }
+                      border-2
+                      ${
+                        isExpanded
+                          ? "border-primary shadow-lg shadow-primary/30"
+                          : isRelated
+                          ? "border-primary animate-pulse"
+                          : "border-white/40"
+                      }`
                   }
                   transition-all duration-300 transform
                   ${isExpanded ? "scale-150" : ""}
                 `}
                   style={{ width: effectiveNodeSize, height: effectiveNodeSize }}
                 >
-                  <Icon size={effectiveNodeSize < 56 ? 16 : 22} />
+                  {item.image ? (
+                    <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <Icon size={effectiveNodeSize < 56 ? 16 : 22} />
+                  )}
                 </div>
 
                 <div
@@ -456,8 +478,12 @@ export default function RadialOrbitalTimeline({
         {activeItem && (
           <div className="max-w-lg">
             <div className="inline-flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
-                <activeItem.icon size={20} className="text-white" />
+              <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center overflow-hidden">
+                {activeItem.image ? (
+                  <img src={activeItem.image} alt={activeItem.title} className="w-full h-full object-cover" />
+                ) : (
+                  <activeItem.icon size={20} className="text-white" />
+                )}
               </div>
               <span className="text-sm font-medium text-primary uppercase tracking-wider">
                 {activeItem.category}

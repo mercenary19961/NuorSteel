@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\CareerApplication;
 use App\Models\CareerListing;
+use App\Models\Certificate;
 use App\Models\ContactSubmission;
 use App\Models\Media;
 use App\Models\NewsletterSubscriber;
@@ -20,58 +21,31 @@ class DemoContentSeeder extends Seeder
         $admin = User::where('email', 'admin@nuorsteel.com')->first();
         $adminId = $admin?->id;
 
-        // --- Media (4 placeholder images) ---
+        // --- Media (product images from public assets) ---
+        // Clean up old product media entries
+        Media::where('folder', 'products')->forceDelete();
+
         $mediaItems = [];
-        $colors = [
-            ['bg' => [180, 60, 30], 'label' => 'TMT Bars'],
-            ['bg' => [50, 80, 120], 'label' => 'Billets'],
-            ['bg' => [80, 100, 80], 'label' => 'Factory'],
-            ['bg' => [100, 70, 50], 'label' => 'Production'],
-        ];
         $images = [
-            ['original_filename' => 'tmt-bars.jpg', 'alt_text_en' => 'TMT reinforcement steel bars', 'alt_text_ar' => 'قضبان حديد التسليح', 'folder' => 'products'],
-            ['original_filename' => 'billets.jpg', 'alt_text_en' => 'Steel billets', 'alt_text_ar' => 'كتل الصلب', 'folder' => 'products'],
-            ['original_filename' => 'factory-exterior.jpg', 'alt_text_en' => 'Nuor Steel factory', 'alt_text_ar' => 'مصنع نور للحديد', 'folder' => 'general'],
-            ['original_filename' => 'production-line.jpg', 'alt_text_en' => 'Steel production line', 'alt_text_ar' => 'خط إنتاج الحديد', 'folder' => 'general'],
+            ['source' => 'products/tmt-bars-desktop.png', 'original_filename' => 'tmt-bars.png', 'mime' => 'image/png', 'alt_text_en' => 'TMT reinforcement steel bars', 'alt_text_ar' => 'قضبان حديد التسليح', 'folder' => 'products'],
+            ['source' => 'products/billets-desktop.png', 'original_filename' => 'billets.png', 'mime' => 'image/png', 'alt_text_en' => 'Steel billets', 'alt_text_ar' => 'كتل الصلب', 'folder' => 'products'],
         ];
 
         Storage::makeDirectory('media');
 
-        foreach ($images as $i => $img) {
-            $filename = Str::random(20) . '.jpg';
-            $path = 'media/' . $filename;
+        foreach ($images as $img) {
+            $sourcePath = public_path('images/' . $img['source']);
+            $filename = Str::random(20) . '.png';
+            $storagePath = 'media/' . $filename;
 
-            // Generate a real placeholder JPEG using GD
-            $width = 800;
-            $height = 600;
-            $image = imagecreatetruecolor($width, $height);
-            $bg = $colors[$i]['bg'];
-            $bgColor = imagecolorallocate($image, $bg[0], $bg[1], $bg[2]);
-            imagefill($image, 0, 0, $bgColor);
-
-            // Add label text
-            $white = imagecolorallocate($image, 255, 255, 255);
-            $label = $colors[$i]['label'];
-            $fontSize = 5;
-            $textWidth = imagefontwidth($fontSize) * strlen($label);
-            $textHeight = imagefontheight($fontSize);
-            imagestring($image, $fontSize, (int) (($width - $textWidth) / 2), (int) (($height - $textHeight) / 2), $label, $white);
-
-            // Save to a temp file then store via Storage
-            $tmpFile = tempnam(sys_get_temp_dir(), 'demo_');
-            imagejpeg($image, $tmpFile, 85);
-            imagedestroy($image);
-
-            $fileSize = filesize($tmpFile);
-            Storage::put($path, file_get_contents($tmpFile));
-            unlink($tmpFile);
+            Storage::put($storagePath, file_get_contents($sourcePath));
 
             $mediaItems[] = Media::create([
                 'filename' => $filename,
                 'original_filename' => $img['original_filename'],
-                'path' => $path,
-                'mime_type' => 'image/jpeg',
-                'size' => $fileSize,
+                'path' => $storagePath,
+                'mime_type' => $img['mime'],
+                'size' => filesize($sourcePath),
                 'alt_text_en' => $img['alt_text_en'],
                 'alt_text_ar' => $img['alt_text_ar'],
                 'folder' => $img['folder'],
@@ -79,11 +53,51 @@ class DemoContentSeeder extends Seeder
             ]);
         }
 
+        // --- Certificate PDFs in media library ---
+        // Clean up old certificate media entries
+        Media::where('folder', 'certificates')->forceDelete();
+        $certificateFiles = [
+            ['file' => 'saudi-made-certificate.pdf', 'alt_en' => 'Saudi Made Certificate', 'alt_ar' => 'شهادة صنع في السعودية'],
+            ['file' => 'iso-9001-certificate.pdf', 'alt_en' => 'ISO 9001 Certificate', 'alt_ar' => 'شهادة ISO 9001'],
+            ['file' => 'nuor-steel-rebar-hpd.pdf', 'alt_en' => 'HPD Certificate', 'alt_ar' => 'شهادة HPD'],
+            ['file' => 'nuor-steel-duns-certification.pdf', 'alt_en' => 'DUNS Certification', 'alt_ar' => 'شهادة DUNS'],
+            ['file' => 'ncec-2026.pdf', 'alt_en' => 'NCEC 2026 Certificate', 'alt_ar' => 'شهادة NCEC 2026'],
+            ['file' => 'epd-hub-3476.pdf', 'alt_en' => 'EPD Certificate', 'alt_ar' => 'شهادة EPD'],
+            ['file' => 'iso-45001-certificate.pdf', 'alt_en' => 'ISO 45001 Certificate', 'alt_ar' => 'شهادة ISO 45001'],
+            ['file' => 'iso-14001-certificate.pdf', 'alt_en' => 'ISO 14001 Certificate', 'alt_ar' => 'شهادة ISO 14001'],
+            ['file' => 'aramco-registration-letter.pdf', 'alt_en' => 'Aramco Registration Letter', 'alt_ar' => 'خطاب تسجيل أرامكو'],
+        ];
+
+        foreach ($certificateFiles as $cert) {
+            $sourcePath = storage_path('app/private/certificates/' . $cert['file']);
+            if (file_exists($sourcePath)) {
+                $filename = Str::random(20) . '.pdf';
+                $storagePath = 'media/' . $filename;
+
+                Storage::put($storagePath, file_get_contents($sourcePath));
+
+                $mediaRecord = Media::create([
+                    'filename' => $filename,
+                    'original_filename' => $cert['file'],
+                    'path' => $storagePath,
+                    'mime_type' => 'application/pdf',
+                    'size' => filesize($sourcePath),
+                    'alt_text_en' => $cert['alt_en'],
+                    'alt_text_ar' => $cert['alt_ar'],
+                    'folder' => 'certificates',
+                    'uploaded_by' => $adminId,
+                ]);
+
+                // Link media to certificate record
+                Certificate::where('file_path', 'certificates/' . $cert['file'])
+                    ->update(['file_media_id' => $mediaRecord->id]);
+            }
+        }
+
         // --- Products (2) ---
-        Product::create([
+        Product::updateOrCreate(['slug' => 'tmt-bars'], [
             'name_en' => 'TMT Bars',
             'name_ar' => 'قضبان حديد التسليح',
-            'slug' => 'tmt-bars',
             'short_description_en' => 'Thermo-Mechanically Treated reinforcement steel bars for concrete construction.',
             'short_description_ar' => 'قضبان حديد تسليح معالجة حرارياً وميكانيكياً للبناء الخرساني.',
             'description_en' => 'Our TMT Bars are manufactured using advanced Thermo-Mechanical Treatment technology, ensuring superior strength, ductility, and weldability. Compliant with SASO and international standards (BS 4449:2005, Grade B500B), available in sizes from 8mm to 32mm diameter. Ideal for residential, commercial, and infrastructure projects across the Kingdom.',
@@ -97,10 +111,9 @@ class DemoContentSeeder extends Seeder
             'updated_by' => $adminId,
         ]);
 
-        Product::create([
+        Product::updateOrCreate(['slug' => 'billets'], [
             'name_en' => 'Billets',
             'name_ar' => 'كتل الصلب',
-            'slug' => 'billets',
             'short_description_en' => 'High-quality steel billets — the essential semi-finished material for rolling mills.',
             'short_description_ar' => 'كتل صلب عالية الجودة — المادة نصف المصنعة الأساسية لمصانع الدرفلة.',
             'description_en' => 'Nuor Steel produces premium steel billets through Electric Arc Furnace (EAF) steelmaking and continuous casting. Our billets serve as the primary feedstock for TMT bar production and are also available for sale to external rolling mills. Produced to strict chemical and dimensional specifications, ensuring consistent quality downstream.',
@@ -115,10 +128,9 @@ class DemoContentSeeder extends Seeder
         ]);
 
         // --- Career Listings (2) ---
-        $listing1 = CareerListing::create([
+        $listing1 = CareerListing::updateOrCreate(['slug' => 'mechanical-engineer'], [
             'title_en' => 'Mechanical Engineer',
             'title_ar' => 'مهندس ميكانيكي',
-            'slug' => 'mechanical-engineer',
             'description_en' => 'We are looking for an experienced Mechanical Engineer to join our production team. You will be responsible for maintaining and optimizing our steel manufacturing equipment.',
             'description_ar' => 'نبحث عن مهندس ميكانيكي ذو خبرة للانضمام إلى فريق الإنتاج. ستكون مسؤولاً عن صيانة وتحسين معدات تصنيع الحديد.',
             'requirements_en' => "Bachelor's degree in Mechanical Engineering\n5+ years of experience in industrial manufacturing\nKnowledge of steel production processes\nStrong problem-solving skills\nFluent in English; Arabic is a plus",
@@ -131,10 +143,9 @@ class DemoContentSeeder extends Seeder
             'updated_by' => $adminId,
         ]);
 
-        $listing2 = CareerListing::create([
+        $listing2 = CareerListing::updateOrCreate(['slug' => 'quality-control-inspector'], [
             'title_en' => 'Quality Control Inspector',
             'title_ar' => 'مفتش مراقبة الجودة',
-            'slug' => 'quality-control-inspector',
             'description_en' => 'Join our quality assurance team to ensure all products meet SASO standards and customer specifications. Perform inspections and testing on finished steel products.',
             'description_ar' => 'انضم إلى فريق ضمان الجودة لضمان توافق جميع المنتجات مع معايير ساسو ومواصفات العملاء. إجراء الفحوصات والاختبارات على المنتجات الحديدية النهائية.',
             'requirements_en' => "Diploma or degree in Materials Science or related field\n3+ years in quality control within manufacturing\nFamiliarity with ISO 9001 standards\nAttention to detail\nAbility to read technical drawings",
@@ -147,7 +158,10 @@ class DemoContentSeeder extends Seeder
             'updated_by' => $adminId,
         ]);
 
-        // --- Career Applications (5) ---
+        // --- Career Applications (5) --- skip if already seeded
+        if (CareerApplication::where('email', 'ahmed.rashid@example.com')->exists()) {
+            goto skip_demo_data;
+        }
         $applicants = [
             [
                 'career_listing_id' => $listing1->id,
@@ -284,5 +298,7 @@ class DemoContentSeeder extends Seeder
             ));
             $sub->update(['subscribed_at' => now()->subDays(30 - $i * 4)]);
         }
+
+        skip_demo_data:
     }
 }

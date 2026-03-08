@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Certificate;
 use App\Models\Media;
 use App\Models\Product;
 use App\Models\ProductImage;
@@ -80,6 +81,47 @@ class MediaController extends Controller
             }
         }
 
+        // Certificates using these media as file (PDF)
+        $certByFile = Certificate::whereIn('file_media_id', $mediaIds)
+            ->get(['id', 'title_en', 'file_media_id']);
+        foreach ($certByFile as $cert) {
+            $usageMap[$cert->file_media_id][] = [
+                'type' => 'Certificate PDF',
+                'name' => $cert->title_en,
+                'url' => "/admin/certificates/{$cert->id}/edit",
+            ];
+        }
+
+        // Certificates using these media as thumbnail
+        $certByThumb = Certificate::whereIn('thumbnail_id', $mediaIds)
+            ->get(['id', 'title_en', 'thumbnail_id']);
+        foreach ($certByThumb as $cert) {
+            $usageMap[$cert->thumbnail_id][] = [
+                'type' => 'Certificate Thumbnail',
+                'name' => $cert->title_en,
+                'url' => "/admin/certificates/{$cert->id}/edit",
+            ];
+        }
+
+        // Build folder preview map (first media item per folder for thumbnail)
+        $folderPreviews = [];
+        if (!$request->filled('folder')) {
+            $previewItems = Media::selectRaw('MIN(id) as id, folder')
+                ->groupBy('folder')
+                ->pluck('id', 'folder');
+
+            $previewMedia = Media::whereIn('id', $previewItems->values())
+                ->get(['id', 'folder', 'mime_type', 'path'])
+                ->keyBy('folder');
+
+            foreach ($previewMedia as $folder => $m) {
+                $folderPreviews[$folder] = [
+                    'mime_type' => $m->mime_type,
+                    'url' => $m->url,
+                ];
+            }
+        }
+
         // Undo support: check if a media item was recently edited
         $lastEditedId = session('undo_media_last_id');
         $undoMeta = $lastEditedId ? $this->undoService->getUndoMeta('media', $lastEditedId) : null;
@@ -88,6 +130,7 @@ class MediaController extends Controller
             'media' => $media,
             'folders' => $allFolders,
             'folderCounts' => $folderCounts,
+            'folderPreviews' => $folderPreviews,
             'filters' => $request->only(['folder', 'type']),
             'mediaUsage' => $usageMap,
             'undoMeta' => $undoMeta,

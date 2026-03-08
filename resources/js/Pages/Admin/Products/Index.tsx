@@ -107,7 +107,7 @@ export default function ProductsIndex({ products, categories, filters, undoMeta,
                   className="bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all overflow-hidden flex flex-col"
                 >
                   {/* Image */}
-                  <div className="relative h-48 bg-gray-100">
+                  <div className="relative h-96 bg-gray-100">
                     {imageUrl ? (
                       <img
                         src={imageUrl}

@@ -21,21 +21,29 @@ import {
   AlertTriangle,
   FolderInput,
   Link2,
+  Eye,
+  Download,
 } from 'lucide-react';
 import UndoButton from '@/Components/Admin/UndoButton';
 import type { Media, MediaUsage, PaginatedData, UndoMeta } from '@/types';
+
+interface FolderPreview {
+  mime_type: string;
+  url: string;
+}
 
 interface Props {
   media: PaginatedData<Media>;
   folders: string[];
   folderCounts: Record<string, number>;
+  folderPreviews: Record<string, FolderPreview>;
   filters: { folder?: string; type?: string };
   mediaUsage: Record<number, MediaUsage[]>;
   undoMeta?: UndoMeta | null;
   undoModelId?: string | null;
 }
 
-export default function MediaPage({ media, folders, folderCounts, filters, mediaUsage, undoMeta, undoModelId }: Props) {
+export default function MediaPage({ media, folders, folderCounts, folderPreviews, filters, mediaUsage, undoMeta, undoModelId }: Props) {
   // ---------------------------------------------------------------------------
   // State
   // ---------------------------------------------------------------------------
@@ -71,11 +79,12 @@ export default function MediaPage({ media, folders, folderCounts, filters, media
   const [moveItem, setMoveItem] = useState<Media | null>(null);
   const [moveToFolder, setMoveToFolder] = useState('');
 
-  // Edit / Delete media item
+  // Edit / Delete / Preview media item
   const [editItem, setEditItem] = useState<Media | null>(null);
   const [editAltEn, setEditAltEn] = useState('');
   const [editAltAr, setEditAltAr] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<Media | null>(null);
+  const [previewItem, setPreviewItem] = useState<Media | null>(null);
   const [processing, setProcessing] = useState(false);
 
   const items = media.data;
@@ -348,63 +357,93 @@ export default function MediaPage({ media, folders, folderCounts, filters, media
               <p className="text-sm text-gray-400">Create a folder or upload files to get started.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {folders.map((folder) => (
-                <div
-                  key={folder}
-                  className="group relative bg-white rounded-xl border border-gray-200 p-4 text-left hover:shadow-md hover:border-primary/30 transition-all cursor-pointer"
-                  onClick={() => enterFolder(folder)}
-                >
-                  {/* Context menu button (hidden for "general" folder) */}
-                  {folder !== 'general' && (
-                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setFolderMenuOpen(folderMenuOpen === folder ? null : folder);
-                        }}
-                        className="p-1 rounded-md hover:bg-gray-100 text-gray-400 hover:text-gray-600"
-                      >
-                        <MoreVertical size={16} />
-                      </button>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+              {folders.map((folder) => {
+                const preview = folderPreviews[folder];
+                const count = folderCounts[folder] ?? 0;
 
-                      {/* Dropdown menu */}
-                      {folderMenuOpen === folder && (
-                        <div className="absolute right-0 top-8 w-36 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openRenameFolder(folder);
-                            }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                          >
-                            <FolderPen size={14} />
-                            Rename
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openDeleteFolder(folder);
-                            }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50"
-                          >
-                            <Trash2 size={14} />
-                            Delete
-                          </button>
-                        </div>
+                return (
+                  <div
+                    key={folder}
+                    className="group relative bg-white rounded-xl border border-gray-200 hover:shadow-md hover:border-primary/30 transition-all cursor-pointer overflow-hidden"
+                    onClick={() => enterFolder(folder)}
+                  >
+                    {/* Context menu button (hidden for "general" folder) */}
+                    {folder !== 'general' && (
+                      <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFolderMenuOpen(folderMenuOpen === folder ? null : folder);
+                          }}
+                          className="p-1 rounded-md bg-white/80 backdrop-blur-sm hover:bg-white text-gray-400 hover:text-gray-600 shadow-sm"
+                        >
+                          <MoreVertical size={16} />
+                        </button>
+
+                        {/* Dropdown menu */}
+                        {folderMenuOpen === folder && (
+                          <div className="absolute right-0 top-8 w-36 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openRenameFolder(folder);
+                              }}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                            >
+                              <FolderPen size={14} />
+                              Rename
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openDeleteFolder(folder);
+                              }}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+                            >
+                              <Trash2 size={14} />
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Folder preview thumbnail */}
+                    <div className="aspect-4/3 bg-gray-50 flex items-center justify-center relative overflow-hidden">
+                      {preview ? (
+                        preview.mime_type.startsWith('image/') ? (
+                          <img
+                            src={preview.url}
+                            alt={folder}
+                            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300"
+                          />
+                        ) : preview.mime_type === 'application/pdf' ? (
+                          <div className="w-full h-full relative">
+                            <iframe
+                              src={`${preview.url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+                              className="w-[200%] h-[200%] origin-top-left scale-50 pointer-events-none opacity-70 group-hover:opacity-90 transition-opacity"
+                              title={folder}
+                            />
+                          </div>
+                        ) : (
+                          <Folder size={48} className="text-primary/40 group-hover:text-primary/60 transition-colors" />
+                        )
+                      ) : (
+                        <Folder size={48} className="text-primary/40 group-hover:text-primary/60 transition-colors" />
                       )}
                     </div>
-                  )}
 
-                  <div className="flex items-center justify-center mb-3">
-                    <Folder size={40} className="text-primary/70 group-hover:text-primary transition-colors" />
+                    {/* Folder info */}
+                    <div className="p-3">
+                      <p className="text-sm font-medium text-gray-800 truncate">{folderDisplayName(folder)}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {count} {count === 1 ? 'file' : 'files'}
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-sm font-medium text-gray-800 truncate text-center">{folderDisplayName(folder)}</p>
-                  <p className="text-xs text-gray-400 text-center mt-1">
-                    {folderCounts[folder] ?? 0} {(folderCounts[folder] ?? 0) === 1 ? 'file' : 'files'}
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )
         ) : (
@@ -451,18 +490,36 @@ export default function MediaPage({ media, folders, folderCounts, filters, media
                     key={item.id}
                     className="group relative bg-white rounded-xl border border-gray-200 hover:shadow-md transition-shadow"
                   >
-                    <div className="aspect-square bg-gray-100 flex items-center justify-center relative rounded-t-xl overflow-hidden">
+                    <div
+                      className="aspect-square bg-gray-100 flex items-center justify-center relative rounded-t-xl overflow-hidden cursor-pointer"
+                      onClick={() => setPreviewItem(item)}
+                    >
                       {item.mime_type.startsWith('image/') ? (
                         <img
                           src={item.url}
                           alt={item.alt_text_en ?? item.original_filename}
                           className="w-full h-full object-contain"
                         />
+                      ) : item.mime_type === 'application/pdf' ? (
+                        <div className="w-full h-full relative">
+                          <iframe
+                            src={`${item.url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+                            className="w-[200%] h-[200%] origin-top-left scale-50 pointer-events-none"
+                            title={item.original_filename}
+                          />
+                        </div>
                       ) : (
                         <FileText size={32} className="text-red-400" />
                       )}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={() => setPreviewItem(item)}
+                            className="p-2 bg-white rounded-lg shadow hover:bg-gray-50"
+                            title="Preview"
+                          >
+                            <Eye size={14} className="text-gray-600" />
+                          </button>
                           <button
                             onClick={() => openEdit(item)}
                             className="p-2 bg-white rounded-lg shadow hover:bg-gray-50"
@@ -816,13 +873,66 @@ export default function MediaPage({ media, folders, folderCounts, filters, media
         <ConfirmDialog
           open={!!deleteTarget}
           title="Delete Media"
-          message={`Are you sure you want to delete "${deleteTarget?.original_filename}"? This action cannot be undone.`}
+          message={`Are you sure you want to delete "${deleteTarget?.original_filename}"? You can undo this action.`}
           confirmLabel="Delete"
           variant="danger"
           loading={processing}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
         />
+
+        {/* ---- Preview Modal ---- */}
+        {previewItem && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/70" onClick={() => setPreviewItem(null)} />
+            <div className="relative bg-white rounded-xl shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] flex flex-col">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                <div className="flex items-center gap-3">
+                  {previewItem.mime_type.startsWith('image/') ? (
+                    <Image size={18} className="text-blue-500" />
+                  ) : (
+                    <FileText size={18} className="text-red-500" />
+                  )}
+                  <span className="text-sm font-medium text-gray-900 truncate">{previewItem.original_filename}</span>
+                  <span className="text-xs text-gray-400">{formatSize(previewItem.size)}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={previewItem.url}
+                    download={previewItem.original_filename}
+                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
+                    title="Download"
+                  >
+                    <Download size={18} />
+                  </a>
+                  <button onClick={() => setPreviewItem(null)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">
+                    <X size={18} />
+                  </button>
+                </div>
+              </div>
+              <div className="flex-1 overflow-auto p-4 flex items-center justify-center min-h-[60vh]">
+                {previewItem.mime_type.startsWith('image/') ? (
+                  <img
+                    src={previewItem.url}
+                    alt={previewItem.alt_text_en ?? previewItem.original_filename}
+                    className="max-w-full max-h-[75vh] object-contain"
+                  />
+                ) : previewItem.mime_type === 'application/pdf' ? (
+                  <iframe
+                    src={previewItem.url}
+                    className="w-full h-[75vh] rounded-lg border border-gray-200"
+                    title={previewItem.original_filename}
+                  />
+                ) : (
+                  <div className="text-center text-gray-500">
+                    <FileText size={48} className="mx-auto text-gray-300 mb-3" />
+                    <p>Preview not available for this file type.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ---- Rename Folder Modal ---- */}
         {renamingFolder && (

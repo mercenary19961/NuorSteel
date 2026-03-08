@@ -10,12 +10,22 @@ class SiteContentSeeder extends Seeder
     public function run(): void
     {
         $contents = [
-            // Home Page
-            ['page' => 'home', 'section' => 'hero', 'key' => 'title', 'content_en' => "Powering Saudi Arabia's Industrial Future", 'content_ar' => 'ندعم المستقبل الصــناعي للمملكة العربية السعودية', 'type' => 'text'],
-            ['page' => 'home', 'section' => 'hero', 'key' => 'subtitle', 'content_en' => 'Quality steel products for a sustainable future', 'content_ar' => 'منتجات حديدية عالية الجودة لمستقبل مستدام', 'type' => 'text'],
-            ['page' => 'home', 'section' => 'hero', 'key' => 'cta_text', 'content_en' => 'Get in Touch', 'content_ar' => 'تواصل معنا', 'type' => 'text'],
+            // Home Page - About section
+            ['page' => 'home', 'section' => 'about', 'key' => 'title', 'content_en' => 'About Nuor Steel', 'content_ar' => 'عن شركة نور للحديد', 'type' => 'text'],
+            ['page' => 'home', 'section' => 'about', 'key' => 'description', 'content_en' => 'Nuor Steel Industry Company is a leading Saudi steel manufacturer founded in 2010 in Al Kharj Industrial City. As a fully integrated producer of steel billets and TMT rebars, it supports national infrastructure and industrial growth aligned with Saudi Vision 2030.', 'content_ar' => 'شركة نور للصناعات الحديدية هي شركة سعودية رائدة في صناعة الحديد تأسست عام 2010 في المدينة الصناعية بالخرج. بصفتها منتجاً متكاملاً لكتل الصلب وحديد التسليح، تدعم البنية التحتية الوطنية والنمو الصناعي بما يتماشى مع رؤية السعودية 2030.', 'type' => 'textarea'],
 
-            // Home - Features section
+            // Home Page - Vision & Mission section
+            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'title', 'content_en' => 'Vision & Mission', 'content_ar' => 'الرؤية والرسالة', 'type' => 'text'],
+            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'vision_title', 'content_en' => 'Vision', 'content_ar' => 'الرؤية', 'type' => 'text'],
+            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'vision_description', 'content_en' => 'To be the leading producer and marketer of high-quality steel products in the Middle East, setting benchmarks for quality, reliability, and sustainability.', 'content_ar' => 'أن نكون المنتج والمسوّق الرائد لمنتجات الحديد عالية الجودة في الشرق الأوسط، ونضع معايير الجودة والموثوقية والاستدامة.', 'type' => 'textarea'],
+            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'mission_title', 'content_en' => 'Mission', 'content_ar' => 'الرسالة', 'type' => 'text'],
+            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'mission_description', 'content_en' => 'To be the most trusted provider of construction materials in Saudi Arabia and the leading TMT bar brand in the Middle East, powered by innovation, uncompromising quality, and continuous improvement.', 'content_ar' => 'أن نكون المزوّد الأكثر ثقة لمواد البناء في المملكة العربية السعودية والعلامة التجارية الرائدة لحديد التسليح في الشرق الأوسط، بدعم من الابتكار والجودة المتميزة والتحسين المستمر.', 'type' => 'textarea'],
+
+            // Home Page - Vision 2030 section
+            ['page' => 'home', 'section' => 'vision2030', 'key' => 'paragraph1', 'content_en' => 'Nuor Steel Industry Company supports Saudi Vision 2030 by strengthening local industrial capabilities and advancing the localization of critical construction materials. As a fully integrated steel manufacturer, Nuor Steel is positioned to support giga and mega-projects through reliable supply, consistent quality, and national-scale production.', 'content_ar' => 'تدعم شركة نور للصناعات الحديدية رؤية السعودية 2030 من خلال تعزيز القدرات الصناعية المحلية والنهوض بتوطين مواد البناء الحيوية. بصفتها مصنعاً متكاملاً للحديد، تتمتع نور ستيل بالقدرة على دعم المشاريع العملاقة والكبرى من خلال إمداد موثوق وجودة ثابتة وإنتاج على المستوى الوطني.', 'type' => 'textarea'],
+            ['page' => 'home', 'section' => 'vision2030', 'key' => 'paragraph2', 'content_en' => 'As a proud member of the "Made in Saudi" program, Nuor Steel contributes to local value creation and the growth of a competitive, globally respected Saudi industrial sector.', 'content_ar' => 'بصفتها عضواً فخوراً في برنامج "صنع في السعودية"، تساهم نور ستيل في خلق القيمة المحلية ونمو قطاع صناعي سعودي تنافسي ومحترم عالمياً.', 'type' => 'textarea'],
+
+            // Home Page - Core Values section
             ['page' => 'home', 'section' => 'core_values', 'key' => 'title', 'content_en' => 'Core Values', 'content_ar' => 'القيم الأساسية', 'type' => 'text'],
             ['page' => 'home', 'section' => 'core_values', 'key' => 'quality_title', 'content_en' => 'Quality', 'content_ar' => 'الجودة', 'type' => 'text'],
             ['page' => 'home', 'section' => 'core_values', 'key' => 'quality_description', 'content_en' => 'We maintain the highest quality standards through strict inspections and continuous improvement, delivering reliable and consistent steel products.', 'content_ar' => 'نحافظ على أعلى معايير الجودة من خلال عمليات التفتيش الصارمة والتحسين المستمر، لتقديم منتجات حديدية موثوقة ومتسقة.', 'type' => 'textarea'],
@@ -25,32 +35,6 @@ class SiteContentSeeder extends Seeder
             ['page' => 'home', 'section' => 'core_values', 'key' => 'innovation_description', 'content_en' => 'We embrace advanced technologies and digital solutions to optimize our processes and develop efficient, future-ready steel solutions.', 'content_ar' => 'نتبنى التقنيات المتقدمة والحلول الرقمية لتحسين عملياتنا وتطوير حلول حديدية فعالة ومستعدة للمستقبل.', 'type' => 'textarea'],
             ['page' => 'home', 'section' => 'core_values', 'key' => 'strategic_growth_title', 'content_en' => 'Strategic Growth', 'content_ar' => 'النمو الاستراتيجي', 'type' => 'text'],
             ['page' => 'home', 'section' => 'core_values', 'key' => 'strategic_growth_description', 'content_en' => 'We focus on sustainable, long-term growth by building strong partnerships and aligning our expansion with national and regional development objectives.', 'content_ar' => 'نركز على النمو المستدام طويل الأمد من خلال بناء شراكات قوية ومواءمة توسعنا مع أهداف التنمية الوطنية والإقليمية.', 'type' => 'textarea'],
-
-            ['page' => 'home', 'section' => 'about', 'key' => 'title', 'content_en' => 'About Nuor Steel', 'content_ar' => 'عن شركة نور للحديد', 'type' => 'text'],
-            ['page' => 'home', 'section' => 'about', 'key' => 'description', 'content_en' => 'Nuor Steel Industry Company is a leading Saudi steel manufacturer founded in 2010 in Al Kharj Industrial City. As a fully integrated producer of steel billets and TMT rebars, it supports national infrastructure and industrial growth aligned with Saudi Vision 2030.', 'content_ar' => 'شركة نور للصناعات الحديدية هي شركة سعودية رائدة في صناعة الحديد تأسست عام 2010 في المدينة الصناعية بالخرج. بصفتها منتجاً متكاملاً لكتل الصلب وحديد التسليح، تدعم البنية التحتية الوطنية والنمو الصناعي بما يتماشى مع رؤية السعودية 2030.', 'type' => 'textarea'],
-
-            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'title', 'content_en' => 'Vision & Mission', 'content_ar' => 'الرؤية والرسالة', 'type' => 'text'],
-            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'vision_title', 'content_en' => 'Vision', 'content_ar' => 'الرؤية', 'type' => 'text'],
-            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'vision_description', 'content_en' => 'To be the leading producer and marketer of high-quality steel products in the Middle East, setting benchmarks for quality, reliability, and sustainability.', 'content_ar' => 'أن نكون المنتج والمسوّق الرائد لمنتجات الحديد عالية الجودة في الشرق الأوسط، ونضع معايير الجودة والموثوقية والاستدامة.', 'type' => 'textarea'],
-            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'mission_title', 'content_en' => 'Mission', 'content_ar' => 'الرسالة', 'type' => 'text'],
-            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'mission_description', 'content_en' => 'To be the most trusted provider of construction materials in Saudi Arabia and the leading TMT bar brand in the Middle East, powered by innovation, uncompromising quality, and continuous improvement.', 'content_ar' => 'أن نكون المزوّد الأكثر ثقة لمواد البناء في المملكة العربية السعودية والعلامة التجارية الرائدة لحديد التسليح في الشرق الأوسط، بدعم من الابتكار والجودة المتميزة والتحسين المستمر.', 'type' => 'textarea'],
-
-            ['page' => 'home', 'section' => 'vision2030', 'key' => 'paragraph1', 'content_en' => 'Nuor Steel Industry Company supports Saudi Vision 2030 by strengthening local industrial capabilities and advancing the localization of critical construction materials. As a fully integrated steel manufacturer, Nuor Steel is positioned to support giga and mega-projects through reliable supply, consistent quality, and national-scale production.', 'content_ar' => 'تدعم شركة نور للصناعات الحديدية رؤية السعودية 2030 من خلال تعزيز القدرات الصناعية المحلية والنهوض بتوطين مواد البناء الحيوية. بصفتها مصنعاً متكاملاً للحديد، تتمتع نور ستيل بالقدرة على دعم المشاريع العملاقة والكبرى من خلال إمداد موثوق وجودة ثابتة وإنتاج على المستوى الوطني.', 'type' => 'textarea'],
-            ['page' => 'home', 'section' => 'vision2030', 'key' => 'paragraph2', 'content_en' => 'As a proud member of the "Made in Saudi" program, Nuor Steel contributes to local value creation and the growth of a competitive, globally respected Saudi industrial sector.', 'content_ar' => 'بصفتها عضواً فخوراً في برنامج "صنع في السعودية"، تساهم نور ستيل في خلق القيمة المحلية ونمو قطاع صناعي سعودي تنافسي ومحترم عالمياً.', 'type' => 'textarea'],
-
-            ['page' => 'home', 'section' => 'products', 'key' => 'title', 'content_en' => 'Our Products', 'content_ar' => 'منتجاتنا', 'type' => 'text'],
-            ['page' => 'home', 'section' => 'products', 'key' => 'subtitle', 'content_en' => 'Discover our range of high-quality steel products', 'content_ar' => 'اكتشف مجموعتنا من منتجات الحديد عالية الجودة', 'type' => 'text'],
-
-            ['page' => 'home', 'section' => 'certificates', 'key' => 'title', 'content_en' => 'Supplier Approvals & Certificates', 'content_ar' => 'اعتمادات الموردين والشهادات', 'type' => 'text'],
-            ['page' => 'home', 'section' => 'certificates', 'key' => 'subtitle', 'content_en' => 'Our commitment to quality and sustainability', 'content_ar' => 'التزامنا بالجودة والاستدامة', 'type' => 'text'],
-
-            ['page' => 'home', 'section' => 'newsletter', 'key' => 'title', 'content_en' => 'Stay Updated', 'content_ar' => 'ابق على اطلاع', 'type' => 'text'],
-            ['page' => 'home', 'section' => 'newsletter', 'key' => 'description', 'content_en' => 'Subscribe to our newsletter for the latest news and updates.', 'content_ar' => 'اشترك في نشرتنا الإخبارية لأحدث الأخبار والتحديثات.', 'type' => 'text'],
-
-            // Home - CTA section
-            ['page' => 'home', 'section' => 'cta', 'key' => 'title', 'content_en' => 'Ready to Get Started?', 'content_ar' => 'هل أنت مستعد للبدء؟', 'type' => 'text'],
-            ['page' => 'home', 'section' => 'cta', 'key' => 'description', 'content_en' => 'Contact us today to discuss your steel requirements.', 'content_ar' => 'تواصل معنا اليوم لمناقشة متطلباتك من الحديد.', 'type' => 'text'],
-            ['page' => 'home', 'section' => 'cta', 'key' => 'button', 'content_en' => 'Contact Us', 'content_ar' => 'تواصل معنا', 'type' => 'text'],
 
             // About Page
             ['page' => 'about', 'section' => 'overview', 'key' => 'title', 'content_en' => 'About Us', 'content_ar' => 'من نحن', 'type' => 'text'],
@@ -67,12 +51,9 @@ class SiteContentSeeder extends Seeder
             ['page' => 'about', 'section' => 'governance', 'key' => 'title', 'content_en' => 'Governance', 'content_ar' => 'الحوكمة', 'type' => 'text'],
             ['page' => 'about', 'section' => 'governance', 'key' => 'description', 'content_en' => 'Our commitment to ethical business practices and transparent governance.', 'content_ar' => 'التزامنا بممارسات الأعمال الأخلاقية والحوكمة الشفافة.', 'type' => 'text'],
 
-            // Recycling Page
-            ['page' => 'recycling', 'section' => 'overview', 'key' => 'title', 'content_en' => 'Recycling & Process', 'content_ar' => 'إعادة التدوير والعملية', 'type' => 'text'],
-            ['page' => 'recycling', 'section' => 'overview', 'key' => 'description', 'content_en' => 'Our state-of-the-art recycling facilities contribute to a sustainable steel production process.', 'content_ar' => 'تساهم مرافق إعادة التدوير الحديثة لدينا في عملية إنتاج حديد مستدامة.', 'type' => 'textarea'],
-
-            ['page' => 'recycling', 'section' => 'process', 'key' => 'title', 'content_en' => 'Our Process', 'content_ar' => 'عمليتنا', 'type' => 'text'],
-            ['page' => 'recycling', 'section' => 'process', 'key' => 'description', 'content_en' => 'From scrap collection to finished product, our integrated process ensures maximum efficiency and minimal environmental impact.', 'content_ar' => 'من جمع الخردة إلى المنتج النهائي، تضمن عمليتنا المتكاملة أقصى كفاءة وأقل تأثير بيئي.', 'type' => 'textarea'],
+            // Products Page
+            ['page' => 'products', 'section' => 'overview', 'key' => 'title', 'content_en' => 'Our Products', 'content_ar' => 'منتجاتنا', 'type' => 'text'],
+            ['page' => 'products', 'section' => 'overview', 'key' => 'description', 'content_en' => 'Discover our range of high-quality steel products, engineered to meet the most demanding construction and industrial requirements.', 'content_ar' => 'اكتشف مجموعتنا من منتجات الحديد عالية الجودة، المصممة لتلبية أصعب متطلبات البناء والصناعة.', 'type' => 'textarea'],
 
             // Quality Page
             ['page' => 'quality', 'section' => 'overview', 'key' => 'title', 'content_en' => 'Quality Assurance', 'content_ar' => 'ضمان الجودة', 'type' => 'text'],
@@ -112,5 +93,11 @@ class SiteContentSeeder extends Seeder
                 $content
             );
         }
+
+        // Clean up deprecated sections
+        SiteContent::where('page', 'home')
+            ->whereIn('section', ['hero', 'products', 'certificates', 'newsletter', 'cta'])
+            ->delete();
+        SiteContent::where('page', 'recycling')->delete();
     }
 }

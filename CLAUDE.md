@@ -154,6 +154,7 @@
 - [x] Certificate data migration (`2026_03_03_102243_seed_certificates_data.php`) — seeds 9 PDFs via `DB::table()->updateOrInsert()`
 - [x] Products data migration (`2026_03_03_103058_seed_products_data.php`) — seeds TMT Bars + Billets with 16 specifications
 - [x] LinkedIn posts data migration (`2026_03_04_120000_seed_linkedin_posts_data.php`) — seeds 5 real Nuor Steel LinkedIn posts
+- [x] Settings data migration (`2026_03_07_120000_seed_default_settings.php`) — seeds phone, email, LinkedIn URL so footer works on fresh deploy
 - [x] Data migrations run automatically via Railpack's `php artisan migrate --force` (no custom start command needed)
 - [x] Certificate PDFs tracked in git (`storage/app/private/certificates/`) via `.gitignore` exceptions
 - [x] CertificateSeeder updated: `created_by`/`updated_by` set to null (avoids FK violation on fresh DB)
@@ -179,6 +180,16 @@
 - [x] Hero: responsive mobile layout — `min-h-[87svh] lg:h-screen`, content aligned to bottom (`items-end pb-8`) on mobile, centered on desktop
 - [x] Home: product cards link to `/products` (generic listing page) instead of product-specific routes
 - [x] Home: LinkedIn section renamed to "News" (removed LinkedIn icon, uses `t('home.hero.bottomLinks.news')` title)
+- [x] Contact submissions: `company` column made nullable via migration (matches optional form field)
+- [x] Admin contact detail: file download uses dynamic extension instead of hardcoded `.pdf`; removed stale `file_url` accessor
+- [x] Admin contact detail: company field conditionally rendered (only shown when present)
+- [x] Contact email template: company field conditionally rendered
+- [x] Settings data migration (`2026_03_07_120000_seed_default_settings.php`) — seeds phone, email, LinkedIn URL for production footer
+- [x] Admin Site Content tab: synced `SECTION_ORDER` with actual CMS-editable homepage sections; replaced Recycling page entry with Products page
+- [x] Admin Site Content tab: added missing section/key labels (vision_mission, vision2030, core_values); pages sorted by config order
+- [x] SiteContentSeeder: cleaned up deprecated entries (hero, cta, newsletter, certificates, recycling sections)
+- [x] Product spec icons: fixed vertical stacking on mobile (now side by side)
+- [x] Admin Site Content: adjusted "click to interact with preview" text color for better visibility
 
 ### Site-Wide Visual Consistency (DONE)
 - [x] Unified `bg-linear-to-r from-gray-900 to-gray-800` gradient across all public page sections (Home, About, Quality, Career)
@@ -627,4 +638,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-03-07 — based on commit `7bf9c72` (*feat: implement pause functionality for travel animation in RadialOrbitalTimeline and update Home links for better navigation*)
+> **Last updated:** 2026-03-08 — based on commit `1eaaaa6` (*fix: adjusted the text color for the "click to interact with preview" text that's in the site content section in the admin panel*)

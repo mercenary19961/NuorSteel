@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Certificate;
+use App\Models\Media;
 use Illuminate\Database\Seeder;
 
 class CertificateSeeder extends Seeder
@@ -97,7 +98,7 @@ class CertificateSeeder extends Seeder
         ];
 
         foreach ($certificates as $data) {
-            Certificate::updateOrCreate(
+            $cert = Certificate::updateOrCreate(
                 ['file_path' => $data['file_path']],
                 array_merge($data, [
                     'is_active' => true,
@@ -105,6 +106,17 @@ class CertificateSeeder extends Seeder
                     'updated_by' => null,
                 ])
             );
+
+            // Link to media record if not already linked
+            if (!$cert->file_media_id) {
+                $media = Media::where('original_filename', basename($data['file_path']))
+                    ->where('folder', 'certificates')
+                    ->first();
+
+                if ($media) {
+                    $cert->update(['file_media_id' => $media->id]);
+                }
+            }
         }
     }
 }
