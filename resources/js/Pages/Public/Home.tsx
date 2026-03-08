@@ -356,7 +356,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         <div className="flex flex-col lg:flex-row min-h-100 lg:min-h-137.5 lg:bg-white/20">
           {/* TMT Bars */}
           <Link
-            href="/products"
+            href="/products?product=tmt-bars&expanded=true"
             className="relative z-10 flex-1 overflow-hidden cursor-pointer group"
             style={{
               flex: hoveredProduct === 0 ? 1.4 : hoveredProduct === 1 ? 0.6 : 1,
@@ -397,7 +397,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
 
           {/* Billets */}
           <Link
-            href="/products"
+            href="/products?product=billets&expanded=true"
             className="relative flex-1 overflow-hidden cursor-pointer group lg:-ms-12"
             style={{
               flex: hoveredProduct === 1 ? 1.4 : hoveredProduct === 0 ? 0.6 : 1,
