@@ -37,9 +37,9 @@
 - [x] Dashboard with stats
 - [x] Content editor (bilingual side-by-side EN/AR)
 - [x] Timeline events CRUD (drag-and-drop reorder)
-- [x] Media library (upload, grid, folder/type filter, folder management)
+- [x] Media library (upload, grid, folder/type filter, folder management, usage tracking, folder previews, PDF viewer)
 - [x] Products CRUD (half-width card grid, featured image picker, CustomSelect dropdowns)
-- [x] Certificates CRUD (category-folder navigation, PDF viewer modal)
+- [x] Certificates CRUD (category-folder navigation, PDF viewer modal, PDF preview cards, media library linkage)
 - [x] Careers CRUD (card grid with detail modal) + Applications inbox (card grid with time filters)
 - [x] Contact submissions inbox (read/archive/filters, archived rows highlighted)
 - [x] Newsletter management (admin-only, stats, export, demo data)
@@ -190,6 +190,17 @@
 - [x] SiteContentSeeder: cleaned up deprecated entries (hero, cta, newsletter, certificates, recycling sections)
 - [x] Product spec icons: fixed vertical stacking on mobile (now side by side)
 - [x] Admin Site Content: adjusted "click to interact with preview" text color for better visibility
+- [x] Real images added: logo, hero background, bottom link hover panels, core values icons, Vision 2030, product panels
+- [x] HeroBottomLinks: increased image heights (`h-32 lg:h-44`), responsive sizing
+- [x] Vision 2030: text and logos on same row (text left 40%, logos top-right), image `object-top`
+- [x] Core values: reduced padding, removed borders from orbital circle nodes and center node
+- [x] Section backgrounds: About, Vision & Mission, Core Values, News changed to solid `bg-black`
+- [x] Products section: reduced overlay opacity (0.4), product names in orange (`text-primary`)
+- [x] Admin products: real product images from media library, increased card image height to `h-64`
+- [x] Certificates linked to media library: `file_media_id` (PDF) and `thumbnail_id` (thumbnail) FK columns
+- [x] Media library: "Used in" indicator for PDFs (certificates usage), folder preview thumbnails (first image/PDF per folder)
+- [x] Media library: soft delete preserves physical files (`forceDeleting` hook), PDF viewer modal on cards
+- [x] Admin certificates: redesigned card layout — PDF preview on top (scaled iframe), 3-column grid, status/expiry badge overlays
 
 ### Site-Wide Visual Consistency (DONE)
 - [x] Unified `bg-linear-to-r from-gray-900 to-gray-800` gradient across all public page sections (Home, About, Quality, Career)
@@ -263,8 +274,8 @@
 - [x] Admin sidebar updated with LinkedIn Posts link
 
 ### Remaining
-- [ ] Real images for hero background, bottom link hover panels, core values section, and product panels (currently gradient placeholders)
-- [ ] Logo image for header (currently text-only)
+- [x] Real images for hero background, bottom link hover panels, core values section, and product panels
+- [x] Logo image for header
 - [ ] Code splitting (chunk >500kB)
 - [ ] Structured data remaining placeholders (see above)
 - [ ] Final testing & go-live
@@ -638,4 +649,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-03-08 — based on commit `1eaaaa6` (*fix: adjusted the text color for the "click to interact with preview" text that's in the site content section in the admin panel*)
+> **Last updated:** 2026-03-08 — based on commit `8ed7eec` (*Merge: certificate PDF previews, media library enhancements, real images*)
