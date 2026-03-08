@@ -229,39 +229,56 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* Vision 2030 Section */}
-      <section id="section-vision-2030" className="relative py-16 lg:py-24 text-white overflow-hidden">
+      <section id="section-vision-2030" className="relative min-h-screen flex flex-col text-white overflow-hidden">
         {/* Background image */}
         <picture>
           <source media="(max-width: 1023px)" srcSet="/images/vision2030/bg-mobile.png" />
           <img
             src="/images/vision2030/bg-desktop.png"
             alt=""
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover object-bottom"
           />
         </picture>
-        <div className="absolute inset-0 bg-gray-900/75" />
 
-        <div className="relative z-10 container mx-auto px-4">
-          {/* Logos */}
-          <div className="flex items-center justify-center gap-6 lg:gap-10 mb-10">
-            <img src="/images/vision2030/nuor-logo.png" alt="Nuor Steel" className="h-16 lg:h-24 object-contain" />
-            <div className="w-px h-12 lg:h-16 bg-white/30" />
-            <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" className="h-12 lg:h-20 object-contain" />
+        <div className="relative z-10 flex-1 flex flex-col container mx-auto px-4">
+          {/* Mobile: logos centered, then text below */}
+          <div className="lg:hidden flex flex-col items-center pt-12">
+            <div className="flex items-center gap-6">
+              <img src="/images/vision2030/nuor-logo.png" alt="Nuor Steel" className="h-16 object-contain" />
+              <div className="w-px h-12 bg-white/40" />
+              <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" className="h-12 object-contain" />
+            </div>
+            <div className="space-y-6 pt-8">
+              <p className="text-base leading-relaxed text-white/90">
+                {content?.vision2030?.paragraph1 || t('home.vision2030.paragraph1')}
+              </p>
+              <p className="text-base leading-relaxed text-white/90">
+                {content?.vision2030?.paragraph2 || t('home.vision2030.paragraph2')}
+              </p>
+            </div>
           </div>
 
-          <div className="max-w-4xl mx-auto space-y-6">
-            <p className="text-lg leading-relaxed text-white/90">
-              {content?.vision2030?.paragraph1 || t('home.vision2030.paragraph1')}
-            </p>
-            <p className="text-lg leading-relaxed text-white/90">
-              {content?.vision2030?.paragraph2 || t('home.vision2030.paragraph2')}
-            </p>
+          {/* Desktop: text left, logos top-right — same row */}
+          <div className="hidden lg:flex justify-between items-start pt-16">
+            <div className="w-2/5 space-y-6">
+              <p className="text-lg leading-relaxed text-white/90">
+                {content?.vision2030?.paragraph1 || t('home.vision2030.paragraph1')}
+              </p>
+              <p className="text-lg leading-relaxed text-white/90">
+                {content?.vision2030?.paragraph2 || t('home.vision2030.paragraph2')}
+              </p>
+            </div>
+            <div className="flex items-center gap-8">
+              <img src="/images/vision2030/nuor-logo.png" alt="Nuor Steel" className="h-20 object-contain" />
+              <div className="w-px h-14 bg-white/40" />
+              <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" className="h-16 object-contain" />
+            </div>
           </div>
         </div>
       </section>
 
       {/* Core Values Section */}
-      <section id="section-core-values" className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800">
+      <section id="section-core-values" className="py-10 lg:py-16 bg-linear-to-r from-gray-900 to-gray-800">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl lg:text-4xl font-bold text-white text-center">
             {content?.core_values?.title || t('home.coreValues.title')}

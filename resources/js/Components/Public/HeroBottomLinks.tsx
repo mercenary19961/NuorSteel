@@ -30,7 +30,7 @@ export default function HeroBottomLinks() {
             transition={{ delay: 0.8 + index * 0.15, duration: 0.5, ease: 'easeOut' }}
           >
             {/* Image reveal container — hidden on mobile */}
-            <div className="relative hidden sm:block h-32 overflow-hidden mb-2 rounded-sm">
+            <div className="relative hidden sm:block h-32 lg:h-44 overflow-hidden mb-2 rounded-sm">
               <img
                 src={link.image}
                 alt=""
