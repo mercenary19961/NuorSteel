@@ -126,14 +126,13 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         {/* Background + Overlay */}
         <div className="absolute inset-0">
           <picture>
-            <source media="(max-width: 1023px)" srcSet="/images/hero/hero-mobile.png" />
+            <source media="(max-width: 1023px)" srcSet="/images/hero/hero-mobile.webp" />
             <img
-              src="/images/hero/hero-desktop.png"
+              src="/images/hero/hero-desktop.webp"
               alt=""
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover object-bottom"
             />
           </picture>
-          <div className="absolute inset-0 bg-gray-900/60" />
         </div>
 
         {/* Main Content */}
@@ -180,7 +179,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       <section id="section-about" className="py-16 lg:py-24 bg-black">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
+            <h2 className="text-3xl lg:text-5xl font-bold text-primary mb-6">
               {content?.about?.title || t('home.about.title')}
             </h2>
             <p className="text-lg text-white/80 mb-8">
@@ -200,7 +199,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       {/* Vision & Mission Section */}
       <section id="section-vision-mission" className="py-16 lg:py-24 bg-black">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl lg:text-4xl font-bold text-white text-center mb-12">
+          <h2 className="text-3xl lg:text-5xl font-bold text-primary text-center mb-12">
             {content?.vision_mission?.title || t('home.visionMission.title')}
           </h2>
           <MagicCardGrid className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
@@ -232,9 +231,9 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       <section id="section-vision-2030" className="relative min-h-screen flex flex-col text-white overflow-hidden">
         {/* Background image */}
         <picture>
-          <source media="(max-width: 1023px)" srcSet="/images/vision2030/bg-mobile.png" />
+          <source media="(max-width: 1023px)" srcSet="/images/vision2030/bg-mobile.webp" />
           <img
-            src="/images/vision2030/bg-desktop.png"
+            src="/images/vision2030/bg-desktop.webp"
             alt=""
             className="absolute inset-0 w-full h-full object-cover object-top"
           />
@@ -315,7 +314,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             </picture>
             {/* Color Overlay */}
             <div
-              className="absolute inset-0 bg-blue-900/60 transition-opacity duration-600"
+              className="absolute inset-0 bg-gray-900/70 transition-opacity duration-600"
               style={{ opacity: hoveredProduct === 0 ? 0.4 : 1 }}
             />
             {/* Content */}
@@ -356,7 +355,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             </picture>
             {/* Color Overlay */}
             <div
-              className="absolute inset-0 bg-red-900/60 transition-opacity duration-600"
+              className="absolute inset-0 bg-gray-900/70 transition-opacity duration-600"
               style={{ opacity: hoveredProduct === 1 ? 0.4 : 1 }}
             />
             {/* Content */}
