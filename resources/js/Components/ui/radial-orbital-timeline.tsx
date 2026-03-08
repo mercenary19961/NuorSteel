@@ -400,12 +400,10 @@ export default function RadialOrbitalTimeline({
                   className={`
                   rounded-full flex items-center justify-center overflow-hidden
                   ${item.image
-                    ? `border-2 ${
+                    ? `${
                         isExpanded
-                          ? "border-primary shadow-lg shadow-primary/30"
-                          : isRelated
-                          ? "border-primary animate-pulse"
-                          : "border-white/40"
+                          ? "shadow-lg shadow-primary/30"
+                          : ""
                       }`
                     : `${
                         isExpanded
