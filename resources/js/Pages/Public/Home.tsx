@@ -34,6 +34,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       content: content?.core_values?.quality_description || t('home.coreValues.quality.description'),
       category: 'Quality',
       icon: ShieldCheck,
+      image: '/images/core-values/quality.webp',
       relatedIds: [2, 4],
       status: 'completed' as const,
       energy: 100,
@@ -45,6 +46,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       content: content?.core_values?.sustainability_description || t('home.coreValues.sustainability.description'),
       category: 'Sustainability',
       icon: Leaf,
+      image: '/images/core-values/sustainability.webp',
       relatedIds: [1, 3],
       status: 'completed' as const,
       energy: 95,
@@ -56,6 +58,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       content: content?.core_values?.innovation_description || t('home.coreValues.innovation.description'),
       category: 'Innovation',
       icon: Lightbulb,
+      image: '/images/core-values/innovation.webp',
       relatedIds: [2, 4],
       status: 'completed' as const,
       energy: 90,
@@ -67,6 +70,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       content: content?.core_values?.strategic_growth_description || t('home.coreValues.strategicGrowth.description'),
       category: 'Growth',
       icon: TrendingUp,
+      image: '/images/core-values/strategic-growth.webp',
       relatedIds: [1, 3],
       status: 'completed' as const,
       energy: 85,
@@ -121,7 +125,15 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       <section id="section-hero" className="relative min-h-[87svh] lg:h-screen flex flex-col justify-between overflow-hidden">
         {/* Background + Overlay */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-linear-to-r from-gray-900 to-gray-800" />
+          <picture>
+            <source media="(max-width: 1023px)" srcSet="/images/hero/hero-mobile.png" />
+            <img
+              src="/images/hero/hero-desktop.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </picture>
+          <div className="absolute inset-0 bg-gray-900/60" />
         </div>
 
         {/* Main Content */}
@@ -217,8 +229,26 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* Vision 2030 Section */}
-      <section id="section-vision-2030" className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800 text-white">
-        <div className="container mx-auto px-4">
+      <section id="section-vision-2030" className="relative py-16 lg:py-24 text-white overflow-hidden">
+        {/* Background image */}
+        <picture>
+          <source media="(max-width: 1023px)" srcSet="/images/vision2030/bg-mobile.png" />
+          <img
+            src="/images/vision2030/bg-desktop.png"
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </picture>
+        <div className="absolute inset-0 bg-gray-900/75" />
+
+        <div className="relative z-10 container mx-auto px-4">
+          {/* Logos */}
+          <div className="flex items-center justify-center gap-6 lg:gap-10 mb-10">
+            <img src="/images/vision2030/nuor-logo.png" alt="Nuor Steel" className="h-16 lg:h-24 object-contain" />
+            <div className="w-px h-12 lg:h-16 bg-white/30" />
+            <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" className="h-12 lg:h-20 object-contain" />
+          </div>
+
           <div className="max-w-4xl mx-auto space-y-6">
             <p className="text-lg leading-relaxed text-white/90">
               {content?.vision2030?.paragraph1 || t('home.vision2030.paragraph1')}
@@ -237,7 +267,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             {content?.core_values?.title || t('home.coreValues.title')}
           </h2>
           <MagicCardGrid>
-            <RadialOrbitalTimeline timelineData={coreValuesData} />
+            <RadialOrbitalTimeline timelineData={coreValuesData} centerImage="/images/core-values/center.webp" />
           </MagicCardGrid>
         </div>
       </section>
@@ -261,8 +291,11 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             onMouseEnter={() => setHoveredProduct(0)}
             onMouseLeave={() => setHoveredProduct(null)}
           >
-            {/* Background placeholder (replace with real image later) */}
-            <div className="absolute inset-0 bg-linear-to-br from-slate-600 via-slate-500 to-slate-400" />
+            {/* Background image */}
+            <picture>
+              <source media="(max-width: 1023px)" srcSet="/images/products/tmt-bars-mobile.png" />
+              <img src="/images/products/tmt-bars-desktop.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
+            </picture>
             {/* Color Overlay */}
             <div
               className="absolute inset-0 bg-blue-900/60 transition-opacity duration-600"
@@ -299,8 +332,11 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             onMouseEnter={() => setHoveredProduct(1)}
             onMouseLeave={() => setHoveredProduct(null)}
           >
-            {/* Background placeholder (replace with real image later) */}
-            <div className="absolute inset-0 bg-linear-to-br from-gray-700 via-gray-600 to-gray-500" />
+            {/* Background image */}
+            <picture>
+              <source media="(max-width: 1023px)" srcSet="/images/products/billets-mobile.png" />
+              <img src="/images/products/billets-desktop.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
+            </picture>
             {/* Color Overlay */}
             <div
               className="absolute inset-0 bg-red-900/60 transition-opacity duration-600"

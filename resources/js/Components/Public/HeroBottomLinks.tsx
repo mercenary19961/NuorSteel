@@ -2,16 +2,9 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 
 const links = [
-  { labelKey: 'home.hero.bottomLinks.about', targetId: 'section-about' },
-  { labelKey: 'home.hero.bottomLinks.coreValues', targetId: 'section-core-values' },
-  { labelKey: 'home.hero.bottomLinks.news', targetId: 'section-linkedin' },
-];
-
-// Placeholder gradient colors for each link's hover image
-const gradients = [
-  'from-primary/50 to-orange-900/30',
-  'from-amber-600/50 to-yellow-900/30',
-  'from-green-600/50 to-emerald-900/30',
+  { labelKey: 'home.hero.bottomLinks.about', targetId: 'section-about', image: '/images/page-links/about-us.png' },
+  { labelKey: 'home.hero.bottomLinks.coreValues', targetId: 'section-core-values', image: '/images/page-links/core-values.png' },
+  { labelKey: 'home.hero.bottomLinks.news', targetId: 'section-linkedin', image: '/images/page-links/news.png' },
 ];
 
 export default function HeroBottomLinks() {
@@ -38,8 +31,10 @@ export default function HeroBottomLinks() {
           >
             {/* Image reveal container — hidden on mobile */}
             <div className="relative hidden sm:block h-32 overflow-hidden mb-2 rounded-sm">
-              <div
-                className={`absolute inset-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out bg-linear-to-t ${gradients[index]}`}
+              <img
+                src={link.image}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"
               />
             </div>
 

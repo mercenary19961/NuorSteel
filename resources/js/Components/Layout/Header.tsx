@@ -43,13 +43,21 @@ export default function Header() {
             : 'bg-linear-to-b from-gray-900 to-gray-900/70'
       } ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}
     >
-      <div className="px-4">
+      <div className="container mx-auto px-4">
         <div className={`flex items-center justify-between transition-all duration-300 ${isAtTop ? 'h-16 lg:h-20' : 'h-12 lg:h-14'}`}>
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl lg:text-2xl font-bold text-white transition-colors duration-300">
-              {t('company.name')}
-            </span>
+          <Link href="/" className="flex items-center">
+            <picture>
+              <source
+                srcSet={isAtTop ? '/images/logo/logo-lg.webp' : '/images/logo/logo-sm.webp'}
+                type="image/webp"
+              />
+              <img
+                src={isAtTop ? '/images/logo/logo-lg.png' : '/images/logo/logo-sm.png'}
+                alt={t('company.name')}
+                className={`transition-all duration-300 ${isAtTop ? 'h-10 lg:h-12' : 'h-7 lg:h-9'}`}
+              />
+            </picture>
           </Link>
 
           {/* Desktop Navigation */}
