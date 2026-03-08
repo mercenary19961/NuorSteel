@@ -350,7 +350,7 @@ export default function Content({ content: contentByPage, undoMeta }: Props) {
                     className="absolute inset-0 z-10 cursor-pointer bg-black/10"
                     onClick={() => setPreviewInteractive(true)}
                   >
-                    <div className="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 bg-gray-900/70 text-white text-xs rounded-full">
+                    <div className="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 bg-gray-900/80 text-amber-400 text-xs font-medium rounded-full">
                       <MousePointerClick size={12} />
                       Click to interact with preview
                     </div>
