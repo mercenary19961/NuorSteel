@@ -290,7 +290,7 @@ export default function RadialOrbitalTimeline({
           <div
             className={`absolute w-20 h-20 rounded-full flex items-center justify-center z-10 transition-all duration-300 ${
               centerImage
-                ? 'bg-gray-900 border-2 border-primary/50 shadow-lg shadow-primary/20'
+                ? 'bg-gray-900'
                 : 'bg-linear-to-br from-primary via-danger to-primary animate-pulse'
             } ${
               isDetailView ? 'cursor-pointer hover:scale-110 hover:shadow-lg hover:shadow-primary/40' : 'cursor-pointer hover:scale-105'

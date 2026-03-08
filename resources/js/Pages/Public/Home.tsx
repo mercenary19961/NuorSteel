@@ -177,7 +177,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* About Section */}
-      <section id="section-about" className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800">
+      <section id="section-about" className="py-16 lg:py-24 bg-black">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
@@ -198,7 +198,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* Vision & Mission Section */}
-      <section id="section-vision-mission" className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800">
+      <section id="section-vision-mission" className="py-16 lg:py-24 bg-black">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl lg:text-4xl font-bold text-white text-center mb-12">
             {content?.vision_mission?.title || t('home.visionMission.title')}
@@ -236,7 +236,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
           <img
             src="/images/vision2030/bg-desktop.png"
             alt=""
-            className="absolute inset-0 w-full h-full object-cover object-bottom"
+            className="absolute inset-0 w-full h-full object-cover object-top"
           />
         </picture>
 
@@ -278,7 +278,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* Core Values Section */}
-      <section id="section-core-values" className="py-10 lg:py-16 bg-linear-to-r from-gray-900 to-gray-800">
+      <section id="section-core-values" className="py-10 lg:py-16 bg-black">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl lg:text-4xl font-bold text-white text-center">
             {content?.core_values?.title || t('home.coreValues.title')}
@@ -316,11 +316,11 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             {/* Color Overlay */}
             <div
               className="absolute inset-0 bg-blue-900/60 transition-opacity duration-600"
-              style={{ opacity: hoveredProduct === 0 ? 0 : 1 }}
+              style={{ opacity: hoveredProduct === 0 ? 0.4 : 1 }}
             />
             {/* Content */}
             <div className="relative z-10 h-full flex flex-col justify-center items-center p-8 lg:p-12 text-white text-center min-h-87.5 lg:min-h-0">
-              <h3 className="text-3xl lg:text-4xl font-bold mb-4">
+              <h3 className="text-3xl lg:text-4xl font-bold mb-4 text-primary">
                 {t('home.products.tmtBars.title')}
               </h3>
               <p className="text-sm lg:text-base text-white/80 max-w-md leading-relaxed">
@@ -357,11 +357,11 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             {/* Color Overlay */}
             <div
               className="absolute inset-0 bg-red-900/60 transition-opacity duration-600"
-              style={{ opacity: hoveredProduct === 1 ? 0 : 1 }}
+              style={{ opacity: hoveredProduct === 1 ? 0.4 : 1 }}
             />
             {/* Content */}
             <div className="relative z-10 h-full flex flex-col justify-center items-center p-8 lg:p-12 text-white text-center min-h-87.5 lg:min-h-0">
-              <h3 className="text-3xl lg:text-4xl font-bold mb-4">
+              <h3 className="text-3xl lg:text-4xl font-bold mb-4 text-primary">
                 {t('home.products.billets.title')}
               </h3>
               <p className="text-sm lg:text-base text-white/80 max-w-md leading-relaxed">
@@ -377,7 +377,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* LinkedIn Feed Section */}
-      <section id="section-linkedin" className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800">
+      <section id="section-linkedin" className="py-16 lg:py-24 bg-black">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
             {/* Left column: info + controls (flips to right in RTL) */}
