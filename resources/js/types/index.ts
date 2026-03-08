@@ -182,6 +182,7 @@ export interface Certificate {
   description_en: string | null;
   description_ar: string | null;
   file_path: string;
+  file_media_id: number | null;
   file_url: string;
   thumbnail_id: number | null;
   issue_date: string | null;
@@ -193,6 +194,7 @@ export interface Certificate {
   created_at: string;
   updated_at: string;
   thumbnail?: Media;
+  file_media?: Media;
 }
 
 // Timeline

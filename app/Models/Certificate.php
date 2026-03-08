@@ -19,6 +19,7 @@ class Certificate extends Model
         'description_en',
         'description_ar',
         'file_path',
+        'file_media_id',
         'thumbnail_id',
         'issue_date',
         'expiry_date',
@@ -40,6 +41,11 @@ class Certificate extends Model
     public function thumbnail(): BelongsTo
     {
         return $this->belongsTo(Media::class, 'thumbnail_id');
+    }
+
+    public function fileMedia(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'file_media_id');
     }
 
     public function createdBy(): BelongsTo
@@ -68,6 +74,10 @@ class Certificate extends Model
 
     public function getFileUrlAttribute(): string
     {
+        if ($this->file_media_id) {
+            return url("/media/{$this->file_media_id}");
+        }
+
         return Storage::url($this->file_path);
     }
 

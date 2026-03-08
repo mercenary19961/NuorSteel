@@ -204,9 +204,9 @@ export default function CertificateForm({ item, undoMeta }: Props) {
               </div>
             ) : (
               <div>
-                {isEditing && item?.file_path && (
+                {isEditing && (item?.file_media?.original_filename || item?.file_path) && (
                   <p className="text-xs text-gray-500 mb-2">
-                    Current file: {item.file_path.split('/').pop()} — Upload a new file to replace it.
+                    Current file: {item?.file_media?.original_filename || item?.file_path?.split('/').pop()} — Upload a new file to replace it.
                   </p>
                 )}
                 <button

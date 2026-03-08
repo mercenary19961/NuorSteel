@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Certificate;
+use App\Models\Media;
 use App\Services\UndoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -18,7 +21,7 @@ class CertificateController extends Controller
     ) {}
     public function index(Request $request): Response
     {
-        $query = Certificate::with('thumbnail');
+        $query = Certificate::with(['thumbnail', 'fileMedia']);
 
         if ($request->filled('category')) {
             $query->where('category', $request->category);
@@ -70,7 +73,22 @@ class CertificateController extends Controller
             'sort_order' => 'integer',
         ]);
 
-        $filePath = $request->file('file')->store('certificates');
+        $uploadedFile = $request->file('file');
+        $filename = Str::random(20) . '.pdf';
+        $storagePath = 'media/' . $filename;
+
+        Storage::put($storagePath, file_get_contents($uploadedFile->getRealPath()));
+
+        $media = Media::create([
+            'filename' => $filename,
+            'original_filename' => $uploadedFile->getClientOriginalName(),
+            'path' => $storagePath,
+            'mime_type' => 'application/pdf',
+            'size' => $uploadedFile->getSize(),
+            'alt_text_en' => $request->title_en,
+            'folder' => 'certificates',
+            'uploaded_by' => Auth::id(),
+        ]);
 
         Certificate::create([
             'title_en' => $request->title_en,
@@ -78,14 +96,15 @@ class CertificateController extends Controller
             'category' => $request->category,
             'description_en' => $request->description_en,
             'description_ar' => $request->description_ar,
-            'file_path' => $filePath,
+            'file_path' => $storagePath,
+            'file_media_id' => $media->id,
             'thumbnail_id' => $request->thumbnail_id,
             'issue_date' => $request->issue_date,
             'expiry_date' => $request->expiry_date,
             'is_active' => $request->boolean('is_active', true),
             'sort_order' => $request->input('sort_order', 0),
-            'created_by' => $request->user()->id,
-            'updated_by' => $request->user()->id,
+            'created_by' => Auth::id(),
+            'updated_by' => Auth::id(),
         ]);
 
         return redirect()->route('admin.certificates.index')->with('success', 'Certificate created successfully.');
@@ -93,7 +112,7 @@ class CertificateController extends Controller
 
     public function edit(int $id): Response
     {
-        $certificate = Certificate::with('thumbnail')->findOrFail($id);
+        $certificate = Certificate::with(['thumbnail', 'fileMedia'])->findOrFail($id);
 
         return Inertia::render('Admin/Certificates/Form', [
             'item' => $certificate,
@@ -138,8 +157,33 @@ class CertificateController extends Controller
         $data['updated_by'] = $request->user()->id;
 
         if ($request->hasFile('file')) {
-            Storage::delete($certificate->file_path);
-            $data['file_path'] = $request->file('file')->store('certificates');
+            // Delete old media record (cascades file deletion via Media::deleting)
+            if ($certificate->file_media_id) {
+                Media::find($certificate->file_media_id)?->forceDelete();
+            } else {
+                Storage::delete($certificate->file_path);
+            }
+
+            // Create new media record
+            $uploadedFile = $request->file('file');
+            $filename = Str::random(20) . '.pdf';
+            $storagePath = 'media/' . $filename;
+
+            Storage::put($storagePath, file_get_contents($uploadedFile->getRealPath()));
+
+            $media = Media::create([
+                'filename' => $filename,
+                'original_filename' => $uploadedFile->getClientOriginalName(),
+                'path' => $storagePath,
+                'mime_type' => 'application/pdf',
+                'size' => $uploadedFile->getSize(),
+                'alt_text_en' => $request->title_en,
+                'folder' => 'certificates',
+                'uploaded_by' => Auth::id(),
+            ]);
+
+            $data['file_media_id'] = $media->id;
+            $data['file_path'] = $storagePath;
         }
 
         $certificate->update($data);
@@ -151,7 +195,12 @@ class CertificateController extends Controller
     {
         $certificate = Certificate::findOrFail($id);
 
-        return Storage::response($certificate->file_path, $certificate->title_en . '.pdf', [
+        // Prefer media path, fallback to legacy file_path
+        $path = $certificate->file_media_id
+            ? Media::findOrFail($certificate->file_media_id)->path
+            : $certificate->file_path;
+
+        return Storage::response($path, $certificate->title_en . '.pdf', [
             'Content-Type' => 'application/pdf',
         ]);
     }

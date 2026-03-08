@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\SiteContent;
 use App\Models\Certificate;
+use App\Models\Media;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -43,11 +44,16 @@ class CertificateController extends Controller
     {
         $certificate = Certificate::active()->findOrFail($id);
 
-        if (!Storage::exists($certificate->file_path)) {
+        // Prefer media path, fallback to legacy file_path
+        $path = $certificate->file_media_id
+            ? Media::findOrFail($certificate->file_media_id)->path
+            : $certificate->file_path;
+
+        if (!Storage::exists($path)) {
             throw new NotFoundHttpException();
         }
 
-        return Storage::response($certificate->file_path, $certificate->title_en . '.pdf', [
+        return Storage::response($path, $certificate->title_en . '.pdf', [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="' . $certificate->title_en . '.pdf"',
         ]);
