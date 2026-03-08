@@ -231,7 +231,7 @@ export default function RadialOrbitalTimeline({
     const zIndex = Math.round(100 + 50 * Math.cos(radian));
     const opacity = Math.max(
       0.4,
-      Math.min(1, 0.4 + 0.6 * ((1 + Math.sin(radian)) / 2))
+      Math.min(1, 0.4 + 0.6 * ((1 - Math.sin(radian)) / 2))
     );
 
     return { x, y, angle, zIndex, opacity };
@@ -290,7 +290,7 @@ export default function RadialOrbitalTimeline({
           <div
             className={`absolute w-20 h-20 rounded-full flex items-center justify-center z-10 transition-all duration-300 ${
               centerImage
-                ? 'bg-gray-900'
+                ? ''
                 : 'bg-linear-to-br from-primary via-danger to-primary animate-pulse'
             } ${
               isDetailView ? 'cursor-pointer hover:scale-110 hover:shadow-lg hover:shadow-primary/40' : 'cursor-pointer hover:scale-105'
@@ -315,7 +315,7 @@ export default function RadialOrbitalTimeline({
               style={{ animationDelay: "0.5s" }}
             ></div>
             {centerImage ? (
-              <img src={centerImage} alt="" className="w-14 h-14 object-contain" />
+              <img src={centerImage} alt="" className="w-20 h-20 object-contain" />
             ) : (
               <div className="w-8 h-8 rounded-full bg-white/80 backdrop-blur-md"></div>
             )}

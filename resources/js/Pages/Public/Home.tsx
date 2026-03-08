@@ -176,53 +176,108 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* About Section */}
-      <section id="section-about" className="py-16 lg:py-24 bg-black">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl lg:text-5xl font-bold text-primary mb-6">
-              {content?.about?.title || t('home.about.title')}
-            </h2>
-            <p className="text-lg text-white/80 mb-8">
-              {content?.about?.description || t('home.about.description')}
-            </p>
-            <Link
-              href="/about"
-              className="inline-flex items-center text-primary hover:text-primary/80 font-medium"
+      <section id="section-about" className="relative py-16 lg:py-24 bg-black overflow-hidden">
+        {/* Subtle grid texture */}
+        <div
+          className="absolute inset-0 opacity-[0.5]"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
+          }}
+        />
+        <div className="relative container mx-auto px-4">
+          <motion.div
+            className="max-w-3xl mx-auto text-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: 0.15 } },
+            }}
+          >
+            <motion.h2
+              className="text-3xl lg:text-5xl font-bold text-primary mb-6"
+              variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
             >
-              {t('home.about.learnMore')}
-              <ArrowRight className="ml-2" size={18} />
-            </Link>
-          </div>
+              {content?.about?.title || t('home.about.title')}
+            </motion.h2>
+            <motion.p
+              className="text-lg text-white/80 mb-8"
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+            >
+              {content?.about?.description || t('home.about.description')}
+            </motion.p>
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
+            >
+              <Link
+                href="/about"
+                className="inline-flex items-center text-primary hover:text-primary/80 font-medium"
+              >
+                {t('home.about.learnMore')}
+                <ArrowRight className="ml-2" size={18} />
+              </Link>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
       {/* Vision & Mission Section */}
-      <section id="section-vision-mission" className="py-16 lg:py-24 bg-black">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl lg:text-5xl font-bold text-primary text-center mb-12">
+      <section id="section-vision-mission" className="relative py-16 lg:py-24 bg-black overflow-hidden">
+        {/* Subtle grid texture */}
+        <div
+          className="absolute inset-0 opacity-50"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
+          }}
+        />
+        <div className="relative container mx-auto px-4">
+          <motion.h2
+            className="text-3xl lg:text-5xl font-bold text-primary text-center mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6 }}
+          >
             {content?.vision_mission?.title || t('home.visionMission.title')}
-          </h2>
+          </motion.h2>
           <MagicCardGrid className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <MagicCard className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10">
-              <div className="relative z-10">
-                <h3 className="text-xl font-semibold text-white mb-4">
-                  {content?.vision_mission?.vision_title || t('home.visionMission.visionTitle')}
-                </h3>
-                <p className="text-white/70 leading-relaxed">
-                  {content?.vision_mission?.vision_description || t('home.visionMission.visionDescription')}
-                </p>
-              </div>
-            </MagicCard>
-            <MagicCard className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10">
-              <div className="relative z-10">
-                <h3 className="text-xl font-semibold text-white mb-4">
-                  {content?.vision_mission?.mission_title || t('home.visionMission.missionTitle')}
-                </h3>
-                <p className="text-white/70 leading-relaxed">
-                  {content?.vision_mission?.mission_description || t('home.visionMission.missionDescription')}
-                </p>
-              </div>
-            </MagicCard>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              <MagicCard className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 h-full">
+                <div className="relative z-10">
+                  <h3 className="text-xl font-semibold text-white mb-4">
+                    {content?.vision_mission?.vision_title || t('home.visionMission.visionTitle')}
+                  </h3>
+                  <p className="text-white/70 leading-relaxed">
+                    {content?.vision_mission?.vision_description || t('home.visionMission.visionDescription')}
+                  </p>
+                </div>
+              </MagicCard>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <MagicCard className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 h-full">
+                <div className="relative z-10">
+                  <h3 className="text-xl font-semibold text-white mb-4">
+                    {content?.vision_mission?.mission_title || t('home.visionMission.missionTitle')}
+                  </h3>
+                  <p className="text-white/70 leading-relaxed">
+                    {content?.vision_mission?.mission_description || t('home.visionMission.missionDescription')}
+                  </p>
+                </div>
+              </MagicCard>
+            </motion.div>
           </MagicCardGrid>
         </div>
       </section>
@@ -257,8 +312,8 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             </div>
           </div>
 
-          {/* Desktop: text left, logos top-right — same row */}
-          <div className="hidden lg:flex justify-between items-start pt-16">
+          {/* Desktop: text left, logos right — same row */}
+          <div className="hidden lg:flex justify-between items-end pt-40 ">
             <div className="w-2/5 space-y-6">
               <p className="text-lg leading-relaxed text-white/90">
                 {content?.vision2030?.paragraph1 || t('home.vision2030.paragraph1')}
@@ -267,18 +322,26 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
                 {content?.vision2030?.paragraph2 || t('home.vision2030.paragraph2')}
               </p>
             </div>
-            <div className="flex items-center gap-8">
-              <img src="/images/vision2030/nuor-logo.png" alt="Nuor Steel" className="h-20 object-contain" />
-              <div className="w-px h-14 bg-white/40" />
-              <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" className="h-16 object-contain" />
+            <div className="flex flex-col items-center gap-6 me-24">
+              <img src="/images/vision2030/nuor-logo.png" alt="Nuor Steel" className="h-28 object-contain" />
+              <div className="h-px w-20 bg-white/40" />
+              <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" className="h-24 object-contain" />
             </div>
           </div>
         </div>
       </section>
 
       {/* Core Values Section */}
-      <section id="section-core-values" className="py-10 lg:py-16 bg-black">
-        <div className="container mx-auto px-4">
+      <section id="section-core-values" className="relative py-10 lg:py-16 bg-black overflow-hidden">
+        {/* Subtle grid texture */}
+        <div
+          className="absolute inset-0 opacity-50"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
+          }}
+        />
+        <div className="relative container mx-auto px-4">
           <h2 className="text-3xl lg:text-4xl font-bold text-white text-center">
             {content?.core_values?.title || t('home.coreValues.title')}
           </h2>
@@ -376,8 +439,16 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* LinkedIn Feed Section */}
-      <section id="section-linkedin" className="py-16 lg:py-24 bg-black">
-        <div className="container mx-auto px-4">
+      <section id="section-linkedin" className="relative py-16 lg:py-24 bg-black overflow-hidden">
+        {/* Subtle grid texture */}
+        <div
+          className="absolute inset-0 opacity-50"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
+          }}
+        />
+        <div className="relative container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
             {/* Left column: info + controls (flips to right in RTL) */}
             <div className="lg:w-2/5 text-center lg:text-start">

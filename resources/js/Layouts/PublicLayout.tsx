@@ -9,7 +9,7 @@ interface Props {
 
 export default function PublicLayout({ children }: Props) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-black">
       <Header />
       <main className="grow">
         {children}

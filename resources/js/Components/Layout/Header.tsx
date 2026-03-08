@@ -37,10 +37,10 @@ export default function Header() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-white/20 ${
         mobileMenuOpen
-          ? 'bg-gray-900'
+          ? 'bg-black'
           : isAtTop
             ? 'bg-transparent'
-            : 'bg-linear-to-b from-gray-900 to-gray-900/70'
+            : 'bg-linear-to-b from-black to-black/70'
       } ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}
     >
       <div className="container mx-auto px-4">
