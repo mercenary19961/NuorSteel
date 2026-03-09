@@ -189,23 +189,32 @@ export default function RadialOrbitalTimeline({
     }
   };
 
+  const rotationRef = useRef(rotationAngle);
+  const rotationRafRef = useRef<number | null>(null);
+  const lastRotationTimeRef = useRef(0);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    let rotationTimer: ReturnType<typeof setInterval>;
-
     if (autoRotate) {
-      rotationTimer = setInterval(() => {
-        setRotationAngle((prev) => {
-          const newAngle = (prev + 0.3) % 360;
-          return Number(newAngle.toFixed(3));
-        });
-      }, 50);
+      lastRotationTimeRef.current = performance.now();
+
+      const animate = (now: number) => {
+        const delta = now - lastRotationTimeRef.current;
+        lastRotationTimeRef.current = now;
+        // 0.3 degrees per 50ms = 6 degrees per second
+        rotationRef.current = (rotationRef.current + (delta * 6) / 1000) % 360;
+        setRotationAngle(rotationRef.current);
+        rotationRafRef.current = requestAnimationFrame(animate);
+      };
+
+      rotationRafRef.current = requestAnimationFrame(animate);
     }
 
     return () => {
-      if (rotationTimer) {
-        clearInterval(rotationTimer);
+      if (rotationRafRef.current) {
+        cancelAnimationFrame(rotationRafRef.current);
+        rotationRafRef.current = null;
       }
     };
   }, [autoRotate]);
@@ -217,7 +226,9 @@ export default function RadialOrbitalTimeline({
     const totalNodes = timelineData.length;
     const targetAngle = (nodeIndex / totalNodes) * 360;
 
-    setRotationAngle(270 - targetAngle);
+    const newAngle = 270 - targetAngle;
+    rotationRef.current = newAngle;
+    setRotationAngle(newAngle);
   };
 
   const calculateNodePosition = (index: number, total: number) => {

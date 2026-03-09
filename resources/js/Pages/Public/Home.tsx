@@ -82,6 +82,15 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
   const [linkedinIndex, setLinkedinIndex] = useState(0);
   const [iframeHeight, setIframeHeight] = useState(600);
   const [linkedinPaused, setLinkedinPaused] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const check = () => setIsDesktop(window.innerWidth >= 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -130,6 +139,8 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             <img
               src="/images/hero/hero-desktop.webp"
               alt=""
+              fetchPriority="high"
+              decoding="async"
               className="absolute inset-0 w-full h-full object-cover object-bottom"
             />
           </picture>
@@ -290,6 +301,8 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
           <img
             src="/images/vision2030/bg-desktop.webp"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 w-full h-full object-cover object-top"
           />
         </picture>
@@ -298,9 +311,9 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
           {/* Mobile: logos centered, then text below */}
           <div className="lg:hidden flex flex-col items-center pt-12">
             <div className="flex items-center gap-6">
-              <img src="/images/vision2030/nuor-logo.png" alt="Nuor Steel" className="h-16 object-contain" />
+              <img src="/images/vision2030/nuor-logo.png" alt="Nuor Steel" loading="lazy" decoding="async" className="h-16 object-contain" />
               <div className="w-px h-12 bg-white/40" />
-              <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" className="h-12 object-contain" />
+              <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" loading="lazy" decoding="async" className="h-12 object-contain" />
             </div>
             <div className="space-y-6 pt-8">
               <p className="text-base leading-relaxed text-white/90">
@@ -323,9 +336,9 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
               </p>
             </div>
             <div className="flex flex-col items-center gap-6 me-24">
-              <img src="/images/vision2030/nuor-logo.png" alt="Nuor Steel" className="h-28 object-contain" />
+              <img src="/images/vision2030/nuor-logo.png" alt="Nuor Steel" loading="lazy" decoding="async" className="h-28 object-contain" />
               <div className="h-px w-20 bg-white/40" />
-              <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" className="h-24 object-contain" />
+              <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" loading="lazy" decoding="async" className="h-24 object-contain" />
             </div>
           </div>
         </div>
@@ -361,7 +374,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             style={{
               flex: hoveredProduct === 0 ? 1.4 : hoveredProduct === 1 ? 0.6 : 1,
               transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-              clipPath: typeof window !== 'undefined' && window.innerWidth >= 1024
+              clipPath: isDesktop
                 ? language === 'ar'
                   ? 'polygon(3px 0, 100% 0, 100% 100%, calc(3rem + 3px) 100%)'
                   : 'polygon(0 0, calc(100% - 3px) 0, calc(100% - 3rem - 3px) 100%, 0 100%)'
@@ -373,7 +386,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             {/* Background image */}
             <picture>
               <source media="(max-width: 1023px)" srcSet="/images/products/tmt-bars-mobile.png" />
-              <img src="/images/products/tmt-bars-desktop.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
+              <img src="/images/products/tmt-bars-desktop.png" alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
             </picture>
             {/* Color Overlay */}
             <div
@@ -402,7 +415,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             style={{
               flex: hoveredProduct === 1 ? 1.4 : hoveredProduct === 0 ? 0.6 : 1,
               transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-              clipPath: typeof window !== 'undefined' && window.innerWidth >= 1024
+              clipPath: isDesktop
                 ? language === 'ar'
                   ? 'polygon(0 0, calc(100% - 3rem - 3px) 0, calc(100% - 3px) 100%, 0 100%)'
                   : 'polygon(calc(3rem + 3px) 0, 100% 0, 100% 100%, 3px 100%)'
@@ -414,7 +427,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             {/* Background image */}
             <picture>
               <source media="(max-width: 1023px)" srcSet="/images/products/billets-mobile.png" />
-              <img src="/images/products/billets-desktop.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
+              <img src="/images/products/billets-desktop.png" alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
             </picture>
             {/* Color Overlay */}
             <div
