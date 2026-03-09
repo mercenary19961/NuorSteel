@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowRight, ChevronLeft, ChevronRight, ShieldCheck, Leaf, Lightbulb, TrendingUp, Linkedin } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, ShieldCheck, Leaf, Lightbulb, TrendingUp, Linkedin, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import HeroBottomLinks from '@/Components/Public/HeroBottomLinks';
@@ -493,7 +493,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
               )}
 
               <a
-                href="https://www.linkedin.com/company/nuorsteel"
+                href="https://www.linkedin.com/company/nuor-steel/?trk=public_post_embed_feed-actor-name"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center px-6 py-3 bg-[#0A66C2] hover:bg-[#004182] text-white rounded-md font-medium transition-colors"
@@ -531,6 +531,19 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
                         className="h-full bg-[#0A66C2] rounded-full transition-[width] duration-500 ease-in-out"
                         style={{ width: `${((linkedinIndex + 1) / linkedin_posts.length) * 100}%` }}
                       />
+                    </div>
+                  )}
+                  {linkedin_posts[linkedinIndex]?.post_url && (
+                    <div className="mt-4 flex justify-center">
+                      <a
+                        href={linkedin_posts[linkedinIndex].post_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-md text-sm font-medium transition-colors"
+                      >
+                        {t('home.linkedin.viewPost')}
+                        <ExternalLink size={16} />
+                      </a>
                     </div>
                   )}
                 </div>
