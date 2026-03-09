@@ -186,19 +186,25 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         </div>
       </section>
 
-      {/* About Section */}
-      <section id="section-about" className="relative py-16 lg:py-24 bg-black overflow-hidden">
-        {/* Subtle grid texture */}
-        <div
-          className="absolute inset-0 opacity-60"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
-        <div className="relative container mx-auto px-4">
+      {/* About Section (includes Vision & Mission) */}
+      <section id="section-about" className="relative min-h-screen flex flex-col justify-center overflow-hidden">
+        {/* Background image */}
+        <picture>
+          <source media="(max-width: 1023px)" srcSet="/images/about/bg-mobile.webp" />
+          <img
+            src="/images/about/bg-desktop.webp"
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </picture>
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-black/60" />
+
+        <div className="relative z-10 container mx-auto px-4">
           <motion.div
-            className="max-w-3xl mx-auto text-center"
+            className="max-w-3xl mx-auto text-center mb-16"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
@@ -208,7 +214,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             }}
           >
             <motion.h2
-              className="text-3xl lg:text-5xl font-bold text-primary mb-6"
+              className="text-3xl lg:text-5xl font-bold text-white mb-6"
               variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
             >
               {content?.about?.title || t('home.about.title')}
@@ -231,29 +237,8 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
               </Link>
             </motion.div>
           </motion.div>
-        </div>
-      </section>
 
-      {/* Vision & Mission Section */}
-      <section id="section-vision-mission" className="relative py-16 lg:py-24 bg-black overflow-hidden">
-        {/* Subtle grid texture */}
-        <div
-          className="absolute inset-0 opacity-60"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
-        <div className="relative container mx-auto px-4">
-          <motion.h2
-            className="text-3xl lg:text-5xl font-bold text-primary text-center mb-12"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6 }}
-          >
-            {content?.vision_mission?.title || t('home.visionMission.title')}
-          </motion.h2>
+          {/* Vision & Mission cards */}
           <MagicCardGrid className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}

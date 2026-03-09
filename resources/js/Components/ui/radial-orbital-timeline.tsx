@@ -55,7 +55,7 @@ export default function RadialOrbitalTimeline({
     const updateSizes = () => {
       const w = window.innerWidth;
       setOrbitRadius(w < 640 ? 140 : w < 1024 ? 200 : w < 1280 ? 280 : 320);
-      setNodeSize(w < 640 ? 40 : w < 1024 ? 40 : 56);
+      setNodeSize(w < 640 ? 40 : w < 1024 ? 40 : 72);
       setIsLargeScreen(w >= 1024);
     };
     updateSizes();
@@ -299,7 +299,7 @@ export default function RadialOrbitalTimeline({
           }}
         >
           <div
-            className={`absolute w-20 h-20 rounded-full flex items-center justify-center z-10 transition-all duration-300 ${
+            className={`absolute w-32 h-32 rounded-full flex items-center justify-center z-10 transition-all duration-300 ${
               centerImage
                 ? ''
                 : 'bg-linear-to-br from-primary via-danger to-primary animate-pulse'
@@ -326,7 +326,7 @@ export default function RadialOrbitalTimeline({
               style={{ animationDelay: "0.5s" }}
             ></div>
             {centerImage ? (
-              <img src={centerImage} alt="" className="w-20 h-20 object-contain" />
+              <img src={centerImage} alt="" className="w-32 h-32 object-contain" />
             ) : (
               <div className="w-8 h-8 rounded-full bg-white/80 backdrop-blur-md"></div>
             )}
