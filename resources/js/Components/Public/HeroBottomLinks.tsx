@@ -34,6 +34,8 @@ export default function HeroBottomLinks() {
               <img
                 src={link.image}
                 alt=""
+                loading="lazy"
+                decoding="async"
                 className="absolute inset-0 w-full h-full object-cover translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"
               />
             </div>

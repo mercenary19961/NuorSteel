@@ -224,11 +224,10 @@ class CareerController extends Controller
         $this->undoService->saveState('application', $application->id, $oldData, $newData);
         session()->put('undo_application_last_id', $application->id);
 
-        $application->update([
-            'status' => $request->status,
-            'admin_notes' => $request->admin_notes,
-            'reviewed_by' => $request->user()->id,
-        ]);
+        $application->status = $request->status;
+        $application->admin_notes = $request->admin_notes;
+        $application->reviewed_by = $request->user()->id;
+        $application->save();
 
         return redirect()->back()->with('success', 'Application updated successfully.');
     }

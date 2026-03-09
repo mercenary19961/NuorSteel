@@ -78,6 +78,7 @@ const en = {
       title: "Latest from LinkedIn",
       subtitle: "Stay updated with our latest news and insights",
       noPosts: "Follow us on LinkedIn for the latest updates.",
+      viewPost: "View Post on LinkedIn",
     },
     cta: {
       title: "Ready to Get Started?",

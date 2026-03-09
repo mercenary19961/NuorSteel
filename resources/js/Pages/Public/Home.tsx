@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowRight, ChevronLeft, ChevronRight, ShieldCheck, Leaf, Lightbulb, TrendingUp, Linkedin } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, ShieldCheck, Leaf, Lightbulb, TrendingUp, Linkedin, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import HeroBottomLinks from '@/Components/Public/HeroBottomLinks';
@@ -82,6 +82,15 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
   const [linkedinIndex, setLinkedinIndex] = useState(0);
   const [iframeHeight, setIframeHeight] = useState(600);
   const [linkedinPaused, setLinkedinPaused] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const check = () => setIsDesktop(window.innerWidth >= 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -126,14 +135,15 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         {/* Background + Overlay */}
         <div className="absolute inset-0">
           <picture>
-            <source media="(max-width: 1023px)" srcSet="/images/hero/hero-mobile.png" />
+            <source media="(max-width: 1023px)" srcSet="/images/hero/hero-mobile.webp" />
             <img
-              src="/images/hero/hero-desktop.png"
+              src="/images/hero/hero-desktop.webp"
               alt=""
-              className="absolute inset-0 w-full h-full object-cover"
+              fetchPriority="high"
+              decoding="async"
+              className="absolute inset-0 w-full h-full object-cover object-bottom"
             />
           </picture>
-          <div className="absolute inset-0 bg-gray-900/60" />
         </div>
 
         {/* Main Content */}
@@ -176,54 +186,94 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         </div>
       </section>
 
-      {/* About Section */}
-      <section id="section-about" className="py-16 lg:py-24 bg-black">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
-              {content?.about?.title || t('home.about.title')}
-            </h2>
-            <p className="text-lg text-white/80 mb-8">
-              {content?.about?.description || t('home.about.description')}
-            </p>
-            <Link
-              href="/about"
-              className="inline-flex items-center text-primary hover:text-primary/80 font-medium"
-            >
-              {t('home.about.learnMore')}
-              <ArrowRight className="ml-2" size={18} />
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* About Section (includes Vision & Mission) */}
+      <section id="section-about" className="relative min-h-screen flex flex-col justify-center overflow-hidden">
+        {/* Background image */}
+        <picture>
+          <source media="(max-width: 1023px)" srcSet="/images/about/bg-mobile.webp" />
+          <img
+            src="/images/about/bg-desktop.webp"
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 w-full h-full object-cover object-bottom"
+          />
+        </picture>
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-black/10" />
 
-      {/* Vision & Mission Section */}
-      <section id="section-vision-mission" className="py-16 lg:py-24 bg-black">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl lg:text-4xl font-bold text-white text-center mb-12">
-            {content?.vision_mission?.title || t('home.visionMission.title')}
-          </h2>
+        <div className="relative z-10 container mx-auto px-4">
+          <motion.div
+            className="max-w-3xl mx-auto text-center mb-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: 0.15 } },
+            }}
+          >
+            <motion.h2
+              className="text-3xl lg:text-5xl font-bold text-white mb-6"
+              variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+            >
+              {content?.about?.title || t('home.about.title')}
+            </motion.h2>
+            <motion.p
+              className="text-lg text-white/80 mb-8"
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+            >
+              {content?.about?.description || t('home.about.description')}
+            </motion.p>
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
+            >
+              <Link
+                href="/about"
+                className="inline-flex items-center text-primary hover:text-primary/80 font-medium"
+              >
+                {t('home.about.learnMore')}
+                <ArrowRight className="ml-2" size={18} />
+              </Link>
+            </motion.div>
+          </motion.div>
+
+          {/* Vision & Mission cards */}
           <MagicCardGrid className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <MagicCard className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10">
-              <div className="relative z-10">
-                <h3 className="text-xl font-semibold text-white mb-4">
-                  {content?.vision_mission?.vision_title || t('home.visionMission.visionTitle')}
-                </h3>
-                <p className="text-white/70 leading-relaxed">
-                  {content?.vision_mission?.vision_description || t('home.visionMission.visionDescription')}
-                </p>
-              </div>
-            </MagicCard>
-            <MagicCard className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10">
-              <div className="relative z-10">
-                <h3 className="text-xl font-semibold text-white mb-4">
-                  {content?.vision_mission?.mission_title || t('home.visionMission.missionTitle')}
-                </h3>
-                <p className="text-white/70 leading-relaxed">
-                  {content?.vision_mission?.mission_description || t('home.visionMission.missionDescription')}
-                </p>
-              </div>
-            </MagicCard>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              <MagicCard className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 h-full">
+                <div className="relative z-10">
+                  <h3 className="text-xl font-semibold text-white mb-4">
+                    {content?.vision_mission?.vision_title || t('home.visionMission.visionTitle')}
+                  </h3>
+                  <p className="text-white/70 leading-relaxed">
+                    {content?.vision_mission?.vision_description || t('home.visionMission.visionDescription')}
+                  </p>
+                </div>
+              </MagicCard>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <MagicCard className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 h-full">
+                <div className="relative z-10">
+                  <h3 className="text-xl font-semibold text-white mb-4">
+                    {content?.vision_mission?.mission_title || t('home.visionMission.missionTitle')}
+                  </h3>
+                  <p className="text-white/70 leading-relaxed">
+                    {content?.vision_mission?.mission_description || t('home.visionMission.missionDescription')}
+                  </p>
+                </div>
+              </MagicCard>
+            </motion.div>
           </MagicCardGrid>
         </div>
       </section>
@@ -232,54 +282,58 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       <section id="section-vision-2030" className="relative min-h-screen flex flex-col text-white overflow-hidden">
         {/* Background image */}
         <picture>
-          <source media="(max-width: 1023px)" srcSet="/images/vision2030/bg-mobile.png" />
+          <source media="(max-width: 1023px)" srcSet="/images/vision2030/bg-mobile.webp" />
           <img
-            src="/images/vision2030/bg-desktop.png"
+            src="/images/vision2030/bg-desktop.webp"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 w-full h-full object-cover object-top"
           />
         </picture>
 
-        <div className="relative z-10 flex-1 flex flex-col container mx-auto px-4">
-          {/* Mobile: logos centered, then text below */}
-          <div className="lg:hidden flex flex-col items-center pt-12">
-            <div className="flex items-center gap-6">
-              <img src="/images/vision2030/nuor-logo.png" alt="Nuor Steel" className="h-16 object-contain" />
-              <div className="w-px h-12 bg-white/40" />
-              <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" className="h-12 object-contain" />
-            </div>
+        <div className="relative z-10 flex-1 flex flex-col justify-center container mx-auto px-4">
+          {/* Mobile: logo centered, then text below */}
+          <div className="lg:hidden flex flex-col items-center">
+            <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" loading="lazy" decoding="async" className="h-24 object-contain" />
             <div className="space-y-6 pt-8">
-              <p className="text-base leading-relaxed text-white/90">
+              <p className="text-lg leading-relaxed text-white/90">
                 {content?.vision2030?.paragraph1 || t('home.vision2030.paragraph1')}
               </p>
-              <p className="text-base leading-relaxed text-white/90">
+              <p className="text-lg leading-relaxed text-white/90">
                 {content?.vision2030?.paragraph2 || t('home.vision2030.paragraph2')}
               </p>
             </div>
           </div>
 
-          {/* Desktop: text left, logos top-right — same row */}
-          <div className="hidden lg:flex justify-between items-start pt-16">
-            <div className="w-2/5 space-y-6">
-              <p className="text-lg leading-relaxed text-white/90">
+          {/* Desktop: text left, logo right — same row */}
+          <div className="hidden lg:flex justify-between items-center">
+            <div className="w-1/2 space-y-6">
+              <p className="text-xl leading-relaxed text-white/90">
                 {content?.vision2030?.paragraph1 || t('home.vision2030.paragraph1')}
               </p>
-              <p className="text-lg leading-relaxed text-white/90">
+              <p className="text-xl leading-relaxed text-white/90">
                 {content?.vision2030?.paragraph2 || t('home.vision2030.paragraph2')}
               </p>
             </div>
-            <div className="flex items-center gap-8">
-              <img src="/images/vision2030/nuor-logo.png" alt="Nuor Steel" className="h-20 object-contain" />
-              <div className="w-px h-14 bg-white/40" />
-              <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" className="h-16 object-contain" />
+            <div className="flex items-center justify-center me-24">
+              <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" loading="lazy" decoding="async" className="h-72 object-contain" />
             </div>
           </div>
         </div>
       </section>
 
       {/* Core Values Section */}
-      <section id="section-core-values" className="py-10 lg:py-16 bg-black">
-        <div className="container mx-auto px-4">
+      <section id="section-core-values" className="relative py-10 lg:py-16 bg-black overflow-hidden">
+        {/* Subtle grid texture */}
+        <div
+          className="absolute inset-0 opacity-60"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
+          }}
+        />
+        <div className="relative container mx-auto px-4">
           <h2 className="text-3xl lg:text-4xl font-bold text-white text-center">
             {content?.core_values?.title || t('home.coreValues.title')}
           </h2>
@@ -294,12 +348,12 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         <div className="flex flex-col lg:flex-row min-h-100 lg:min-h-137.5 lg:bg-white/20">
           {/* TMT Bars */}
           <Link
-            href="/products"
+            href="/products?product=tmt-bars&expanded=true"
             className="relative z-10 flex-1 overflow-hidden cursor-pointer group"
             style={{
               flex: hoveredProduct === 0 ? 1.4 : hoveredProduct === 1 ? 0.6 : 1,
               transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-              clipPath: typeof window !== 'undefined' && window.innerWidth >= 1024
+              clipPath: isDesktop
                 ? language === 'ar'
                   ? 'polygon(3px 0, 100% 0, 100% 100%, calc(3rem + 3px) 100%)'
                   : 'polygon(0 0, calc(100% - 3px) 0, calc(100% - 3rem - 3px) 100%, 0 100%)'
@@ -311,11 +365,11 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             {/* Background image */}
             <picture>
               <source media="(max-width: 1023px)" srcSet="/images/products/tmt-bars-mobile.png" />
-              <img src="/images/products/tmt-bars-desktop.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
+              <img src="/images/products/tmt-bars-desktop.png" alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
             </picture>
             {/* Color Overlay */}
             <div
-              className="absolute inset-0 bg-blue-900/60 transition-opacity duration-600"
+              className="absolute inset-0 bg-gray-900/70 transition-opacity duration-600"
               style={{ opacity: hoveredProduct === 0 ? 0.4 : 1 }}
             />
             {/* Content */}
@@ -335,12 +389,12 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
 
           {/* Billets */}
           <Link
-            href="/products"
+            href="/products?product=billets&expanded=true"
             className="relative flex-1 overflow-hidden cursor-pointer group lg:-ms-12"
             style={{
               flex: hoveredProduct === 1 ? 1.4 : hoveredProduct === 0 ? 0.6 : 1,
               transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-              clipPath: typeof window !== 'undefined' && window.innerWidth >= 1024
+              clipPath: isDesktop
                 ? language === 'ar'
                   ? 'polygon(0 0, calc(100% - 3rem - 3px) 0, calc(100% - 3px) 100%, 0 100%)'
                   : 'polygon(calc(3rem + 3px) 0, 100% 0, 100% 100%, 3px 100%)'
@@ -352,11 +406,11 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             {/* Background image */}
             <picture>
               <source media="(max-width: 1023px)" srcSet="/images/products/billets-mobile.png" />
-              <img src="/images/products/billets-desktop.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
+              <img src="/images/products/billets-desktop.png" alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
             </picture>
             {/* Color Overlay */}
             <div
-              className="absolute inset-0 bg-red-900/60 transition-opacity duration-600"
+              className="absolute inset-0 bg-gray-900/70 transition-opacity duration-600"
               style={{ opacity: hoveredProduct === 1 ? 0.4 : 1 }}
             />
             {/* Content */}
@@ -377,8 +431,16 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* LinkedIn Feed Section */}
-      <section id="section-linkedin" className="py-16 lg:py-24 bg-black">
-        <div className="container mx-auto px-4">
+      <section id="section-linkedin" className="relative py-16 lg:py-24 bg-black overflow-hidden">
+        {/* Subtle grid texture */}
+        <div
+          className="absolute inset-0 opacity-60"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
+          }}
+        />
+        <div className="relative container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
             {/* Left column: info + controls (flips to right in RTL) */}
             <div className="lg:w-2/5 text-center lg:text-start">
@@ -410,7 +472,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
               )}
 
               <a
-                href="https://www.linkedin.com/company/nuorsteel"
+                href="https://www.linkedin.com/company/nuor-steel/?trk=public_post_embed_feed-actor-name"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center px-6 py-3 bg-[#0A66C2] hover:bg-[#004182] text-white rounded-md font-medium transition-colors"
@@ -448,6 +510,19 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
                         className="h-full bg-[#0A66C2] rounded-full transition-[width] duration-500 ease-in-out"
                         style={{ width: `${((linkedinIndex + 1) / linkedin_posts.length) * 100}%` }}
                       />
+                    </div>
+                  )}
+                  {linkedin_posts[linkedinIndex]?.post_url && (
+                    <div className="mt-4 flex justify-center">
+                      <a
+                        href={linkedin_posts[linkedinIndex].post_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-md text-sm font-medium transition-colors"
+                      >
+                        {t('home.linkedin.viewPost')}
+                        <ExternalLink size={16} />
+                      </a>
                     </div>
                   )}
                 </div>

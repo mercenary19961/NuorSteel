@@ -43,7 +43,7 @@ class TimelineController extends Controller
         ]);
 
         TimelineEvent::create([
-            ...$request->all(),
+            ...$request->only(['year', 'title_en', 'title_ar', 'description_en', 'description_ar', 'image_id', 'sort_order']),
             'created_by' => $request->user()->id,
             'updated_by' => $request->user()->id,
         ]);
@@ -65,7 +65,7 @@ class TimelineController extends Controller
 
         $event = TimelineEvent::findOrFail($id);
         $event->update([
-            ...$request->all(),
+            ...$request->only(['year', 'title_en', 'title_ar', 'description_en', 'description_ar', 'image_id', 'sort_order']),
             'updated_by' => $request->user()->id,
         ]);
 

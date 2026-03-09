@@ -7,6 +7,7 @@ use App\Models\SiteContent;
 use App\Models\Certificate;
 use App\Models\Media;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -53,9 +54,13 @@ class CertificateController extends Controller
             throw new NotFoundHttpException();
         }
 
-        return Storage::response($path, $certificate->title_en . '.pdf', [
+        $safeFilename = Str::ascii(
+            str_replace(['"', "\r", "\n", '\\'], '', $certificate->title_en)
+        );
+
+        return Storage::response($path, $safeFilename . '.pdf', [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="' . $certificate->title_en . '.pdf"',
+            'Content-Disposition' => 'inline; filename="' . $safeFilename . '.pdf"',
         ]);
     }
 

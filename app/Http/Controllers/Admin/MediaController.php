@@ -38,18 +38,18 @@ class MediaController extends Controller
 
         $media = $query->orderByDesc('created_at')->paginate(24);
 
-        // Merge DB-derived folders with custom (empty) folders from settings
-        $dbFolders = Media::distinct()->pluck('folder')->toArray();
+        // Single query: folder names + counts
+        $folderCounts = Media::selectRaw('folder, count(*) as count')
+            ->groupBy('folder')
+            ->pluck('count', 'folder');
+
+        $dbFolders = $folderCounts->keys()->toArray();
         $customFolders = $this->getCustomFolders();
         $allFolders = collect(array_unique(array_merge($dbFolders, $customFolders)))
             ->sort()
             ->values()
             ->sortBy(fn ($f) => $f === 'general' ? 0 : 1)
             ->values();
-
-        $folderCounts = Media::selectRaw('folder, count(*) as count')
-            ->groupBy('folder')
-            ->pluck('count', 'folder');
 
         // Build usage map for the current page of media items
         $mediaIds = $media->pluck('id');
@@ -150,7 +150,7 @@ class MediaController extends Controller
         $file = $request->file('file');
         $folder = $request->input('folder', 'general');
 
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $filename = Str::uuid() . '.' . ($file->extension() ?: $file->getClientOriginalExtension());
         $path = $file->storeAs("media/{$folder}", $filename);
 
         Media::create([
@@ -237,15 +237,15 @@ class MediaController extends Controller
         }
 
         if ($request->filled('search')) {
-            $query->where('original_filename', 'like', '%' . $request->search . '%');
+            $search = str_replace(['%', '_'], ['\\%', '\\_'], $request->search);
+            $query->where('original_filename', 'like', '%' . $search . '%');
         }
 
         $media = $query->orderByDesc('created_at')->paginate(24);
-        $folders = Media::distinct()->pluck('folder');
 
         return response()->json([
             'media' => $media,
-            'folders' => $folders,
+            'folders' => Media::distinct()->pluck('folder'),
         ]);
     }
 
@@ -259,7 +259,7 @@ class MediaController extends Controller
         $file = $request->file('file');
         $folder = $request->input('folder', 'general');
 
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $filename = Str::uuid() . '.' . ($file->extension() ?: $file->getClientOriginalExtension());
         $path = $file->storeAs("media/{$folder}", $filename);
 
         $media = Media::create([

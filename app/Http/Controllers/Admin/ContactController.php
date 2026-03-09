@@ -7,6 +7,7 @@ use App\Models\ContactSubmission;
 use App\Services\UndoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -40,14 +41,7 @@ class ContactController extends Controller
 
         return Inertia::render('Admin/Contacts', [
             'submissions' => $query->ordered()->paginate(15)->withQueryString(),
-            'stats' => [
-                'total' => ContactSubmission::count(),
-                'unread' => ContactSubmission::unread()->notArchived()->count(),
-                'by_type' => ContactSubmission::notArchived()
-                    ->selectRaw('request_type, count(*) as count')
-                    ->groupBy('request_type')
-                    ->pluck('count', 'request_type'),
-            ],
+            'stats' => $this->getStats(),
             'filters' => $request->only(['request_type', 'is_read', 'archived']),
             'undoMeta' => $undoMeta,
             'undoModelId' => $undoMeta ? (string) $lastId : null,
@@ -86,6 +80,25 @@ class ContactController extends Controller
         $submission->delete();
 
         return redirect()->back()->with('success', 'Submission deleted.');
+    }
+
+    private function getStats(): array
+    {
+        $row = ContactSubmission::query()
+            ->selectRaw('count(*) as total')
+            ->selectRaw('sum(case when is_read = 0 and is_archived = 0 then 1 else 0 end) as unread')
+            ->first();
+
+        $byType = ContactSubmission::notArchived()
+            ->selectRaw('request_type, count(*) as count')
+            ->groupBy('request_type')
+            ->pluck('count', 'request_type');
+
+        return [
+            'total' => (int) $row->total,
+            'unread' => (int) $row->unread,
+            'by_type' => $byType,
+        ];
     }
 
     public function downloadFile(int $id): mixed

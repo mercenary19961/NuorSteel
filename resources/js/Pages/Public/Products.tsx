@@ -174,8 +174,12 @@ function ProductTabs({ activeTab, onTabChange }: { activeTab: TabKey; onTabChang
 export default function Products({ products }: Props) {
   const { t } = useTranslation();
   const { language } = useLanguage();
-  const [selectedSlug, setSelectedSlug] = useState(products[0]?.slug ?? '');
-  const [expanded, setExpanded] = useState(false);
+  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const initialSlug = (urlParams?.get('product') && products.find(p => p.slug === urlParams.get('product'))?.slug) || products[0]?.slug || '';
+  const initialExpanded = urlParams?.get('expanded') === 'true';
+
+  const [selectedSlug, setSelectedSlug] = useState(initialSlug);
+  const [expanded, setExpanded] = useState(initialExpanded);
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
   const [isLg, setIsLg] = useState(false);
   const detailRef = useRef<HTMLDivElement>(null);

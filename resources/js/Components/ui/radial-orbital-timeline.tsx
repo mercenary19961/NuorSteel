@@ -55,7 +55,7 @@ export default function RadialOrbitalTimeline({
     const updateSizes = () => {
       const w = window.innerWidth;
       setOrbitRadius(w < 640 ? 140 : w < 1024 ? 200 : w < 1280 ? 280 : 320);
-      setNodeSize(w < 640 ? 40 : w < 1024 ? 40 : 56);
+      setNodeSize(w < 640 ? 40 : w < 1024 ? 40 : 72);
       setIsLargeScreen(w >= 1024);
     };
     updateSizes();
@@ -189,23 +189,32 @@ export default function RadialOrbitalTimeline({
     }
   };
 
+  const rotationRef = useRef(rotationAngle);
+  const rotationRafRef = useRef<number | null>(null);
+  const lastRotationTimeRef = useRef(0);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    let rotationTimer: ReturnType<typeof setInterval>;
-
     if (autoRotate) {
-      rotationTimer = setInterval(() => {
-        setRotationAngle((prev) => {
-          const newAngle = (prev + 0.3) % 360;
-          return Number(newAngle.toFixed(3));
-        });
-      }, 50);
+      lastRotationTimeRef.current = performance.now();
+
+      const animate = (now: number) => {
+        const delta = now - lastRotationTimeRef.current;
+        lastRotationTimeRef.current = now;
+        // 0.3 degrees per 50ms = 6 degrees per second
+        rotationRef.current = (rotationRef.current + (delta * 6) / 1000) % 360;
+        setRotationAngle(rotationRef.current);
+        rotationRafRef.current = requestAnimationFrame(animate);
+      };
+
+      rotationRafRef.current = requestAnimationFrame(animate);
     }
 
     return () => {
-      if (rotationTimer) {
-        clearInterval(rotationTimer);
+      if (rotationRafRef.current) {
+        cancelAnimationFrame(rotationRafRef.current);
+        rotationRafRef.current = null;
       }
     };
   }, [autoRotate]);
@@ -217,7 +226,9 @@ export default function RadialOrbitalTimeline({
     const totalNodes = timelineData.length;
     const targetAngle = (nodeIndex / totalNodes) * 360;
 
-    setRotationAngle(270 - targetAngle);
+    const newAngle = 270 - targetAngle;
+    rotationRef.current = newAngle;
+    setRotationAngle(newAngle);
   };
 
   const calculateNodePosition = (index: number, total: number) => {
@@ -231,7 +242,7 @@ export default function RadialOrbitalTimeline({
     const zIndex = Math.round(100 + 50 * Math.cos(radian));
     const opacity = Math.max(
       0.4,
-      Math.min(1, 0.4 + 0.6 * ((1 + Math.sin(radian)) / 2))
+      Math.min(1, 0.4 + 0.6 * ((1 - Math.sin(radian)) / 2))
     );
 
     return { x, y, angle, zIndex, opacity };
@@ -288,9 +299,9 @@ export default function RadialOrbitalTimeline({
           }}
         >
           <div
-            className={`absolute w-20 h-20 rounded-full flex items-center justify-center z-10 transition-all duration-300 ${
+            className={`absolute w-32 h-32 rounded-full flex items-center justify-center z-10 transition-all duration-300 ${
               centerImage
-                ? 'bg-gray-900'
+                ? ''
                 : 'bg-linear-to-br from-primary via-danger to-primary animate-pulse'
             } ${
               isDetailView ? 'cursor-pointer hover:scale-110 hover:shadow-lg hover:shadow-primary/40' : 'cursor-pointer hover:scale-105'
@@ -315,7 +326,7 @@ export default function RadialOrbitalTimeline({
               style={{ animationDelay: "0.5s" }}
             ></div>
             {centerImage ? (
-              <img src={centerImage} alt="" className="w-14 h-14 object-contain" />
+              <img src={centerImage} alt="" className="w-32 h-32 object-contain" />
             ) : (
               <div className="w-8 h-8 rounded-full bg-white/80 backdrop-blur-md"></div>
             )}

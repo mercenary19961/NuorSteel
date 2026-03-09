@@ -19,8 +19,10 @@ class ContactFormSubmitted extends Mailable
 
     public function envelope(): Envelope
     {
+        $safeSubject = str_replace(["\r", "\n", "\t"], '', $this->submission->subject);
+
         return new Envelope(
-            subject: 'New Contact Submission: ' . $this->submission->subject,
+            subject: 'New Contact Submission: ' . mb_substr($safeSubject, 0, 100),
         );
     }
 

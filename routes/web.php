@@ -55,7 +55,7 @@ Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
 Route::get('/media/{id}', [MediaServeController::class, 'show'])->name('media.serve')->where('id', '[0-9]+');
 
 // Locale switch
-Route::post('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
+Route::post('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch')->middleware('throttle:30,1');
 
 /*
 |--------------------------------------------------------------------------

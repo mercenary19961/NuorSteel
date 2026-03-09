@@ -11,7 +11,7 @@ return new class extends Migration
             [
                 'post_id' => 'urn:li:ugcPost:7301318483181522944',
                 'content' => 'first',
-                'post_url' => 'https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7301318483181522944',
+                'post_url' => 'https://www.linkedin.com/feed/update/urn:li:ugcPost:7301318483181522944',
                 'posted_at' => '2026-02-23 07:59:31',
                 'sort_order' => 0,
             ],

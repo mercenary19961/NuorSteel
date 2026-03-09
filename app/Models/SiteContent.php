@@ -69,9 +69,15 @@ class SiteContent extends Model
         return $result;
     }
 
+    private static array $pageCache = [];
+
     public static function getPage(string $page, string $locale = 'en'): array
     {
-        $contents = static::where('page', $page)->get();
+        if (!isset(static::$pageCache[$page])) {
+            static::$pageCache[$page] = static::where('page', $page)->get();
+        }
+
+        $contents = static::$pageCache[$page];
 
         $result = [];
         foreach ($contents as $content) {
