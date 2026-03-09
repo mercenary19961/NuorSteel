@@ -9,6 +9,7 @@ use Tighten\Ziggy\Ziggy;
 
 class HandleInertiaRequests extends Middleware
 {
+    private ?array $cachedSettings = null;
     /**
      * The root template that is loaded on the first page visit.
      */
@@ -42,15 +43,7 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
-            'siteSettings' => fn () => [
-                'phone' => Setting::get('company_phone', ''),
-                'email' => Setting::get('company_email', ''),
-                'address' => Setting::get(
-                    session('locale', 'en') === 'ar' ? 'company_address_ar' : 'company_address_en',
-                    ''
-                ),
-                'linkedin_url' => Setting::get('linkedin_url', ''),
-            ],
+            'siteSettings' => fn () => $this->getSiteSettings(),
             'ziggy' => function () use ($request) {
                 $ziggy = new Ziggy;
 
@@ -64,5 +57,25 @@ class HandleInertiaRequests extends Middleware
                 ];
             },
         ]);
+    }
+
+    private function getSiteSettings(): array
+    {
+        if ($this->cachedSettings === null) {
+            $this->cachedSettings = Setting::whereIn('key', [
+                'company_phone', 'company_email',
+                'company_address_en', 'company_address_ar',
+                'linkedin_url',
+            ])->pluck('value', 'key')->toArray();
+        }
+
+        $addressKey = session('locale', 'en') === 'ar' ? 'company_address_ar' : 'company_address_en';
+
+        return [
+            'phone' => $this->cachedSettings['company_phone'] ?? '',
+            'email' => $this->cachedSettings['company_email'] ?? '',
+            'address' => $this->cachedSettings[$addressKey] ?? '',
+            'linkedin_url' => $this->cachedSettings['linkedin_url'] ?? '',
+        ];
     }
 }

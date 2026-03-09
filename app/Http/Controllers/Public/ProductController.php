@@ -92,18 +92,30 @@ class ProductController extends Controller
                     'is_primary' => $img->is_primary,
                 ]),
                 'specifications' => [
-                    'chemical' => $product->getChemicalSpecifications()->map(fn($s) => [
-                        'property' => $s->property,
-                        'value' => $s->display_value,
-                    ]),
-                    'mechanical' => $product->getMechanicalSpecifications()->map(fn($s) => [
-                        'property' => $s->property,
-                        'value' => $s->display_value,
-                    ]),
-                    'dimensional' => $product->getDimensionalSpecifications()->map(fn($s) => [
-                        'property' => $s->property,
-                        'value' => $s->display_value,
-                    ]),
+                    'chemical' => $product->specifications
+                        ->where('spec_type', 'chemical')
+                        ->sortBy('sort_order')
+                        ->values()
+                        ->map(fn($s) => [
+                            'property' => $s->property,
+                            'value' => $s->display_value,
+                        ]),
+                    'mechanical' => $product->specifications
+                        ->where('spec_type', 'mechanical')
+                        ->sortBy('sort_order')
+                        ->values()
+                        ->map(fn($s) => [
+                            'property' => $s->property,
+                            'value' => $s->display_value,
+                        ]),
+                    'dimensional' => $product->specifications
+                        ->where('spec_type', 'dimensional')
+                        ->sortBy('sort_order')
+                        ->values()
+                        ->map(fn($s) => [
+                            'property' => $s->property,
+                            'value' => $s->display_value,
+                        ]),
                 ],
             ],
         ]);

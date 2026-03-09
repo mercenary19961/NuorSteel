@@ -33,15 +33,7 @@ class NewsletterController extends Controller
 
         return Inertia::render('Admin/Newsletter', [
             'subscribers' => $query->ordered()->paginate(25)->withQueryString(),
-            'stats' => [
-                'total' => NewsletterSubscriber::count(),
-                'active' => NewsletterSubscriber::active()->count(),
-                'inactive' => NewsletterSubscriber::inactive()->count(),
-                'by_source' => NewsletterSubscriber::active()
-                    ->selectRaw('source, count(*) as count')
-                    ->groupBy('source')
-                    ->pluck('count', 'source'),
-            ],
+            'stats' => $this->getStats(),
             'filters' => $request->only(['active']),
             'undoMeta' => $undoMeta,
             'undoModelId' => $undoMeta ? (string) $lastId : null,
@@ -87,6 +79,27 @@ class NewsletterController extends Controller
         }
 
         return redirect()->back()->with('success', $subscriber->is_active ? 'Subscriber activated.' : 'Subscriber deactivated.');
+    }
+
+    private function getStats(): array
+    {
+        $row = NewsletterSubscriber::query()
+            ->selectRaw('count(*) as total')
+            ->selectRaw('sum(case when is_active = 1 then 1 else 0 end) as active')
+            ->selectRaw('sum(case when is_active = 0 then 1 else 0 end) as inactive')
+            ->first();
+
+        $bySource = NewsletterSubscriber::active()
+            ->selectRaw('source, count(*) as count')
+            ->groupBy('source')
+            ->pluck('count', 'source');
+
+        return [
+            'total' => (int) $row->total,
+            'active' => (int) $row->active,
+            'inactive' => (int) $row->inactive,
+            'by_source' => $bySource,
+        ];
     }
 
     public function export()

@@ -38,18 +38,18 @@ class MediaController extends Controller
 
         $media = $query->orderByDesc('created_at')->paginate(24);
 
-        // Merge DB-derived folders with custom (empty) folders from settings
-        $dbFolders = Media::distinct()->pluck('folder')->toArray();
+        // Single query: folder names + counts
+        $folderCounts = Media::selectRaw('folder, count(*) as count')
+            ->groupBy('folder')
+            ->pluck('count', 'folder');
+
+        $dbFolders = $folderCounts->keys()->toArray();
         $customFolders = $this->getCustomFolders();
         $allFolders = collect(array_unique(array_merge($dbFolders, $customFolders)))
             ->sort()
             ->values()
             ->sortBy(fn ($f) => $f === 'general' ? 0 : 1)
             ->values();
-
-        $folderCounts = Media::selectRaw('folder, count(*) as count')
-            ->groupBy('folder')
-            ->pluck('count', 'folder');
 
         // Build usage map for the current page of media items
         $mediaIds = $media->pluck('id');
@@ -242,11 +242,10 @@ class MediaController extends Controller
         }
 
         $media = $query->orderByDesc('created_at')->paginate(24);
-        $folders = Media::distinct()->pluck('folder');
 
         return response()->json([
             'media' => $media,
-            'folders' => $folders,
+            'folders' => Media::distinct()->pluck('folder'),
         ]);
     }
 
