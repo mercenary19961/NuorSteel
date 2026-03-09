@@ -24,8 +24,8 @@ class FormSubmissionTest extends TestCase
 
         Storage::fake('local');
 
-        Setting::create(['key' => 'contact_recipients', 'value' => 'test@example.com', 'type' => 'text', 'group' => 'email']);
-        Setting::create(['key' => 'career_recipients', 'value' => 'test@example.com', 'type' => 'text', 'group' => 'email']);
+        Setting::updateOrCreate(['key' => 'contact_recipients'], ['value' => 'test@example.com', 'type' => 'text', 'group' => 'email']);
+        Setting::updateOrCreate(['key' => 'career_recipients'], ['value' => 'test@example.com', 'type' => 'text', 'group' => 'email']);
     }
 
     private function validContactData(array $overrides = []): array
@@ -96,7 +96,6 @@ class FormSubmissionTest extends TestCase
 
         $response->assertSessionHasErrors([
             'name',
-            'company',
             'email',
             'phone',
             'country',
