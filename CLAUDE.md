@@ -71,12 +71,14 @@
 - [x] framer-motion for all hero animations + mobile menu `AnimatePresence`
 - [x] `useScrollDirection` custom hook with idle state detection (`resources/js/hooks/useScrollDirection.ts`)
 - [x] `HeroBottomLinks` component (`resources/js/Components/Public/HeroBottomLinks.tsx`)
-- [x] Homepage sections: About Us, Vision & Mission, Vision 2030, interactive Core Values, Products, News (LinkedIn feed), CTA — each with `id` for scroll navigation
-- [x] Core Values V2: RadialOrbitalTimeline component with orbital animation, rotating value cards, responsive node sizes, detail panel on lg+ screens, and traveling dot auto-cycle with pause on hover (`resources/js/Components/ui/radial-orbital-timeline.tsx`)
+- [x] Homepage sections: About Us (combined with Vision & Mission), Vision 2030, interactive Core Values, Products, News (LinkedIn feed), CTA — each with `id` for scroll navigation
+- [x] Core Values V2: RadialOrbitalTimeline component with orbital animation, rotating value cards, responsive node sizes (72px desktop, 40px mobile), enlarged center logo (128px), detail panel on lg+ screens, and traveling dot auto-cycle with pause on hover (`resources/js/Components/ui/radial-orbital-timeline.tsx`)
 - [x] Products section on homepage links to `/products` page (ISL-style redesign lives on dedicated Products page)
 - [x] All sections use unified left-to-right gradient (`bg-linear-to-r from-gray-900 to-gray-800`)
-- [x] News (LinkedIn feed): auto-rotating carousel with dot indicators, improved iframe sizing, RTL-aware chevron arrows, section titled "News" (not "LinkedIn")
+- [x] News (LinkedIn feed): auto-rotating carousel with dot indicators, improved iframe sizing, RTL-aware chevron arrows, section titled "News" (not "LinkedIn"), "View Post on LinkedIn" button per post
 - [x] News section uses CSS logical properties (`text-start`, `ms-0`/`me-auto`) for RTL support
+- [x] About Us section: merged with Vision & Mission into single full-screen section with factory background image (`public/images/about/bg-desktop.webp`), dark overlay, white title
+- [x] Vision 2030 section: Nuor Steel logo removed, Vision 2030 logo enlarged (`h-72` desktop, `h-24` mobile), text size increased (`text-xl`), content vertically centered
 - [x] UI primitive components: Badge, Button, Card (`resources/js/Components/ui/`)
 - [x] MagicCard + MagicCardGrid: animated border glow bento effect (`resources/js/Components/ui/magic-card.tsx` + `magic-card.css`)
 - [x] ScrollToTop: fixed-position button with SVG progress ring, appears at 70% scroll (`resources/js/Components/ui/scroll-to-top.tsx`)
@@ -192,9 +194,13 @@
 - [x] Admin Site Content: adjusted "click to interact with preview" text color for better visibility
 - [x] Real images added: logo, hero background, bottom link hover panels, core values icons, Vision 2030, product panels
 - [x] HeroBottomLinks: increased image heights (`h-32 lg:h-44`), responsive sizing
-- [x] Vision 2030: text and logos on same row (text left 40%, logos top-right), image `object-top`
-- [x] Core values: reduced padding, removed borders from orbital circle nodes and center node
-- [x] Section backgrounds: About, Vision & Mission, Core Values, News changed to solid `bg-black`
+- [x] Vision 2030: text left, Vision 2030 logo right (Nuor logo removed), vertically centered, image `object-top`
+- [x] Core values: reduced padding, removed borders from orbital circle nodes and center node, enlarged node sizes (72px) and center logo (128px)
+- [x] Section backgrounds: About (factory bg image), Core Values, News changed to solid `bg-black`
+- [x] About & Vision/Mission merged into single full-screen section with `<picture>` bg image + dark overlay
+- [x] News section: "View Post on LinkedIn" button linking to actual LinkedIn post per carousel item
+- [x] News section: "Follow us on LinkedIn" URL corrected to `https://www.linkedin.com/company/nuor-steel/`
+- [x] First LinkedIn post URL fixed (was embed URL, now direct link); data migration added
 - [x] Products section: reduced overlay opacity (0.4), product names in orange (`text-primary`)
 - [x] Admin products: real product images from media library, increased card image height to `h-64`
 - [x] Certificates linked to media library: `file_media_id` (PDF) and `thumbnail_id` (thumbnail) FK columns
@@ -272,6 +278,16 @@
 - [x] Added `is_visible` column to `linkedin_cache` table via migration
 - [x] `LinkedinPostSeeder` seeds real Nuor Steel LinkedIn posts
 - [x] Admin sidebar updated with LinkedIn Posts link
+
+### Performance Optimizations (DONE)
+- [x] Batch site settings into single query (4 `Setting::get()` → 1 `whereIn` per request) in `HandleInertiaRequests` middleware
+- [x] Per-request cache on `SiteContent::getPage()` — eliminates duplicate EN/AR queries on bilingual pages
+- [x] Fix Product N+1: filter eager-loaded specs collection instead of 3 extra queries in `ProductController::show()`
+- [x] Consolidate admin stats queries: Contact (3→1), Newsletter (4→2), Media folders (3→1)
+- [x] Database indexes added: `media` (folder, mime_type), `contact_submissions` (is_read, is_archived, request_type), `settings` (group)
+- [x] RadialOrbitalTimeline: `setInterval` → `requestAnimationFrame` for smoother animation (eliminates 20 re-renders/sec)
+- [x] Home page images: `loading="lazy"`, `decoding="async"`, `fetchPriority="high"` on hero LCP image
+- [x] SSR-safe `isDesktop` state with resize listener (replaces per-render `typeof window` checks)
 
 ### Remaining
 - [x] Real images for hero background, bottom link hover panels, core values section, and product panels
@@ -649,4 +665,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-03-08 — based on commit `8ed7eec` (*Merge: certificate PDF previews, media library enhancements, real images*)
+> **Last updated:** 2026-03-09 — based on commit `f3a5b73` (*combine About & Vision/Mission sections, performance optimizations, LinkedIn fixes*)
