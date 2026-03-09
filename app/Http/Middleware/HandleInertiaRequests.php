@@ -51,10 +51,18 @@ class HandleInertiaRequests extends Middleware
                 ),
                 'linkedin_url' => Setting::get('linkedin_url', ''),
             ],
-            'ziggy' => fn () => [
-                ...(new Ziggy)->toArray(),
-                'location' => $request->url(),
-            ],
+            'ziggy' => function () use ($request) {
+                $ziggy = new Ziggy;
+
+                if (!$request->user()) {
+                    $ziggy = $ziggy->filter(['!admin.*', '!logout']);
+                }
+
+                return [
+                    ...$ziggy->toArray(),
+                    'location' => $request->url(),
+                ];
+            },
         ]);
     }
 }

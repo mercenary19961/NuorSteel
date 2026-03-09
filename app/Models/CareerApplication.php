@@ -23,9 +23,6 @@ class CareerApplication extends Model
         'phone',
         'job_title',
         'cv_path',
-        'status',
-        'admin_notes',
-        'reviewed_by',
     ];
 
     public function careerListing(): BelongsTo
@@ -38,11 +35,6 @@ class CareerApplication extends Model
         return $this->belongsTo(User::class, 'reviewed_by');
     }
 
-    public function getCvUrlAttribute(): string
-    {
-        return url('/api/v1/admin/career-applications/' . $this->id . '/download-cv');
-    }
-
     public function isOpenApplication(): bool
     {
         return $this->career_listing_id === null;
@@ -50,26 +42,23 @@ class CareerApplication extends Model
 
     public function markAsReviewed(int $userId): void
     {
-        $this->update([
-            'status' => 'reviewed',
-            'reviewed_by' => $userId,
-        ]);
+        $this->status = 'reviewed';
+        $this->reviewed_by = $userId;
+        $this->save();
     }
 
     public function markAsShortlisted(int $userId): void
     {
-        $this->update([
-            'status' => 'shortlisted',
-            'reviewed_by' => $userId,
-        ]);
+        $this->status = 'shortlisted';
+        $this->reviewed_by = $userId;
+        $this->save();
     }
 
     public function markAsRejected(int $userId): void
     {
-        $this->update([
-            'status' => 'rejected',
-            'reviewed_by' => $userId,
-        ]);
+        $this->status = 'rejected';
+        $this->reviewed_by = $userId;
+        $this->save();
     }
 
     public function scopeNew(Builder $query): Builder

@@ -12,6 +12,7 @@ use App\Models\CareerListing;
 use App\Models\CareerApplication;
 use App\Models\TimelineEvent;
 use App\Models\ContactSubmission;
+use App\Models\LinkedinCache;
 use App\Models\NewsletterSubscriber;
 use Illuminate\Support\Facades\Auth;
 
@@ -137,6 +138,7 @@ class UndoService
             'timeline' => TimelineEvent::class,
             'contact' => ContactSubmission::class,
             'newsletter' => NewsletterSubscriber::class,
+            'linkedin' => LinkedinCache::class,
             default => null,
         };
 
@@ -158,6 +160,7 @@ class UndoService
             'timeline' => '/admin/timeline',
             'contact' => '/admin/contacts',
             'newsletter' => '/admin/newsletter',
+            'linkedin' => '/admin/linkedin-posts',
             default => null,
         };
     }

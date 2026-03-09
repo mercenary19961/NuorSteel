@@ -150,7 +150,7 @@ class MediaController extends Controller
         $file = $request->file('file');
         $folder = $request->input('folder', 'general');
 
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $filename = Str::uuid() . '.' . ($file->extension() ?: $file->getClientOriginalExtension());
         $path = $file->storeAs("media/{$folder}", $filename);
 
         Media::create([
@@ -237,7 +237,8 @@ class MediaController extends Controller
         }
 
         if ($request->filled('search')) {
-            $query->where('original_filename', 'like', '%' . $request->search . '%');
+            $search = str_replace(['%', '_'], ['\\%', '\\_'], $request->search);
+            $query->where('original_filename', 'like', '%' . $search . '%');
         }
 
         $media = $query->orderByDesc('created_at')->paginate(24);
@@ -259,7 +260,7 @@ class MediaController extends Controller
         $file = $request->file('file');
         $folder = $request->input('folder', 'general');
 
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $filename = Str::uuid() . '.' . ($file->extension() ?: $file->getClientOriginalExtension());
         $path = $file->storeAs("media/{$folder}", $filename);
 
         $media = Media::create([

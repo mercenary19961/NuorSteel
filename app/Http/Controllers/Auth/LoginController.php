@@ -37,7 +37,7 @@ class LoginController extends Controller
             $request->session()->regenerateToken();
 
             throw ValidationException::withMessages([
-                'email' => ['Your account has been deactivated.'],
+                'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 

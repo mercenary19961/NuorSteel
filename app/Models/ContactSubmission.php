@@ -27,9 +27,6 @@ class ContactSubmission extends Model
         'subject',
         'message',
         'file_path',
-        'is_read',
-        'is_archived',
-        'read_by',
     ];
 
     protected function casts(): array
@@ -60,20 +57,21 @@ class ContactSubmission extends Model
 
     public function markAsRead(int $userId): void
     {
-        $this->update([
-            'is_read' => true,
-            'read_by' => $userId,
-        ]);
+        $this->is_read = true;
+        $this->read_by = $userId;
+        $this->save();
     }
 
     public function archive(): void
     {
-        $this->update(['is_archived' => true]);
+        $this->is_archived = true;
+        $this->save();
     }
 
     public function unarchive(): void
     {
-        $this->update(['is_archived' => false]);
+        $this->is_archived = false;
+        $this->save();
     }
 
     public function scopeUnread(Builder $query): Builder

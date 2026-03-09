@@ -15,8 +15,8 @@ class NewsletterController extends Controller
         ]);
 
         NewsletterSubscriber::subscribe(
-            $request->email,
-            $request->input('source', 'website')
+            trim($request->email),
+            'website'
         );
 
         return back()->with('success', 'Thank you for subscribing to our newsletter!');

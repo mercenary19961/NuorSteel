@@ -26,9 +26,14 @@ class SettingController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
+        $allowedKeys = [
+            'company_phone', 'company_email', 'company_address_en', 'company_address_ar',
+            'linkedin_url', 'contact_recipients', 'career_recipients',
+        ];
+
         $request->validate([
             'settings' => 'required|array',
-            'settings.*.key' => 'required|string',
+            'settings.*.key' => ['required', 'string', 'in:' . implode(',', $allowedKeys)],
             'settings.*.value' => 'nullable|string',
         ]);
 

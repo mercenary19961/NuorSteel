@@ -8,9 +8,22 @@ use Symfony\Component\HttpFoundation\Response;
 
 class MediaServeController extends Controller
 {
+    private const ALLOWED_MIME_TYPES = [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'image/gif',
+        'image/svg+xml',
+        'application/pdf',
+    ];
+
     public function show(int $id): Response
     {
         $media = Media::findOrFail($id);
+
+        if (!in_array($media->mime_type, self::ALLOWED_MIME_TYPES, true)) {
+            abort(403);
+        }
 
         if (!Storage::exists($media->path)) {
             abort(404);
@@ -20,7 +33,8 @@ class MediaServeController extends Controller
             Storage::path($media->path),
             [
                 'Content-Type' => $media->mime_type,
-                'Cache-Control' => 'public, max-age=31536000, immutable',
+                'Cache-Control' => 'public, max-age=86400',
+                'X-Content-Type-Options' => 'nosniff',
             ]
         );
     }

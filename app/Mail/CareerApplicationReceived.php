@@ -21,8 +21,10 @@ class CareerApplicationReceived extends Mailable
 
     public function envelope(): Envelope
     {
+        $safeTitle = str_replace(["\r", "\n", "\t"], '', $this->application->job_title);
+
         return new Envelope(
-            subject: 'New Career Application: ' . $this->application->job_title,
+            subject: 'New Career Application: ' . mb_substr($safeTitle, 0, 100),
         );
     }
 

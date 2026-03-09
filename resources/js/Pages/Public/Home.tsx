@@ -179,7 +179,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       <section id="section-about" className="relative py-16 lg:py-24 bg-black overflow-hidden">
         {/* Subtle grid texture */}
         <div
-          className="absolute inset-0 opacity-[0.5]"
+          className="absolute inset-0 opacity-50"
           style={{
             backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
             backgroundSize: '60px 60px',

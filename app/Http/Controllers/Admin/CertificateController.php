@@ -153,7 +153,10 @@ class CertificateController extends Controller
 
         $this->undoService->saveState('certificate', $certificate->id, $oldData, $newData);
 
-        $data = $request->except('file');
+        $data = $request->only([
+            'title_en', 'title_ar', 'category', 'description_en', 'description_ar',
+            'thumbnail_id', 'issue_date', 'expiry_date', 'is_active', 'sort_order',
+        ]);
         $data['updated_by'] = $request->user()->id;
 
         if ($request->hasFile('file')) {
