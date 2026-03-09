@@ -196,11 +196,11 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             alt=""
             loading="lazy"
             decoding="async"
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover object-bottom"
           />
         </picture>
         {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute inset-0 bg-black/10" />
 
         <div className="relative z-10 container mx-auto px-4">
           <motion.div
@@ -292,38 +292,32 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
           />
         </picture>
 
-        <div className="relative z-10 flex-1 flex flex-col container mx-auto px-4">
-          {/* Mobile: logos centered, then text below */}
-          <div className="lg:hidden flex flex-col items-center pt-12">
-            <div className="flex items-center gap-6">
-              <img src="/images/vision2030/nuor-logo.png" alt="Nuor Steel" loading="lazy" decoding="async" className="h-16 object-contain" />
-              <div className="w-px h-12 bg-white/40" />
-              <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" loading="lazy" decoding="async" className="h-12 object-contain" />
-            </div>
+        <div className="relative z-10 flex-1 flex flex-col justify-center container mx-auto px-4">
+          {/* Mobile: logo centered, then text below */}
+          <div className="lg:hidden flex flex-col items-center">
+            <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" loading="lazy" decoding="async" className="h-24 object-contain" />
             <div className="space-y-6 pt-8">
-              <p className="text-base leading-relaxed text-white/90">
+              <p className="text-lg leading-relaxed text-white/90">
                 {content?.vision2030?.paragraph1 || t('home.vision2030.paragraph1')}
               </p>
-              <p className="text-base leading-relaxed text-white/90">
+              <p className="text-lg leading-relaxed text-white/90">
                 {content?.vision2030?.paragraph2 || t('home.vision2030.paragraph2')}
               </p>
             </div>
           </div>
 
-          {/* Desktop: text left, logos right — same row */}
-          <div className="hidden lg:flex justify-between items-end pt-40 ">
-            <div className="w-2/5 space-y-6">
-              <p className="text-lg leading-relaxed text-white/90">
+          {/* Desktop: text left, logo right — same row */}
+          <div className="hidden lg:flex justify-between items-center">
+            <div className="w-1/2 space-y-6">
+              <p className="text-xl leading-relaxed text-white/90">
                 {content?.vision2030?.paragraph1 || t('home.vision2030.paragraph1')}
               </p>
-              <p className="text-lg leading-relaxed text-white/90">
+              <p className="text-xl leading-relaxed text-white/90">
                 {content?.vision2030?.paragraph2 || t('home.vision2030.paragraph2')}
               </p>
             </div>
-            <div className="flex flex-col items-center gap-6 me-24">
-              <img src="/images/vision2030/nuor-logo.png" alt="Nuor Steel" loading="lazy" decoding="async" className="h-28 object-contain" />
-              <div className="h-px w-20 bg-white/40" />
-              <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" loading="lazy" decoding="async" className="h-24 object-contain" />
+            <div className="flex items-center justify-center me-24">
+              <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" loading="lazy" decoding="async" className="h-72 object-contain" />
             </div>
           </div>
         </div>
