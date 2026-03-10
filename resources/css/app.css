@@ -77,6 +77,17 @@ html[dir="rtl"] body {
     animation: ring-pulse 2s ease-in-out infinite;
 }
 
+@keyframes detailSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Custom scrollbar — thin, subtle, auto-hiding */
 .scrollbar-thin {
     scrollbar-width: thin;

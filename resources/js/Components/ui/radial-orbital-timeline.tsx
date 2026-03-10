@@ -17,6 +17,7 @@ interface TimelineItem {
 interface RadialOrbitalTimelineProps {
   timelineData: TimelineItem[];
   centerImage?: string;
+  scrollStep?: number; // 0 = idle/auto-rotate, 1–N = show Nth value
 }
 
 const easeInOutCubic = (t: number) =>
@@ -25,6 +26,7 @@ const easeInOutCubic = (t: number) =>
 export default function RadialOrbitalTimeline({
   timelineData,
   centerImage,
+  scrollStep,
 }: RadialOrbitalTimelineProps) {
   const [expandedItems, setExpandedItems] = useState<Record<number, boolean>>(
     {}
@@ -34,6 +36,7 @@ export default function RadialOrbitalTimeline({
   const [pulseEffect, setPulseEffect] = useState<Record<number, boolean>>({});
   const [activeNodeId, setActiveNodeId] = useState<number | null>(null);
   const [orbitRadius, setOrbitRadius] = useState<number>(250);
+  const [containerHeight, setContainerHeight] = useState<string>('37.5rem');
   const [nodeSize, setNodeSize] = useState<number>(40);
   const [isLargeScreen, setIsLargeScreen] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -47,6 +50,7 @@ export default function RadialOrbitalTimeline({
     progress: number;
   } | null>(null);
   const cyclePausedRef = useRef(false);
+  const [detailHovered, setDetailHovered] = useState(false);
   const pauseOffsetRef = useRef(0);
   const travelAnimRef = useRef<number | null>(null);
 
@@ -54,7 +58,8 @@ export default function RadialOrbitalTimeline({
     if (typeof window === 'undefined') return;
     const updateSizes = () => {
       const w = window.innerWidth;
-      setOrbitRadius(w < 640 ? 140 : w < 1024 ? 200 : w < 1280 ? 280 : 320);
+      setOrbitRadius(w < 640 ? 140 : w < 1024 ? 200 : w < 1280 ? 180 : w <= 1536 ? 240 : 320);
+      setContainerHeight(w < 1024 ? '37.5rem' : w <= 1536 ? '40rem' : '50rem');
       setNodeSize(w < 640 ? 40 : w < 1024 ? 40 : 72);
       setIsLargeScreen(w >= 1024);
     };
@@ -219,6 +224,47 @@ export default function RadialOrbitalTimeline({
     };
   }, [autoRotate]);
 
+  // Scroll-driven step control
+  const prevScrollStepRef = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (scrollStep === undefined) return;
+    if (scrollStep === prevScrollStepRef.current) return;
+    prevScrollStepRef.current = scrollStep;
+
+    if (scrollStep === 0) {
+      cancelTravelDot();
+      setExpandedItems({});
+      setActiveNodeId(null);
+      setPulseEffect({});
+      setAutoRotate(true);
+    } else {
+      const idx = scrollStep - 1;
+      if (idx < 0 || idx >= timelineData.length) return;
+      const targetItem = timelineData[idx];
+
+      cancelTravelDot();
+      setAutoRotate(false);
+
+      const newState: Record<number, boolean> = {};
+      timelineData.forEach((item) => {
+        newState[item.id] = item.id === targetItem.id;
+      });
+      setExpandedItems(newState);
+      setActiveNodeId(targetItem.id);
+
+      const related = targetItem.relatedIds ?? [];
+      const newPulse: Record<number, boolean> = {};
+      related.forEach((relId) => { newPulse[relId] = true; });
+      setPulseEffect(newPulse);
+
+      centerViewOnNode(targetItem.id);
+
+      // Start auto-cycle from this node (scroll will cancel & restart on next step)
+      const nextIdx = (idx + 1) % timelineData.length;
+      startCycleRef.current?.(idx, nextIdx);
+    }
+  }, [scrollStep]);
+
   const centerViewOnNode = (nodeId: number) => {
     if (!nodeRefs.current[nodeId]) return;
 
@@ -277,19 +323,15 @@ export default function RadialOrbitalTimeline({
 
   return (
     <div
-      className={`w-full h-150 lg:h-185 xl:h-200 overflow-hidden relative ${
-        isDetailView
-          ? 'flex flex-row items-center'
-          : 'flex flex-col items-center justify-start lg:pt-8'
-      }`}
+      className="w-full overflow-hidden relative flex flex-col lg:flex-row items-center"
+      style={{ height: containerHeight }}
       ref={containerRef}
       onClick={handleContainerClick}
     >
       {/* Orbit side */}
       <div
-        className={`relative h-full flex items-center justify-center transition-all duration-700 ${
-          isDetailView ? 'w-1/2 shrink-0' : 'w-full max-w-4xl'
-        }`}
+        className="relative h-full flex items-center justify-center transition-all duration-700 ease-in-out"
+        style={{ width: isDetailView ? '50%' : '100%' }}
       >
         <div
           className="absolute w-full h-full flex items-center justify-center"
@@ -320,11 +362,12 @@ export default function RadialOrbitalTimeline({
               }
             }}
           >
-            <div className="absolute w-24 h-24 rounded-full border border-primary/20 animate-ping opacity-70"></div>
+            <div className="absolute w-36 h-36 rounded-full border-2 border-primary/30 animate-ping opacity-60"></div>
             <div
-              className="absolute w-28 h-28 rounded-full border border-primary/10 animate-ping opacity-50"
-              style={{ animationDelay: "0.5s" }}
+              className="absolute w-44 h-44 rounded-full border border-primary/15 animate-ping opacity-40"
+              style={{ animationDelay: "0.7s", animationDuration: "1.5s" }}
             ></div>
+            <div className="absolute w-36 h-36 rounded-full bg-primary/5 animate-pulse"></div>
             {centerImage ? (
               <img src={centerImage} alt="" className="w-32 h-32 object-contain" />
             ) : (
@@ -356,13 +399,18 @@ export default function RadialOrbitalTimeline({
 
             return (
               <div
-                className="absolute w-3 h-3 rounded-full bg-primary z-150 pointer-events-none transition-none"
+                className={`absolute rounded-full bg-primary z-150 pointer-events-none ${detailHovered ? 'animate-pulse' : ''}`}
                 style={{
+                  width: detailHovered ? '1rem' : '0.75rem',
+                  height: detailHovered ? '1rem' : '0.75rem',
                   left: '50%',
                   top: '50%',
                   transform: `translate(calc(-50% + ${dotX}px), calc(-50% + ${dotY}px))`,
                   opacity: dotOpacity,
-                  boxShadow: '0 0 10px 3px rgba(255,122,0,0.6), 0 0 20px 6px rgba(255,122,0,0.3)',
+                  transition: 'width 300ms ease, height 300ms ease, box-shadow 300ms ease',
+                  boxShadow: detailHovered
+                    ? '0 0 14px 5px rgba(255,122,0,0.8), 0 0 28px 10px rgba(255,122,0,0.4)'
+                    : '0 0 10px 3px rgba(255,122,0,0.6), 0 0 20px 6px rgba(255,122,0,0.3)',
                 }}
               />
             );
@@ -480,29 +528,40 @@ export default function RadialOrbitalTimeline({
 
       {/* Detail panel — lg+ only */}
       <div
-        className={`hidden lg:flex items-center transition-all duration-700 overflow-hidden ${
-          isDetailView ? 'w-1/2 opacity-100 px-8 xl:px-12' : 'w-0 opacity-0'
-        }`}
-        onMouseEnter={() => { cyclePausedRef.current = true; }}
-        onMouseLeave={() => { cyclePausedRef.current = false; }}
+        className="hidden lg:flex items-center overflow-hidden"
+        style={{
+          width: isDetailView ? '50%' : '0%',
+          opacity: isDetailView ? 1 : 0,
+          paddingLeft: isDetailView ? '2rem' : '0',
+          paddingRight: isDetailView ? '3rem' : '0',
+          transition: isDetailView
+            ? 'width 700ms ease-in-out, padding 700ms ease-in-out, opacity 500ms ease-in 200ms'
+            : 'opacity 300ms ease-out, width 700ms ease-in-out 100ms, padding 700ms ease-in-out 100ms',
+        }}
+        onMouseEnter={() => { cyclePausedRef.current = true; setDetailHovered(true); }}
+        onMouseLeave={() => { cyclePausedRef.current = false; setDetailHovered(false); }}
       >
         {activeItem && (
-          <div className="max-w-lg">
-            <div className="inline-flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center overflow-hidden">
+          <div
+            key={activeItem.id}
+            className="max-w-lg w-full rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-2xl shadow-black/40 p-8 xl:p-10"
+            style={{
+              animation: 'detailSlideUp 500ms ease-out both',
+            }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-2xl xl:text-3xl font-bold text-white">
+                {activeItem.title}
+              </h3>
+              <div className="w-10 h-10 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center overflow-hidden shrink-0">
                 {activeItem.image ? (
                   <img src={activeItem.image} alt={activeItem.title} className="w-full h-full object-cover" />
                 ) : (
-                  <activeItem.icon size={20} className="text-white" />
+                  <activeItem.icon size={20} className="text-primary" />
                 )}
               </div>
-              <span className="text-sm font-medium text-primary uppercase tracking-wider">
-                {activeItem.category}
-              </span>
             </div>
-            <h3 className="text-2xl xl:text-3xl font-bold text-white mb-4">
-              {activeItem.title}
-            </h3>
+            <div className="w-12 h-0.5 bg-primary/40 rounded-full mb-4" />
             <p className="text-base xl:text-lg text-white/70 leading-relaxed">
               {activeItem.content}
             </p>
