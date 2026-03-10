@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowRight, ChevronLeft, ChevronRight, ShieldCheck, Leaf, Lightbulb, TrendingUp, Linkedin, ExternalLink } from 'lucide-react';
@@ -83,6 +83,8 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
   const [iframeHeight, setIframeHeight] = useState(600);
   const [linkedinPaused, setLinkedinPaused] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [coreValuesStep, setCoreValuesStep] = useState(0);
+  const coreValuesWrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -91,6 +93,39 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  // Scroll-driven core values stepping (desktop only)
+  useEffect(() => {
+    if (typeof window === 'undefined' || !isDesktop) {
+      setCoreValuesStep(0);
+      return;
+    }
+
+    const handleScroll = () => {
+      const wrapper = coreValuesWrapperRef.current;
+      if (!wrapper) return;
+
+      const rect = wrapper.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const stickyTravel = wrapper.offsetHeight - viewportHeight;
+
+      if (stickyTravel <= 0) { setCoreValuesStep(0); return; }
+
+      const scrolled = -rect.top;
+
+      if (scrolled <= 0) {
+        setCoreValuesStep(0);
+      } else {
+        // 5 stages: idle view + 4 values
+        const stepSize = stickyTravel / 5;
+        const step = Math.floor(scrolled / stepSize);
+        setCoreValuesStep(Math.min(4, step));
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isDesktop]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -323,25 +358,27 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         </div>
       </section>
 
-      {/* Core Values Section */}
-      <section id="section-core-values" className="relative py-10 lg:py-16 bg-black overflow-hidden">
-        {/* Subtle grid texture */}
-        <div
-          className="absolute inset-0 opacity-60"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
-        <div className="relative container mx-auto px-4">
-          <h2 className="text-3xl lg:text-4xl font-bold text-white text-center">
-            {content?.core_values?.title || t('home.coreValues.title')}
-          </h2>
-          <MagicCardGrid>
-            <RadialOrbitalTimeline timelineData={coreValuesData} centerImage="/images/core-values/center.webp" />
-          </MagicCardGrid>
-        </div>
-      </section>
+      {/* Core Values Section — scroll-driven on desktop */}
+      <div ref={coreValuesWrapperRef} className="lg:h-[400vh]">
+        <section id="section-core-values" className="relative py-10 lg:py-16 bg-black overflow-hidden lg:sticky lg:top-0 lg:min-h-screen lg:flex lg:flex-col lg:justify-center">
+          {/* Subtle grid texture */}
+          <div
+            className="absolute inset-0 opacity-60"
+            style={{
+              backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+              backgroundSize: '60px 60px',
+            }}
+          />
+          <div className="relative container mx-auto px-4">
+            <h2 className="text-3xl lg:text-4xl font-bold text-white text-center">
+              {content?.core_values?.title || t('home.coreValues.title')}
+            </h2>
+            <MagicCardGrid>
+              <RadialOrbitalTimeline timelineData={coreValuesData} centerImage="/images/core-values/center.webp" scrollStep={isDesktop ? coreValuesStep : undefined} />
+            </MagicCardGrid>
+          </div>
+        </section>
+      </div>
 
       {/* Products Showcase */}
       <section id="section-products" className="overflow-hidden">

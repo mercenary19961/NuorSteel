@@ -17,6 +17,7 @@ interface TimelineItem {
 interface RadialOrbitalTimelineProps {
   timelineData: TimelineItem[];
   centerImage?: string;
+  scrollStep?: number; // 0 = idle/auto-rotate, 1–N = show Nth value
 }
 
 const easeInOutCubic = (t: number) =>
@@ -25,6 +26,7 @@ const easeInOutCubic = (t: number) =>
 export default function RadialOrbitalTimeline({
   timelineData,
   centerImage,
+  scrollStep,
 }: RadialOrbitalTimelineProps) {
   const [expandedItems, setExpandedItems] = useState<Record<number, boolean>>(
     {}
@@ -219,6 +221,47 @@ export default function RadialOrbitalTimeline({
     };
   }, [autoRotate]);
 
+  // Scroll-driven step control
+  const prevScrollStepRef = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (scrollStep === undefined) return;
+    if (scrollStep === prevScrollStepRef.current) return;
+    prevScrollStepRef.current = scrollStep;
+
+    if (scrollStep === 0) {
+      cancelTravelDot();
+      setExpandedItems({});
+      setActiveNodeId(null);
+      setPulseEffect({});
+      setAutoRotate(true);
+    } else {
+      const idx = scrollStep - 1;
+      if (idx < 0 || idx >= timelineData.length) return;
+      const targetItem = timelineData[idx];
+
+      cancelTravelDot();
+      setAutoRotate(false);
+
+      const newState: Record<number, boolean> = {};
+      timelineData.forEach((item) => {
+        newState[item.id] = item.id === targetItem.id;
+      });
+      setExpandedItems(newState);
+      setActiveNodeId(targetItem.id);
+
+      const related = targetItem.relatedIds ?? [];
+      const newPulse: Record<number, boolean> = {};
+      related.forEach((relId) => { newPulse[relId] = true; });
+      setPulseEffect(newPulse);
+
+      centerViewOnNode(targetItem.id);
+
+      // Start auto-cycle from this node (scroll will cancel & restart on next step)
+      const nextIdx = (idx + 1) % timelineData.length;
+      startCycleRef.current?.(idx, nextIdx);
+    }
+  }, [scrollStep]);
+
   const centerViewOnNode = (nodeId: number) => {
     if (!nodeRefs.current[nodeId]) return;
 
@@ -320,11 +363,12 @@ export default function RadialOrbitalTimeline({
               }
             }}
           >
-            <div className="absolute w-24 h-24 rounded-full border border-primary/20 animate-ping opacity-70"></div>
+            <div className="absolute w-36 h-36 rounded-full border-2 border-primary/30 animate-ping opacity-60"></div>
             <div
-              className="absolute w-28 h-28 rounded-full border border-primary/10 animate-ping opacity-50"
-              style={{ animationDelay: "0.5s" }}
+              className="absolute w-44 h-44 rounded-full border border-primary/15 animate-ping opacity-40"
+              style={{ animationDelay: "0.7s", animationDuration: "1.5s" }}
             ></div>
+            <div className="absolute w-36 h-36 rounded-full bg-primary/5 animate-pulse"></div>
             {centerImage ? (
               <img src={centerImage} alt="" className="w-32 h-32 object-contain" />
             ) : (
