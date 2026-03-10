@@ -320,19 +320,14 @@ export default function RadialOrbitalTimeline({
 
   return (
     <div
-      className={`w-full h-150 lg:h-185 xl:h-200 overflow-hidden relative ${
-        isDetailView
-          ? 'flex flex-row items-center'
-          : 'flex flex-col items-center justify-start lg:pt-8'
-      }`}
+      className="w-full h-150 lg:h-185 xl:h-200 overflow-hidden relative flex flex-col lg:flex-row items-center"
       ref={containerRef}
       onClick={handleContainerClick}
     >
       {/* Orbit side */}
       <div
-        className={`relative h-full flex items-center justify-center transition-all duration-700 ${
-          isDetailView ? 'w-1/2 shrink-0' : 'w-full max-w-4xl'
-        }`}
+        className="relative h-full flex items-center justify-center transition-all duration-700 ease-in-out"
+        style={{ width: isDetailView ? '50%' : '100%' }}
       >
         <div
           className="absolute w-full h-full flex items-center justify-center"
@@ -524,29 +519,34 @@ export default function RadialOrbitalTimeline({
 
       {/* Detail panel — lg+ only */}
       <div
-        className={`hidden lg:flex items-center transition-all duration-700 overflow-hidden ${
-          isDetailView ? 'w-1/2 opacity-100 px-8 xl:px-12' : 'w-0 opacity-0'
-        }`}
+        className="hidden lg:flex items-center overflow-hidden"
+        style={{
+          width: isDetailView ? '50%' : '0%',
+          opacity: isDetailView ? 1 : 0,
+          paddingLeft: isDetailView ? '2rem' : '0',
+          paddingRight: isDetailView ? '3rem' : '0',
+          transition: isDetailView
+            ? 'width 700ms ease-in-out, padding 700ms ease-in-out, opacity 500ms ease-in 200ms'
+            : 'opacity 300ms ease-out, width 700ms ease-in-out 100ms, padding 700ms ease-in-out 100ms',
+        }}
         onMouseEnter={() => { cyclePausedRef.current = true; }}
         onMouseLeave={() => { cyclePausedRef.current = false; }}
       >
         {activeItem && (
-          <div className="max-w-lg">
-            <div className="inline-flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center overflow-hidden">
+          <div className="max-w-lg w-full rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-2xl shadow-black/40 p-8 xl:p-10">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-2xl xl:text-3xl font-bold text-white">
+                {activeItem.title}
+              </h3>
+              <div className="w-10 h-10 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center overflow-hidden shrink-0">
                 {activeItem.image ? (
                   <img src={activeItem.image} alt={activeItem.title} className="w-full h-full object-cover" />
                 ) : (
-                  <activeItem.icon size={20} className="text-white" />
+                  <activeItem.icon size={20} className="text-primary" />
                 )}
               </div>
-              <span className="text-sm font-medium text-primary uppercase tracking-wider">
-                {activeItem.category}
-              </span>
             </div>
-            <h3 className="text-2xl xl:text-3xl font-bold text-white mb-4">
-              {activeItem.title}
-            </h3>
+            <div className="w-12 h-0.5 bg-primary/40 rounded-full mb-4" />
             <p className="text-base xl:text-lg text-white/70 leading-relaxed">
               {activeItem.content}
             </p>
