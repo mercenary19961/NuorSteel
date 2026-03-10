@@ -36,6 +36,7 @@ export default function RadialOrbitalTimeline({
   const [pulseEffect, setPulseEffect] = useState<Record<number, boolean>>({});
   const [activeNodeId, setActiveNodeId] = useState<number | null>(null);
   const [orbitRadius, setOrbitRadius] = useState<number>(250);
+  const [containerHeight, setContainerHeight] = useState<string>('37.5rem');
   const [nodeSize, setNodeSize] = useState<number>(40);
   const [isLargeScreen, setIsLargeScreen] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -49,6 +50,7 @@ export default function RadialOrbitalTimeline({
     progress: number;
   } | null>(null);
   const cyclePausedRef = useRef(false);
+  const [detailHovered, setDetailHovered] = useState(false);
   const pauseOffsetRef = useRef(0);
   const travelAnimRef = useRef<number | null>(null);
 
@@ -56,7 +58,8 @@ export default function RadialOrbitalTimeline({
     if (typeof window === 'undefined') return;
     const updateSizes = () => {
       const w = window.innerWidth;
-      setOrbitRadius(w < 640 ? 140 : w < 1024 ? 200 : w < 1280 ? 280 : 320);
+      setOrbitRadius(w < 640 ? 140 : w < 1024 ? 200 : w < 1280 ? 180 : w <= 1536 ? 240 : 320);
+      setContainerHeight(w < 1024 ? '37.5rem' : w <= 1536 ? '40rem' : '50rem');
       setNodeSize(w < 640 ? 40 : w < 1024 ? 40 : 72);
       setIsLargeScreen(w >= 1024);
     };
@@ -320,7 +323,8 @@ export default function RadialOrbitalTimeline({
 
   return (
     <div
-      className="w-full h-150 lg:h-185 xl:h-200 overflow-hidden relative flex flex-col lg:flex-row items-center"
+      className="w-full overflow-hidden relative flex flex-col lg:flex-row items-center"
+      style={{ height: containerHeight }}
       ref={containerRef}
       onClick={handleContainerClick}
     >
@@ -395,13 +399,18 @@ export default function RadialOrbitalTimeline({
 
             return (
               <div
-                className="absolute w-3 h-3 rounded-full bg-primary z-150 pointer-events-none transition-none"
+                className={`absolute rounded-full bg-primary z-150 pointer-events-none ${detailHovered ? 'animate-pulse' : ''}`}
                 style={{
+                  width: detailHovered ? '1rem' : '0.75rem',
+                  height: detailHovered ? '1rem' : '0.75rem',
                   left: '50%',
                   top: '50%',
                   transform: `translate(calc(-50% + ${dotX}px), calc(-50% + ${dotY}px))`,
                   opacity: dotOpacity,
-                  boxShadow: '0 0 10px 3px rgba(255,122,0,0.6), 0 0 20px 6px rgba(255,122,0,0.3)',
+                  transition: 'width 300ms ease, height 300ms ease, box-shadow 300ms ease',
+                  boxShadow: detailHovered
+                    ? '0 0 14px 5px rgba(255,122,0,0.8), 0 0 28px 10px rgba(255,122,0,0.4)'
+                    : '0 0 10px 3px rgba(255,122,0,0.6), 0 0 20px 6px rgba(255,122,0,0.3)',
                 }}
               />
             );
@@ -529,11 +538,17 @@ export default function RadialOrbitalTimeline({
             ? 'width 700ms ease-in-out, padding 700ms ease-in-out, opacity 500ms ease-in 200ms'
             : 'opacity 300ms ease-out, width 700ms ease-in-out 100ms, padding 700ms ease-in-out 100ms',
         }}
-        onMouseEnter={() => { cyclePausedRef.current = true; }}
-        onMouseLeave={() => { cyclePausedRef.current = false; }}
+        onMouseEnter={() => { cyclePausedRef.current = true; setDetailHovered(true); }}
+        onMouseLeave={() => { cyclePausedRef.current = false; setDetailHovered(false); }}
       >
         {activeItem && (
-          <div className="max-w-lg w-full rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-2xl shadow-black/40 p-8 xl:p-10">
+          <div
+            key={activeItem.id}
+            className="max-w-lg w-full rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-2xl shadow-black/40 p-8 xl:p-10"
+            style={{
+              animation: 'detailSlideUp 500ms ease-out both',
+            }}
+          >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-2xl xl:text-3xl font-bold text-white">
                 {activeItem.title}
