@@ -222,24 +222,10 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* About Section (includes Vision & Mission) */}
-      <section id="section-about" className="relative min-h-screen flex flex-col justify-center overflow-hidden">
-        {/* Background image */}
-        <picture>
-          <source media="(max-width: 1023px)" srcSet="/images/about/bg-mobile.webp" />
-          <img
-            src="/images/about/bg-desktop.webp"
-            alt=""
-            loading="lazy"
-            decoding="async"
-            className="absolute inset-0 w-full h-full object-cover object-bottom"
-          />
-        </picture>
-        {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 bg-black/10" />
-
-        <div className="relative z-10 container mx-auto px-4">
+      <section id="section-about" className="relative min-h-screen flex flex-col justify-center bg-black overflow-hidden">
+        <div className="container mx-auto px-4">
           <motion.div
-            className="max-w-3xl mx-auto text-center mb-16"
+            className="lg:max-w-2xl mb-16"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
@@ -265,16 +251,16 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             >
               <Link
                 href="/about"
-                className="inline-flex items-center text-primary hover:text-primary/80 font-medium"
+                className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-medium px-6 py-3 rounded-lg transition-colors"
               >
                 {t('home.about.learnMore')}
-                <ArrowRight className="ml-2" size={18} />
+                <ArrowRight size={18} />
               </Link>
             </motion.div>
           </motion.div>
 
           {/* Vision & Mission cards */}
-          <MagicCardGrid className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          <MagicCardGrid className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -351,7 +337,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
                 {content?.vision2030?.paragraph2 || t('home.vision2030.paragraph2')}
               </p>
             </div>
-            <div className="flex items-center justify-center me-24">
+            <div className="w-1/2 flex items-center justify-end">
               <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" loading="lazy" decoding="async" className="h-72 object-contain" />
             </div>
           </div>
