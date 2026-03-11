@@ -529,7 +529,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
               onMouseLeave={() => setLinkedinPaused(false)}
             >
               {linkedin_posts.length > 0 ? (
-                <div className="w-full max-w-126">
+                <div className="w-full max-w-150">
                   <div className="relative rounded-xl overflow-hidden shadow-2xl shadow-black/30 ring-1 ring-white/10 transition-[height] duration-300" style={{ height: `${iframeHeight}px` }}>
                     {linkedin_posts.map((post, i) => (
                       <iframe

@@ -25,9 +25,8 @@ export function useScrollDirection(threshold = 10, idleTimeout = 3000): ScrollDi
 
         lastScrollY.current = window.scrollY;
 
-        const startIdleTimer = (atTop: boolean) => {
+        const startIdleTimer = () => {
             if (idleTimer.current) clearTimeout(idleTimer.current);
-            if (atTop) return; // Don't auto-hide at top
             idleTimer.current = setTimeout(() => {
                 setState((prev) => ({ ...prev, isIdle: true }));
             }, idleTimeout);
@@ -52,12 +51,22 @@ export function useScrollDirection(threshold = 10, idleTimeout = 3000): ScrollDi
 
             lastScrollY.current = currentScrollY;
 
-            startIdleTimer(atTop);
+            startIdleTimer();
         };
 
+        const handleMouseMove = () => {
+            setState((prev) => (prev.isIdle ? { ...prev, isIdle: false } : prev));
+            startIdleTimer();
+        };
+
+        // Start idle timer immediately (for initial page load at top)
+        startIdleTimer();
+
         window.addEventListener('scroll', handleScroll, { passive: true });
+        window.addEventListener('mousemove', handleMouseMove, { passive: true });
         return () => {
             window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('mousemove', handleMouseMove);
             if (idleTimer.current) clearTimeout(idleTimer.current);
         };
     }, [threshold, idleTimeout]);
