@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import { MagicCard } from "@/Components/ui/magic-card";
 
 interface TimelineItem {
   id: number;
@@ -544,27 +545,30 @@ export default function RadialOrbitalTimeline({
         {activeItem && (
           <div
             key={activeItem.id}
-            className="max-w-lg w-full rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-2xl shadow-black/40 p-8 xl:p-10"
-            style={{
-              animation: 'detailSlideUp 500ms ease-out both',
-            }}
+            style={{ animation: 'detailSlideUp 500ms ease-out both' }}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl xl:text-3xl font-bold text-white">
-                {activeItem.title}
-              </h3>
-              <div className="w-10 h-10 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center overflow-hidden shrink-0">
-                {activeItem.image ? (
-                  <img src={activeItem.image} alt={activeItem.title} className="w-full h-full object-cover" />
-                ) : (
-                  <activeItem.icon size={20} className="text-primary" />
-                )}
+          <MagicCard
+            className="max-w-lg w-full rounded-2xl bg-black border border-white/10 shadow-2xl shadow-black/40 p-8 xl:p-10"
+          >
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-2xl xl:text-3xl font-bold text-white">
+                  {activeItem.title}
+                </h3>
+                <div className="w-10 h-10 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center overflow-hidden shrink-0">
+                  {activeItem.image ? (
+                    <img src={activeItem.image} alt={activeItem.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <activeItem.icon size={20} className="text-primary" />
+                  )}
+                </div>
               </div>
+              <div className="w-12 h-0.5 bg-primary/40 rounded-full mb-4" />
+              <p className="text-base xl:text-lg text-white/70 leading-relaxed">
+                {activeItem.content}
+              </p>
             </div>
-            <div className="w-12 h-0.5 bg-primary/40 rounded-full mb-4" />
-            <p className="text-base xl:text-lg text-white/70 leading-relaxed">
-              {activeItem.content}
-            </p>
+          </MagicCard>
           </div>
         )}
       </div>

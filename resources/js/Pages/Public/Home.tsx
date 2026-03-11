@@ -222,24 +222,23 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* About Section (includes Vision & Mission) */}
-      <section id="section-about" className="relative min-h-screen flex flex-col justify-center overflow-hidden">
+      <section id="section-about" className="relative min-h-screen flex flex-col overflow-hidden">
         {/* Background image */}
         <picture>
-          <source media="(max-width: 1023px)" srcSet="/images/about/bg-mobile.webp" />
+          <source media="(max-width: 1023px)" srcSet="/images/about/bg-mobile.png" />
           <img
-            src="/images/about/bg-desktop.webp"
+            src="/images/about/bg-desktop.png"
             alt=""
             loading="lazy"
             decoding="async"
-            className="absolute inset-0 w-full h-full object-cover object-bottom"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         </picture>
-        {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 bg-black/10" />
 
-        <div className="relative z-10 container mx-auto px-4">
+        <div className="relative z-10 container mx-auto px-4 flex-1 flex flex-col py-12 lg:py-16">
+          {/* Top: title + description + CTA */}
           <motion.div
-            className="max-w-3xl mx-auto text-center mb-16"
+            className="lg:max-w-2xl lg:pt-10"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
@@ -255,7 +254,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
               {content?.about?.title || t('home.about.title')}
             </motion.h2>
             <motion.p
-              className="text-lg text-white/80 mb-8"
+              className="text-sm lg:text-base text-white/80 mb-6"
               variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
             >
               {content?.about?.description || t('home.about.description')}
@@ -265,28 +264,29 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             >
               <Link
                 href="/about"
-                className="inline-flex items-center text-primary hover:text-primary/80 font-medium"
+                className="inline-flex items-center gap-1.5 bg-primary hover:bg-primary/90 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
               >
                 {t('home.about.learnMore')}
-                <ArrowRight className="ml-2" size={18} />
+                <ArrowRight size={16} />
               </Link>
             </motion.div>
           </motion.div>
 
           {/* Vision & Mission cards */}
-          <MagicCardGrid className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          {/* Bottom: Vision & Mission cards */}
+          <MagicCardGrid className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 mt-auto lg:mb-16">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              <MagicCard className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 h-full">
+              <MagicCard className="bg-white/5 backdrop-blur-sm p-5 lg:p-6 rounded-xl border border-white/10 h-full">
                 <div className="relative z-10">
-                  <h3 className="text-xl font-semibold text-white mb-4">
+                  <h3 className="text-base lg:text-lg font-semibold text-white mb-2">
                     {content?.vision_mission?.vision_title || t('home.visionMission.visionTitle')}
                   </h3>
-                  <p className="text-white/70 leading-relaxed">
+                  <p className="text-sm text-white/70 leading-relaxed">
                     {content?.vision_mission?.vision_description || t('home.visionMission.visionDescription')}
                   </p>
                 </div>
@@ -298,12 +298,12 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <MagicCard className="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 h-full">
+              <MagicCard className="bg-white/5 backdrop-blur-sm p-5 lg:p-6 rounded-xl border border-white/10 h-full">
                 <div className="relative z-10">
-                  <h3 className="text-xl font-semibold text-white mb-4">
+                  <h3 className="text-base lg:text-lg font-semibold text-white mb-2">
                     {content?.vision_mission?.mission_title || t('home.visionMission.missionTitle')}
                   </h3>
-                  <p className="text-white/70 leading-relaxed">
+                  <p className="text-sm text-white/70 leading-relaxed">
                     {content?.vision_mission?.mission_description || t('home.visionMission.missionDescription')}
                   </p>
                 </div>
@@ -319,23 +319,23 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         <picture>
           <source media="(max-width: 1023px)" srcSet="/images/vision2030/bg-mobile.webp" />
           <img
-            src="/images/vision2030/bg-desktop.webp"
+            src="/images/vision2030/bg-desktop.png"
             alt=""
             loading="lazy"
             decoding="async"
-            className="absolute inset-0 w-full h-full object-cover object-top"
+            className="absolute inset-0 w-full h-full object-cover object-top opacity-85"
           />
         </picture>
 
-        <div className="relative z-10 flex-1 flex flex-col justify-center container mx-auto px-4">
+        <div className="relative z-10 flex-1 flex flex-col justify-start pt-20 lg:justify-center lg:pt-0 container mx-auto px-4">
           {/* Mobile: logo centered, then text below */}
           <div className="lg:hidden flex flex-col items-center">
-            <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" loading="lazy" decoding="async" className="h-24 object-contain" />
-            <div className="space-y-6 pt-8">
-              <p className="text-lg leading-relaxed text-white/90">
+            <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" loading="lazy" decoding="async" className="h-36 object-contain" />
+            <div className="space-y-4 pt-6">
+              <p className="text-sm leading-relaxed text-white/90">
                 {content?.vision2030?.paragraph1 || t('home.vision2030.paragraph1')}
               </p>
-              <p className="text-lg leading-relaxed text-white/90">
+              <p className="text-sm leading-relaxed text-white/90">
                 {content?.vision2030?.paragraph2 || t('home.vision2030.paragraph2')}
               </p>
             </div>
@@ -351,7 +351,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
                 {content?.vision2030?.paragraph2 || t('home.vision2030.paragraph2')}
               </p>
             </div>
-            <div className="flex items-center justify-center me-24">
+            <div className="w-1/2 flex items-center justify-end">
               <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" loading="lazy" decoding="async" className="h-72 object-contain" />
             </div>
           </div>
@@ -381,7 +381,10 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </div>
 
       {/* Products Showcase */}
-      <section id="section-products" className="overflow-hidden">
+      <section id="section-products" className="overflow-hidden bg-black">
+        <h2 className="text-3xl lg:text-4xl font-bold text-white text-center py-10 lg:py-14">
+          {content?.products?.title || t('home.products.title', 'Our Products')}
+        </h2>
         <div className="flex flex-col lg:flex-row min-h-100 lg:min-h-137.5 lg:bg-white/20">
           {/* TMT Bars */}
           <Link
@@ -526,7 +529,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
               onMouseLeave={() => setLinkedinPaused(false)}
             >
               {linkedin_posts.length > 0 ? (
-                <div className="w-full max-w-126">
+                <div className="w-full max-w-150">
                   <div className="relative rounded-xl overflow-hidden shadow-2xl shadow-black/30 ring-1 ring-white/10 transition-[height] duration-300" style={{ height: `${iframeHeight}px` }}>
                     {linkedin_posts.map((post, i) => (
                       <iframe
