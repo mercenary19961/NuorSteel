@@ -323,7 +323,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             alt=""
             loading="lazy"
             decoding="async"
-            className="absolute inset-0 w-full h-full object-cover object-top opacity-70"
+            className="absolute inset-0 w-full h-full object-cover object-top opacity-85"
           />
         </picture>
 
@@ -381,7 +381,10 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </div>
 
       {/* Products Showcase */}
-      <section id="section-products" className="overflow-hidden">
+      <section id="section-products" className="overflow-hidden bg-black">
+        <h2 className="text-3xl lg:text-4xl font-bold text-white text-center py-10 lg:py-14">
+          {content?.products?.title || t('home.products.title', 'Our Products')}
+        </h2>
         <div className="flex flex-col lg:flex-row min-h-100 lg:min-h-137.5 lg:bg-white/20">
           {/* TMT Bars */}
           <Link
