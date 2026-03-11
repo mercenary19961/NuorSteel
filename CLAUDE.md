@@ -73,11 +73,14 @@
 - [x] `HeroBottomLinks` component (`resources/js/Components/Public/HeroBottomLinks.tsx`)
 - [x] Homepage sections: About Us (combined with Vision & Mission), Vision 2030, interactive Core Values, Products, News (LinkedIn feed), CTA — each with `id` for scroll navigation
 - [x] Core Values V2: RadialOrbitalTimeline component with orbital animation, rotating value cards, responsive node sizes (72px desktop, 40px mobile), enlarged center logo (128px), detail panel on lg+ screens, and traveling dot auto-cycle with pause on hover (`resources/js/Components/ui/radial-orbital-timeline.tsx`)
+- [x] Core Values V3: scroll-driven stepping on desktop — sticky section in `400vh` wrapper, scroll position maps to 5 stages (idle + 4 values), `scrollStep` prop drives RadialOrbitalTimeline node selection
+- [x] Core Values detail panel: glass card UI (`bg-white/5 backdrop-blur-lg border-white/10 shadow-2xl`), `detailSlideUp` CSS animation, icon moved to top-right, title enlarged
+- [x] Core Values detail panel: traveling dot grows + pulses on detail hover, enhanced center node ping rings (larger, stronger opacity)
 - [x] Products section on homepage links to `/products` page (ISL-style redesign lives on dedicated Products page)
 - [x] All sections use unified left-to-right gradient (`bg-linear-to-r from-gray-900 to-gray-800`)
 - [x] News (LinkedIn feed): auto-rotating carousel with dot indicators, improved iframe sizing, RTL-aware chevron arrows, section titled "News" (not "LinkedIn"), "View Post on LinkedIn" button per post
 - [x] News section uses CSS logical properties (`text-start`, `ms-0`/`me-auto`) for RTL support
-- [x] About Us section: merged with Vision & Mission into single full-screen section with factory background image (`public/images/about/bg-desktop.webp`), dark overlay, white title
+- [x] About Us section: merged with Vision & Mission into single full-screen section, solid `bg-black` background (factory bg image removed), left-aligned text with orange CTA button
 - [x] Vision 2030 section: Nuor Steel logo removed, Vision 2030 logo enlarged (`h-72` desktop, `h-24` mobile), text size increased (`text-xl`), content vertically centered
 - [x] UI primitive components: Badge, Button, Card (`resources/js/Components/ui/`)
 - [x] MagicCard + MagicCardGrid: animated border glow bento effect (`resources/js/Components/ui/magic-card.tsx` + `magic-card.css`)
@@ -171,6 +174,13 @@
 - [x] Typewriter: first cycle delay longer than subsequent cycles (3s first, 1.5s after)
 - [x] RadialOrbitalTimeline: responsive node sizes (larger on desktop), detail panel slides in on lg+ when node selected, orbit shrinks in detail view, center node clickable (opens top node / closes detail view)
 - [x] RadialOrbitalTimeline: traveling dot auto-cycles between nodes (8s per travel, eased with `easeInOutCubic`, fades in/out), pauses on detail panel hover, cancels on manual node click
+- [x] RadialOrbitalTimeline: `scrollStep` prop for external scroll-driven control (0 = idle/auto-rotate, 1–N = activate Nth value)
+- [x] RadialOrbitalTimeline: responsive orbit radius and container height per breakpoint (`sm:140, md:200, lg:180, xl:240, 2xl:320`), dynamic `containerHeight` state
+- [x] RadialOrbitalTimeline: detail panel glass card redesign with `detailSlideUp` keyframe animation, icon repositioned to top-right
+- [x] RadialOrbitalTimeline: traveling dot grows (`0.75rem → 1rem`) and pulses when detail panel is hovered, enhanced glow box-shadow
+- [x] RadialOrbitalTimeline: center node ping rings enlarged (`w-36/w-44`) with stronger opacity and staggered timing
+- [x] Core Values section: scroll-driven stepping on desktop — sticky section in `400vh` wrapper, scroll progress maps to 5 stages (idle + 4 values)
+- [x] About section: factory background image removed, solid `bg-black`, left-aligned text layout with orange CTA button (`bg-primary`)
 - [x] Core values subtitle removed from homepage (cleaner layout)
 - [x] `useScrollDirection` hook: added `isIdle` state with configurable timeout (default 3s), added `isAtBottom` state
 - [x] Contact page: full dark-theme redesign — unified gradient bg, dark form inputs (`bg-white/5`, `border-white/10`), clickable phone/email links, custom `RequestTypeSelect` dropdown with keyboard navigation
@@ -196,8 +206,8 @@
 - [x] HeroBottomLinks: increased image heights (`h-32 lg:h-44`), responsive sizing
 - [x] Vision 2030: text left, Vision 2030 logo right (Nuor logo removed), vertically centered, image `object-top`
 - [x] Core values: reduced padding, removed borders from orbital circle nodes and center node, enlarged node sizes (72px) and center logo (128px)
-- [x] Section backgrounds: About (factory bg image), Core Values, News changed to solid `bg-black`
-- [x] About & Vision/Mission merged into single full-screen section with `<picture>` bg image + dark overlay
+- [x] Section backgrounds: About, Core Values, News changed to solid `bg-black`
+- [x] About & Vision/Mission merged into single full-screen section with solid `bg-black` background
 - [x] News section: "View Post on LinkedIn" button linking to actual LinkedIn post per carousel item
 - [x] News section: "Follow us on LinkedIn" URL corrected to `https://www.linkedin.com/company/nuor-steel/`
 - [x] First LinkedIn post URL fixed (was embed URL, now direct link); data migration added
@@ -665,4 +675,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-03-09 — based on commit `f3a5b73` (*combine About & Vision/Mission sections, performance optimizations, LinkedIn fixes*)
+> **Last updated:** 2026-03-11 — based on commit `ffa6ffa` (*scroll-driven core values stepping, glass card detail panel, About section bg image removed*)
