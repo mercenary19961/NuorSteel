@@ -35,16 +35,14 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-white/20 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         mobileMenuOpen
-          ? 'bg-black'
-          : isAtTop
-            ? 'bg-transparent'
-            : 'bg-linear-to-b from-black to-black/70'
+          ? 'bg-black border-b border-white/20'
+          : 'bg-linear-to-b from-black/80 to-black/50 border-b border-white/20'
       } ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}
     >
       <div className="container mx-auto px-4">
-        <div className={`flex items-center justify-between transition-all duration-300 ${isAtTop ? 'h-16 lg:h-20' : 'h-12 lg:h-14'}`}>
+        <div className={`flex items-center justify-between transition-all duration-300 ${isAtTop ? 'h-14 lg:h-16' : 'h-12 lg:h-14'}`}>
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <picture>
@@ -61,14 +59,14 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-6">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 href={item.path}
-                className={`text-sm font-medium transition-colors duration-200 ${
-                  isActive(item.path) ? 'text-white' : 'text-white/70 hover:text-white'
-                }`}
+                className={`transition-colors duration-200 ${
+                  isAtTop ? 'text-base font-medium' : 'text-sm font-medium'
+                } ${isActive(item.path) ? 'text-white' : 'text-white/90 hover:text-white'}`}
               >
                 {t(item.labelKey)}
               </Link>
