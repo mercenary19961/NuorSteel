@@ -80,14 +80,16 @@
 - [x] All sections use unified left-to-right gradient (`bg-linear-to-r from-gray-900 to-gray-800`)
 - [x] News (LinkedIn feed): auto-rotating carousel with dot indicators, improved iframe sizing, RTL-aware chevron arrows, section titled "News" (not "LinkedIn"), "View Post on LinkedIn" button per post
 - [x] News section uses CSS logical properties (`text-start`, `ms-0`/`me-auto`) for RTL support
-- [x] About Us section: merged with Vision & Mission into single full-screen section, solid `bg-black` background (factory bg image removed), left-aligned text with orange CTA button
-- [x] Vision 2030 section: Nuor Steel logo removed, Vision 2030 logo enlarged (`h-72` desktop, `h-24` mobile), text size increased (`text-xl`), content vertically centered
+- [x] About Us section: merged with Vision & Mission into single full-screen section, responsive background image (`bg-desktop.png`/`bg-mobile.png`), left-aligned text with orange CTA button, Vision & Mission cards pushed to bottom with `mt-auto`
+- [x] Vision 2030 section: Nuor Steel logo removed, Vision 2030 logo enlarged (`h-72` desktop, `h-36` mobile), background image at 85% opacity, content top-aligned on mobile (`pt-20`), vertically centered on desktop
 - [x] UI primitive components: Badge, Button, Card (`resources/js/Components/ui/`)
 - [x] MagicCard + MagicCardGrid: animated border glow bento effect (`resources/js/Components/ui/magic-card.tsx` + `magic-card.css`)
 - [x] ScrollToTop: fixed-position button with SVG progress ring, appears at 70% scroll (`resources/js/Components/ui/scroll-to-top.tsx`)
 - [x] ScrollStack component: scroll-triggered stacking card animation (`resources/js/Components/ui/scroll-stack.tsx`)
 - [x] Language defaults to English always (no localStorage persistence)
-- [x] Magic card glow applied to: Home (Vision & Mission, Core Values), About (Vision & Mission, Capabilities), Quality (assurance cards), Career (job listings)
+- [x] Magic card glow applied to: Home (Vision & Mission, Core Values, Core Values detail panel), About (Vision & Mission, Capabilities), Quality (assurance cards), Career (job listings)
+- [x] Products section: `bg-black` background with section title heading above product cards
+- [x] News section: LinkedIn embed max width increased to `max-w-150`
 
 ### About Page Enhancements (DONE)
 - [x] Intro section: animated large text with scroll-triggered reveal (TimelineContent + framer-motion `useInView`)
@@ -166,7 +168,7 @@
 
 ### Misc Fixes & Enhancements (post-2026-03-01)
 - [x] Header: burger menu background color fix on mobile view
-- [x] Header: improved scroll behavior — hides on scroll down or 3s idle, shows on scroll up, compact height + gradient bg when scrolled
+- [x] Header: improved scroll behavior — hides on idle (even at top) or scroll down, shows on mouse move or scroll up, compact height when scrolled
 - [x] Header: conditional Contact CTA button — visible in desktop nav (hidden on homepage hero when at top, shows when scrolled or on other pages), also added to mobile menu
 - [x] Header: stays visible at bottom of page (`isAtBottom` check in scroll direction hook)
 - [x] Career page: multilingual support enhancements (bilingual i18n keys)
@@ -176,13 +178,13 @@
 - [x] RadialOrbitalTimeline: traveling dot auto-cycles between nodes (8s per travel, eased with `easeInOutCubic`, fades in/out), pauses on detail panel hover, cancels on manual node click
 - [x] RadialOrbitalTimeline: `scrollStep` prop for external scroll-driven control (0 = idle/auto-rotate, 1–N = activate Nth value)
 - [x] RadialOrbitalTimeline: responsive orbit radius and container height per breakpoint (`sm:140, md:200, lg:180, xl:240, 2xl:320`), dynamic `containerHeight` state
-- [x] RadialOrbitalTimeline: detail panel glass card redesign with `detailSlideUp` keyframe animation, icon repositioned to top-right
+- [x] RadialOrbitalTimeline: detail panel redesigned with MagicCard glow effect + `detailSlideUp` keyframe animation, icon repositioned to top-right
 - [x] RadialOrbitalTimeline: traveling dot grows (`0.75rem → 1rem`) and pulses when detail panel is hovered, enhanced glow box-shadow
 - [x] RadialOrbitalTimeline: center node ping rings enlarged (`w-36/w-44`) with stronger opacity and staggered timing
 - [x] Core Values section: scroll-driven stepping on desktop — sticky section in `400vh` wrapper, scroll progress maps to 5 stages (idle + 4 values)
-- [x] About section: factory background image removed, solid `bg-black`, left-aligned text layout with orange CTA button (`bg-primary`)
+- [x] About section: responsive background image added (`bg-desktop.png`/`bg-mobile.png`), left-aligned text layout with orange CTA button (`bg-primary`)
 - [x] Core values subtitle removed from homepage (cleaner layout)
-- [x] `useScrollDirection` hook: added `isIdle` state with configurable timeout (default 3s), added `isAtBottom` state
+- [x] `useScrollDirection` hook: added `isIdle` state with configurable timeout (default 3s), added `isAtBottom` state, idle timer starts on load, mouse movement resets idle
 - [x] Contact page: full dark-theme redesign — unified gradient bg, dark form inputs (`bg-white/5`, `border-white/10`), clickable phone/email links, custom `RequestTypeSelect` dropdown with keyboard navigation
 - [x] Contact page: bilingual content support (controller passes `content_en` + `content_ar`, client picks via `useLanguage()`)
 - [x] Contact form: company field changed from required to optional; file upload now accepts PDF, JPG, PNG (was PDF-only)
@@ -206,8 +208,8 @@
 - [x] HeroBottomLinks: increased image heights (`h-32 lg:h-44`), responsive sizing
 - [x] Vision 2030: text left, Vision 2030 logo right (Nuor logo removed), vertically centered, image `object-top`
 - [x] Core values: reduced padding, removed borders from orbital circle nodes and center node, enlarged node sizes (72px) and center logo (128px)
-- [x] Section backgrounds: About, Core Values, News changed to solid `bg-black`
-- [x] About & Vision/Mission merged into single full-screen section with solid `bg-black` background
+- [x] Section backgrounds: Core Values, News changed to solid `bg-black`; About uses background image
+- [x] About & Vision/Mission merged into single full-screen section with responsive background image (`/images/about/bg-desktop.png`, `/images/about/bg-mobile.png`)
 - [x] News section: "View Post on LinkedIn" button linking to actual LinkedIn post per carousel item
 - [x] News section: "Follow us on LinkedIn" URL corrected to `https://www.linkedin.com/company/nuor-steel/`
 - [x] First LinkedIn post URL fixed (was embed URL, now direct link); data migration added
@@ -217,6 +219,12 @@
 - [x] Media library: "Used in" indicator for PDFs (certificates usage), folder preview thumbnails (first image/PDF per folder)
 - [x] Media library: soft delete preserves physical files (`forceDeleting` hook), PDF viewer modal on cards
 - [x] Admin certificates: redesigned card layout — PDF preview on top (scaled iframe), 3-column grid, status/expiry badge overlays
+- [x] Header: gradient background always visible (`from-black/80 to-black/50`), no longer transparent at top
+- [x] Header: reduced height (`h-14 lg:h-16` at top, `h-12 lg:h-14` when scrolled), reduced nav gap (`gap-6`), responsive nav text size (`text-base` at top, `text-sm` when scrolled)
+- [x] `useScrollDirection` hook: idle timer starts on page load (header auto-hides at top too), mouse movement resets idle and restores header visibility
+- [x] Vision 2030: mobile logo enlarged (`h-36`), text sizes reduced (`text-sm`), spacing tightened
+- [x] Vision & Mission cards: compact sizing (smaller padding `p-5 lg:p-6`, smaller text `text-base lg:text-lg` titles, `text-sm` body, reduced gaps `gap-4 lg:gap-6`)
+- [x] About section description and CTA button: reduced sizes for balanced layout
 
 ### Site-Wide Visual Consistency (DONE)
 - [x] Unified `bg-linear-to-r from-gray-900 to-gray-800` gradient across all public page sections (Home, About, Quality, Career)
@@ -675,4 +683,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-03-11 — based on commit `ffa6ffa` (*scroll-driven core values stepping, glass card detail panel, About section bg image removed*)
+> **Last updated:** 2026-03-12 — based on commit `c2a9779` (*About section bg image, header idle/mouse logic, Vision 2030 & card sizing refinements, MagicCard detail panel, products section title*)
