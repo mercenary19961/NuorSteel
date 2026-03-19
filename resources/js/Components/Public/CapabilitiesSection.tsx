@@ -53,7 +53,15 @@ export default function CapabilitiesSection() {
   }, []);
 
   return (
-    <section id="section-capabilities" className="bg-linear-to-r from-gray-900 to-gray-800">
+    <section id="section-capabilities" className="relative bg-black">
+      {/* Subtle grid texture */}
+      <div
+        className="absolute inset-0 opacity-60 z-0"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+        }}
+      />
       <MagicCardGrid>
       <ScrollStack
         useWindowScroll
@@ -80,7 +88,7 @@ export default function CapabilitiesSection() {
         {capabilities.map(({ icon: Icon, key }) => (
           <ScrollStackItem
             key={key}
-            className="magic-card min-h-[55vh] lg:min-h-[50vh] mx-auto max-w-4xl w-[92%] lg:w-[50%] p-6 lg:p-10 rounded-2xl lg:rounded-3xl bg-gray-800 border border-white/10 shadow-2xl shadow-black/30 flex items-center"
+            className="magic-card min-h-[55vh] lg:min-h-[50vh] mx-auto max-w-4xl w-[92%] lg:w-[50%] p-6 lg:p-10 rounded-2xl lg:rounded-3xl bg-zinc-800/90 backdrop-blur-sm border border-white/10 shadow-2xl shadow-black/30 flex items-center"
           >
             <div className="relative z-10 w-full">
               <div className="flex items-start gap-4 lg:gap-5">

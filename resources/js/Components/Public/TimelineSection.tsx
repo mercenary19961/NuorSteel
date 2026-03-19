@@ -17,8 +17,16 @@ export default function TimelineSection() {
   ];
 
   return (
-    <section ref={sectionRef} className="py-16 lg:py-24 bg-linear-to-r from-gray-900 to-gray-800 overflow-hidden">
-      <div className="container mx-auto px-4">
+    <section ref={sectionRef} className="relative py-16 lg:py-24 bg-black overflow-hidden">
+      {/* Subtle grid texture */}
+      <div
+        className="absolute inset-0 opacity-60"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+        }}
+      />
+      <div className="relative container mx-auto px-4">
         {/* Section title */}
         <motion.h2
           initial={{ opacity: 0, y: 20 }}

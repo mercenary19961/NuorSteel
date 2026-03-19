@@ -45,8 +45,16 @@ export default function About() {
       <h1 className="sr-only">{t('about.hero.title')}</h1>
 
       {/* About Intro — animated large text with highlighted keywords */}
-      <section className="bg-linear-to-r from-gray-900 to-gray-800 text-white pt-32 lg:pt-44 pb-20 lg:pb-32">
-        <div className="max-w-6xl mx-auto px-4" ref={introRef}>
+      <section className="relative bg-black text-white pt-32 lg:pt-44 pb-20 lg:pb-32 overflow-hidden">
+        {/* Subtle grid texture */}
+        <div
+          className="absolute inset-0 opacity-60"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
+          }}
+        />
+        <div className="relative max-w-6xl mx-auto px-4" ref={introRef}>
           <TimelineContent
             as="p"
             animationNum={0}
