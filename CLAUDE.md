@@ -225,6 +225,10 @@
 - [x] Vision 2030: mobile logo enlarged (`h-36`), text sizes reduced (`text-sm`), spacing tightened
 - [x] Vision & Mission cards: compact sizing (smaller padding `p-5 lg:p-6`, smaller text `text-base lg:text-lg` titles, `text-sm` body, reduced gaps `gap-4 lg:gap-6`)
 - [x] About section description and CTA button: reduced sizes for balanced layout
+- [x] Favicon assets added: `favicon-32.png`, `favicon-16.png`, `apple-touch-icon.png`, `favicon.ico` with `<link>` tags in `app.blade.php`
+- [x] Container max-width capped at 1280px from `xl` upward — prevents abrupt layout jump at the `2xl` breakpoint (`app.css` media query)
+- [x] About page: black grid texture background applied to all sections (Intro, Capabilities, Timeline, Vision & Mission) — replaces `bg-linear-to-r from-gray-900 to-gray-800` with `bg-black` + subtle 60px CSS grid overlay (`rgba(255,255,255,.1)`)
+- [x] Capabilities ScrollStack cards: `bg-zinc-800/90 backdrop-blur-sm` (was `bg-gray-800`) for glass effect over grid texture
 
 ### Site-Wide Visual Consistency (DONE)
 - [x] Unified `bg-linear-to-r from-gray-900 to-gray-800` gradient across all public page sections (Home, About, Quality, Career)
@@ -683,4 +687,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-03-12 — based on commit `c2a9779` (*About section bg image, header idle/mouse logic, Vision 2030 & card sizing refinements, MagicCard detail panel, products section title*)
+> **Last updated:** 2026-03-28 — based on commit `74e938e` (*favicon assets, 2xl container cap, black grid texture on About page sections*)
