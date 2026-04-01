@@ -26,10 +26,8 @@ export default function Header() {
     return url.startsWith(path);
   };
 
-  // Hide header when scrolling down, idle for 3s, or idle at top with no mouse activity
-  const isHidden = !mobileMenuOpen && !isAtBottom && (
-    isIdle || (!isAtTop && scrollDirection === 'down')
-  );
+  // Hide header only after 6s idle (no scroll or mouse activity)
+  const isHidden = !mobileMenuOpen && !isAtBottom && isIdle;
 
   // Hide Contact CTA when on homepage hero (at top of page)
   const isHomepage = url === '/';
