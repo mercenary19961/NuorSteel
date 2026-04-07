@@ -34,7 +34,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       content: content?.core_values?.quality_description || t('home.coreValues.quality.description'),
       category: 'Quality',
       icon: ShieldCheck,
-      image: '/images/core-values/quality.webp',
+      image: '/images/home/core-values/quality.webp',
       relatedIds: [2, 4],
       status: 'completed' as const,
       energy: 100,
@@ -46,7 +46,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       content: content?.core_values?.sustainability_description || t('home.coreValues.sustainability.description'),
       category: 'Sustainability',
       icon: Leaf,
-      image: '/images/core-values/sustainability.webp',
+      image: '/images/home/core-values/sustainability.webp',
       relatedIds: [1, 3],
       status: 'completed' as const,
       energy: 95,
@@ -58,7 +58,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       content: content?.core_values?.innovation_description || t('home.coreValues.innovation.description'),
       category: 'Innovation',
       icon: Lightbulb,
-      image: '/images/core-values/innovation.webp',
+      image: '/images/home/core-values/innovation.webp',
       relatedIds: [2, 4],
       status: 'completed' as const,
       energy: 90,
@@ -70,7 +70,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       content: content?.core_values?.strategic_growth_description || t('home.coreValues.strategicGrowth.description'),
       category: 'Growth',
       icon: TrendingUp,
-      image: '/images/core-values/strategic-growth.webp',
+      image: '/images/home/core-values/strategic-growth.webp',
       relatedIds: [1, 3],
       status: 'completed' as const,
       energy: 85,
@@ -170,9 +170,9 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         {/* Background + Overlay */}
         <div className="absolute inset-0">
           <picture>
-            <source media="(max-width: 1023px)" srcSet="/images/hero/hero-mobile.webp" />
+            <source media="(max-width: 1023px)" srcSet="/images/home/hero/hero-mobile.webp" />
             <img
-              src="/images/hero/hero-desktop.webp"
+              src="/images/home/hero/hero-desktop.webp"
               alt=""
               fetchPriority="high"
               decoding="async"
@@ -225,9 +225,9 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       <section id="section-about" className="relative min-h-screen flex flex-col overflow-hidden">
         {/* Background image */}
         <picture>
-          <source media="(max-width: 1023px)" srcSet="/images/about/bg-mobile.png" />
+          <source media="(max-width: 1023px)" srcSet="/images/home/about/bg-mobile-en.webp" />
           <img
-            src="/images/about/bg-desktop.png"
+            src="/images/home/about/bg-desktop-en.webp"
             alt=""
             loading="lazy"
             decoding="async"
@@ -317,9 +317,9 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       <section id="section-vision-2030" className="relative min-h-screen flex flex-col text-white overflow-hidden">
         {/* Background image */}
         <picture>
-          <source media="(max-width: 1023px)" srcSet="/images/vision2030/bg-mobile.webp" />
+          <source media="(max-width: 1023px)" srcSet="/images/home/vision2030/bg-mobile.webp" />
           <img
-            src="/images/vision2030/bg-desktop.png"
+            src="/images/home/vision2030/bg-desktop.png"
             alt=""
             loading="lazy"
             decoding="async"
@@ -330,7 +330,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         <div className="relative z-10 flex-1 flex flex-col justify-start pt-20 lg:justify-center lg:pt-0 container mx-auto px-4">
           {/* Mobile: logo centered, then text below */}
           <div className="lg:hidden flex flex-col items-center">
-            <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" loading="lazy" decoding="async" className="h-36 object-contain" />
+            <img src="/images/home/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" loading="lazy" decoding="async" className="h-36 object-contain" />
             <div className="space-y-4 pt-6">
               <p className="text-sm leading-relaxed text-white/90">
                 {content?.vision2030?.paragraph1 || t('home.vision2030.paragraph1')}
@@ -352,7 +352,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
               </p>
             </div>
             <div className="w-1/2 flex items-center justify-end">
-              <img src="/images/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" loading="lazy" decoding="async" className="h-72 object-contain" />
+              <img src="/images/home/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" loading="lazy" decoding="async" className="h-72 object-contain" />
             </div>
           </div>
         </div>
@@ -374,7 +374,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
               {content?.core_values?.title || t('home.coreValues.title')}
             </h2>
             <MagicCardGrid>
-              <RadialOrbitalTimeline timelineData={coreValuesData} centerImage="/images/core-values/center.webp" scrollStep={isDesktop ? coreValuesStep : undefined} />
+              <RadialOrbitalTimeline timelineData={coreValuesData} centerImage="/images/home/core-values/center.webp" scrollStep={isDesktop ? coreValuesStep : undefined} />
             </MagicCardGrid>
           </div>
         </section>
@@ -404,8 +404,8 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
           >
             {/* Background image */}
             <picture>
-              <source media="(max-width: 1023px)" srcSet="/images/products/tmt-bars-mobile.png" />
-              <img src="/images/products/tmt-bars-desktop.png" alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+              <source media="(max-width: 1023px)" srcSet="/images/home/products/tmt-bars-mobile.png" />
+              <img src="/images/home/products/tmt-bars-desktop.png" alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
             </picture>
             {/* Color Overlay */}
             <div
@@ -445,8 +445,8 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
           >
             {/* Background image */}
             <picture>
-              <source media="(max-width: 1023px)" srcSet="/images/products/billets-mobile.png" />
-              <img src="/images/products/billets-desktop.png" alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+              <source media="(max-width: 1023px)" srcSet="/images/home/products/billets-mobile.png" />
+              <img src="/images/home/products/billets-desktop.png" alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
             </picture>
             {/* Color Overlay */}
             <div

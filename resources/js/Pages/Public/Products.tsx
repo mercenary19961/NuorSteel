@@ -611,10 +611,12 @@ export default function Products({ products }: Props) {
 
         {/* RIGHT PANEL — Product Navigation / Image (hidden on mobile when expanded) */}
         <div
-          className={`relative overflow-hidden lg:bg-linear-to-br lg:from-gray-800 lg:to-gray-700 lg:-ms-120 ${expanded ? 'hidden lg:block' : ''}`}
+          className={`relative overflow-hidden lg:bg-black lg:-ms-120 ${expanded ? 'hidden lg:block' : ''}`}
           style={{
             flex: rightFlex,
             transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
           }}
         >
           <AnimatePresence mode="wait">

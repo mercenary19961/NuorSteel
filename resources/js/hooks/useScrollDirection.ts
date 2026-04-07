@@ -8,7 +8,7 @@ interface ScrollDirectionState {
     isIdle: boolean;
 }
 
-export function useScrollDirection(threshold = 10, idleTimeout = 3000): ScrollDirectionState {
+export function useScrollDirection(threshold = 10, idleTimeout = 6000): ScrollDirectionState {
     const [state, setState] = useState<ScrollDirectionState>({
         scrollDirection: 'up',
         scrollY: 0,

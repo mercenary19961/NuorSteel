@@ -26,10 +26,8 @@ export default function Header() {
     return url.startsWith(path);
   };
 
-  // Hide header when scrolling down, idle for 3s, or idle at top with no mouse activity
-  const isHidden = !mobileMenuOpen && !isAtBottom && (
-    isIdle || (!isAtTop && scrollDirection === 'down')
-  );
+  // Hide header only after 6s idle (no scroll or mouse activity)
+  const isHidden = !mobileMenuOpen && !isAtBottom && isIdle;
 
   // Hide Contact CTA when on homepage hero (at top of page)
   const isHomepage = url === '/';
@@ -49,11 +47,11 @@ export default function Header() {
           <Link href="/" className="flex items-center">
             <picture>
               <source
-                srcSet={isAtTop ? '/images/logo/logo-lg.webp' : '/images/logo/logo-sm.webp'}
+                srcSet={isAtTop ? '/images/shared/logo/logo-lg.webp' : '/images/shared/logo/logo-sm.webp'}
                 type="image/webp"
               />
               <img
-                src={isAtTop ? '/images/logo/logo-lg.png' : '/images/logo/logo-sm.png'}
+                src={isAtTop ? '/images/shared/logo/logo-lg.png' : '/images/shared/logo/logo-sm.png'}
                 alt={t('company.name')}
                 className={`transition-all duration-300 ${isAtTop ? 'h-10 lg:h-12' : 'h-7 lg:h-9'}`}
               />

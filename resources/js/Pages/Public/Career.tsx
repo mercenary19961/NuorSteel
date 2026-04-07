@@ -104,15 +104,21 @@ export default function Career({ listings, content_en, content_ar }: Props) {
       <Head title="Career" />
 
       {/* Hero Section — matches Quality page pattern */}
-      <section className="relative h-screen bg-gray-900 text-white overflow-hidden flex items-center">
+      <section className="relative h-screen bg-black text-white overflow-hidden flex items-center">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-linear-to-r from-gray-900 to-gray-800" />
+          <div
+            className="absolute inset-0 opacity-60"
+            style={{
+              backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+              backgroundSize: '60px 60px',
+            }}
+          />
           <div
             className="absolute top-0 right-0 w-1/2 h-full hidden lg:block"
             style={{ clipPath: 'polygon(25% 0, 100% 0, 100% 100%, 0% 100%)' }}
           >
-            <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-primary/10 to-gray-900/80" />
-            <div className="absolute inset-0 bg-linear-to-t from-gray-900/60 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-primary/10 to-black/80" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
           </div>
           <div
             className="absolute top-0 bottom-0 hidden lg:block w-px bg-primary/30"
@@ -136,8 +142,15 @@ export default function Career({ listings, content_en, content_ar }: Props) {
       </section>
 
       {/* Job Listings Section */}
-      <section className="bg-linear-to-r from-gray-900 to-gray-800 text-white py-24 lg:py-32">
-        <div className="container mx-auto px-4">
+      <section className="relative bg-black text-white py-24 lg:py-32">
+        <div
+          className="absolute inset-0 opacity-60"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
+          }}
+        />
+        <div className="relative container mx-auto px-4">
           <div className="max-w-3xl mb-16">
             <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
               {t('career.hero.label', 'Careers')}
