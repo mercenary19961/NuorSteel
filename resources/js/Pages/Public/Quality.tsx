@@ -12,10 +12,16 @@ export default function Quality() {
       <Head title="Quality" />
 
       {/* Hero Section */}
-      <section className="relative h-screen bg-gray-950 text-white overflow-hidden flex items-center">
-        {/* Background gradient + decorative shape */}
+      <section className="relative h-screen bg-black text-white overflow-hidden flex items-center">
+        {/* Background grid + decorative shape */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-linear-to-br from-gray-950 via-gray-900 to-gray-950" />
+          <div
+            className="absolute inset-0 opacity-60"
+            style={{
+              backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+              backgroundSize: '60px 60px',
+            }}
+          />
           {/* Diagonal geometric shape on the right — placeholder for future image */}
           <div
             className="absolute top-0 right-0 w-1/2 h-full hidden lg:block"
@@ -23,8 +29,8 @@ export default function Quality() {
               clipPath: 'polygon(25% 0, 100% 0, 100% 100%, 0% 100%)',
             }}
           >
-            <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-primary/10 to-gray-900/80" />
-            <div className="absolute inset-0 bg-linear-to-t from-gray-950/60 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-primary/10 to-black/80" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
           </div>
           {/* Subtle accent line */}
           <div
@@ -49,8 +55,15 @@ export default function Quality() {
       </section>
 
       {/* Quality & Manufacturing Assurance */}
-      <section className="bg-linear-to-b from-gray-950 to-gray-900 text-white py-24 lg:py-32">
-        <div className="container mx-auto px-4">
+      <section className="relative bg-black text-white py-24 lg:py-32">
+        <div
+          className="absolute inset-0 opacity-60"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
+          }}
+        />
+        <div className="relative container mx-auto px-4">
           {/* Section intro */}
           <div className="max-w-3xl mb-20">
             <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
