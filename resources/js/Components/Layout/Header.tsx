@@ -47,11 +47,11 @@ export default function Header() {
           <Link href="/" className="flex items-center">
             <picture>
               <source
-                srcSet={isAtTop ? '/images/logo/logo-lg.webp' : '/images/logo/logo-sm.webp'}
+                srcSet={isAtTop ? '/images/shared/logo/logo-lg.webp' : '/images/shared/logo/logo-sm.webp'}
                 type="image/webp"
               />
               <img
-                src={isAtTop ? '/images/logo/logo-lg.png' : '/images/logo/logo-sm.png'}
+                src={isAtTop ? '/images/shared/logo/logo-lg.png' : '/images/shared/logo/logo-sm.png'}
                 alt={t('company.name')}
                 className={`transition-all duration-300 ${isAtTop ? 'h-10 lg:h-12' : 'h-7 lg:h-9'}`}
               />

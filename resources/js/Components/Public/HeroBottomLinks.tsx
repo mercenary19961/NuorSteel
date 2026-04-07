@@ -2,9 +2,9 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 
 const links = [
-  { labelKey: 'home.hero.bottomLinks.about', targetId: 'section-about', image: '/images/page-links/about-us.png' },
-  { labelKey: 'home.hero.bottomLinks.coreValues', targetId: 'section-core-values', image: '/images/page-links/core-values.png' },
-  { labelKey: 'home.hero.bottomLinks.news', targetId: 'section-linkedin', image: '/images/page-links/news.png' },
+  { labelKey: 'home.hero.bottomLinks.about', targetId: 'section-about', image: '/images/home/page-links/about-us.png' },
+  { labelKey: 'home.hero.bottomLinks.coreValues', targetId: 'section-core-values', image: '/images/home/page-links/core-values.png' },
+  { labelKey: 'home.hero.bottomLinks.news', targetId: 'section-linkedin', image: '/images/home/page-links/news.png' },
 ];
 
 export default function HeroBottomLinks() {
