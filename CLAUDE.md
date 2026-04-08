@@ -63,7 +63,7 @@
 
 ### Homepage Redesign (DONE)
 - [x] Header: transparent overlay on all pages, fixed positioning
-- [x] Header: visible at top, hides on scroll down or after 3s idle (shows on scroll up), compact height when scrolled, gradient bg when not at top
+- [x] Header: always visible at top of page (except Products page), hides only after 6s idle when scrolled (shows on mouse move or scroll up), compact height when scrolled, gradient bg when not at top
 - [x] Hero: full-viewport (`h-screen`), gradient placeholder bg, staggered entrance animations
 - [x] Hero: H1 with multi-line typewriter effect — types lines simultaneously, then cycles keywords with delete/retype animation, longer first-cycle delay (`resources/js/Components/ui/typewriter.tsx`)
 - [x] Hero: "Contact Us" outline button fades in after typewriter completes, links directly to `/contact` page
@@ -78,7 +78,7 @@
 - [x] Core Values detail panel: traveling dot grows + pulses on detail hover, enhanced center node ping rings (larger, stronger opacity)
 - [x] Products section on homepage links to `/products` page (ISL-style redesign lives on dedicated Products page)
 - [x] All sections use unified left-to-right gradient (`bg-linear-to-r from-gray-900 to-gray-800`)
-- [x] News (LinkedIn feed): auto-rotating carousel with dot indicators, improved iframe sizing, RTL-aware chevron arrows, section titled "News" (not "LinkedIn"), "View Post on LinkedIn" button per post
+- [x] News (LinkedIn feed): auto-rotating carousel with dot indicators, single active iframe (destroyed/recreated on switch, preloaded 2s before), Intersection Observer to unmount iframes when section is off-screen, RTL-aware chevron arrows, section titled "News" (not "LinkedIn"), "View Post on LinkedIn" button per post
 - [x] News section uses CSS logical properties (`text-start`, `ms-0`/`me-auto`) for RTL support
 - [x] About Us section: merged with Vision & Mission into single full-screen section, responsive background image (`bg-desktop.png`/`bg-mobile.png`), left-aligned text with orange CTA button, Vision & Mission cards pushed to bottom with `mt-auto`
 - [x] Vision 2030 section: Nuor Steel logo removed, Vision 2030 logo enlarged (`h-72` desktop, `h-36` mobile), background image at 85% opacity, content top-aligned on mobile (`pt-20`), vertically centered on desktop
@@ -168,7 +168,7 @@
 
 ### Misc Fixes & Enhancements (post-2026-03-01)
 - [x] Header: burger menu background color fix on mobile view
-- [x] Header: improved scroll behavior — hides on idle (even at top) or scroll down, shows on mouse move or scroll up, compact height when scrolled
+- [x] Header: improved scroll behavior — always visible at top of page (except Products page), hides only after 6s idle when scrolled, shows on mouse move or scroll up, compact height when scrolled
 - [x] Header: conditional Contact CTA button — visible in desktop nav (hidden on homepage hero when at top, shows when scrolled or on other pages), also added to mobile menu
 - [x] Header: stays visible at bottom of page (`isAtBottom` check in scroll direction hook)
 - [x] Career page: multilingual support enhancements (bilingual i18n keys)
@@ -209,7 +209,7 @@
 - [x] Vision 2030: text left, Vision 2030 logo right (Nuor logo removed), vertically centered, image `object-top`
 - [x] Core values: reduced padding, removed borders from orbital circle nodes and center node, enlarged node sizes (72px) and center logo (128px)
 - [x] Section backgrounds: Core Values, News changed to solid `bg-black`; About uses background image
-- [x] About & Vision/Mission merged into single full-screen section with responsive background image (`/images/about/bg-desktop.png`, `/images/about/bg-mobile.png`)
+- [x] About & Vision/Mission merged into single full-screen section with responsive background image (`/images/home/about/bg-desktop-en.webp`, `/images/home/about/bg-mobile-en.webp`)
 - [x] News section: "View Post on LinkedIn" button linking to actual LinkedIn post per carousel item
 - [x] News section: "Follow us on LinkedIn" URL corrected to `https://www.linkedin.com/company/nuor-steel/`
 - [x] First LinkedIn post URL fixed (was embed URL, now direct link); data migration added
@@ -229,6 +229,15 @@
 - [x] Container max-width capped at 1280px from `xl` upward — prevents abrupt layout jump at the `2xl` breakpoint (`app.css` media query)
 - [x] About page: black grid texture background applied to all sections (Intro, Capabilities, Timeline, Vision & Mission) — replaces `bg-linear-to-r from-gray-900 to-gray-800` with `bg-black` + subtle 60px CSS grid overlay (`rgba(255,255,255,.1)`)
 - [x] Capabilities ScrollStack cards: `bg-zinc-800/90 backdrop-blur-sm` (was `bg-gray-800`) for glass effect over grid texture
+- [x] Career page: black grid texture background applied to hero and Open Positions sections
+- [x] Quality page: black grid texture background applied to hero and Quality & Manufacturing Assurance sections
+- [x] Products page: black grid texture applied to right panel background
+- [x] Certificates page: black grid texture background (already done previously)
+- [x] Public images reorganized into page-based folder structure: `images/home/` (hero, about, core-values, vision2030, page-links, products) and `images/shared/` (logo)
+- [x] About section background images renamed to `-en.webp` suffix (prep for Arabic versions), old PNGs deleted
+- [x] LinkedIn iframes: only active post rendered (destroyed/recreated on switch), next post preloaded 2s before auto-switch, Intersection Observer unmounts all iframes when section is off-screen
+- [x] Hero H1 position: pinned at `pt-[25vh]` on desktop (consistent across screen sizes) instead of flex-center
+- [x] `useScrollDirection` hook: idle timeout increased from 3s to 6s, header no longer hides on scroll down
 
 ### Site-Wide Visual Consistency (DONE)
 - [x] Unified `bg-linear-to-r from-gray-900 to-gray-800` gradient across all public page sections (Home, About, Quality, Career)
@@ -636,6 +645,8 @@ app/Http/Controllers/Admin/    → Admin Inertia controllers
 app/Http/Controllers/Auth/     → Login/logout controller
 app/Services/                  → UndoService, ChangeLogService
 routes/web.php                 → All routes (public + admin)
+public/images/home/            → Homepage images (hero/, about/, core-values/, vision2030/, page-links/, products/)
+public/images/shared/          → Shared images (logo/)
 ```
 
 ### Deployment (Railway)
@@ -650,7 +661,8 @@ routes/web.php                 → All routes (public + admin)
 - **SSR in production**: Requires running `node bootstrap/ssr/ssr.js` alongside PHP (port 13714)
 - **Proxy**: Railway terminates SSL — `trustProxies(at: '*')` in `bootstrap/app.php` ensures HTTPS URLs
 - **SSR toggle**: `INERTIA_SSR_ENABLED=true/false` env var controls whether Laravel calls the SSR server
-- **Staging URL**: `https://nuorsteel-website-production.up.railway.app`
+- **Client staging URL**: `https://nuorsteel-website-production.up.railway.app`
+- **Demo URL**: `https://nuorsteel.hardrock-co.com` (separate Railway project on Hardrock domain, Cloudflare DNS with CNAME + TXT verification)
 - **Certificate PDFs**: Stored in `storage/app/private/certificates/`, tracked in git via `.gitignore` exceptions
 
 ### LinkedIn Integration
@@ -687,4 +699,4 @@ routes/web.php                 → All routes (public + admin)
 
 ---
 
-> **Last updated:** 2026-03-28 — based on commit `74e938e` (*favicon assets, 2xl container cap, black grid texture on About page sections*)
+> **Last updated:** 2026-04-08 — black grid texture on Career/Quality/Products pages, image folder restructure, LinkedIn iframe optimization, hero H1 positioning, Hardrock demo deployment
