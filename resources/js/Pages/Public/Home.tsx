@@ -82,9 +82,12 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
   const [linkedinIndex, setLinkedinIndex] = useState(0);
   const [iframeHeight, setIframeHeight] = useState(600);
   const [linkedinPaused, setLinkedinPaused] = useState(false);
+  const [preloadNext, setPreloadNext] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const [coreValuesStep, setCoreValuesStep] = useState(0);
   const coreValuesWrapperRef = useRef<HTMLDivElement>(null);
+  const [linkedinVisible, setLinkedinVisible] = useState(false);
+  const linkedinSectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -143,17 +146,32 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
     return () => window.removeEventListener('message', handleMessage);
   }, [linkedinIndex]);
 
-  // Auto-rotate LinkedIn posts every 15 seconds (pauses on hover)
+  // Only render LinkedIn iframes when section is visible in viewport
   useEffect(() => {
-    if (typeof window === 'undefined' || linkedin_posts.length <= 1 || linkedinPaused) return;
-    const timer = setInterval(() => {
+    if (typeof window === 'undefined' || !linkedinSectionRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setLinkedinVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    observer.observe(linkedinSectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  // Auto-rotate LinkedIn posts every 15 seconds (pauses on hover or when not visible)
+  // Preloads the next iframe 2 seconds before switching
+  useEffect(() => {
+    if (typeof window === 'undefined' || linkedin_posts.length <= 1 || linkedinPaused || !linkedinVisible) return;
+    setPreloadNext(false);
+    const preloadTimer = setTimeout(() => setPreloadNext(true), 13000);
+    const switchTimer = setTimeout(() => {
       setLinkedinIndex((prev) => (prev + 1) % linkedin_posts.length);
     }, 15000);
-    return () => clearInterval(timer);
-  }, [linkedin_posts.length, linkedinPaused]);
+    return () => { clearTimeout(preloadTimer); clearTimeout(switchTimer); };
+  }, [linkedin_posts.length, linkedinPaused, linkedinIndex]);
 
   // Reset progress bar on manual navigation
   const goToLinkedinPost = (direction: 'prev' | 'next') => {
+    setPreloadNext(false);
     setLinkedinIndex((prev) =>
       direction === 'prev'
         ? (prev - 1 + linkedin_posts.length) % linkedin_posts.length
@@ -182,7 +200,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         </div>
 
         {/* Main Content */}
-        <div className="relative z-10 flex-1 flex items-end pb-8 lg:items-center lg:pb-0">
+        <div className="relative z-10 flex-1 flex items-end pb-8 lg:items-start lg:pt-[25vh] lg:pb-0">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl">
               <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-tight">
@@ -471,7 +489,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* LinkedIn Feed Section */}
-      <section id="section-linkedin" className="relative py-16 lg:py-24 bg-black overflow-hidden">
+      <section ref={linkedinSectionRef} id="section-linkedin" className="relative py-16 lg:py-24 bg-black overflow-hidden">
         {/* Subtle grid texture */}
         <div
           className="absolute inset-0 opacity-60"
@@ -531,18 +549,38 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
               {linkedin_posts.length > 0 ? (
                 <div className="w-full max-w-150">
                   <div className="relative rounded-xl overflow-hidden shadow-2xl shadow-black/30 ring-1 ring-white/10 transition-[height] duration-300" style={{ height: `${iframeHeight}px` }}>
-                    {linkedin_posts.map((post, i) => (
-                      <iframe
-                        key={post.post_id}
-                        src={`https://www.linkedin.com/embed/feed/update/${post.post_id}`}
-                        width="100%"
-                        height="100%"
-                        allowFullScreen
-                        style={{ border: 'none' }}
-                        title="LinkedIn post"
-                        className={`absolute inset-0 w-full h-full transition-opacity duration-500 ${i === linkedinIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
-                      />
-                    ))}
+                    {linkedinVisible ? (
+                      <>
+                        <iframe
+                          key={linkedin_posts[linkedinIndex].post_id}
+                          src={`https://www.linkedin.com/embed/feed/update/${linkedin_posts[linkedinIndex].post_id}`}
+                          width="100%"
+                          height="100%"
+                          allowFullScreen
+                          loading="lazy"
+                          style={{ border: 'none' }}
+                          title="LinkedIn post"
+                          className="absolute inset-0 w-full h-full"
+                        />
+                        {preloadNext && linkedin_posts.length > 1 && (
+                          <iframe
+                            key={`preload-${linkedin_posts[(linkedinIndex + 1) % linkedin_posts.length].post_id}`}
+                            src={`https://www.linkedin.com/embed/feed/update/${linkedin_posts[(linkedinIndex + 1) % linkedin_posts.length].post_id}`}
+                            width="100%"
+                            height="100%"
+                            style={{ border: 'none' }}
+                            title="LinkedIn post preload"
+                            className="absolute inset-0 w-full h-full opacity-0"
+                            aria-hidden="true"
+                            tabIndex={-1}
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center bg-white/5">
+                        <div className="w-8 h-8 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
+                      </div>
+                    )}
                   </div>
                   {linkedin_posts.length > 1 && (
                     <div className="h-1 bg-white/10 mt-4 rounded-full overflow-hidden">
