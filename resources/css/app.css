@@ -20,10 +20,10 @@
     --color-foreground: #0f172a;
 }
 
-/* Cap container at 1280px from xl upward — prevents abrupt layout jump at the 2xl breakpoint */
+/* Cap container from xl upward — prevents abrupt layout jump at the 2xl breakpoint */
 @media (width >= 80rem) {
     .container {
-        max-width: 1280px;
+        max-width: 1536px;
     }
 }
 
