@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -9,6 +10,20 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // --- Seed admin users ---
+        $users = [
+            ['name' => 'Admin', 'email' => 'admin@nuorsteel.com', 'password' => Hash::make('password'), 'role' => 'admin', 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Editor', 'email' => 'editor@nuorsteel.com', 'password' => Hash::make('password'), 'role' => 'editor', 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+        ];
+
+        foreach ($users as $user) {
+            DB::table('users')->updateOrInsert(
+                ['email' => $user['email']],
+                $user
+            );
+        }
+
+        // --- Fix product images (paths moved from images/products/ to images/home/products/) ---
         Storage::makeDirectory('media');
 
         $products = [
@@ -17,7 +32,6 @@ return new class extends Migration
         ];
 
         foreach ($products as $product) {
-            // Skip if product already has a valid featured image
             $existing = DB::table('products')
                 ->where('slug', $product['slug'])
                 ->first();
@@ -26,6 +40,7 @@ return new class extends Migration
                 continue;
             }
 
+            // Skip if product already has a valid featured image
             if ($existing->featured_image_id) {
                 $mediaExists = DB::table('media')
                     ->where('id', $existing->featured_image_id)
@@ -33,11 +48,10 @@ return new class extends Migration
                     ->exists();
 
                 if ($mediaExists) {
-                    continue; // Already has a valid featured image
+                    continue;
                 }
             }
 
-            // Create media record from public image
             $sourcePath = public_path('images/' . $product['source']);
             if (!file_exists($sourcePath)) {
                 continue;
@@ -68,6 +82,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        // No-op: media records will remain
+        DB::table('users')->whereIn('email', ['admin@nuorsteel.com', 'editor@nuorsteel.com'])->delete();
     }
 };
