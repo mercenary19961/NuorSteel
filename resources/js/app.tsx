@@ -2,7 +2,7 @@ import '../css/app.css';
 import './bootstrap';
 import './i18n';
 
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import type { ComponentType, ReactNode } from 'react';
@@ -20,6 +20,16 @@ function Providers({ children }: { children: ReactNode }) {
         </LanguageProvider>
     );
 }
+
+// Handle expired session (419) and server error (500) — auto-reload the page
+// so the user gets a fresh CSRF token instead of a cryptic error.
+router.on('invalid', (event) => {
+    const status = event.detail.response.status;
+    if (status === 419) {
+        event.preventDefault();
+        window.location.reload();
+    }
+});
 
 createInertiaApp({
     title: (title) => title ? `Nuor Steel | ${title}` : 'Nuor Steel',
