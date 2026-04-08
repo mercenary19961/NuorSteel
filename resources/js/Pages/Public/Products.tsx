@@ -441,7 +441,7 @@ export default function Products({ products }: Props) {
         >
           <div className={`h-full flex flex-col lg:flex-row ${expanded ? 'lg:overflow-hidden' : ''}`}>
             {/* Text Content — left side of the left panel */}
-            <div className={`flex-1 flex flex-col p-8 lg:p-12 xl:ps-16 xl:pe-8 ${expanded ? 'lg:overflow-y-auto scrollbar-thin justify-start pt-28!' : 'justify-center pt-24 lg:pt-0'}`}>
+            <div className={`flex-1 flex flex-col px-4 py-8 sm:px-8 lg:py-12 lg:ps-[max(2rem,calc((100vw-1536px)/2+1rem))] lg:pe-8 ${expanded ? 'lg:overflow-y-auto scrollbar-thin justify-start pt-28!' : 'justify-center pt-24 lg:pt-0'}`}>
               <AnimatePresence mode="wait">
                 {!expanded ? (
                   /* --- DEFAULT: Hero Content --- */
