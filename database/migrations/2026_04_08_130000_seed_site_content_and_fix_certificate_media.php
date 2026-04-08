@@ -66,7 +66,7 @@ return new class extends Migration
         foreach ($contents as $content) {
             DB::table('site_content')->updateOrInsert(
                 ['page' => $content['page'], 'section' => $content['section'], 'key' => $content['key']],
-                array_merge($content, ['created_at' => $now, 'updated_at' => $now])
+                array_merge($content, ['updated_at' => $now])
             );
         }
 
