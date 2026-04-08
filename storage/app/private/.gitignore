@@ -2,3 +2,6 @@
 !.gitignore
 !certificates/
 !certificates/**
+!media/
+!media/tmt-bars-product.png
+!media/billets-product.png
