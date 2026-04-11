@@ -315,7 +315,7 @@ export default function Products({ products }: Props) {
     if (W === 0 || H === 0) {
       // Fallback before measurements
       return language === 'ar'
-        ? 'polygon(25rem 0, 100% 0, 100% 100%, 0 100%)'
+        ? 'polygon(0 0, 100% 0, 100% 100%, 25rem 100%)'
         : 'polygon(0 0, 100% 0, calc(100% - 25rem) 100%, 0 100%)';
     }
     const D = Math.sqrt(DIAG_PX * DIAG_PX + H * H); // diagonal length
@@ -325,14 +325,14 @@ export default function Products({ products }: Props) {
     const dy = H / D;
 
     if (language === 'ar') {
-      // RTL: corners at (DIAG_PX, 0) top and (0, H) bottom
-      const tStartX = DIAG_PX + R;
-      const tEndX = DIAG_PX - dx * R;
+      // RTL: mirror of LTR — diagonal from top-left (0,0) to bottom (DIAG_PX, H)
+      const tStartX = R;                    // top edge, just right of curve
+      const tEndX = dx * R;                 // start of diagonal (near 0,0)
       const tEndY = dy * R;
-      const bStartX = dx * R;
+      const bStartX = DIAG_PX - dx * R;    // end of diagonal (near DIAG_PX, H)
       const bStartY = H - dy * R;
-      const bEndX = R;
-      return `path('M ${tStartX} 0 L ${W} 0 L ${W} ${H} L ${bEndX} ${H} Q 0 ${H} ${bStartX} ${bStartY} L ${tEndX} ${tEndY} Q ${DIAG_PX} 0 ${tStartX} 0 Z')`;
+      const bEndX = DIAG_PX + R;           // bottom edge, just right of curve
+      return `path('M ${tStartX} 0 L ${W} 0 L ${W} ${H} L ${bEndX} ${H} Q ${DIAG_PX} ${H} ${bStartX} ${bStartY} L ${tEndX} ${tEndY} Q 0 0 ${tStartX} 0 Z')`;
     } else {
       // LTR: corners at (W, 0) top and (W - DIAG_PX, H) bottom
       const tStartX = W - R;
