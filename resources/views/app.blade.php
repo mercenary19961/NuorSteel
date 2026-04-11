@@ -17,8 +17,8 @@
          hard-reloads while in Arabic still preload the correct (Arabic) hero. --}}
     @if (Route::currentRouteName() === 'home')
         @php($heroLocale = session('locale', 'en'))
-        <link rel="preload" as="image" href="/images/home/hero/hero-mobile-{{ $heroLocale }}.webp" media="(max-width: 1023px)" fetchpriority="high">
-        <link rel="preload" as="image" href="/images/home/hero/hero-desktop-{{ $heroLocale }}.webp" media="(min-width: 1024px)" fetchpriority="high">
+        <link rel="preload" as="image" href="/images/home/hero/hero-mobile-{{ $heroLocale }}.webp" media="(max-width: 639px)" fetchpriority="high">
+        <link rel="preload" as="image" href="/images/home/hero/hero-desktop-{{ $heroLocale }}.webp" media="(min-width: 640px)" fetchpriority="high">
     @endif
 
     @routes

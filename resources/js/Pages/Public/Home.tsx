@@ -215,7 +215,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         {/* Background + Overlay */}
         <div className="absolute inset-0">
           <picture>
-            <source media="(max-width: 1023px)" srcSet={`/images/home/hero/hero-mobile-${language}.webp`} />
+            <source media="(max-width: 639px)" srcSet={`/images/home/hero/hero-mobile-${language}.webp`} />
             <img
               key={`hero-${language}`}
               src={`/images/home/hero/hero-desktop-${language}.webp`}
@@ -271,7 +271,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       <section id="section-about" className="relative min-h-screen flex flex-col overflow-hidden">
         {/* Background image */}
         <picture>
-          <source media="(max-width: 1023px)" srcSet={`/images/home/about/bg-mobile-${language}.webp`} />
+          <source media="(max-width: 639px)" srcSet={`/images/home/about/bg-mobile-${language}.webp`} />
           <img
             key={`about-${language}`}
             src={`/images/home/about/bg-desktop-${language}.webp`}
