@@ -84,6 +84,19 @@ html[dir="rtl"] body {
     animation: ring-pulse 2s ease-in-out infinite;
 }
 
+@keyframes bounce-subtle {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+.animate-bounce-subtle {
+    animation: bounce-subtle 1.5s ease-in-out infinite;
+}
+
 @keyframes detailSlideUp {
     from {
         opacity: 0;
