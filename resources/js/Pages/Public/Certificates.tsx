@@ -32,9 +32,9 @@ interface Props {
 
 // --- Category metadata ---
 const categoryMeta: Record<Category, { icon: typeof Leaf; colorClass: string }> = {
-  esg: { icon: Leaf, colorClass: 'text-emerald-400' },
-  quality: { icon: ShieldCheck, colorClass: 'text-sky-400' },
-  governance: { icon: FileText, colorClass: 'text-amber-400' },
+  esg: { icon: Leaf, colorClass: 'text-white' },
+  quality: { icon: ShieldCheck, colorClass: 'text-white' },
+  governance: { icon: FileText, colorClass: 'text-white' },
 };
 
 export default function Certificates({ esg, quality, governance, content_en, content_ar }: Props) {

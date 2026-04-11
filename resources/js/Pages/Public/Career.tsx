@@ -188,8 +188,8 @@ export default function Career({ listings, content_en, content_ar }: Props) {
                     onClick={() => { setSelectedJob(job); setSubmitted(false); setFormError(''); }}
                     className="relative z-10 text-start w-full h-full flex flex-col cursor-pointer"
                   >
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-5">
-                      <Briefcase className="text-primary" size={24} />
+                    <div className="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center mb-5">
+                      <Briefcase className="text-white" size={24} />
                     </div>
                     <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
                       {getJobTitle(job)}

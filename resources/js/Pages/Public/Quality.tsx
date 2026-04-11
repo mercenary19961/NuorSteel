@@ -131,8 +131,8 @@ export default function Quality() {
                 className="relative bg-white/5 border border-white/10 rounded-xl p-8"
               >
                 <div className="relative z-10">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-5">
-                    <card.icon className="text-primary" size={24} />
+                  <div className="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center mb-5">
+                    <card.icon className="text-white" size={24} />
                   </div>
                   <h3 className="text-xl font-semibold mb-3">{card.title}</h3>
                   <p className="text-gray-400 leading-relaxed text-sm">{card.description}</p>
