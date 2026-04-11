@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
+import type { PageProps } from '@/types';
 
 type Language = 'en' | 'ar';
 
@@ -15,8 +16,11 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
     const { i18n } = useTranslation();
+    // Seed from the server-shared session locale so hard reloads preserve the user's
+    // language choice (Option A — session cookie is the single source of truth).
+    const serverLocale = (usePage<PageProps>().props.locale ?? 'en') as Language;
 
-    const [language, setLanguageState] = useState<Language>('en');
+    const [language, setLanguageState] = useState<Language>(serverLocale);
 
     const isRTL = language === 'ar';
 

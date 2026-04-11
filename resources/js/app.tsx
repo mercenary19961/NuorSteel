@@ -33,6 +33,7 @@ router.on('invalid', (event) => {
 
 createInertiaApp({
     title: (title) => title ? `Nuor Steel | ${title}` : 'Nuor Steel',
+    progress: false,
     resolve: (name) => resolvePageComponent(
         `./Pages/${name}.tsx`,
         import.meta.glob<{ default: ComponentType }>('./Pages/**/*.tsx'),

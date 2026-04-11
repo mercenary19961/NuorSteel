@@ -26,6 +26,33 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
   const { language } = useLanguage();
   const content = language === 'ar' ? content_ar : content_en;
 
+  // Warm the browser cache for the opposite-language hero + about images during idle time.
+  // This makes the language toggle swap instant without hurting initial LCP — the current
+  // language loads eagerly from the <picture> tags, the other language is fetched only
+  // after the page is interactive.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const other = language === 'ar' ? 'en' : 'ar';
+    const urls = [
+      `/images/home/hero/hero-desktop-${other}.webp`,
+      `/images/home/hero/hero-mobile-${other}.webp`,
+      `/images/home/about/bg-desktop-${other}.webp`,
+      `/images/home/about/bg-mobile-${other}.webp`,
+    ];
+    const preload = () => urls.forEach((src) => { const img = new Image(); img.src = src; });
+    const hasIdle = 'requestIdleCallback' in window;
+    const handle = hasIdle
+      ? window.requestIdleCallback(preload, { timeout: 2000 })
+      : window.setTimeout(preload, 1500);
+    return () => {
+      if (hasIdle) {
+        window.cancelIdleCallback(handle);
+      } else {
+        window.clearTimeout(handle);
+      }
+    };
+  }, [language]);
+
   const coreValuesData = [
     {
       id: 1,
@@ -188,9 +215,10 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         {/* Background + Overlay */}
         <div className="absolute inset-0">
           <picture>
-            <source media="(max-width: 1023px)" srcSet="/images/home/hero/hero-mobile.webp" />
+            <source media="(max-width: 1023px)" srcSet={`/images/home/hero/hero-mobile-${language}.webp`} />
             <img
-              src="/images/home/hero/hero-desktop.webp"
+              key={`hero-${language}`}
+              src={`/images/home/hero/hero-desktop-${language}.webp`}
               alt=""
               fetchPriority="high"
               decoding="async"
@@ -243,9 +271,10 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       <section id="section-about" className="relative min-h-screen flex flex-col overflow-hidden">
         {/* Background image */}
         <picture>
-          <source media="(max-width: 1023px)" srcSet="/images/home/about/bg-mobile-en.webp" />
+          <source media="(max-width: 1023px)" srcSet={`/images/home/about/bg-mobile-${language}.webp`} />
           <img
-            src="/images/home/about/bg-desktop-en.webp"
+            key={`about-${language}`}
+            src={`/images/home/about/bg-desktop-${language}.webp`}
             alt=""
             loading="lazy"
             decoding="async"
@@ -285,7 +314,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
                 className="inline-flex items-center gap-1.5 bg-primary hover:bg-primary/90 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
               >
                 {t('home.about.learnMore')}
-                <ArrowRight size={16} />
+                <ArrowRight size={16} className="rtl:rotate-180" />
               </Link>
             </motion.div>
           </motion.div>
