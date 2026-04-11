@@ -23,8 +23,7 @@
         "erasableSyntaxOnly": true,
         "noFallthroughCasesInSwitch": true,
 
-        /* Path aliases */
-        "baseUrl": ".",
+        /* Path aliases — paths are resolved relative to tsconfig.json since TS 5 */
         "paths": {
             "@/*": ["./resources/js/*"]
         }
