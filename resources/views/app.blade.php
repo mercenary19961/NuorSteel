@@ -12,6 +12,15 @@
     <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
 
+    {{-- Preload hero LCP image so the browser starts fetching it in parallel with JS/CSS
+         instead of waiting for React to render the <img>. Uses the session locale so
+         hard-reloads while in Arabic still preload the correct (Arabic) hero. --}}
+    @if (Route::currentRouteName() === 'home')
+        @php($heroLocale = session('locale', 'en'))
+        <link rel="preload" as="image" href="/images/home/hero/hero-mobile-{{ $heroLocale }}.webp" media="(max-width: 639px)" fetchpriority="high">
+        <link rel="preload" as="image" href="/images/home/hero/hero-desktop-{{ $heroLocale }}.webp" media="(min-width: 640px)" fetchpriority="high">
+    @endif
+
     @routes
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.tsx'])

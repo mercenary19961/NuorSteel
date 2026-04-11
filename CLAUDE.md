@@ -238,6 +238,11 @@
 - [x] LinkedIn iframes: only active post rendered (destroyed/recreated on switch), next post preloaded 2s before auto-switch, Intersection Observer unmounts all iframes when section is off-screen
 - [x] Hero H1 position: pinned at `pt-[25vh]` on desktop (consistent across screen sizes) instead of flex-center
 - [x] `useScrollDirection` hook: idle timeout increased from 3s to 6s, header no longer hides on scroll down
+- [x] Products page: text aligned with navbar container, max-width increased to 1536px (`app.css` container cap)
+- [x] Production seeders: admin users seeded via data migration (`2026_04_08_120000_seed_users_and_fix_product_images.php`) — fixes empty users table FK issues
+- [x] Production seeders: site_content data migration (`2026_04_08_130000_seed_site_content_and_fix_certificate_media.php`) seeds editable CMS content + fixes certificate media links on fresh deploy
+- [x] Media on Railway ephemeral filesystem: product images (TMT bars, billets) tracked in git at `storage/app/private/media/` via `.gitignore` exception; data migration (`2026_04_08_140000_fix_media_paths_for_ephemeral_storage.php`) normalizes media paths
+- [x] CSRF 419 handling: `app.tsx` listens to Inertia `error` event and auto-reloads on 419 (expired CSRF token during language toggle) instead of showing a broken state
 
 ### Site-Wide Visual Consistency (DONE)
 - [x] Unified `bg-linear-to-r from-gray-900 to-gray-800` gradient across all public page sections (Home, About, Quality, Career)
@@ -699,4 +704,4 @@ public/images/shared/          → Shared images (logo/)
 
 ---
 
-> **Last updated:** 2026-04-08 — black grid texture on Career/Quality/Products pages, image folder restructure, LinkedIn iframe optimization, hero H1 positioning, Hardrock demo deployment
+> **Last updated:** 2026-04-11 — production seeders (users, site_content, media paths), git-tracked product media for Railway ephemeral FS, 419 CSRF auto-reload, Products page container alignment
