@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Head, router } from '@inertiajs/react';
 import {
@@ -37,6 +37,26 @@ export default function Career({ listings, content_en, content_ar }: Props) {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const content = language === 'ar' ? content_ar : content_en;
+
+  // Warm opposite-language hero image during idle time so the language
+  // toggle is instant without hurting initial LCP.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const other = language === 'ar' ? 'en' : 'ar';
+    const urls = [
+      `/images/career/hero/hero-desktop-${other}.webp`,
+      `/images/career/hero/hero-mobile-${other}.webp`,
+    ];
+    const preload = () => urls.forEach((src) => { const img = new Image(); img.src = src; });
+    const hasIdle = 'requestIdleCallback' in window;
+    const handle = hasIdle
+      ? window.requestIdleCallback(preload, { timeout: 2000 })
+      : window.setTimeout(preload, 1500);
+    return () => {
+      if (hasIdle) window.cancelIdleCallback(handle);
+      else window.clearTimeout(handle);
+    };
+  }, [language]);
 
   const [selectedJob, setSelectedJob] = useState<CareerListItem | null>(null);
   const [showOpenApplication, setShowOpenApplication] = useState(false);
@@ -106,24 +126,18 @@ export default function Career({ listings, content_en, content_ar }: Props) {
       {/* Hero Section — matches Quality page pattern */}
       <section className="relative h-screen bg-black text-white overflow-hidden flex items-center">
         <div className="absolute inset-0">
-          <div
-            className="absolute inset-0 opacity-60"
-            style={{
-              backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-              backgroundSize: '60px 60px',
-            }}
-          />
-          <div
-            className="absolute top-0 right-0 w-1/2 h-full hidden lg:block"
-            style={{ clipPath: 'polygon(25% 0, 100% 0, 100% 100%, 0% 100%)' }}
-          >
-            <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-primary/10 to-black/80" />
-            <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
-          </div>
-          <div
-            className="absolute top-0 bottom-0 hidden lg:block w-px bg-primary/30"
-            style={{ left: '62.5%', transform: 'skewX(-12deg)' }}
-          />
+          <picture>
+            <source media="(max-width: 639px)" srcSet={`/images/career/hero/hero-mobile-${language}.webp`} />
+            <img
+              key={`career-hero-${language}`}
+              src={`/images/career/hero/hero-desktop-${language}.webp`}
+              alt=""
+              fetchPriority="high"
+              decoding="async"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </picture>
+          <div className="absolute inset-0 bg-linear-to-r from-black/70 via-black/40 to-transparent" />
         </div>
 
         <div className="relative container mx-auto px-4 pt-32 lg:pt-44 pb-16 lg:pb-24">
