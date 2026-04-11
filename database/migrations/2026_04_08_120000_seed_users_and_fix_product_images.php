@@ -27,8 +27,8 @@ return new class extends Migration
         Storage::makeDirectory('media');
 
         $products = [
-            ['slug' => 'tmt-bars', 'source' => 'home/products/tmt-bars-desktop.png', 'original' => 'tmt-bars.png', 'alt_en' => 'TMT reinforcement steel bars', 'alt_ar' => 'قضبان حديد التسليح'],
-            ['slug' => 'billets', 'source' => 'home/products/billets-desktop.png', 'original' => 'billets.png', 'alt_en' => 'Steel billets', 'alt_ar' => 'كتل الصلب'],
+            ['slug' => 'tmt-bars', 'source' => 'home/products/tmt-bars-desktop.png', 'original' => 'tmt-bars.png', 'alt_en' => 'TMT reinforcement steel bars', 'alt_ar' => 'حديد التسليح'],
+            ['slug' => 'billets', 'source' => 'home/products/billets-desktop.png', 'original' => 'billets.png', 'alt_en' => 'Steel billets', 'alt_ar' => 'ستيل بِليت'],
         ];
 
         foreach ($products as $product) {

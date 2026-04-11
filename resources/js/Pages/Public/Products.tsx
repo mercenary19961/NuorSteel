@@ -87,11 +87,11 @@ function SpecDataTable({ tableData }: { tableData: { title: string; headers: str
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-white/10">
+            <tr className="bg-white/20">
               {tableData.headers.map((header: string, i: number) => (
                 <th
                   key={i}
-                  className="text-start py-3 px-4 text-sm font-semibold text-primary border-b border-white/10 max-w-32 relative cursor-pointer select-none"
+                  className="text-start py-3 px-4 text-sm font-semibold text-white border-b border-white/20 max-w-32 relative cursor-pointer select-none"
                   title={header}
                   onClick={(e) => { e.stopPropagation(); setExpandedHeader(expandedHeader === i ? null : i); }}
                 >
@@ -126,7 +126,7 @@ function SpecDataTable({ tableData }: { tableData: { title: string; headers: str
           </thead>
           <tbody>
             {tableData.rows.map((row: string[], rowIndex: number) => (
-              <tr key={rowIndex} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+              <tr key={rowIndex} className="border-b border-white/15 hover:bg-white/10 transition-colors">
                 {row.map((cell: string, cellIndex: number) => (
                   <td key={cellIndex} className={`py-3 px-4 text-sm ${cellIndex === 0 ? 'font-medium text-white' : 'text-white/70'}`}>
                     {cell}
@@ -157,10 +157,10 @@ function ProductTabs({ activeTab, onTabChange }: { activeTab: TabKey; onTabChang
         <button
           key={tab.key}
           onClick={() => onTabChange(tab.key)}
-          className={`relative px-5 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${
+          className={`relative px-5 py-2 rounded-full text-sm font-medium transition-all cursor-pointer outline-none border ${
             activeTab === tab.key
-              ? 'bg-white text-gray-900'
-              : 'border border-white/30 text-white/80 hover:border-white/60 hover:text-white'
+              ? 'bg-white text-gray-900 border-transparent'
+              : 'border-white/30 text-white/80 hover:border-white/60 hover:text-white'
           }`}
         >
           {tab.label}
@@ -228,7 +228,7 @@ export default function Products({ products }: Props) {
   const [showAttention, setShowAttention] = useState(false);
   useEffect(() => {
     if (!expanded) { setShowAttention(false); return; }
-    const timer = setTimeout(() => setShowAttention(true), 10000);
+    const timer = setTimeout(() => setShowAttention(true), 2000);
     return () => clearTimeout(timer);
   }, [expanded]);
 
@@ -236,7 +236,7 @@ export default function Products({ products }: Props) {
   const [showExploreAttention, setShowExploreAttention] = useState(false);
   useEffect(() => {
     if (expanded) { setShowExploreAttention(false); return; }
-    const timer = setTimeout(() => setShowExploreAttention(true), 10000);
+    const timer = setTimeout(() => setShowExploreAttention(true), 2000);
     return () => clearTimeout(timer);
   }, [expanded, selectedSlug]);
 
@@ -249,6 +249,32 @@ export default function Products({ products }: Props) {
   const getName = (p: ProductData) => language === 'ar' ? p.name_ar : p.name_en;
   const getShortDesc = (p: ProductData) => language === 'ar' ? p.short_description_ar : p.short_description_en;
   const getDesc = (p: ProductData) => language === 'ar' ? p.description_ar : p.description_en;
+  // Bilingual 3D renders for known products; falls back to DB-stored image.
+  const localRenderSlugs = new Set(['tmt-bars', 'billets']);
+  const getProductImage = (p: ProductData) =>
+    localRenderSlugs.has(p.slug)
+      ? `/images/products/renders/${p.slug}-${language}.webp`
+      : p.image;
+
+  // Warm opposite-language background + product renders during idle time.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const other = language === 'ar' ? 'en' : 'ar';
+    const urls = [
+      `/images/products/background/bg-desktop-${other}.webp`,
+      `/images/products/renders/tmt-bars-${other}.webp`,
+      `/images/products/renders/billets-${other}.webp`,
+    ];
+    const preload = () => urls.forEach((src) => { const img = new Image(); img.src = src; });
+    const hasIdle = 'requestIdleCallback' in window;
+    const handle = hasIdle
+      ? window.requestIdleCallback(preload, { timeout: 2000 })
+      : window.setTimeout(preload, 1500);
+    return () => {
+      if (hasIdle) window.cancelIdleCallback(handle);
+      else window.clearTimeout(handle);
+    };
+  }, [language]);
 
   // Slug-based i18n key map
   const slugToKey: Record<string, string> = {
@@ -289,7 +315,7 @@ export default function Products({ products }: Props) {
     if (W === 0 || H === 0) {
       // Fallback before measurements
       return language === 'ar'
-        ? 'polygon(25rem 0, 100% 0, 100% 100%, 0 100%)'
+        ? 'polygon(0 0, 100% 0, 100% 100%, 25rem 100%)'
         : 'polygon(0 0, 100% 0, calc(100% - 25rem) 100%, 0 100%)';
     }
     const D = Math.sqrt(DIAG_PX * DIAG_PX + H * H); // diagonal length
@@ -299,14 +325,14 @@ export default function Products({ products }: Props) {
     const dy = H / D;
 
     if (language === 'ar') {
-      // RTL: corners at (DIAG_PX, 0) top and (0, H) bottom
-      const tStartX = DIAG_PX + R;
-      const tEndX = DIAG_PX - dx * R;
+      // RTL: mirror of LTR — diagonal from top-left (0,0) to bottom (DIAG_PX, H)
+      const tStartX = R;                    // top edge, just right of curve
+      const tEndX = dx * R;                 // start of diagonal (near 0,0)
       const tEndY = dy * R;
-      const bStartX = dx * R;
+      const bStartX = DIAG_PX - dx * R;    // end of diagonal (near DIAG_PX, H)
       const bStartY = H - dy * R;
-      const bEndX = R;
-      return `path('M ${tStartX} 0 L ${W} 0 L ${W} ${H} L ${bEndX} ${H} Q 0 ${H} ${bStartX} ${bStartY} L ${tEndX} ${tEndY} Q ${DIAG_PX} 0 ${tStartX} 0 Z')`;
+      const bEndX = DIAG_PX + R;           // bottom edge, just right of curve
+      return `path('M ${tStartX} 0 L ${W} 0 L ${W} ${H} L ${bEndX} ${H} Q ${DIAG_PX} ${H} ${bStartX} ${bStartY} L ${tEndX} ${tEndY} Q 0 0 ${tStartX} 0 Z')`;
     } else {
       // LTR: corners at (W, 0) top and (W - DIAG_PX, H) bottom
       const tStartX = W - R;
@@ -338,10 +364,10 @@ export default function Products({ products }: Props) {
             <div className="grid grid-cols-3 gap-6 mt-8">
               {Object.entries(t(`products.${productKey}.specIcons`, { returnObjects: true }) as Record<string, { title: string; value: string }>).map(([key, icon]) => (
                 <div key={key} className="text-center">
-                  <div className="w-14 h-14 mx-auto mb-3 border border-white/20 rounded-lg flex items-center justify-center">
-                    {key === 'diameterRange' || key === 'crossSection' ? <Ruler className="text-white/70" size={24} /> :
-                     key === 'standards' || key === 'chemicalControl' ? <Shield className="text-white/70" size={24} /> :
-                     <Package className="text-white/70" size={24} />}
+                  <div className="w-14 h-14 mx-auto mb-3 border border-white/40 rounded-lg flex items-center justify-center">
+                    {key === 'diameterRange' || key === 'crossSection' ? <Ruler className="text-white" size={24} /> :
+                     key === 'standards' || key === 'chemicalControl' ? <Shield className="text-white" size={24} /> :
+                     <Package className="text-white" size={24} />}
                   </div>
                   <h4 className="text-white font-semibold text-sm mb-1">{icon.title}</h4>
                   <p className="text-white/60 text-xs">{icon.value}</p>
@@ -355,7 +381,7 @@ export default function Products({ products }: Props) {
               <ul className="space-y-2">
                 {(t(`products.${productKey}.highlights`, { returnObjects: true }) as string[]).map((item, i) => (
                   <li key={i} className="flex items-start gap-2 text-white/80 text-sm">
-                    <CheckCircle className="text-primary shrink-0 mt-0.5" size={16} />
+                    <CheckCircle className="text-white shrink-0 mt-0.5" size={16} />
                     {item}
                   </li>
                 ))}
@@ -370,7 +396,7 @@ export default function Products({ products }: Props) {
             <SpecDataTable
               tableData={t(`products.${productKey}.specTable`, { returnObjects: true }) as { title: string; headers: string[]; rows: string[][] }}
             />
-            <p className="text-white/50 text-sm italic mt-4">{t('products.specNote')}</p>
+            <p className="text-white/70 text-sm italic mt-4">{t('products.specNote')}</p>
           </div>
         );
 
@@ -380,10 +406,10 @@ export default function Products({ products }: Props) {
             {Object.entries(t(`products.${productKey}.features`, { returnObjects: true }) as Record<string, { title: string; description: string }>).map(([key, feature]) => {
               const Icon = featureIcons[key] ?? Zap;
               return (
-                <MagicCard key={key} className="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10">
+                <MagicCard key={key} className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
                   <div className="relative z-10">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                      <Icon className="text-primary" size={20} />
+                    <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center mb-4">
+                      <Icon className="text-white" size={20} />
                     </div>
                     <h4 className="text-white font-semibold mb-2">{feature.title}</h4>
                     <p className="text-white/60 text-sm leading-relaxed">{feature.description}</p>
@@ -401,7 +427,7 @@ export default function Products({ products }: Props) {
             <p className="text-white/70 leading-relaxed mb-8">{t('products.requestQuote.description')}</p>
             <Link
               href="/contact"
-              className="inline-flex items-center px-8 py-3 bg-primary hover:bg-primary/90 text-white rounded-full font-medium transition-colors"
+              className="inline-flex items-center px-8 py-3 bg-white hover:bg-white/90 text-primary rounded-full font-semibold transition-colors"
             >
               {t('products.requestQuote.button')}
               <ArrowRight className="ms-2 rtl:rotate-180" size={18} />
@@ -421,7 +447,7 @@ export default function Products({ products }: Props) {
       <h1 className="sr-only">{t('products.hero.title')}</h1>
 
       {/* Main Split Section */}
-      <section className="relative flex flex-col lg:flex-row min-h-screen overflow-hidden bg-linear-to-r from-gray-900 to-gray-800">
+      <section className="relative flex flex-col lg:flex-row min-h-screen overflow-hidden bg-black">
         {/* LEFT PANEL — Featured Product (wrapper for drop-shadow along diagonal) */}
         <div
           className="relative z-10"
@@ -433,13 +459,13 @@ export default function Products({ products }: Props) {
         >
         <div
           ref={leftPanelRef}
-          className="h-full overflow-hidden lg:bg-linear-to-r lg:from-gray-900 lg:to-gray-800"
+          className="relative h-full overflow-hidden lg:bg-primary"
           style={{
             clipPath: leftClipPath,
             backgroundSize: isLg ? '100vw 100%' : undefined,
           }}
         >
-          <div className={`h-full flex flex-col lg:flex-row ${expanded ? 'lg:overflow-hidden' : ''}`}>
+          <div className={`relative h-full flex flex-col lg:flex-row ${expanded ? 'lg:overflow-hidden' : ''}`}>
             {/* Text Content — left side of the left panel */}
             <div className={`flex-1 flex flex-col px-4 py-8 sm:px-8 lg:py-12 lg:ps-[max(2rem,calc((100vw-1536px)/2+1rem))] lg:pe-8 ${expanded ? 'lg:overflow-y-auto scrollbar-thin justify-start pt-28!' : 'justify-center pt-24 lg:pt-0'}`}>
               <AnimatePresence mode="wait">
@@ -461,10 +487,8 @@ export default function Products({ products }: Props) {
                     </p>
                     <button
                       onClick={handleExplore}
-                      className={`inline-flex items-center px-8 py-3 rounded-full border text-white transition-all cursor-pointer group ${
-                        showExploreAttention
-                          ? 'border-primary/60 bg-white/10 animate-ring-pulse'
-                          : 'border-white/30 hover:bg-white/10'
+                      className={`inline-flex items-center px-8 py-3 rounded-full bg-white text-primary font-semibold hover:bg-white/90 transition-all cursor-pointer group ${
+                        showExploreAttention ? 'animate-bounce-subtle' : ''
                       }`}
                     >
                       {t('products.exploreMore')}
@@ -511,9 +535,10 @@ export default function Products({ products }: Props) {
                         <ArrowRight className="-rotate-90 group-hover:-translate-y-0.5 transition-transform" size={12} />
                       </button>
                       <div className="flex items-end justify-end">
-                        {selectedProduct.image ? (
+                        {getProductImage(selectedProduct) ? (
                           <img
-                            src={selectedProduct.image}
+                            key={`mobile-detail-img-${selectedSlug}-${language}`}
+                            src={getProductImage(selectedProduct)!}
                             alt={getName(selectedProduct)}
                             className="max-h-28 w-auto object-contain drop-shadow-2xl"
                           />
@@ -534,7 +559,7 @@ export default function Products({ products }: Props) {
 
         {/* Large Product Image — absolutely positioned over both panels, near the diagonal */}
         {!expanded && (
-          <div className="hidden lg:flex absolute z-20 bottom-16 items-end justify-center pointer-events-none max-w-[30%] -translate-x-1/2 left-[35%] xl:left-[40%] 2xl:left-[45%]">
+          <div className="hidden lg:flex absolute z-20 bottom-16 items-end justify-center pointer-events-none max-w-[30%] -translate-x-1/2 left-[40%] xl:left-[48%] 2xl:left-[52%]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={`img-${selectedSlug}`}
@@ -544,11 +569,12 @@ export default function Products({ products }: Props) {
                 transition={{ duration: 0.4 }}
                 className="relative"
               >
-                {selectedProduct.image ? (
+                {getProductImage(selectedProduct) ? (
                   <img
-                    src={selectedProduct.image}
+                    key={`hero-img-${selectedSlug}-${language}`}
+                    src={getProductImage(selectedProduct)!}
                     alt={getName(selectedProduct)}
-                    className="max-h-36 xl:max-h-44 2xl:max-h-56 w-auto object-contain drop-shadow-2xl"
+                    className="max-h-36 xl:max-h-44 2xl:max-h-56 w-auto object-contain"
                   />
                 ) : (
                   <div className="w-48 h-48 rounded-full bg-white/5 flex items-center justify-center">
@@ -568,13 +594,11 @@ export default function Products({ products }: Props) {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
-              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-medium transition-all cursor-pointer group ${
-                showAttention
-                  ? 'border-primary/60 text-white bg-white/10 animate-ring-pulse'
-                  : 'border-white/20 text-white/70 hover:text-white hover:border-white/40 hover:bg-white/10'
+              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-primary text-sm font-semibold hover:bg-white/90 transition-all cursor-pointer group ${
+                showAttention ? 'animate-bounce-subtle' : ''
               }`}
             >
-              <LayoutGrid size={15} className={showAttention ? 'text-primary' : 'text-white/50 group-hover:text-white/70'} />
+              <LayoutGrid size={15} />
               {t('products.backToProducts')}
               <ArrowLeft className="rtl:rotate-180 group-hover:-translate-x-1 transition-transform" size={15} />
             </motion.button>
@@ -592,9 +616,10 @@ export default function Products({ products }: Props) {
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.4 }}
               >
-                {selectedProduct.image ? (
+                {getProductImage(selectedProduct) ? (
                   <img
-                    src={selectedProduct.image}
+                    key={`expanded-img-${selectedSlug}-${language}`}
+                    src={getProductImage(selectedProduct)!}
                     alt={getName(selectedProduct)}
                     className="max-h-48 xl:max-h-60 w-auto object-contain drop-shadow-2xl"
                   />
@@ -611,14 +636,24 @@ export default function Products({ products }: Props) {
 
         {/* RIGHT PANEL — Product Navigation / Image (hidden on mobile when expanded) */}
         <div
-          className={`relative overflow-hidden lg:bg-black lg:-ms-120 ${expanded ? 'hidden lg:block' : ''}`}
+          className={`relative overflow-hidden lg:-ms-120 ${expanded ? 'hidden lg:block' : ''}`}
           style={{
             flex: rightFlex,
             transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
           }}
         >
+          {/* Bilingual background artwork */}
+          <picture>
+            <img
+              key={`products-bg-${language}`}
+              src={`/images/products/background/bg-desktop-${language}.webp`}
+              alt=""
+              aria-hidden="true"
+              fetchPriority="high"
+              decoding="async"
+              className="hidden lg:block absolute inset-0 w-full h-full object-cover pointer-events-none opacity-40"
+            />
+          </picture>
           <AnimatePresence mode="wait">
             {!expanded ? (
               /* --- DEFAULT: Product Thumbnails --- */
@@ -640,9 +675,10 @@ export default function Products({ products }: Props) {
                       exit={{ opacity: 0, scale: 0.9 }}
                       transition={{ duration: 0.4 }}
                     >
-                      {selectedProduct.image ? (
+                      {getProductImage(selectedProduct) ? (
                         <img
-                          src={selectedProduct.image}
+                          key={`mobile-hero-img-${selectedSlug}-${language}`}
+                          src={getProductImage(selectedProduct)!}
                           alt={getName(selectedProduct)}
                           className="max-h-52 w-auto object-contain drop-shadow-2xl"
                         />
@@ -695,8 +731,8 @@ export default function Products({ products }: Props) {
                       }`}
                     >
                       <div className="aspect-4/3 bg-gray-800/50 flex items-center justify-center">
-                        {product.image ? (
-                          <img src={product.image} alt={getName(product)} className="w-full h-full object-cover" />
+                        {getProductImage(product) ? (
+                          <img src={getProductImage(product)!} alt={getName(product)} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full bg-linear-to-br from-gray-600 to-gray-500 flex items-center justify-center">
                             <Package className="text-white/30" size={36} />
@@ -717,43 +753,44 @@ export default function Products({ products }: Props) {
 
                 {/* Desktop: Product thumbnails — stacked vertically, far right, centered */}
                 <div className="hidden lg:flex flex-col items-end justify-center h-full w-full pe-0 lg:pe-10 xl:pe-30 2xl:pe-30 3xl:pe-40 gap-4">
-                  {products.map((product) => (
-                    <button
-                      key={product.slug}
-                      onClick={() => handleSelectProduct(product.slug)}
-                      className={`group relative w-24 xl:w-40 2xl:w-56 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer ${
-                        product.slug === selectedSlug
-                          ? 'ring-2 ring-white/40 shadow-2xl shadow-black/30 scale-105'
-                          : 'opacity-40 hover:opacity-70 hover:scale-102'
-                      }`}
-                    >
-                      <div className="aspect-4/3 bg-gray-800/50 flex items-center justify-center">
-                        {product.image ? (
-                          <img src={product.image} alt={getName(product)} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full bg-linear-to-br from-gray-600 to-gray-500 flex items-center justify-center">
-                            <Package className="text-white/30" size={36} />
-                          </div>
-                        )}
-                      </div>
-                      <div className="absolute bottom-0 inset-x-0 bg-linear-to-t from-black/80 to-transparent px-3 py-2">
-                        <h3 className="text-white font-bold text-xs uppercase tracking-wider text-center">
+                  {products.map((product) => {
+                    const isSelected = product.slug === selectedSlug;
+                    return (
+                      <button
+                        key={product.slug}
+                        onClick={() => handleSelectProduct(product.slug)}
+                        className="group relative w-36 xl:w-44 2xl:w-56 transition-all duration-300 cursor-pointer"
+                      >
+                        <div className="aspect-4/3 flex items-center justify-center">
+                          {getProductImage(product) ? (
+                            <img src={getProductImage(product)!} alt={getName(product)} className="w-full h-full object-contain" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Package className="text-white/30" size={36} />
+                            </div>
+                          )}
+                        </div>
+                        <h3
+                          className={`mt-2 uppercase tracking-wider text-center transition-all ${
+                            isSelected ? 'text-primary font-bold text-base xl:text-lg' : 'text-white font-normal text-xs'
+                          }`}
+                        >
                           {getName(product)}
                         </h3>
-                      </div>
-                    </button>
-                  ))}
+                      </button>
+                    );
+                  })}
                 </div>
 
                 {/* Navigation button — positioned at bottom-right, independent of thumbnails */}
-                <div className="hidden lg:flex absolute bottom-8 end-0 pe-10 xl:pe-30 2xl:pe-30 3xl:pe-40">
+                <div className="hidden lg:flex absolute bottom-8 end-0 pe-20 xl:pe-40 2xl:pe-52 3xl:pe-64">
                   <button
                     onClick={() => {
                       const idx = products.findIndex(p => p.slug === selectedSlug);
                       const next = (idx + 1) % products.length;
                       handleSelectProduct(products[next].slug);
                     }}
-                    className="w-44 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-white/20 text-white/50 hover:text-white hover:border-white/40 transition-colors cursor-pointer text-sm uppercase tracking-wider"
+                    className="w-44 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-white/50 text-white hover:border-white transition-colors cursor-pointer text-sm uppercase tracking-wider"
                   >
                     {(() => {
                       const idx = products.findIndex(p => p.slug === selectedSlug);
