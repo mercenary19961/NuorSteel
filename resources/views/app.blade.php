@@ -15,10 +15,13 @@
     {{-- Preload hero LCP image so the browser starts fetching it in parallel with JS/CSS
          instead of waiting for React to render the <img>. Uses the session locale so
          hard-reloads while in Arabic still preload the correct (Arabic) hero. --}}
+    @php($heroLocale = session('locale', 'en'))
     @if (Route::currentRouteName() === 'home')
-        @php($heroLocale = session('locale', 'en'))
         <link rel="preload" as="image" href="/images/home/hero/hero-mobile-{{ $heroLocale }}.webp" media="(max-width: 639px)" fetchpriority="high">
         <link rel="preload" as="image" href="/images/home/hero/hero-desktop-{{ $heroLocale }}.webp" media="(min-width: 640px)" fetchpriority="high">
+    @elseif (Route::currentRouteName() === 'quality')
+        <link rel="preload" as="image" href="/images/quality/hero/hero-mobile-{{ $heroLocale }}.webp" media="(max-width: 639px)" fetchpriority="high">
+        <link rel="preload" as="image" href="/images/quality/hero/hero-desktop-{{ $heroLocale }}.webp" media="(min-width: 640px)" fetchpriority="high">
     @endif
 
     @routes

@@ -1,11 +1,34 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Head } from '@inertiajs/react';
 import { Gauge, FlaskConical, Ruler, Flame, ShieldCheck, FileCheck } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { MagicCardGrid, MagicCard } from '@/Components/ui/magic-card';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Quality() {
   const { t } = useTranslation();
+  const { language } = useLanguage();
+
+  // Warm opposite-language hero image during idle time so the language
+  // toggle is instant without hurting initial LCP.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const other = language === 'ar' ? 'en' : 'ar';
+    const urls = [
+      `/images/quality/hero/hero-desktop-${other}.webp`,
+      `/images/quality/hero/hero-mobile-${other}.webp`,
+    ];
+    const preload = () => urls.forEach((src) => { const img = new Image(); img.src = src; });
+    const hasIdle = 'requestIdleCallback' in window;
+    const handle = hasIdle
+      ? window.requestIdleCallback(preload, { timeout: 2000 })
+      : window.setTimeout(preload, 1500);
+    return () => {
+      if (hasIdle) window.cancelIdleCallback(handle);
+      else window.clearTimeout(handle);
+    };
+  }, [language]);
 
   return (
     <PublicLayout>
@@ -13,30 +36,19 @@ export default function Quality() {
 
       {/* Hero Section */}
       <section className="relative h-screen bg-black text-white overflow-hidden flex items-center">
-        {/* Background grid + decorative shape */}
+        {/* Background image */}
         <div className="absolute inset-0">
-          <div
-            className="absolute inset-0 opacity-60"
-            style={{
-              backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-              backgroundSize: '60px 60px',
-            }}
-          />
-          {/* Diagonal geometric shape on the right — placeholder for future image */}
-          <div
-            className="absolute top-0 right-0 w-1/2 h-full hidden lg:block"
-            style={{
-              clipPath: 'polygon(25% 0, 100% 0, 100% 100%, 0% 100%)',
-            }}
-          >
-            <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-primary/10 to-black/80" />
-            <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
-          </div>
-          {/* Subtle accent line */}
-          <div
-            className="absolute top-0 bottom-0 hidden lg:block w-px bg-primary/30"
-            style={{ left: '62.5%', transform: 'skewX(-12deg)' }}
-          />
+          <picture>
+            <source media="(max-width: 639px)" srcSet={`/images/quality/hero/hero-mobile-${language}.webp`} />
+            <img
+              key={`quality-hero-${language}`}
+              src={`/images/quality/hero/hero-desktop-${language}.webp`}
+              alt=""
+              fetchPriority="high"
+              decoding="async"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </picture>
         </div>
 
         <div className="relative container mx-auto px-4 pt-32 lg:pt-44 pb-16 lg:pb-24">
@@ -44,7 +56,7 @@ export default function Quality() {
             <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
               {t('quality.hero.label', 'Quality Assurance')}
             </p>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6 whitespace-pre-line">
               {t('quality.hero.title')}
             </h1>
             <p className="text-lg lg:text-xl text-gray-400 max-w-lg leading-relaxed">
