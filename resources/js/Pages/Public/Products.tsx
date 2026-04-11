@@ -449,7 +449,7 @@ export default function Products({ products }: Props) {
       <section className="relative flex flex-col lg:flex-row min-h-screen overflow-hidden bg-black">
         {/* LEFT PANEL — Featured Product (wrapper for drop-shadow along diagonal) */}
         <div
-          className="relative z-10"
+          className="relative lg:z-10 bg-primary lg:bg-transparent"
           style={{
             flex: leftFlex,
             transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -458,20 +458,22 @@ export default function Products({ products }: Props) {
         >
         <div
           ref={leftPanelRef}
-          className="relative h-full overflow-hidden lg:bg-primary"
+          className="relative h-full overflow-hidden bg-primary"
           style={{
             clipPath: leftClipPath,
             backgroundSize: isLg ? '100vw 100%' : undefined,
           }}
         >
-          {/* Faint warehouse background overlay */}
-          <img
-            key={`products-bg-overlay-${language}`}
-            src={`/images/products/background/bg-desktop-${language}.webp`}
-            alt=""
-            aria-hidden="true"
-            className="hidden lg:block absolute inset-0 w-full h-full object-cover pointer-events-none opacity-10"
-          />
+          {/* Faint warehouse background overlay — only in expanded detail view */}
+          {expanded && (
+            <img
+              key={`products-bg-overlay-${language}`}
+              src={`/images/products/background/bg-desktop-${language}.webp`}
+              alt=""
+              aria-hidden="true"
+              className="hidden lg:block absolute inset-0 w-full h-full object-cover pointer-events-none opacity-10"
+            />
+          )}
           <div className={`relative h-full flex flex-col lg:flex-row ${expanded ? 'lg:overflow-hidden' : ''}`}>
             {/* Text Content — left side of the left panel */}
             <div className={`flex-1 flex flex-col px-4 py-8 sm:px-8 lg:py-12 lg:ps-[max(2rem,calc((100vw-1536px)/2+1rem))] lg:pe-8 ${expanded ? 'lg:overflow-y-auto scrollbar-thin justify-start pt-28!' : 'justify-center pt-24 lg:pt-0'}`}>
@@ -501,6 +503,32 @@ export default function Products({ products }: Props) {
                       {t('products.exploreMore')}
                       <ArrowRight className="ms-2 rtl:rotate-180 group-hover:translate-x-1 transition-transform" size={18} />
                     </button>
+
+                    {/* Mobile: Featured product image */}
+                    <div className="lg:hidden flex items-center justify-center mt-8">
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={`mobile-img-${selectedSlug}`}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          transition={{ duration: 0.4 }}
+                        >
+                          {getProductImage(selectedProduct) ? (
+                            <img
+                              key={`mobile-hero-img-${selectedSlug}-${language}`}
+                              src={getProductImage(selectedProduct)!}
+                              alt={getName(selectedProduct)}
+                              className="max-h-52 w-auto object-contain"
+                            />
+                          ) : (
+                            <div className="w-40 h-40 rounded-full bg-white/5 flex items-center justify-center">
+                              <Package className="text-white/20" size={56} />
+                            </div>
+                          )}
+                        </motion.div>
+                      </AnimatePresence>
+                    </div>
                   </motion.div>
                 ) : (
                   /* --- EXPANDED: Detail Content with Tabs --- */
@@ -535,9 +563,9 @@ export default function Products({ products }: Props) {
                     <div className="lg:hidden flex items-end justify-between mt-12 pb-4">
                       <button
                         onClick={handleBack}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/20 text-white/70 hover:text-white hover:border-white/40 hover:bg-white/10 text-xs font-medium transition-all cursor-pointer group"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white text-primary text-xs font-semibold hover:bg-white/90 transition-all cursor-pointer group"
                       >
-                        <LayoutGrid size={12} className="text-white/50 group-hover:text-white/70" />
+                        <LayoutGrid size={12} />
                         {t('products.backToProducts')}
                         <ArrowRight className="-rotate-90 group-hover:-translate-y-0.5 transition-transform" size={12} />
                       </button>
@@ -547,7 +575,7 @@ export default function Products({ products }: Props) {
                             key={`mobile-detail-img-${selectedSlug}-${language}`}
                             src={getProductImage(selectedProduct)!}
                             alt={getName(selectedProduct)}
-                            className="max-h-28 w-auto object-contain drop-shadow-2xl"
+                            className="max-h-28 w-auto object-contain"
                           />
                         ) : (
                           <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center">
@@ -651,7 +679,7 @@ export default function Products({ products }: Props) {
         >
           {/* Grid texture background */}
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 pointer-events-none"
             style={{
               backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
               backgroundSize: '60px 60px',
@@ -668,41 +696,46 @@ export default function Products({ products }: Props) {
                 transition={{ duration: 0.3 }}
                 className="h-full flex flex-col items-center p-4 sm:p-6 lg:p-0"
               >
-                {/* Mobile: Featured product image filling the space */}
-                <div className="flex-1 flex items-center justify-center pb-20 lg:hidden">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={`mobile-img-${selectedSlug}`}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ duration: 0.4 }}
-                    >
-                      {getProductImage(selectedProduct) ? (
-                        <img
-                          key={`mobile-hero-img-${selectedSlug}-${language}`}
-                          src={getProductImage(selectedProduct)!}
-                          alt={getName(selectedProduct)}
-                          className="max-h-52 w-auto object-contain drop-shadow-2xl"
-                        />
-                      ) : (
-                        <div className="w-40 h-40 rounded-full bg-white/5 flex items-center justify-center">
-                          <Package className="text-white/20" size={56} />
+                {/* Mobile: Product thumbnails — horizontal at top */}
+                <div className="flex lg:hidden items-center justify-center gap-6 pb-4 w-full max-w-full px-2">
+                  {products.map((product) => {
+                    const isSelected = product.slug === selectedSlug;
+                    return (
+                      <button
+                        key={product.slug}
+                        onClick={() => handleSelectProduct(product.slug)}
+                        className="group relative flex-1 min-w-0 max-w-44 transition-all duration-300 cursor-pointer"
+                      >
+                        <div className="aspect-4/3 flex items-center justify-center">
+                          {getProductImage(product) ? (
+                            <img src={getProductImage(product)!} alt={getName(product)} className="w-full h-full object-contain" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Package className="text-white/30" size={36} />
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </motion.div>
-                  </AnimatePresence>
+                        <h3
+                          className={`mt-2 uppercase tracking-wider text-center transition-all text-xs ${
+                            isSelected ? 'text-primary font-bold text-sm' : 'text-white font-normal'
+                          }`}
+                        >
+                          {getName(product)}
+                        </h3>
+                      </button>
+                    );
+                  })}
                 </div>
 
-                {/* Mobile navigation — next product button */}
-                <div className="flex lg:hidden items-center justify-center mb-3">
+                {/* Mobile navigation — next product button (below thumbnails) */}
+                <div className="flex lg:hidden items-center justify-center mt-3 pb-4">
                   <button
                     onClick={() => {
                       const idx = products.findIndex(p => p.slug === selectedSlug);
                       const next = (idx + 1) % products.length;
                       handleSelectProduct(products[next].slug);
                     }}
-                    className="flex items-center justify-center gap-2 px-5 py-2 rounded-full border border-white/20 text-white/50 hover:text-white hover:border-white/40 transition-colors cursor-pointer text-sm uppercase tracking-wider"
+                    className="flex items-center justify-center gap-2 px-5 py-2 rounded-full bg-white text-primary font-semibold hover:bg-white/90 transition-colors cursor-pointer text-sm uppercase tracking-wider"
                   >
                     {(() => {
                       const idx = products.findIndex(p => p.slug === selectedSlug);
@@ -719,39 +752,6 @@ export default function Products({ products }: Props) {
                       );
                     })()}
                   </button>
-                </div>
-
-                {/* Mobile: Product thumbnails — horizontal at bottom */}
-                <div className="flex lg:hidden items-center justify-center gap-4 pb-4 w-full max-w-full px-2">
-                  {products.map((product) => (
-                    <button
-                      key={product.slug}
-                      onClick={() => handleSelectProduct(product.slug)}
-                      className={`group relative flex-1 min-w-0 max-w-52 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer ${
-                        product.slug === selectedSlug
-                          ? 'ring-2 ring-white/40 shadow-2xl shadow-black/30 scale-105'
-                          : 'opacity-40 hover:opacity-70 hover:scale-102'
-                      }`}
-                    >
-                      <div className="aspect-4/3 bg-gray-800/50 flex items-center justify-center">
-                        {getProductImage(product) ? (
-                          <img src={getProductImage(product)!} alt={getName(product)} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full bg-linear-to-br from-gray-600 to-gray-500 flex items-center justify-center">
-                            <Package className="text-white/30" size={36} />
-                          </div>
-                        )}
-                      </div>
-                      <div className="absolute bottom-0 inset-x-0 bg-linear-to-t from-black/80 to-transparent px-3 py-2">
-                        <h3 className="text-white font-bold text-xs uppercase tracking-wider">
-                          {getName(product)}
-                        </h3>
-                      </div>
-                      {product.slug === selectedSlug && (
-                        <div className="absolute top-0 inset-x-0 h-0.5 bg-primary hidden lg:block" />
-                      )}
-                    </button>
-                  ))}
                 </div>
 
                 {/* Desktop: Product thumbnails — stacked vertically, far right, centered */}
