@@ -26,7 +26,6 @@
         <link rel="preload" as="image" href="/images/career/hero/hero-mobile-{{ $heroLocale }}.webp" media="(max-width: 639px)" fetchpriority="high">
         <link rel="preload" as="image" href="/images/career/hero/hero-desktop-{{ $heroLocale }}.webp" media="(min-width: 640px)" fetchpriority="high">
     @elseif (Route::currentRouteName() === 'products.index')
-        <link rel="preload" as="image" href="/images/products/background/bg-desktop-{{ $heroLocale }}.webp" media="(min-width: 1024px)" fetchpriority="high">
         <link rel="preload" as="image" href="/images/products/renders/tmt-bars-{{ $heroLocale }}.webp" fetchpriority="high">
     @endif
 

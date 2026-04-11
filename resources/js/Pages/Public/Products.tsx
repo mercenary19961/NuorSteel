@@ -261,7 +261,6 @@ export default function Products({ products }: Props) {
     if (typeof window === 'undefined') return;
     const other = language === 'ar' ? 'en' : 'ar';
     const urls = [
-      `/images/products/background/bg-desktop-${other}.webp`,
       `/images/products/renders/tmt-bars-${other}.webp`,
       `/images/products/renders/billets-${other}.webp`,
     ];
@@ -465,6 +464,14 @@ export default function Products({ products }: Props) {
             backgroundSize: isLg ? '100vw 100%' : undefined,
           }}
         >
+          {/* Faint warehouse background overlay */}
+          <img
+            key={`products-bg-overlay-${language}`}
+            src={`/images/products/background/bg-desktop-${language}.webp`}
+            alt=""
+            aria-hidden="true"
+            className="hidden lg:block absolute inset-0 w-full h-full object-cover pointer-events-none opacity-10"
+          />
           <div className={`relative h-full flex flex-col lg:flex-row ${expanded ? 'lg:overflow-hidden' : ''}`}>
             {/* Text Content — left side of the left panel */}
             <div className={`flex-1 flex flex-col px-4 py-8 sm:px-8 lg:py-12 lg:ps-[max(2rem,calc((100vw-1536px)/2+1rem))] lg:pe-8 ${expanded ? 'lg:overflow-y-auto scrollbar-thin justify-start pt-28!' : 'justify-center pt-24 lg:pt-0'}`}>
@@ -607,7 +614,7 @@ export default function Products({ products }: Props) {
 
         {/* Expanded Product Image — absolutely positioned, bottom-right, floats above the panel */}
         {expanded && (
-          <div className="hidden lg:flex absolute z-20 bottom-8 end-[15%] min-[1280px]:end-[12%] min-[1536px]:end-[8%] min-[1800px]:end-[5%] pointer-events-none">
+          <div className="hidden lg:flex absolute z-20 bottom-24 end-[15%] min-[1280px]:end-[12%] min-[1536px]:end-[8%] min-[1800px]:end-[5%] pointer-events-none">
             <AnimatePresence mode="wait">
               <motion.div
                 key={`expanded-img-${selectedSlug}`}
@@ -636,24 +643,20 @@ export default function Products({ products }: Props) {
 
         {/* RIGHT PANEL — Product Navigation / Image (hidden on mobile when expanded) */}
         <div
-          className={`relative overflow-hidden lg:-ms-120 ${expanded ? 'hidden lg:block' : ''}`}
+          className={`relative overflow-hidden lg:-ms-120 bg-black ${expanded ? 'hidden lg:block' : ''}`}
           style={{
             flex: rightFlex,
             transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
         >
-          {/* Bilingual background artwork */}
-          <picture>
-            <img
-              key={`products-bg-${language}`}
-              src={`/images/products/background/bg-desktop-${language}.webp`}
-              alt=""
-              aria-hidden="true"
-              fetchPriority="high"
-              decoding="async"
-              className="hidden lg:block absolute inset-0 w-full h-full object-cover pointer-events-none opacity-40"
-            />
-          </picture>
+          {/* Grid texture background */}
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+              backgroundSize: '60px 60px',
+            }}
+          />
           <AnimatePresence mode="wait">
             {!expanded ? (
               /* --- DEFAULT: Product Thumbnails --- */
