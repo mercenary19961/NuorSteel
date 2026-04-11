@@ -157,10 +157,10 @@ function ProductTabs({ activeTab, onTabChange }: { activeTab: TabKey; onTabChang
         <button
           key={tab.key}
           onClick={() => onTabChange(tab.key)}
-          className={`relative px-5 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${
+          className={`relative px-5 py-2 rounded-full text-sm font-medium transition-all cursor-pointer outline-none border ${
             activeTab === tab.key
-              ? 'bg-white text-gray-900'
-              : 'border border-white/30 text-white/80 hover:border-white/60 hover:text-white'
+              ? 'bg-white text-gray-900 border-transparent'
+              : 'border-white/30 text-white/80 hover:border-white/60 hover:text-white'
           }`}
         >
           {tab.label}
