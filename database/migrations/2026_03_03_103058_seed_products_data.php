@@ -14,7 +14,7 @@ return new class extends Migration
             ['slug' => 'tmt-bars'],
             [
                 'name_en' => 'TMT Bars',
-                'name_ar' => 'قضبان حديد التسليح',
+                'name_ar' => 'حديد التسليح',
                 'slug' => 'tmt-bars',
                 'short_description_en' => 'Thermo-Mechanically Treated reinforcement steel bars manufactured to BS 4449:2005, Grade B500B standards.',
                 'short_description_ar' => 'قضبان حديد تسليح معالجة حرارياً وميكانيكياً مصنعة وفق معايير BS 4449:2005، الدرجة B500B.',

@@ -12,7 +12,7 @@ class SiteContentSeeder extends Seeder
         $contents = [
             // Home Page - About section
             ['page' => 'home', 'section' => 'about', 'key' => 'title', 'content_en' => 'About Nuor Steel', 'content_ar' => 'عن شركة نور للحديد', 'type' => 'text'],
-            ['page' => 'home', 'section' => 'about', 'key' => 'description', 'content_en' => 'Nuor Steel Industry Company is a leading Saudi steel manufacturer founded in 2010 in Al Kharj Industrial City. As a fully integrated producer of steel billets and TMT rebars, it supports national infrastructure and industrial growth aligned with Saudi Vision 2030.', 'content_ar' => 'شركة نور للصناعات الحديدية هي شركة سعودية رائدة في صناعة الحديد تأسست عام 2010 في المدينة الصناعية بالخرج. بصفتها منتجاً متكاملاً لكتل الصلب وحديد التسليح، تدعم البنية التحتية الوطنية والنمو الصناعي بما يتماشى مع رؤية السعودية 2030.', 'type' => 'textarea'],
+            ['page' => 'home', 'section' => 'about', 'key' => 'description', 'content_en' => 'Nuor Steel Industry Company is a leading Saudi steel manufacturer founded in 2010 in Al Kharj Industrial City. As a fully integrated producer of steel billets and TMT rebars, it supports national infrastructure and industrial growth aligned with Saudi Vision 2030.', 'content_ar' => 'شركة نور للصناعات الحديدية هي شركة سعودية رائدة في صناعة الحديد تأسست عام 2010 في المدينة الصناعية بالخرج. بصفتها منتجاً متكاملاً لستيل بِليت وحديد التسليح، تدعم البنية التحتية الوطنية والنمو الصناعي بما يتماشى مع رؤية السعودية 2030.', 'type' => 'textarea'],
 
             // Home Page - Vision & Mission section
             ['page' => 'home', 'section' => 'vision_mission', 'key' => 'title', 'content_en' => 'Vision & Mission', 'content_ar' => 'الرؤية والرسالة', 'type' => 'text'],
