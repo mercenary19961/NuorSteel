@@ -249,6 +249,32 @@ export default function Products({ products }: Props) {
   const getName = (p: ProductData) => language === 'ar' ? p.name_ar : p.name_en;
   const getShortDesc = (p: ProductData) => language === 'ar' ? p.short_description_ar : p.short_description_en;
   const getDesc = (p: ProductData) => language === 'ar' ? p.description_ar : p.description_en;
+  // Bilingual 3D renders for known products; falls back to DB-stored image.
+  const localRenderSlugs = new Set(['tmt-bars', 'billets']);
+  const getProductImage = (p: ProductData) =>
+    localRenderSlugs.has(p.slug)
+      ? `/images/products/renders/${p.slug}-${language}.webp`
+      : p.image;
+
+  // Warm opposite-language background + product renders during idle time.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const other = language === 'ar' ? 'en' : 'ar';
+    const urls = [
+      `/images/products/background/bg-desktop-${other}.webp`,
+      `/images/products/renders/tmt-bars-${other}.webp`,
+      `/images/products/renders/billets-${other}.webp`,
+    ];
+    const preload = () => urls.forEach((src) => { const img = new Image(); img.src = src; });
+    const hasIdle = 'requestIdleCallback' in window;
+    const handle = hasIdle
+      ? window.requestIdleCallback(preload, { timeout: 2000 })
+      : window.setTimeout(preload, 1500);
+    return () => {
+      if (hasIdle) window.cancelIdleCallback(handle);
+      else window.clearTimeout(handle);
+    };
+  }, [language]);
 
   // Slug-based i18n key map
   const slugToKey: Record<string, string> = {
@@ -433,13 +459,26 @@ export default function Products({ products }: Props) {
         >
         <div
           ref={leftPanelRef}
-          className="h-full overflow-hidden lg:bg-linear-to-r lg:from-gray-900 lg:to-gray-800"
+          className="relative h-full overflow-hidden lg:bg-linear-to-r lg:from-gray-900 lg:to-gray-800"
           style={{
             clipPath: leftClipPath,
             backgroundSize: isLg ? '100vw 100%' : undefined,
           }}
         >
-          <div className={`h-full flex flex-col lg:flex-row ${expanded ? 'lg:overflow-hidden' : ''}`}>
+          {/* Bilingual background artwork */}
+          <picture>
+            <img
+              key={`products-bg-${language}`}
+              src={`/images/products/background/bg-desktop-${language}.webp`}
+              alt=""
+              aria-hidden="true"
+              fetchPriority="high"
+              decoding="async"
+              className="hidden lg:block absolute inset-0 w-full h-full object-cover pointer-events-none"
+            />
+          </picture>
+          <div className="hidden lg:block absolute inset-0 bg-linear-to-r from-black/70 via-black/40 to-transparent pointer-events-none" />
+          <div className={`relative h-full flex flex-col lg:flex-row ${expanded ? 'lg:overflow-hidden' : ''}`}>
             {/* Text Content — left side of the left panel */}
             <div className={`flex-1 flex flex-col px-4 py-8 sm:px-8 lg:py-12 lg:ps-[max(2rem,calc((100vw-1536px)/2+1rem))] lg:pe-8 ${expanded ? 'lg:overflow-y-auto scrollbar-thin justify-start pt-28!' : 'justify-center pt-24 lg:pt-0'}`}>
               <AnimatePresence mode="wait">
@@ -511,9 +550,10 @@ export default function Products({ products }: Props) {
                         <ArrowRight className="-rotate-90 group-hover:-translate-y-0.5 transition-transform" size={12} />
                       </button>
                       <div className="flex items-end justify-end">
-                        {selectedProduct.image ? (
+                        {getProductImage(selectedProduct) ? (
                           <img
-                            src={selectedProduct.image}
+                            key={`mobile-detail-img-${selectedSlug}-${language}`}
+                            src={getProductImage(selectedProduct)!}
                             alt={getName(selectedProduct)}
                             className="max-h-28 w-auto object-contain drop-shadow-2xl"
                           />
@@ -544,9 +584,10 @@ export default function Products({ products }: Props) {
                 transition={{ duration: 0.4 }}
                 className="relative"
               >
-                {selectedProduct.image ? (
+                {getProductImage(selectedProduct) ? (
                   <img
-                    src={selectedProduct.image}
+                    key={`hero-img-${selectedSlug}-${language}`}
+                    src={getProductImage(selectedProduct)!}
                     alt={getName(selectedProduct)}
                     className="max-h-36 xl:max-h-44 2xl:max-h-56 w-auto object-contain drop-shadow-2xl"
                   />
@@ -592,9 +633,10 @@ export default function Products({ products }: Props) {
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.4 }}
               >
-                {selectedProduct.image ? (
+                {getProductImage(selectedProduct) ? (
                   <img
-                    src={selectedProduct.image}
+                    key={`expanded-img-${selectedSlug}-${language}`}
+                    src={getProductImage(selectedProduct)!}
                     alt={getName(selectedProduct)}
                     className="max-h-48 xl:max-h-60 w-auto object-contain drop-shadow-2xl"
                   />
@@ -640,9 +682,10 @@ export default function Products({ products }: Props) {
                       exit={{ opacity: 0, scale: 0.9 }}
                       transition={{ duration: 0.4 }}
                     >
-                      {selectedProduct.image ? (
+                      {getProductImage(selectedProduct) ? (
                         <img
-                          src={selectedProduct.image}
+                          key={`mobile-hero-img-${selectedSlug}-${language}`}
+                          src={getProductImage(selectedProduct)!}
                           alt={getName(selectedProduct)}
                           className="max-h-52 w-auto object-contain drop-shadow-2xl"
                         />
@@ -695,8 +738,8 @@ export default function Products({ products }: Props) {
                       }`}
                     >
                       <div className="aspect-4/3 bg-gray-800/50 flex items-center justify-center">
-                        {product.image ? (
-                          <img src={product.image} alt={getName(product)} className="w-full h-full object-cover" />
+                        {getProductImage(product) ? (
+                          <img src={getProductImage(product)!} alt={getName(product)} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full bg-linear-to-br from-gray-600 to-gray-500 flex items-center justify-center">
                             <Package className="text-white/30" size={36} />
@@ -717,43 +760,44 @@ export default function Products({ products }: Props) {
 
                 {/* Desktop: Product thumbnails — stacked vertically, far right, centered */}
                 <div className="hidden lg:flex flex-col items-end justify-center h-full w-full pe-0 lg:pe-10 xl:pe-30 2xl:pe-30 3xl:pe-40 gap-4">
-                  {products.map((product) => (
-                    <button
-                      key={product.slug}
-                      onClick={() => handleSelectProduct(product.slug)}
-                      className={`group relative w-24 xl:w-40 2xl:w-56 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer ${
-                        product.slug === selectedSlug
-                          ? 'ring-2 ring-white/40 shadow-2xl shadow-black/30 scale-105'
-                          : 'opacity-40 hover:opacity-70 hover:scale-102'
-                      }`}
-                    >
-                      <div className="aspect-4/3 bg-gray-800/50 flex items-center justify-center">
-                        {product.image ? (
-                          <img src={product.image} alt={getName(product)} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full bg-linear-to-br from-gray-600 to-gray-500 flex items-center justify-center">
-                            <Package className="text-white/30" size={36} />
-                          </div>
-                        )}
-                      </div>
-                      <div className="absolute bottom-0 inset-x-0 bg-linear-to-t from-black/80 to-transparent px-3 py-2">
-                        <h3 className="text-white font-bold text-xs uppercase tracking-wider text-center">
+                  {products.map((product) => {
+                    const isSelected = product.slug === selectedSlug;
+                    return (
+                      <button
+                        key={product.slug}
+                        onClick={() => handleSelectProduct(product.slug)}
+                        className="group relative w-24 xl:w-40 2xl:w-56 transition-all duration-300 cursor-pointer"
+                      >
+                        <div className="aspect-4/3 flex items-center justify-center">
+                          {getProductImage(product) ? (
+                            <img src={getProductImage(product)!} alt={getName(product)} className="w-full h-full object-contain" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Package className="text-white/30" size={36} />
+                            </div>
+                          )}
+                        </div>
+                        <h3
+                          className={`mt-2 text-xs uppercase tracking-wider text-center transition-colors ${
+                            isSelected ? 'text-primary font-bold' : 'text-white font-normal'
+                          }`}
+                        >
                           {getName(product)}
                         </h3>
-                      </div>
-                    </button>
-                  ))}
+                      </button>
+                    );
+                  })}
                 </div>
 
                 {/* Navigation button — positioned at bottom-right, independent of thumbnails */}
-                <div className="hidden lg:flex absolute bottom-8 end-0 pe-10 xl:pe-30 2xl:pe-30 3xl:pe-40">
+                <div className="hidden lg:flex absolute bottom-8 end-0 pe-4 xl:pe-10 2xl:pe-16 3xl:pe-24">
                   <button
                     onClick={() => {
                       const idx = products.findIndex(p => p.slug === selectedSlug);
                       const next = (idx + 1) % products.length;
                       handleSelectProduct(products[next].slug);
                     }}
-                    className="w-44 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-white/20 text-white/50 hover:text-white hover:border-white/40 transition-colors cursor-pointer text-sm uppercase tracking-wider"
+                    className="w-44 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-white/50 text-white hover:border-white transition-colors cursor-pointer text-sm uppercase tracking-wider"
                   >
                     {(() => {
                       const idx = products.findIndex(p => p.slug === selectedSlug);
