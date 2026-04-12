@@ -19,17 +19,13 @@ export default function About() {
     offset: ['start start', 'end start'],
   });
 
-  // Text container: start offset left, move further left on scroll
+  // Text container: start centered, move to the side on scroll
   const textX = useTransform(scrollYProgress, [0, 0.5], [isRtl ? '40%' : '-40%', isRtl ? '70%' : '-70%']);
   const textScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.85]);
 
-  // TMT image: visible initially, fades out on scroll
-  const tmtOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
-  const tmtX = useTransform(scrollYProgress, [0, 0.15], ['0%', isRtl ? '-30%' : '30%']);
-
-  // Billets image: fades in after TMT fades out
-  const billetsOpacity = useTransform(scrollYProgress, [0.2, 0.45], [0, 1]);
-  const billetsX = useTransform(scrollYProgress, [0.2, 0.45], [isRtl ? '-30%' : '30%', '0%']);
+  // Logo animation — slides in from the side and fades in on scroll
+  const logoX = useTransform(scrollYProgress, [0.05, 0.4], [isRtl ? '-60%' : '60%', '0%']);
+  const logoOpacity = useTransform(scrollYProgress, [0.05, 0.3], [0, 1]);
 
   // Shifting green letters for "Saudi Arabia" / "المملكة العربية السعودية"
   const highlightText = t('about.intro.headlineHighlight');
@@ -50,17 +46,22 @@ export default function About() {
       {/* SEO h1 — visually hidden */}
       <h1 className="sr-only">{t('about.hero.title')}</h1>
 
-      {/* About Intro — scroll-driven center → side + image reveal */}
+      {/* About Intro — scroll-driven text + logo assembly */}
       <div ref={sectionRef} className="relative h-[300vh]">
         <section className="sticky top-0 h-screen bg-black text-white overflow-hidden">
-          {/* Grid texture */}
-          <div
-            className="absolute inset-0 opacity-60"
-            style={{
-              backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-              backgroundSize: '60px 60px',
-            }}
-          />
+          {/* Background image */}
+          <picture>
+            <source media="(max-width: 639px)" srcSet={`/images/about/hero/bg-mobile-${isRtl ? 'ar' : 'en'}.webp`} />
+            <img
+              src={`/images/about/hero/bg-desktop-${isRtl ? 'ar' : 'en'}.webp`}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </picture>
+
+          {/* Dark overlay for readability */}
+          <div className="absolute inset-0 bg-black/40" />
 
           <div className="relative z-10 h-full flex items-center">
             <div className="relative container mx-auto px-4 h-full flex items-center justify-center">
@@ -100,29 +101,18 @@ export default function About() {
                 </p>
               </motion.div>
 
-              {/* TMT image — visible initially, fades out to the side on scroll */}
-              <motion.div
-                style={{ opacity: tmtOpacity, x: tmtX }}
-                className={`hidden lg:flex absolute top-0 bottom-0 items-center justify-center w-1/2 ${isRtl ? 'start-0' : 'end-0'}`}
-              >
-                <img
-                  src={`/images/products/renders/tmt-bars-${language === 'ar' ? 'ar' : 'en'}.webp`}
-                  alt="TMT Rebars"
-                  className="max-h-[50vh] w-auto object-contain"
+              {/* Logo — right side on desktop */}
+              <div className={`hidden lg:flex absolute top-0 bottom-0 items-center justify-center w-1/2 ${isRtl ? 'start-0' : 'end-0'}`}>
+                <motion.img
+                  src="/images/about/hero/logo.webp"
+                  alt="Nuor Steel"
+                  className="w-95 h-auto"
+                  style={{
+                    x: logoX,
+                    opacity: logoOpacity,
+                  }}
                 />
-              </motion.div>
-
-              {/* Billets image — fades in from the side after TMT fades out */}
-              <motion.div
-                style={{ opacity: billetsOpacity, x: billetsX }}
-                className={`hidden lg:flex absolute top-0 bottom-0 items-center justify-center w-1/2 ${isRtl ? 'start-0' : 'end-0'}`}
-              >
-                <img
-                  src={`/images/products/renders/billets-${language === 'ar' ? 'ar' : 'en'}.webp`}
-                  alt={t('about.intro.highlight')}
-                  className="max-h-[70vh] w-auto object-contain"
-                />
-              </motion.div>
+              </div>
             </div>
           </div>
         </section>
