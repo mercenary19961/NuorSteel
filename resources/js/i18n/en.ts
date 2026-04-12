@@ -127,12 +127,36 @@ const en = {
     timeline: {
       title: "Our Journey",
       events: [
-        { year: "Apr 2010", description: "Started our First Trading Business." },
-        { year: "May 2014", description: "Started Installing Melt Shops." },
-        { year: "Aug 2016", description: "Started Manufacturing our own Billets." },
-        { year: "Sept 2020", description: "Started Installing our Rolling Mills." },
-        { year: "2023", description: "Start production of rebar TMT Bars." },
-        { year: "Present", description: "One of the best steel manufacturers in the sector." },
+        {
+          year: "2010",
+          title: "Where the Story Began",
+          body: "Nuor Steel's journey began in 2010 with a clear vision: to build a business rooted in reliability, market understanding, and long-term value. What started as a steel trading operation quickly became a trusted name in supplying steel products to the market, supported by strong commercial relationships and a deep understanding of customer needs. In these early years, the company focused on building credibility, learning the dynamics of the regional steel industry, and laying the operational and strategic foundation for future growth. This first chapter was not only about business activity — it was about establishing the discipline, trust, and ambition that would later shape Nuor Steel into a manufacturing force.",
+        },
+        {
+          year: "2014",
+          title: "The Shift from Trading to Industry",
+          body: "By 2014, Nuor Steel had reached a defining milestone in its evolution. With growing confidence, market insight, and a stronger strategic direction, the company moved beyond trading and entered the world of manufacturing by installing its melt shop. This was a transformational step — one that marked the transition from participating in the steel supply chain to becoming an active industrial producer within it. The decision reflected Nuor Steel's commitment to greater control, stronger quality standards, and long-term industrial investment. It was the moment the company began converting ambition into infrastructure, and vision into production capability.",
+        },
+        {
+          year: "2016",
+          title: "Building from the Core",
+          body: "In 2016, Nuor Steel advanced its industrial strategy by beginning the production of its own steel billets — a milestone that strengthened the company from the very core of the manufacturing process. Producing billets internally represented far more than an expansion in output; it signaled a deeper move toward integration, quality assurance, and production independence. By taking control of this essential stage, Nuor Steel enhanced its ability to maintain consistency, improve efficiency, and ensure that every downstream product would be built on a reliable foundation. This phase reflected the company's determination to move closer to full industrial integration and to create value through every stage of production.",
+        },
+        {
+          year: "2020",
+          title: "Expanding Capability, Strengthening Integration",
+          body: "In September 2020, Nuor Steel reached another major milestone by installing its rolling mills — a development that significantly expanded its manufacturing capabilities and accelerated its transformation into a fully integrated steel producer. This step brought the company closer to completing the industrial chain in-house, allowing greater efficiency between upstream production and finished output. It also represented a strategic investment in scale, consistency, and operational excellence. With rolling capacity added to its infrastructure, Nuor Steel was no longer simply growing in size; it was building a stronger, more connected manufacturing ecosystem designed to serve evolving market needs with greater responsiveness and reliability.",
+        },
+        {
+          year: "2023",
+          title: "Delivering Finished Strength to the Market",
+          body: "In 2023, Nuor Steel began the production of TMT bars, marking a new chapter in delivering finished steel solutions to the construction and infrastructure sectors. This achievement represented the culmination of years of strategic investment, industrial expansion, and operational development. By entering TMT bar production, Nuor Steel strengthened its position as a manufacturer capable of supplying high-performance products engineered for strength, consistency, and modern building requirements. This was more than a product launch — it was the realization of a long-term vision to move from foundational industrial capability to market-ready steel solutions that directly support regional development.",
+        },
+        {
+          year: "Present",
+          title: "A Fully Integrated Industrial Vision",
+          body: "Today, Nuor Steel stands as one of the leading steel manufacturers in the region, backed by an integrated production model, advanced industrial facilities, and a clear commitment to quality. From its beginnings as a trading business to its evolution into a producer of steel billets and TMT bars, the company's journey reflects ambition guided by strategy and growth supported by capability. Nuor Steel continues to serve the market with confidence, delivering reliable steel solutions to businesses across Saudi Arabia and the wider MENA region. Its story is still being written — driven by progress, powered by industry, and built on a vision of long-term manufacturing excellence.",
+        },
       ],
     },
     capabilities: {
