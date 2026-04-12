@@ -212,19 +212,18 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
 
       {/* Hero Section — Full Viewport */}
       <section id="section-hero" className="relative min-h-[87svh] lg:h-screen flex flex-col justify-between overflow-hidden">
-        {/* Background + Overlay */}
+        {/* Background video + image fallback */}
         <div className="absolute inset-0">
-          <picture>
-            <source media="(max-width: 639px)" srcSet={`/images/home/hero/hero-mobile-${language}.webp`} />
-            <img
-              key={`hero-${language}`}
-              src={`/images/home/hero/hero-desktop-${language}.webp`}
-              alt=""
-              fetchPriority="high"
-              decoding="async"
-              className="absolute inset-0 w-full h-full object-cover object-bottom"
-            />
-          </picture>
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            poster={`/images/home/hero/hero-desktop-${language}.webp`}
+            className="absolute inset-0 w-full h-full object-cover object-center"
+          >
+            <source src="/videos/hero-bg.mp4" type="video/mp4" />
+          </video>
         </div>
 
         {/* Main Content */}
@@ -366,11 +365,11 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         <picture>
           <source media="(max-width: 1023px)" srcSet="/images/home/vision2030/bg-mobile.webp" />
           <img
-            src="/images/home/vision2030/bg-desktop.png"
+            src="/images/home/vision2030/bg-desktop.webp"
             alt=""
             loading="lazy"
             decoding="async"
-            className="absolute inset-0 w-full h-full object-cover object-top opacity-85"
+            className="absolute inset-0 w-full h-full object-cover object-center opacity-85"
           />
         </picture>
 
