@@ -80,10 +80,33 @@ export default function TimelineSection() {
     }, stepMs);
   }, [stopAll, scrollToEvent]);
 
-  // Start auto on mount
+  // Start auto only when section is in view
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInViewRef = useRef(false);
+
   useEffect(() => {
-    startAuto(0);
-    return stopAll;
+    if (typeof window === 'undefined') return;
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isInViewRef.current = entry.isIntersecting;
+        if (entry.isIntersecting) {
+          startAuto(activeRef.current);
+        } else {
+          stopAll();
+          modeRef.current = 'auto'; // reset mode so scroll can take over when re-entering
+        }
+      },
+      { threshold: 0.3 },
+    );
+
+    observer.observe(section);
+    return () => {
+      observer.disconnect();
+      stopAll();
+    };
   }, [startAuto, stopAll]);
 
   // --- Scroll-driven ---
@@ -141,7 +164,7 @@ export default function TimelineSection() {
 
   return (
     <div ref={wrapperRef} className="relative" style={{ height: `${EVENT_COUNT * 100}vh` }}>
-      <section className="sticky top-0 h-screen w-full overflow-hidden bg-black">
+      <section ref={sectionRef} className="sticky top-0 h-screen w-full overflow-hidden bg-black">
         {/* Background image */}
         <picture>
           <source media="(max-width: 639px)" srcSet={`/images/about/journey/bg-mobile-${language === 'ar' ? 'ar' : 'en'}.webp`} />
