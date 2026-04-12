@@ -88,7 +88,7 @@ export default function CapabilitiesSection() {
         {capabilities.map(({ icon: Icon, key }) => (
           <ScrollStackItem
             key={key}
-            className="magic-card min-h-[55vh] lg:min-h-[50vh] mx-auto max-w-4xl w-[92%] lg:w-[50%] p-6 lg:p-10 rounded-2xl lg:rounded-3xl bg-zinc-800/90 backdrop-blur-sm border border-white/10 shadow-2xl shadow-black/30 flex items-center"
+            className="magic-card min-h-[55vh] lg:min-h-[50vh] mx-auto max-w-4xl w-[92%] lg:w-[50%] p-6 lg:p-10 rounded-2xl lg:rounded-3xl bg-black border border-white/10 shadow-2xl shadow-black/30 flex items-center overflow-hidden"
           >
             <div className="relative z-10 w-full">
               <div className="flex items-start gap-4 lg:gap-5">
