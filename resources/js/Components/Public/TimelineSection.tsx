@@ -54,9 +54,6 @@ export default function TimelineSection() {
         />
       </picture>
 
-      {/* Dark overlay for legibility */}
-      <div className="absolute inset-0" />
-
       {/* Content */}
       <div className="relative z-10 flex flex-col lg:flex-row h-full min-h-[80vh] lg:min-h-screen">
         {/* Spacer — pushes timeline toward center */}

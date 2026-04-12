@@ -1,41 +1,31 @@
 import { useTranslation } from 'react-i18next';
 import { useRef } from 'react';
 import { Head } from '@inertiajs/react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import CapabilitiesSection from '@/Components/Public/CapabilitiesSection';
 import VisionMissionSection from '@/Components/Public/VisionMissionSection';
 import TimelineSection from '@/Components/Public/TimelineSection';
-import { TimelineContent } from '@/Components/ui/timeline-animation';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function About() {
   const { t } = useTranslation();
-  const introRef = useRef<HTMLDivElement>(null);
+  const { language } = useLanguage();
+  const isRtl = language === 'ar';
 
-  const revealVariants = {
-    visible: (i: number) => ({
-      y: 0,
-      opacity: 1,
-      filter: 'blur(0px)',
-      transition: { delay: i * 1.5, duration: 0.7 },
-    }),
-    hidden: {
-      filter: 'blur(10px)',
-      y: 40,
-      opacity: 0,
-    },
-  };
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start'],
+  });
 
-  const textVariants = {
-    visible: (i: number) => ({
-      filter: 'blur(0px)',
-      opacity: 1,
-      transition: { delay: i * 0.3, duration: 0.7 },
-    }),
-    hidden: {
-      filter: 'blur(10px)',
-      opacity: 0,
-    },
-  };
+  // Text container: start offset left, move further left on scroll
+  const textX = useTransform(scrollYProgress, [0, 0.5], [isRtl ? '40%' : '-40%', isRtl ? '70%' : '-70%']);
+  const textScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.85]);
+
+  // Image: fade in
+  const imageOpacity = useTransform(scrollYProgress, [0.2, 0.55], [0, 1]);
+  const imageX = useTransform(scrollYProgress, [0.2, 0.55], [isRtl ? '-30%' : '30%', '0%']);
 
   return (
     <PublicLayout>
@@ -44,57 +34,54 @@ export default function About() {
       {/* SEO h1 — visually hidden */}
       <h1 className="sr-only">{t('about.hero.title')}</h1>
 
-      {/* About Intro — animated large text with highlighted keywords */}
-      <section className="relative bg-black text-white pt-32 lg:pt-44 pb-20 lg:pb-32 overflow-hidden">
-        {/* Subtle grid texture */}
-        <div
-          className="absolute inset-0 opacity-60"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
-        <div className="relative max-w-6xl mx-auto px-4" ref={introRef}>
-          <TimelineContent
-            as="p"
-            animationNum={0}
-            timelineRef={introRef}
-            customVariants={revealVariants}
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl leading-[120%]! font-semibold text-white"
-          >
-            {t('about.intro.segment1')}{' '}
-            <TimelineContent
-              as="span"
-              animationNum={1}
-              timelineRef={introRef}
-              customVariants={textVariants}
-              className="text-primary border-2 border-primary/50 inline-block border-dotted px-2 rounded-md"
-            >
-              {t('about.intro.highlight1')}
-            </TimelineContent>{' '}
-            {t('about.intro.segment2')}{' '}
-            <TimelineContent
-              as="span"
-              animationNum={2}
-              timelineRef={introRef}
-              customVariants={textVariants}
-              className="text-sky-400 border-2 border-sky-400/50 inline-block border-dotted px-2 rounded-md"
-            >
-              {t('about.intro.highlight2')}
-            </TimelineContent>{' '}
-            {t('about.intro.segment3')}{' '}
-            <TimelineContent
-              as="span"
-              animationNum={3}
-              timelineRef={introRef}
-              customVariants={textVariants}
-              className="text-emerald-400 border-2 border-emerald-400/50 inline-block border-dotted px-2 rounded-md"
-            >
-              {t('about.intro.highlight3')}
-            </TimelineContent>
-          </TimelineContent>
-        </div>
-      </section>
+      {/* About Intro — scroll-driven center → side + image reveal */}
+      <div ref={sectionRef} className="relative h-[300vh]">
+        <section className="sticky top-0 h-screen bg-black text-white overflow-hidden">
+          {/* Grid texture */}
+          <div
+            className="absolute inset-0 opacity-60"
+            style={{
+              backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+              backgroundSize: '60px 60px',
+            }}
+          />
+
+          <div className="relative z-10 h-full flex items-center">
+            <div className="relative container mx-auto px-4 h-full flex items-center justify-center">
+              {/* Text */}
+              <motion.div
+                style={{ x: textX, scale: textScale }}
+                className="max-w-2xl text-start"
+              >
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight mb-4 lg:mb-6">
+                  {t('about.intro.headline')}
+                </h2>
+                <p className="text-lg sm:text-xl lg:text-2xl text-primary font-medium mb-4 lg:mb-6">
+                  {t('about.intro.subline')}
+                </p>
+                <p className="text-base sm:text-lg lg:text-xl text-white/70 leading-relaxed mb-3">
+                  {t('about.intro.body')}
+                </p>
+                <p className="text-lg sm:text-xl lg:text-2xl text-white font-semibold">
+                  {t('about.intro.highlight')}
+                </p>
+              </motion.div>
+
+              {/* Image — fades in from the side on scroll (absolute so it doesn't push text) */}
+              <motion.div
+                style={{ opacity: imageOpacity, x: imageX }}
+                className={`hidden lg:flex absolute top-0 bottom-0 items-center justify-center w-1/2 ${isRtl ? 'start-0' : 'end-0'}`}
+              >
+                <img
+                  src={`/images/products/renders/billets-${language === 'ar' ? 'ar' : 'en'}.webp`}
+                  alt={t('about.intro.highlight')}
+                  className="max-h-[70vh] w-auto object-contain"
+                />
+              </motion.div>
+            </div>
+          </div>
+        </section>
+      </div>
 
       {/* Vision & Mission */}
       <VisionMissionSection />
