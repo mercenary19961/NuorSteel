@@ -55,7 +55,7 @@ function VisionCard({ icon: Icon, title, highlight, description, large, index, f
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, margin: '-50px' }}
       transition={{ duration: 0.6, delay: index * 0.12, ease: 'easeOut' }}
-      className={`magic-card relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 lg:p-8 flex flex-col ${
+      className={`magic-card relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 lg:p-8 flex flex-col h-full ${
         large ? 'lg:col-span-1 lg:row-span-1' : ''
       }`}
     >
@@ -80,7 +80,7 @@ function VisionCard({ icon: Icon, title, highlight, description, large, index, f
           </span>
         )}
 
-        <p className="text-sm lg:text-base text-white/60 leading-relaxed mt-auto">
+        <p className="text-sm lg:text-base text-white/60 leading-relaxed">
           {sweepActive ? (
             <SweepText active offset={titleLen + highlightLen} fromColor="rgba(255,255,255,0.6)">{description}</SweepText>
           ) : description}
@@ -188,19 +188,15 @@ export default function VisionMissionSection() {
 
         {/* 4-column grid: small | large | large | small */}
         <MagicCardGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 max-w-6xl mx-auto lg:grid-rows-1 lg:auto-rows-fr">
-          {/* Established — smaller */}
           <div className="lg:col-span-1">
             <VisionCard {...cards[0]} sweepActive={activeSweepCard === 0} />
           </div>
-          {/* Vision — larger */}
-          <div className="lg:col-span-1 lg:[&>div]:min-h-70">
+          <div className="lg:col-span-1">
             <VisionCard {...cards[1]} sweepActive={activeSweepCard === 1} />
           </div>
-          {/* Mission — larger */}
-          <div className="lg:col-span-1 lg:[&>div]:min-h-70">
+          <div className="lg:col-span-1">
             <VisionCard {...cards[2]} sweepActive={activeSweepCard === 2} />
           </div>
-          {/* Employees — smaller */}
           <div className="lg:col-span-1">
             <VisionCard {...cards[3]} sweepActive={activeSweepCard === 3} />
           </div>

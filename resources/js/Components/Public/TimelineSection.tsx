@@ -1,89 +1,164 @@
-import { useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion, useInView } from 'framer-motion';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+const AUTO_ADVANCE_MS = 10_000;
 
 export default function TimelineSection() {
   const { t } = useTranslation();
-  const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: '-80px' });
+  const { language } = useLanguage();
+  const [active, setActive] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isRtl = language === 'ar';
 
-  const events = [
-    { year: t('about.timeline.events.0.year'), description: t('about.timeline.events.0.description') },
-    { year: t('about.timeline.events.1.year'), description: t('about.timeline.events.1.description') },
-    { year: t('about.timeline.events.2.year'), description: t('about.timeline.events.2.description') },
-    { year: t('about.timeline.events.3.year'), description: t('about.timeline.events.3.description') },
-    { year: t('about.timeline.events.4.year'), description: t('about.timeline.events.4.description') },
-    { year: t('about.timeline.events.5.year'), description: t('about.timeline.events.5.description') },
-  ];
+  const events = Array.from({ length: 6 }, (_, i) => ({
+    year: t(`about.timeline.events.${i}.year`),
+    title: t(`about.timeline.events.${i}.title`),
+    body: t(`about.timeline.events.${i}.body`),
+  }));
+
+  const resetTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setActive((prev) => (prev + 1) % events.length);
+    }, AUTO_ADVANCE_MS);
+  }, [events.length]);
+
+  useEffect(() => {
+    resetTimer();
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [resetTimer]);
+
+  const goTo = (index: number) => {
+    setActive(index);
+    resetTimer();
+  };
+
+  const goPrev = () => goTo((active - 1 + events.length) % events.length);
+  const goNext = () => goTo((active + 1) % events.length);
 
   return (
-    <section ref={sectionRef} className="relative py-16 lg:py-24 bg-black overflow-hidden">
-      {/* Subtle grid texture */}
-      <div
-        className="absolute inset-0 opacity-60"
-        style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-        }}
-      />
-      <div className="relative container mx-auto px-4">
-        {/* Section title */}
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center mb-12 lg:mb-16"
-        >
-          {t('about.timeline.title')}
-        </motion.h2>
+    <section className="relative w-full min-h-[80vh] lg:min-h-screen overflow-hidden bg-black">
+      {/* Background image */}
+      <picture>
+        <source media="(max-width: 639px)" srcSet={`/images/about/journey/bg-mobile-${language === 'ar' ? 'ar' : 'en'}.webp`} />
+        <img
+          src={`/images/about/journey/bg-desktop-${language === 'ar' ? 'ar' : 'en'}.webp`}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </picture>
 
-        {/* Horizontal scrollable on mobile, full width on desktop */}
-        <div className="overflow-x-auto pb-4 -mx-4 px-4 lg:mx-0 lg:px-0">
-          <div className="flex min-w-max lg:min-w-0 max-w-5xl mx-auto">
-            {events.map((event, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                animate={isInView ? { opacity: 1, y: 0 } : undefined}
-                transition={{ duration: 0.5, delay: index * 0.12 }}
-                className="flex flex-col items-center flex-1 min-w-35 lg:min-w-0 px-2 lg:px-1"
+      {/* Content */}
+      <div className="relative z-10 flex flex-col lg:flex-row h-full min-h-[80vh] lg:min-h-screen">
+        {/* Spacer — pushes timeline toward center */}
+        <div className="hidden lg:block lg:flex-1" />
+
+        {/* Timeline rail — left on LTR, right on RTL */}
+        <div className="order-2 lg:order-0 flex lg:flex-col items-center justify-center gap-0 py-6 lg:py-0 px-4 lg:px-8 shrink-0 overflow-x-auto">
+          {events.map((event, i) => (
+            <div key={i} className="flex flex-col lg:flex-col items-center relative">
+              {/* Connecting line above (desktop) / left (mobile) */}
+              {i > 0 && (
+                <div className="hidden lg:block w-px h-8 bg-white/20" />
+              )}
+              {i > 0 && (
+                <div className="lg:hidden w-8 h-px bg-white/20" />
+              )}
+
+              {/* Node + year */}
+              <button
+                onClick={() => goTo(i)}
+                className="group flex lg:flex-col items-center gap-2 lg:gap-1 cursor-pointer focus:outline-none"
               >
-                {/* Year label */}
-                <span className="text-sm lg:text-base font-semibold text-white mb-3">
+                {/* Year label — shown on desktop, hidden on mobile unless active */}
+                <span className={`hidden lg:block text-sm font-medium transition-colors whitespace-nowrap ${
+                  i === active ? 'text-primary' : 'text-white/50 group-hover:text-white/80'
+                }`}>
                   {event.year}
                 </span>
 
-                {/* Dot + connecting line */}
-                <div className="relative w-full flex justify-center py-1.5">
-                  {/* Left half of line */}
-                  {index > 0 && (
-                    <div className="absolute top-1/2 -translate-y-1/2 start-0 end-1/2 h-0.5 bg-white/20" />
-                  )}
-                  {/* Right half of line */}
-                  {index < events.length - 1 && (
-                    <div className="absolute top-1/2 -translate-y-1/2 start-1/2 end-0 h-0.5 bg-white/20" />
-                  )}
-                  {/* Dot */}
-                  <div className="w-3 h-3 rounded-full bg-primary relative z-10 shrink-0" />
+                {/* Circle */}
+                <div className={`rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
+                  i === active
+                    ? 'w-5 h-5 lg:w-6 lg:h-6 border-primary bg-primary shadow-[0_0_12px_rgba(255,122,0,0.5)]'
+                    : 'w-3.5 h-3.5 lg:w-4 lg:h-4 border-white/30 bg-transparent group-hover:border-white/60'
+                }`}>
+                  {i === active && <div className="w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full bg-white" />}
                 </div>
 
-                {/* Circular image placeholder */}
-                <div className="w-24 h-24 lg:w-28 lg:h-28 rounded-full overflow-hidden bg-gray-700 mt-5 mb-4 shrink-0 border-2 border-white/10 shadow-sm">
-                  <div className="w-full h-full bg-gray-700 flex items-center justify-center">
-                    <svg className="w-8 h-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
-                    </svg>
-                  </div>
-                </div>
+                {/* Year on mobile (below dot) */}
+                <span className={`lg:hidden text-xs font-medium whitespace-nowrap ${
+                  i === active ? 'text-primary' : 'text-white/40'
+                }`}>
+                  {event.year}
+                </span>
+              </button>
 
-                {/* Event description */}
-                <p className="text-xs lg:text-sm text-white/60 leading-relaxed text-center max-w-35 lg:max-w-40">
-                  {event.description}
-                </p>
-              </motion.div>
-            ))}
+              {/* Connecting line below (desktop) / right (mobile) */}
+              {i < events.length - 1 && (
+                <div className="hidden lg:block w-px h-8 bg-white/20" />
+              )}
+              {i < events.length - 1 && (
+                <div className="lg:hidden w-8 h-px bg-white/20" />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Content panel */}
+        <div className="order-1 lg:order-0 flex-1 flex flex-col justify-center px-6 sm:px-10 lg:ps-12 lg:pe-16 xl:pe-24 py-12 lg:py-16">
+          {/* Counter + navigation */}
+          <div className="flex items-center gap-4 mb-8 lg:mb-12">
+            <button
+              onClick={goPrev}
+              className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:border-white/50 transition-colors cursor-pointer"
+              aria-label="Previous"
+            >
+              {isRtl ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+            </button>
+            <span className="text-sm text-white/50 font-medium">
+              {active + 1} / {events.length}
+            </span>
+            <button
+              onClick={goNext}
+              className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:border-white/50 transition-colors cursor-pointer"
+              aria-label="Next"
+            >
+              {isRtl ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+            </button>
           </div>
+
+          {/* Event content */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={active}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4, ease: 'easeOut' }}
+            >
+              {/* Big year */}
+              <div className="text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-bold text-primary/80 mb-4 lg:mb-6 leading-none">
+                {events[active].year}
+              </div>
+
+              {/* Title */}
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-4 lg:mb-6 uppercase tracking-wide">
+                {events[active].title}
+              </h3>
+
+              {/* Body */}
+              <p className="text-sm sm:text-base lg:text-lg text-white/70 leading-relaxed max-w-3xl">
+                {events[active].body}
+              </p>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </section>

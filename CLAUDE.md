@@ -104,7 +104,7 @@
 - [x] `vendor-lenis` Vite chunk for code splitting
 - [x] i18n translations for all capabilities (EN + AR)
 - [x] Vision & Mission: 4-card grid with cascading character-by-character color sweep animation (cycles through all cards continuously)
-- [x] Timeline section: horizontal layout with hardcoded i18n events (6 milestones), circular image placeholders, staggered entrance animation (`resources/js/Components/Public/TimelineSection.tsx`)
+- [x] Timeline section redesigned: vertical rail + content panel layout, language-aware background image (`/images/about/journey/bg-desktop-en.webp` etc.), auto-advance every 10s, navigation arrows, `AnimatePresence` content transitions, full bilingual titles + body text for 6 milestones (`resources/js/Components/Public/TimelineSection.tsx`)
 - [x] Governance section removed from About page
 - [x] Unified horizontal (left-to-right) gradients across all About sections for seamless transitions (`from-gray-900 to-gray-800`)
 
@@ -224,6 +224,7 @@
 - [x] `useScrollDirection` hook: idle timer starts on page load (header auto-hides at top too), mouse movement resets idle and restores header visibility
 - [x] Vision 2030: mobile logo enlarged (`h-36`), text sizes reduced (`text-sm`), spacing tightened
 - [x] Vision & Mission cards: compact sizing (smaller padding `p-5 lg:p-6`, smaller text `text-base lg:text-lg` titles, `text-sm` body, reduced gaps `gap-4 lg:gap-6`)
+- [x] Vision & Mission cards: equalized heights via `auto-rows-fr` + `h-full`, content top-aligned (removed `mt-auto` on description)
 - [x] About section description and CTA button: reduced sizes for balanced layout
 - [x] Favicon assets added: `favicon-32.png`, `favicon-16.png`, `apple-touch-icon.png`, `favicon.ico` with `<link>` tags in `app.blade.php`
 - [x] Container max-width capped at 1280px from `xl` upward — prevents abrupt layout jump at the `2xl` breakpoint (`app.css` media query)
@@ -243,6 +244,14 @@
 - [x] Production seeders: site_content data migration (`2026_04_08_130000_seed_site_content_and_fix_certificate_media.php`) seeds editable CMS content + fixes certificate media links on fresh deploy
 - [x] Media on Railway ephemeral filesystem: product images (TMT bars, billets) tracked in git at `storage/app/private/media/` via `.gitignore` exception; data migration (`2026_04_08_140000_fix_media_paths_for_ephemeral_storage.php`) normalizes media paths
 - [x] CSRF 419 handling: `app.tsx` listens to Inertia `error` event and auto-reloads on 419 (expired CSRF token during language toggle) instead of showing a broken state
+- [x] Unified icon styling across public pages: Certificates, Career, and Quality card icons changed to `text-white` with `bg-white/5` containers (consistent look)
+- [x] Arabic product names updated: "قضبان حديد التسليح" → "حديد التسليح", "كتل الصلب" → "ستيل بِليت" (data migration `2026_04_11_120000_update_product_arabic_names.php`)
+- [x] Products page: new 3D render images (webp) for TMT Bars and Billets, language-aware (`tmt-bars-en.webp`/`tmt-bars-ar.webp`)
+- [x] Products page: right panel changed from warehouse image to black grid texture background
+- [x] Products page: faint warehouse overlay on orange left panel (only in Explore More expanded view, `opacity-10`)
+- [x] Products page: mobile redesign — orange bg, white buttons with orange text, clean thumbnails, product image inside orange panel, nav button below thumbnails
+- [x] Products page: RTL clip-path diagonal properly mirrored (fixed SVG path math for Arabic)
+- [x] Products page: tab button border flash fix (`border-transparent` on active state)
 
 ### Site-Wide Visual Consistency (DONE)
 - [x] Unified `bg-linear-to-r from-gray-900 to-gray-800` gradient across all public page sections (Home, About, Quality, Career)
@@ -704,4 +713,4 @@ public/images/shared/          → Shared images (logo/)
 
 ---
 
-> **Last updated:** 2026-04-11 — production seeders (users, site_content, media paths), git-tracked product media for Railway ephemeral FS, 419 CSRF auto-reload, Products page container alignment
+> **Last updated:** 2026-04-12 — Our Journey timeline redesign (vertical rail + bg image), Products page mobile redesign + RTL fix + new renders, unified white icon styling across pages, Vision & Mission equal-height cards, Arabic product name updates

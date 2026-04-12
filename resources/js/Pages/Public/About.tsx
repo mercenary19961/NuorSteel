@@ -1,41 +1,47 @@
 import { useTranslation } from 'react-i18next';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import CapabilitiesSection from '@/Components/Public/CapabilitiesSection';
 import VisionMissionSection from '@/Components/Public/VisionMissionSection';
 import TimelineSection from '@/Components/Public/TimelineSection';
-import { TimelineContent } from '@/Components/ui/timeline-animation';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function About() {
   const { t } = useTranslation();
-  const introRef = useRef<HTMLDivElement>(null);
+  const { language } = useLanguage();
+  const isRtl = language === 'ar';
 
-  const revealVariants = {
-    visible: (i: number) => ({
-      y: 0,
-      opacity: 1,
-      filter: 'blur(0px)',
-      transition: { delay: i * 1.5, duration: 0.7 },
-    }),
-    hidden: {
-      filter: 'blur(10px)',
-      y: 40,
-      opacity: 0,
-    },
-  };
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start'],
+  });
 
-  const textVariants = {
-    visible: (i: number) => ({
-      filter: 'blur(0px)',
-      opacity: 1,
-      transition: { delay: i * 0.3, duration: 0.7 },
-    }),
-    hidden: {
-      filter: 'blur(10px)',
-      opacity: 0,
-    },
-  };
+  // Text container: start offset left, move further left on scroll
+  const textX = useTransform(scrollYProgress, [0, 0.5], [isRtl ? '40%' : '-40%', isRtl ? '70%' : '-70%']);
+  const textScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.85]);
+
+  // TMT image: visible initially, fades out on scroll
+  const tmtOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
+  const tmtX = useTransform(scrollYProgress, [0, 0.15], ['0%', isRtl ? '-30%' : '30%']);
+
+  // Billets image: fades in after TMT fades out
+  const billetsOpacity = useTransform(scrollYProgress, [0.2, 0.45], [0, 1]);
+  const billetsX = useTransform(scrollYProgress, [0.2, 0.45], [isRtl ? '-30%' : '30%', '0%']);
+
+  // Shifting green letters for "Saudi Arabia" / "المملكة العربية السعودية"
+  const highlightText = t('about.intro.headlineHighlight');
+  const GREEN_COUNT = 3;
+  const [greenStart, setGreenStart] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setGreenStart((prev) => (prev + 1) % highlightText.length);
+    }, 150);
+    return () => clearInterval(interval);
+  }, [highlightText.length]);
 
   return (
     <PublicLayout>
@@ -44,57 +50,83 @@ export default function About() {
       {/* SEO h1 — visually hidden */}
       <h1 className="sr-only">{t('about.hero.title')}</h1>
 
-      {/* About Intro — animated large text with highlighted keywords */}
-      <section className="relative bg-black text-white pt-32 lg:pt-44 pb-20 lg:pb-32 overflow-hidden">
-        {/* Subtle grid texture */}
-        <div
-          className="absolute inset-0 opacity-60"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
-        <div className="relative max-w-6xl mx-auto px-4" ref={introRef}>
-          <TimelineContent
-            as="p"
-            animationNum={0}
-            timelineRef={introRef}
-            customVariants={revealVariants}
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl leading-[120%]! font-semibold text-white"
-          >
-            {t('about.intro.segment1')}{' '}
-            <TimelineContent
-              as="span"
-              animationNum={1}
-              timelineRef={introRef}
-              customVariants={textVariants}
-              className="text-primary border-2 border-primary/50 inline-block border-dotted px-2 rounded-md"
-            >
-              {t('about.intro.highlight1')}
-            </TimelineContent>{' '}
-            {t('about.intro.segment2')}{' '}
-            <TimelineContent
-              as="span"
-              animationNum={2}
-              timelineRef={introRef}
-              customVariants={textVariants}
-              className="text-sky-400 border-2 border-sky-400/50 inline-block border-dotted px-2 rounded-md"
-            >
-              {t('about.intro.highlight2')}
-            </TimelineContent>{' '}
-            {t('about.intro.segment3')}{' '}
-            <TimelineContent
-              as="span"
-              animationNum={3}
-              timelineRef={introRef}
-              customVariants={textVariants}
-              className="text-emerald-400 border-2 border-emerald-400/50 inline-block border-dotted px-2 rounded-md"
-            >
-              {t('about.intro.highlight3')}
-            </TimelineContent>
-          </TimelineContent>
-        </div>
-      </section>
+      {/* About Intro — scroll-driven center → side + image reveal */}
+      <div ref={sectionRef} className="relative h-[300vh]">
+        <section className="sticky top-0 h-screen bg-black text-white overflow-hidden">
+          {/* Grid texture */}
+          <div
+            className="absolute inset-0 opacity-60"
+            style={{
+              backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
+              backgroundSize: '60px 60px',
+            }}
+          />
+
+          <div className="relative z-10 h-full flex items-center">
+            <div className="relative container mx-auto px-4 h-full flex items-center justify-center">
+              {/* Text */}
+              <motion.div
+                style={{ x: textX, scale: textScale }}
+                className="max-w-2xl text-start"
+              >
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight mb-4 lg:mb-6">
+                  {t('about.intro.headline')}{' '}
+                  <span className="whitespace-nowrap">
+                    {highlightText.split('').map((char, i) => {
+                      let isGreen = false;
+                      for (let g = 0; g < GREEN_COUNT; g++) {
+                        if ((greenStart + g) % highlightText.length === i) { isGreen = true; break; }
+                      }
+                      return (
+                        <span
+                          key={i}
+                          className="transition-colors duration-500"
+                          style={{ color: isGreen ? '#00A651' : 'white' }}
+                        >
+                          {char}
+                        </span>
+                      );
+                    })}
+                  </span>
+                </h2>
+                <p className="text-sm sm:text-base lg:text-lg text-primary font-medium mb-4 lg:mb-6">
+                  {t('about.intro.subline')}
+                </p>
+                <p className="text-xs sm:text-sm lg:text-base text-white/70 leading-relaxed mb-3">
+                  {t('about.intro.body')}
+                </p>
+                <p className="text-lg sm:text-xl lg:text-2xl text-white font-semibold">
+                  {t('about.intro.highlight')}
+                </p>
+              </motion.div>
+
+              {/* TMT image — visible initially, fades out to the side on scroll */}
+              <motion.div
+                style={{ opacity: tmtOpacity, x: tmtX }}
+                className={`hidden lg:flex absolute top-0 bottom-0 items-center justify-center w-1/2 ${isRtl ? 'start-0' : 'end-0'}`}
+              >
+                <img
+                  src={`/images/products/renders/tmt-bars-${language === 'ar' ? 'ar' : 'en'}.webp`}
+                  alt="TMT Rebars"
+                  className="max-h-[50vh] w-auto object-contain"
+                />
+              </motion.div>
+
+              {/* Billets image — fades in from the side after TMT fades out */}
+              <motion.div
+                style={{ opacity: billetsOpacity, x: billetsX }}
+                className={`hidden lg:flex absolute top-0 bottom-0 items-center justify-center w-1/2 ${isRtl ? 'start-0' : 'end-0'}`}
+              >
+                <img
+                  src={`/images/products/renders/billets-${language === 'ar' ? 'ar' : 'en'}.webp`}
+                  alt={t('about.intro.highlight')}
+                  className="max-h-[70vh] w-auto object-contain"
+                />
+              </motion.div>
+            </div>
+          </div>
+        </section>
+      </div>
 
       {/* Vision & Mission */}
       <VisionMissionSection />
