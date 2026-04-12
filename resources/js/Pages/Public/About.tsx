@@ -31,6 +31,7 @@ export default function About() {
   const highlightText = t('about.intro.headlineHighlight');
   const GREEN_COUNT = 3;
   const [greenStart, setGreenStart] = useState(0);
+  const [mobileAnimated, setMobileAnimated] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -39,6 +40,12 @@ export default function About() {
     return () => clearInterval(interval);
   }, [highlightText.length]);
 
+  // Trigger mobile animation on mount
+  useEffect(() => {
+    const timer = setTimeout(() => setMobileAnimated(true), 800);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <PublicLayout>
       <Head title="About Us" />
@@ -46,12 +53,11 @@ export default function About() {
       {/* SEO h1 — visually hidden */}
       <h1 className="sr-only">{t('about.hero.title')}</h1>
 
-      {/* About Intro — scroll-driven text + logo assembly */}
-      <div ref={sectionRef} className="relative h-[300vh]">
+      {/* About Intro — Desktop: scroll-driven | Mobile: time-based animation */}
+      {/* Desktop */}
+      <div ref={sectionRef} className="relative hidden lg:block h-[300vh]">
         <section className="sticky top-0 h-screen bg-black text-white overflow-hidden">
-          {/* Background image */}
           <picture>
-            <source media="(max-width: 639px)" srcSet={`/images/about/hero/bg-mobile-${isRtl ? 'ar' : 'en'}.webp`} />
             <img
               src={`/images/about/hero/bg-desktop-${isRtl ? 'ar' : 'en'}.webp`}
               alt=""
@@ -59,18 +65,15 @@ export default function About() {
               className="absolute inset-0 w-full h-full object-cover"
             />
           </picture>
-
-          {/* Dark overlay for readability */}
           <div className="absolute inset-0 bg-black/40" />
 
           <div className="relative z-10 h-full flex items-center">
             <div className="relative container mx-auto px-4 h-full flex items-center justify-center">
-              {/* Text */}
               <motion.div
                 style={{ x: textX, scale: textScale }}
                 className="max-w-2xl text-start"
               >
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight mb-4 lg:mb-6">
+                <h2 className="text-5xl xl:text-6xl font-bold text-white leading-tight mb-6">
                   {t('about.intro.headline')}{' '}
                   <span className="whitespace-nowrap">
                     {highlightText.split('').map((char, i) => {
@@ -90,19 +93,18 @@ export default function About() {
                     })}
                   </span>
                 </h2>
-                <p className="text-sm sm:text-base lg:text-lg text-primary font-medium mb-4 lg:mb-6">
+                <p className="text-lg text-primary font-medium mb-6">
                   {t('about.intro.subline')}
                 </p>
-                <p className="text-xs sm:text-sm lg:text-base text-white/70 leading-relaxed mb-3">
+                <p className="text-base text-white/70 leading-relaxed mb-3">
                   {t('about.intro.body')}
                 </p>
-                <p className="text-lg sm:text-xl lg:text-2xl text-white font-semibold">
+                <p className="text-2xl text-white font-semibold">
                   {t('about.intro.highlight')}
                 </p>
               </motion.div>
 
-              {/* Logo — right side on desktop */}
-              <div className={`hidden lg:flex absolute top-0 bottom-0 items-center justify-center w-1/2 ${isRtl ? 'start-0' : 'end-0'}`}>
+              <div className={`flex absolute top-0 bottom-0 items-center justify-center w-1/2 ${isRtl ? 'start-0' : 'end-0'}`}>
                 <motion.img
                   src="/images/about/hero/logo.webp"
                   alt="Nuor Steel"
@@ -117,6 +119,67 @@ export default function About() {
           </div>
         </section>
       </div>
+
+      {/* Mobile */}
+      <section className="lg:hidden relative min-h-screen bg-black text-white overflow-hidden">
+        <img
+          src={`/images/about/hero/bg-mobile-${isRtl ? 'ar' : 'en'}.webp`}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/40" />
+
+        <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-5 py-16">
+          {/* Logo — slides down from above */}
+          <motion.img
+            src="/images/about/hero/logo.webp"
+            alt="Nuor Steel"
+            className="w-48 sm:w-56 h-auto mb-8"
+            initial={{ opacity: 0, y: -40 }}
+            animate={mobileAnimated ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+          />
+
+          {/* Text — slides up into place */}
+          <motion.div
+            className="text-center"
+            initial={{ opacity: 0, y: 30 }}
+            animate={mobileAnimated ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, ease: 'easeOut', delay: 0.3 }}
+          >
+            <h2 className="text-3xl sm:text-4xl font-bold text-white leading-tight mb-4">
+              {t('about.intro.headline')}{' '}
+              <span className="whitespace-nowrap">
+                {highlightText.split('').map((char, i) => {
+                  let isGreen = false;
+                  for (let g = 0; g < GREEN_COUNT; g++) {
+                    if ((greenStart + g) % highlightText.length === i) { isGreen = true; break; }
+                  }
+                  return (
+                    <span
+                      key={i}
+                      className="transition-colors duration-500"
+                      style={{ color: isGreen ? '#00A651' : 'white' }}
+                    >
+                      {char}
+                    </span>
+                  );
+                })}
+              </span>
+            </h2>
+            <p className="text-sm sm:text-base text-primary font-medium mb-4">
+              {t('about.intro.subline')}
+            </p>
+            <p className="text-xs sm:text-sm text-white/70 leading-relaxed mb-3">
+              {t('about.intro.body')}
+            </p>
+            <p className="text-lg sm:text-xl text-white font-semibold">
+              {t('about.intro.highlight')}
+            </p>
+          </motion.div>
+        </div>
+      </section>
 
       {/* Vision & Mission */}
       <VisionMissionSection />

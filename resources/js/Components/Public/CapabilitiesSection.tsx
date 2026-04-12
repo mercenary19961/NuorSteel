@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { motion, useInView } from 'framer-motion';
 import { Factory, Cpu, Building2, FlaskConical, Wrench } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import type { LucideIcon } from 'lucide-react';
@@ -14,6 +15,28 @@ const capabilities: { icon: LucideIcon; key: string }[] = [
 ];
 
 const CARD_COUNT = capabilities.length;
+
+function MobileFlipCard({ children, index }: { children: React.ReactNode; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-50px' });
+
+  return (
+    <motion.div
+      ref={ref}
+      className="rounded-2xl bg-black border border-white/10 p-5 flex items-start gap-4"
+      initial={{ opacity: 0, rotateX: 60 }}
+      animate={isInView ? { opacity: 1, rotateX: 0 } : {}}
+      transition={{
+        duration: 0.6,
+        ease: 'easeOut',
+        delay: index * 0.1,
+      }}
+      style={{ transformOrigin: 'top center' }}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 export default function CapabilitiesSection() {
   const { t } = useTranslation();
@@ -134,7 +157,7 @@ export default function CapabilitiesSection() {
             </div>
           </div>
         ) : (
-          /* ── Mobile: simple stacked layout ── */
+          /* ── Mobile: flip-in cards ── */
           <div className="relative z-10 py-16 px-4">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold text-white mb-3">
@@ -144,12 +167,9 @@ export default function CapabilitiesSection() {
                 {t('about.capabilities.subtitle')}
               </p>
             </div>
-            <div className="flex flex-col gap-4 max-w-md mx-auto">
-              {capabilities.map(({ icon: Icon, key }) => (
-                <div
-                  key={key}
-                  className="rounded-2xl bg-black border border-white/10 p-5 flex items-start gap-4"
-                >
+            <div className="flex flex-col gap-4 max-w-md mx-auto" style={{ perspective: '800px' }}>
+              {capabilities.map(({ icon: Icon, key }, i) => (
+                <MobileFlipCard key={key} index={i}>
                   <div className="shrink-0 w-11 h-11 rounded-xl bg-primary/20 flex items-center justify-center">
                     <Icon className="text-primary" size={22} />
                   </div>
@@ -161,7 +181,7 @@ export default function CapabilitiesSection() {
                       {t(`about.capabilities.${key}.description`)}
                     </p>
                   </div>
-                </div>
+                </MobileFlipCard>
               ))}
             </div>
           </div>
