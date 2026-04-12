@@ -3,20 +3,155 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 const AUTO_ADVANCE_MS = 10_000;
 const EVENT_COUNT = 6;
 
-export default function TimelineSection() {
+/* ─────────────────────────────────────────────
+   Mobile: Swipeable card carousel
+   ───────────────────────────────────────────── */
+function MobileTimeline() {
+  const { t } = useTranslation();
+  const { language } = useLanguage();
+  const isRtl = language === 'ar';
+  const [active, setActive] = useState(0);
+  const touchStartRef = useRef(0);
+  const touchDeltaRef = useRef(0);
+
+  const events = Array.from({ length: EVENT_COUNT }, (_, i) => ({
+    year: t(`about.timeline.events.${i}.year`),
+    title: t(`about.timeline.events.${i}.title`),
+    body: t(`about.timeline.events.${i}.body`),
+  }));
+
+  const goNext = () => setActive((prev) => (prev + 1) % EVENT_COUNT);
+  const goPrev = () => setActive((prev) => (prev - 1 + EVENT_COUNT) % EVENT_COUNT);
+
+  // Auto-advance
+  useEffect(() => {
+    const timer = setInterval(goNext, AUTO_ADVANCE_MS);
+    return () => clearInterval(timer);
+  }, [active]);
+
+  // Touch swipe handlers
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartRef.current = e.touches[0].clientX;
+    touchDeltaRef.current = 0;
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    touchDeltaRef.current = e.touches[0].clientX - touchStartRef.current;
+  };
+  const onTouchEnd = () => {
+    const threshold = 50;
+    if (isRtl) {
+      if (touchDeltaRef.current > threshold) goNext();
+      else if (touchDeltaRef.current < -threshold) goPrev();
+    } else {
+      if (touchDeltaRef.current < -threshold) goNext();
+      else if (touchDeltaRef.current > threshold) goPrev();
+    }
+  };
+
+  return (
+    <section className="relative bg-black overflow-hidden">
+      {/* Background image */}
+      <img
+        src={`/images/about/journey/bg-mobile-${language === 'ar' ? 'ar' : 'en'}.webp`}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+
+      <div className="relative z-10 min-h-[85vh] flex flex-col px-5 py-12">
+        {/* Section title */}
+        <h2 className="text-2xl font-bold text-white mb-8 text-center">
+          {t('about.timeline.title')}
+        </h2>
+
+        {/* Card area */}
+        <div
+          className="flex-1 flex flex-col justify-center"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={active}
+              initial={{ opacity: 0, x: isRtl ? -60 : 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: isRtl ? 60 : -60 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+              className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6"
+            >
+              <div className="text-5xl font-bold text-primary/80 mb-3 leading-none">
+                {events[active].year}
+              </div>
+              <h3 className="text-lg font-bold text-white mb-3 uppercase tracking-wide">
+                {events[active].title}
+              </h3>
+              <p className="text-sm text-white/90 leading-relaxed">
+                {events[active].body}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Navigation arrows + counter */}
+        <div className="flex items-center justify-center gap-4 mt-6 mb-4">
+          <button
+            onClick={goPrev}
+            className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center text-white/60 active:text-white cursor-pointer"
+            aria-label="Previous"
+          >
+            {isRtl ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          </button>
+          <span className="text-sm text-white/50 font-medium">
+            {active + 1} / {EVENT_COUNT}
+          </span>
+          <button
+            onClick={goNext}
+            className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center text-white/60 active:text-white cursor-pointer"
+            aria-label="Next"
+          >
+            {isRtl ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+          </button>
+        </div>
+
+        {/* Dot indicators */}
+        <div className="flex items-center justify-center gap-2">
+          {events.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setActive(i)}
+              className={`rounded-full transition-all duration-300 cursor-pointer ${
+                i === active
+                  ? 'w-6 h-2 bg-primary'
+                  : 'w-2 h-2 bg-white/30'
+              }`}
+              aria-label={`Go to event ${i + 1}`}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   Desktop: Scroll-driven timeline (unchanged)
+   ───────────────────────────────────────────── */
+function DesktopTimeline() {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const [active, setActive] = useState(0);
   const [fillProgress, setFillProgress] = useState(0);
-  const activeRef = useRef(0); // always mirrors `active` for use in closures
+  const activeRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const progressRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const modeRef = useRef<'auto' | 'scroll' | 'manual'>('auto');
-  const isAutoScrollingRef = useRef(false); // true during programmatic smooth scroll
+  const isAutoScrollingRef = useRef(false);
   const isRtl = language === 'ar';
 
   const events = Array.from({ length: EVENT_COUNT }, (_, i) => ({
@@ -25,29 +160,23 @@ export default function TimelineSection() {
     body: t(`about.timeline.events.${i}.body`),
   }));
 
-  // --- Helpers to stop all timers ---
   const stopAll = useCallback(() => {
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
     if (progressRef.current) { clearInterval(progressRef.current); progressRef.current = null; }
   }, []);
 
-  // --- Scroll the page to match a given event index ---
   const scrollToEvent = useCallback((idx: number) => {
     const wrapper = wrapperRef.current;
     if (!wrapper || typeof window === 'undefined') return;
     const rect = wrapper.getBoundingClientRect();
     const wrapperTop = window.scrollY + rect.top;
     const wrapperHeight = rect.height;
-    // Each event occupies 1/EVENT_COUNT of the wrapper
     const targetScroll = wrapperTop + (idx / EVENT_COUNT) * wrapperHeight;
-    // Temporarily ignore scroll events so they don't fight auto
     isAutoScrollingRef.current = true;
     window.scrollTo({ top: targetScroll, behavior: 'smooth' });
-    // Re-allow scroll events after the smooth scroll settles
     setTimeout(() => { isAutoScrollingRef.current = false; }, 800);
   }, []);
 
-  // --- Auto-advance: fill line segment over AUTO_ADVANCE_MS, then switch ---
   const startAuto = useCallback((fromIdx: number) => {
     stopAll();
     modeRef.current = 'auto';
@@ -80,7 +209,6 @@ export default function TimelineSection() {
     }, stepMs);
   }, [stopAll, scrollToEvent]);
 
-  // Start auto only when section is in view
   const sectionRef = useRef<HTMLElement>(null);
   const isInViewRef = useRef(false);
 
@@ -96,7 +224,7 @@ export default function TimelineSection() {
           startAuto(activeRef.current);
         } else {
           stopAll();
-          modeRef.current = 'auto'; // reset mode so scroll can take over when re-entering
+          modeRef.current = 'auto';
         }
       },
       { threshold: 0.3 },
@@ -109,7 +237,6 @@ export default function TimelineSection() {
     };
   }, [startAuto, stopAll]);
 
-  // --- Scroll-driven ---
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: wrapperRef,
@@ -120,9 +247,8 @@ export default function TimelineSection() {
 
   useMotionValueEvent(scrollYProgress, 'change', (v) => {
     if (modeRef.current === 'manual') return;
-    if (isAutoScrollingRef.current) return; // ignore programmatic scroll
+    if (isAutoScrollingRef.current) return;
 
-    // Switch to scroll mode, stop auto
     if (modeRef.current === 'auto') {
       stopAll();
       modeRef.current = 'scroll';
@@ -133,7 +259,6 @@ export default function TimelineSection() {
     setActive(idx);
     setFillProgress(Math.min(EVENT_COUNT - 1, v * EVENT_COUNT));
 
-    // Restart auto after scroll stops for 3s
     if (scrollIdleRef.current) clearTimeout(scrollIdleRef.current);
     scrollIdleRef.current = setTimeout(() => {
       if (modeRef.current === 'scroll') {
@@ -142,7 +267,6 @@ export default function TimelineSection() {
     }, 3000);
   });
 
-  // --- Manual (click / arrows) ---
   const goTo = (index: number) => {
     stopAll();
     modeRef.current = 'manual';
@@ -150,7 +274,6 @@ export default function TimelineSection() {
     setActive(index);
     setFillProgress(index);
 
-    // Restart auto from the NEW position after 2s
     const restartIdx = index;
     setTimeout(() => {
       if (modeRef.current === 'manual') {
@@ -165,9 +288,7 @@ export default function TimelineSection() {
   return (
     <div ref={wrapperRef} className="relative" style={{ height: `${EVENT_COUNT * 100}vh` }}>
       <section ref={sectionRef} className="sticky top-0 h-screen w-full overflow-hidden bg-black">
-        {/* Background image */}
         <picture>
-          <source media="(max-width: 639px)" srcSet={`/images/about/journey/bg-mobile-${language === 'ar' ? 'ar' : 'en'}.webp`} />
           <img
             src={`/images/about/journey/bg-desktop-${language === 'ar' ? 'ar' : 'en'}.webp`}
             alt=""
@@ -176,21 +297,16 @@ export default function TimelineSection() {
           />
         </picture>
 
-        {/* Content */}
-        <div className="relative z-10 flex flex-col lg:flex-row h-full">
-          {/* Spacer */}
-          <div className="hidden lg:block lg:flex-1" />
+        <div className="relative z-10 flex flex-row h-full">
+          <div className="flex-1" />
 
           {/* Timeline rail */}
-          <div className="order-2 lg:order-0 relative flex lg:flex-col items-center justify-center gap-0 py-6 lg:py-0 px-4 lg:px-8 shrink-0 overflow-x-auto">
+          <div className="relative flex flex-col items-center justify-center gap-0 px-8 shrink-0">
             {events.map((event, i) => (
-              <div key={i} className="flex lg:flex-col items-center relative">
-                {/* Connecting segment — desktop vertical / mobile horizontal */}
+              <div key={i} className="flex flex-col items-center relative">
                 {i > 0 && (
-                  <div className="hidden lg:block w-px h-8 relative">
-                    {/* Grey track */}
+                  <div className="w-px h-8 relative">
                     <div className="absolute inset-0 bg-white/10" />
-                    {/* Orange fill — fills if this segment is completed */}
                     <div
                       className="absolute top-0 left-0 right-0 bg-primary transition-[height] duration-300 ease-out"
                       style={{
@@ -199,56 +315,34 @@ export default function TimelineSection() {
                     />
                   </div>
                 )}
-                {i > 0 && (
-                  <div className="lg:hidden h-px w-8 relative">
-                    <div className="absolute inset-0 bg-white/10" />
-                    <div
-                      className="absolute top-0 left-0 bottom-0 bg-primary transition-[width] duration-300 ease-out"
-                      style={{
-                        width: fillProgress >= i ? '100%' : fillProgress > i - 1 ? `${(fillProgress - (i - 1)) * 100}%` : '0%',
-                      }}
-                    />
-                  </div>
-                )}
 
-                {/* Node + year */}
                 <button
                   onClick={() => goTo(i)}
-                  className="group flex lg:flex-col items-center gap-2 lg:gap-1 cursor-pointer focus:outline-none"
+                  className="group flex flex-col items-center gap-1 cursor-pointer focus:outline-none"
                 >
-                  {/* Year label — desktop */}
-                  <span className={`hidden lg:block text-sm font-medium transition-colors whitespace-nowrap ${
+                  <span className={`text-sm font-medium transition-colors whitespace-nowrap ${
                     i === active ? 'text-primary' : i <= fillProgress ? 'text-primary/70' : 'text-white/50 group-hover:text-white/80'
                   }`}>
                     {event.year}
                   </span>
 
-                  {/* Circle */}
                   <div className={`rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
                     i === active
-                      ? 'w-5 h-5 lg:w-6 lg:h-6 border-primary bg-primary shadow-[0_0_12px_rgba(255,122,0,0.5)]'
+                      ? 'w-6 h-6 border-primary bg-primary shadow-[0_0_12px_rgba(255,122,0,0.5)]'
                       : i < fillProgress
-                        ? 'w-3.5 h-3.5 lg:w-4 lg:h-4 border-primary bg-primary/40'
-                        : 'w-3.5 h-3.5 lg:w-4 lg:h-4 border-white/30 bg-transparent group-hover:border-white/60'
+                        ? 'w-4 h-4 border-primary bg-primary/40'
+                        : 'w-4 h-4 border-white/30 bg-transparent group-hover:border-white/60'
                   }`}>
-                    {i === active && <div className="w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full bg-white" />}
+                    {i === active && <div className="w-2.5 h-2.5 rounded-full bg-white" />}
                   </div>
-
-                  {/* Year — mobile */}
-                  <span className={`lg:hidden text-xs font-medium whitespace-nowrap ${
-                    i === active ? 'text-primary' : 'text-white/40'
-                  }`}>
-                    {event.year}
-                  </span>
                 </button>
               </div>
             ))}
           </div>
 
           {/* Content panel */}
-          <div className="order-1 lg:order-0 flex-1 flex flex-col justify-center px-6 sm:px-10 lg:ps-12 lg:pe-16 xl:pe-24 py-12 lg:py-16">
-            {/* Counter + navigation */}
-            <div className="flex items-center gap-4 mb-8 lg:mb-12">
+          <div className="flex-1 flex flex-col justify-center ps-12 pe-16 xl:pe-24 py-16">
+            <div className="flex items-center gap-4 mb-12">
               <button
                 onClick={goPrev}
                 className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center text-white/60 hover:text-white hover:border-white/50 transition-colors cursor-pointer"
@@ -268,7 +362,6 @@ export default function TimelineSection() {
               </button>
             </div>
 
-            {/* Event content */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={active}
@@ -277,13 +370,13 @@ export default function TimelineSection() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
               >
-                <div className="text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-bold text-primary/80 mb-4 lg:mb-6 leading-none">
+                <div className="text-8xl xl:text-9xl font-bold text-primary/80 mb-6 leading-none">
                   {events[active].year}
                 </div>
-                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-4 lg:mb-6 uppercase tracking-wide">
+                <h3 className="text-3xl font-bold text-white mb-6 uppercase tracking-wide">
                   {events[active].title}
                 </h3>
-                <p className="text-sm sm:text-base lg:text-lg text-white/70 leading-relaxed max-w-3xl">
+                <p className="text-lg text-white/70 leading-relaxed max-w-3xl">
                   {events[active].body}
                 </p>
               </motion.div>
@@ -293,4 +386,12 @@ export default function TimelineSection() {
       </section>
     </div>
   );
+}
+
+/* ─────────────────────────────────────────────
+   Export: picks desktop or mobile
+   ───────────────────────────────────────────── */
+export default function TimelineSection() {
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
+  return isDesktop ? <DesktopTimeline /> : <MobileTimeline />;
 }
