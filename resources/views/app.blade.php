@@ -9,8 +9,9 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 
-    <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Cairo:wght@200..1000&display=swap" rel="stylesheet" />
 
     {{-- Preload hero LCP image so the browser starts fetching it in parallel with JS/CSS
          instead of waiting for React to render the <img>. Uses the session locale so

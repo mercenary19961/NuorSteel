@@ -61,7 +61,7 @@ export default function About() {
             src={`/images/about/hero/bg-desktop-${isRtl ? 'ar' : 'en'}.webp`}
             alt=""
             aria-hidden="true"
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover object-bottom"
           />
         </picture>
         <div className="absolute inset-0 bg-black/40" />
