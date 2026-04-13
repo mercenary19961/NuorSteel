@@ -99,7 +99,7 @@ const en = {
       headline: "Nuor Steel is A Leading Steel Manufacturer in",
       headlineHighlight: "Saudi Arabia",
       subline: "Founded in 2010 and headquartered in Al Kharj Industrial City",
-      body: "From a steel trading business to a fully integrated steel producer, Nuor Steel delivers advanced manufacturing capabilities for:",
+      body: "From a steel trading business to a fully integrated steel producer,\nNuor Steel delivers advanced manufacturing capabilities for:",
       highlight: "High-Quality Steel Billets & TMT Rebars",
     },
     visionMission: {

@@ -64,7 +64,7 @@
 ### Homepage Redesign (DONE)
 - [x] Header: transparent overlay on all pages, fixed positioning
 - [x] Header: always visible at top of page (except Products page), hides only after 6s idle when scrolled (shows on mouse move or scroll up), compact height when scrolled, gradient bg when not at top
-- [x] Hero: full-viewport (`h-screen`), gradient placeholder bg, staggered entrance animations
+- [x] Hero: full-viewport (`h-screen`), looping background video (`/videos/hero-bg.mp4`, 3MB, autoPlay muted loop playsInline) with image poster fallback, staggered entrance animations
 - [x] Hero: H1 with multi-line typewriter effect — types lines simultaneously, then cycles keywords with delete/retype animation, longer first-cycle delay (`resources/js/Components/ui/typewriter.tsx`)
 - [x] Hero: "Contact Us" outline button fades in after typewriter completes, links directly to `/contact` page
 - [x] Hero bottom links: 3 interactive links (About Us, Core Values, News) with hover image-reveal (image reveal hidden on mobile)
@@ -92,19 +92,20 @@
 - [x] News section: LinkedIn embed max width increased to `max-w-150`
 
 ### About Page Enhancements (DONE)
-- [x] Intro section: animated large text with scroll-triggered reveal (TimelineContent + framer-motion `useInView`)
-- [x] Highlighted keywords with colored dotted borders (primary, sky-400, emerald-400)
-- [x] Segmented i18n keys for highlighted text (`about.intro.segment1/highlight1/...`)
+- [x] Hero section redesigned: scroll-driven text shift + logo slide-in animation on desktop, time-based animation on mobile (logo drops in, text slides up)
+- [x] Hero background: language-aware construction site images (`/images/about/hero/bg-desktop-en.webp` etc.), dark overlay for readability
+- [x] Hero logo: single combined NS logo image (`/images/about/hero/logo.webp`), slides in from side on scroll (desktop), drops in on load (mobile)
+- [x] Green shifting letter effect on "Saudi Arabia" / "المملكة العربية السعودية" text (3 letters, 150ms interval, `#00A651` KSA flag color)
 - [x] SEO-safe visually hidden `<h1>` using `sr-only` class
-- [x] Capabilities section with ScrollStack animation (5 cards: Integrated Manufacturing, Advanced Technology, Large-Scale Supply, Quality Assurance, Customization)
-- [x] ScrollStack uses sticky viewport + progress-based animation (window scroll mode)
-- [x] Cards slide up from below viewport with ease-out cubic easing, stack with scale-down effect
-- [x] Heading centered as absolute overlay, covered by cards as they enter
-- [x] Lenis smooth scroll library added (used for container scroll mode, not window scroll to avoid hijacking page scroll)
-- [x] `vendor-lenis` Vite chunk for code splitting
+- [x] Capabilities section redesigned: scroll-driven horizontal reveal on desktop (cards slide in from right, line up side by side), RTL-aware (slides from left in Arabic)
+- [x] Capabilities mobile: 3D flip-in animation (rotateX) with staggered delays as cards enter viewport, perspective container
+- [x] Capabilities heading always visible (no fade-out)
 - [x] i18n translations for all capabilities (EN + AR)
 - [x] Vision & Mission: 4-card grid with cascading character-by-character color sweep animation (cycles through all cards continuously)
-- [x] Timeline section redesigned: vertical rail + content panel layout, language-aware background image (`/images/about/journey/bg-desktop-en.webp` etc.), auto-advance every 10s, navigation arrows, `AnimatePresence` content transitions, full bilingual titles + body text for 6 milestones (`resources/js/Components/Public/TimelineSection.tsx`)
+- [x] Timeline desktop: scroll-driven vertical rail + content panel, auto-advance every 10s with gradual orange fill line, IntersectionObserver to start/stop auto when section enters/exits viewport, programmatic scroll sync during auto-advance
+- [x] Timeline mobile: swipeable card carousel with glass cards (`bg-white/5 backdrop-blur`), touch swipe navigation (RTL-aware), arrow buttons + counter, dot indicators (active = orange pill), auto-advance every 10s, `AnimatePresence` slide transitions
+- [x] Timeline: 3 input modes (auto/scroll/manual) with refs for closure-safe state, `isAutoScrollingRef` guard for programmatic scrolls
+- [x] Timeline: language-aware background images (`/images/about/journey/bg-desktop-en.webp` etc.), full bilingual titles + body text for 6 milestones
 - [x] Governance section removed from About page
 - [x] Unified horizontal (left-to-right) gradients across all About sections for seamless transitions (`from-gray-900 to-gray-800`)
 
@@ -252,6 +253,15 @@
 - [x] Products page: mobile redesign — orange bg, white buttons with orange text, clean thumbnails, product image inside orange panel, nav button below thumbnails
 - [x] Products page: RTL clip-path diagonal properly mirrored (fixed SVG path math for Arabic)
 - [x] Products page: tab button border flash fix (`border-transparent` on active state)
+- [x] Homepage hero: background replaced with looping video (`/videos/hero-bg.mp4`, 3MB), poster image fallback for loading state
+- [x] Homepage Vision 2030: background switched from PNG to WebP, `object-center` instead of `object-top`
+- [x] About hero: scroll-driven text + logo animation on desktop, time-based on mobile (logo drops in + text slides up on page load)
+- [x] About hero: language-aware background images (desktop + mobile, EN + AR variants) with dark overlay
+- [x] About hero: green shifting letter effect on "Saudi Arabia" text (KSA flag color `#00A651`)
+- [x] About capabilities: redesigned from vertical ScrollStack to horizontal scroll-driven reveal (cards slide in side by side), RTL-aware direction
+- [x] About capabilities: mobile flip-in animation (3D rotateX with staggered delays via IntersectionObserver)
+- [x] About timeline: auto-advance only starts when section is in viewport (IntersectionObserver)
+- [x] About timeline mobile: swipeable card carousel with glass cards, dot indicators, touch navigation, auto-advance
 
 ### Site-Wide Visual Consistency (DONE)
 - [x] Unified `bg-linear-to-r from-gray-900 to-gray-800` gradient across all public page sections (Home, About, Quality, Career)
@@ -713,4 +723,4 @@ public/images/shared/          → Shared images (logo/)
 
 ---
 
-> **Last updated:** 2026-04-12 — Our Journey timeline redesign (vertical rail + bg image), Products page mobile redesign + RTL fix + new renders, unified white icon styling across pages, Vision & Mission equal-height cards, Arabic product name updates
+> **Last updated:** 2026-04-13 — About page hero redesign (scroll-driven logo + bg image + green text effect), capabilities horizontal scroll reveal, timeline mobile swipeable cards, homepage hero looping video background, Vision 2030 bg webp switch

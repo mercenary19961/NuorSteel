@@ -21,6 +21,57 @@ interface Props {
 }
 
 
+function HeroVideo() {
+  const loRef = useRef<HTMLVideoElement>(null);
+  const hdRef = useRef<HTMLVideoElement>(null);
+  const [hdReady, setHdReady] = useState(false);
+
+  useEffect(() => {
+    const hdVideo = hdRef.current;
+    if (!hdVideo) return;
+
+    const onCanPlay = () => {
+      // Sync HD playback time with the low-res video, then swap
+      if (loRef.current) {
+        hdVideo.currentTime = loRef.current.currentTime;
+      }
+      hdVideo.play().then(() => setHdReady(true)).catch(() => {});
+    };
+
+    hdVideo.addEventListener('canplaythrough', onCanPlay, { once: true });
+    hdVideo.load();
+
+    return () => hdVideo.removeEventListener('canplaythrough', onCanPlay);
+  }, []);
+
+  return (
+    <div className="absolute inset-0">
+      {/* Low-res — plays immediately */}
+      <video
+        ref={loRef}
+        autoPlay
+        loop
+        muted
+        playsInline
+        className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700 ${hdReady ? 'opacity-0' : 'opacity-100'}`}
+      >
+        <source src="/videos/hero-bg.mp4" type="video/mp4" />
+      </video>
+      {/* HD — preloads in background, fades in once ready */}
+      <video
+        ref={hdRef}
+        loop
+        muted
+        playsInline
+        preload="auto"
+        className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700 ${hdReady ? 'opacity-100' : 'opacity-0'}`}
+      >
+        <source src="/videos/hero-bg-hd.mp4" type="video/mp4" />
+      </video>
+    </div>
+  );
+}
+
 export default function Home({ content_en, content_ar, linkedin_posts }: Props) {
   const { t } = useTranslation();
   const { language } = useLanguage();
@@ -212,19 +263,8 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
 
       {/* Hero Section — Full Viewport */}
       <section id="section-hero" className="relative min-h-[87svh] lg:h-screen flex flex-col justify-between overflow-hidden">
-        {/* Background video + image fallback */}
-        <div className="absolute inset-0">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            poster={`/images/home/hero/hero-desktop-${language}.webp`}
-            className="absolute inset-0 w-full h-full object-cover object-center"
-          >
-            <source src="/videos/hero-bg.mp4" type="video/mp4" />
-          </video>
-        </div>
+        {/* Background video — low-res plays immediately, HD swaps in once loaded */}
+        <HeroVideo />
 
         {/* Main Content */}
         <div className="relative z-10 flex-1 flex items-end pb-8 lg:items-start lg:pt-[25vh] lg:pb-0">
