@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { router, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import type { PageProps } from '@/types';
 
 type Language = 'en' | 'ar';
@@ -30,16 +30,29 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         i18n.changeLanguage(language);
     }, [language, isRTL, i18n]);
 
+    const syncLocale = (lang: Language) => {
+        // Update server session without triggering an Inertia page visit.
+        // Laravel reads the XSRF-TOKEN cookie automatically via VerifyCsrfToken middleware.
+        const xsrf = document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1];
+        fetch(`/locale/${lang}`, {
+            method: 'POST',
+            headers: {
+                'X-XSRF-TOKEN': xsrf ? decodeURIComponent(xsrf) : '',
+                'Accept': 'application/json',
+            },
+            credentials: 'same-origin',
+        }).catch(() => {});
+    };
+
     const toggleLanguage = () => {
         const newLang: Language = language === 'en' ? 'ar' : 'en';
         setLanguageState(newLang);
-        // Update server-side locale via POST
-        router.post(`/locale/${newLang}`, {}, { preserveState: true, preserveScroll: true });
+        syncLocale(newLang);
     };
 
     const setLanguage = (lang: Language) => {
         setLanguageState(lang);
-        router.post(`/locale/${lang}`, {}, { preserveState: true, preserveScroll: true });
+        syncLocale(lang);
     };
 
     return (

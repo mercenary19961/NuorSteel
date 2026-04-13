@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class LocaleController extends Controller
 {
-    public function switch(string $locale)
+    public function switch(Request $request, string $locale)
     {
         if (!in_array($locale, ['en', 'ar'])) {
             $locale = 'en';
@@ -15,6 +15,10 @@ class LocaleController extends Controller
 
         session(['locale' => $locale]);
         app()->setLocale($locale);
+
+        if ($request->wantsJson()) {
+            return response()->json(['locale' => $locale]);
+        }
 
         return back();
     }
