@@ -594,7 +594,7 @@ export default function Products({ products }: Props) {
 
         {/* Large Product Image — absolutely positioned over both panels, near the diagonal */}
         {!expanded && (
-          <div className="hidden lg:flex absolute z-20 bottom-16 items-end justify-center pointer-events-none max-w-[30%] -translate-x-1/2 left-[40%] xl:left-[48%] 2xl:left-[52%]">
+          <div className="hidden lg:flex absolute z-20 bottom-1/4 items-end justify-start pointer-events-none max-w-[60%] left-[13%]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={`img-${selectedSlug}`}
@@ -609,7 +609,7 @@ export default function Products({ products }: Props) {
                     key={`hero-img-${selectedSlug}-${language}`}
                     src={getProductImage(selectedProduct)!}
                     alt={getName(selectedProduct)}
-                    className="max-h-36 xl:max-h-44 2xl:max-h-56 w-auto object-contain"
+                    className={`w-auto object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)] ${selectedSlug === 'billets' ? 'max-h-44 xl:max-h-52 2xl:max-h-64 max-w-[300px] xl:max-w-[400px]' : 'max-h-64 xl:max-h-80 2xl:max-h-96'}`}
                   />
                 ) : (
                   <div className="w-48 h-48 rounded-full bg-white/5 flex items-center justify-center">
