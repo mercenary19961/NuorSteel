@@ -60,6 +60,14 @@ const en = {
         title: "Strategic Growth",
         description: "We focus on sustainable, long-term growth by building strong partnerships and aligning our expansion with national and regional development objectives.",
       },
+      peopleTeamwork: {
+        title: "People & Teamwork",
+        description: "Empowering our people and fostering a culture of collaboration to achieve shared success. We believe that strong teams, aligned goals, and continuous development are the foundation of sustainable growth.",
+      },
+      trustIntegrity: {
+        title: "Trust & Integrity",
+        description: "Building long-term relationships through transparency, accountability, and ethical business practices. We are committed to acting with honesty in every interaction, ensuring reliability and confidence in everything we deliver.",
+      },
     },
     products: {
       title: "Our Products",
