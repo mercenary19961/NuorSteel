@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowRight, ChevronLeft, ChevronRight, ShieldCheck, Leaf, Lightbulb, TrendingUp, Linkedin, ExternalLink } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, ShieldCheck, Leaf, Lightbulb, TrendingUp, Users, Handshake, Linkedin, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import HeroBottomLinks from '@/Components/Public/HeroBottomLinks';
@@ -153,6 +153,30 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       status: 'completed' as const,
       energy: 85,
     },
+    {
+      id: 5,
+      title: content?.core_values?.people_teamwork_title || t('home.coreValues.peopleTeamwork.title'),
+      date: '',
+      content: content?.core_values?.people_teamwork_description || t('home.coreValues.peopleTeamwork.description'),
+      category: 'People',
+      icon: Users,
+      image: '/images/home/core-values/quality.webp',
+      relatedIds: [2, 6],
+      status: 'completed' as const,
+      energy: 90,
+    },
+    {
+      id: 6,
+      title: content?.core_values?.trust_integrity_title || t('home.coreValues.trustIntegrity.title'),
+      date: '',
+      content: content?.core_values?.trust_integrity_description || t('home.coreValues.trustIntegrity.description'),
+      category: 'Trust',
+      icon: Handshake,
+      image: '/images/home/core-values/innovation.webp',
+      relatedIds: [1, 5],
+      status: 'completed' as const,
+      energy: 88,
+    },
   ];
 
   const [typingDone, setTypingDone] = useState(false);
@@ -197,10 +221,10 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       if (scrolled <= 0) {
         setCoreValuesStep(0);
       } else {
-        // 5 stages: idle view + 4 values
-        const stepSize = stickyTravel / 5;
+        // 7 stages: idle view + 6 values
+        const stepSize = stickyTravel / 7;
         const step = Math.floor(scrolled / stepSize);
-        setCoreValuesStep(Math.min(4, step));
+        setCoreValuesStep(Math.min(6, step));
       }
     };
 
@@ -445,7 +469,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* Core Values Section — scroll-driven on desktop */}
-      <div ref={coreValuesWrapperRef} className="lg:h-[400vh]">
+      <div ref={coreValuesWrapperRef} className="lg:h-[600vh]">
         <section id="section-core-values" className="relative py-10 lg:py-16 bg-[#414042] overflow-hidden lg:sticky lg:top-0 lg:min-h-screen lg:flex lg:flex-col lg:justify-center">
           <div className="relative container mx-auto px-4">
             <h2 className="text-3xl lg:text-4xl font-black text-white text-center">
