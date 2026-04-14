@@ -89,7 +89,7 @@ export default function Certificates({ esg, quality, governance, content_en, con
                   <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
                     {t('certificates.hero.label')}
                   </p>
-                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-6">
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-6">
                     {content?.overview?.title || t('certificates.hero.title')}
                   </h2>
                   <p className="text-lg text-gray-300 leading-relaxed">
@@ -203,7 +203,7 @@ export default function Certificates({ esg, quality, governance, content_en, con
 
                           {/* Content */}
                           <div className="p-5">
-                            <h3 className="font-semibold text-white text-sm leading-snug mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                            <h3 className="font-bold text-white text-sm leading-snug mb-2 group-hover:text-primary transition-colors line-clamp-2">
                               {getTitle(cert)}
                             </h3>
                             {getDesc(cert) && (

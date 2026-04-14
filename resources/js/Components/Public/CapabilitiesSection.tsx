@@ -112,7 +112,7 @@ export default function CapabilitiesSection() {
               ref={headingRef}
               className="text-center mb-10"
             >
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 lg:mb-4">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-3 lg:mb-4">
                 {t('about.capabilities.title')}
               </h2>
               <p className="text-base lg:text-lg text-white/60 max-w-2xl mx-auto">
@@ -160,7 +160,7 @@ export default function CapabilitiesSection() {
           /* ── Mobile: flip-in cards ── */
           <div className="relative z-10 py-16 px-4">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-white mb-3">
+              <h2 className="text-2xl font-black text-white mb-3">
                 {t('about.capabilities.title')}
               </h2>
               <p className="text-base text-white/60 max-w-md mx-auto">

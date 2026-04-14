@@ -174,7 +174,7 @@ export default function Contact({ content_en, content_ar }: Props) {
             <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
               {t('contact.hero.title', 'Get in Touch')}
             </p>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-4">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-4">
               {content?.overview?.title || t('contact.hero.title')}
             </h1>
             <p className="text-lg text-gray-400 leading-relaxed">

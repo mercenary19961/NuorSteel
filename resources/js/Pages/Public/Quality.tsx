@@ -56,7 +56,7 @@ export default function Quality() {
             <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
               {t('quality.hero.label', 'Quality Assurance')}
             </p>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6 whitespace-pre-line">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight mb-6 whitespace-pre-line">
               {t('quality.hero.title')}
             </h1>
             <p className="text-lg lg:text-xl text-gray-400 max-w-lg leading-relaxed">
@@ -81,7 +81,7 @@ export default function Quality() {
             <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
               {t('quality.assurance.label', 'Our Approach')}
             </p>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-8">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-8">
               {t('quality.assurance.title', 'Quality & Manufacturing Assurance')}
             </h2>
             <p className="text-lg text-gray-300 leading-relaxed mb-6">
@@ -134,7 +134,7 @@ export default function Quality() {
                   <div className="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center mb-5">
                     <card.icon className="text-white" size={24} />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3">{card.title}</h3>
+                  <h3 className="text-xl font-bold mb-3">{card.title}</h3>
                   <p className="text-gray-400 leading-relaxed text-sm">{card.description}</p>
                 </div>
               </MagicCard>

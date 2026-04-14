@@ -32,7 +32,7 @@ export default function RecyclingPage({ content }: Props) {
             <div className="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center">
               <Recycle size={28} />
             </div>
-            <h1 className="text-4xl lg:text-5xl font-bold">
+            <h1 className="text-4xl lg:text-5xl font-black">
               {t('recycling.hero.title')}
             </h1>
           </div>

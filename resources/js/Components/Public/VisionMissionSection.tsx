@@ -181,7 +181,7 @@ export default function VisionMissionSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center mb-10 lg:mb-14"
+          className="text-2xl sm:text-3xl lg:text-4xl font-black text-white text-center mb-10 lg:mb-14"
         >
           {t('about.visionMission.title')}
         </motion.h2>
