@@ -53,7 +53,7 @@ return new class extends Migration
         $tmtId = DB::table('products')->where('slug', 'tmt-bars')->value('id');
         $billetId = DB::table('products')->where('slug', 'billets')->value('id');
 
-        // TMT Bars - Dimensional specs (Linear Mass per BS 4449)
+        // TMT Bars - Dimensional specs (Linear Mass per ASTM A615)
         if ($tmtId && DB::table('product_specifications')->where('product_id', $tmtId)->count() === 0) {
             DB::table('product_specifications')->insert([
                 ['product_id' => $tmtId, 'property_en' => '8mm', 'property_ar' => '8 مم', 'value' => '0.395', 'min_value' => null, 'max_value' => null, 'unit' => 'kg/m', 'spec_type' => 'dimensional', 'sort_order' => 1],
