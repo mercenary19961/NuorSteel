@@ -68,13 +68,6 @@ export default function Quality() {
 
       {/* Quality & Manufacturing Assurance */}
       <section className="relative bg-black text-white py-24 lg:py-32">
-        <div
-          className="absolute inset-0 opacity-60"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
         <div className="relative container mx-auto px-4">
           {/* Section intro */}
           <div className="max-w-3xl mb-20">

@@ -94,14 +94,6 @@ export default function CapabilitiesSection() {
   return (
     <div ref={wrapperRef} className="relative" style={{ height: isDesktop ? '350vh' : 'auto' }}>
       <section className="sticky top-0 h-screen bg-black overflow-hidden" style={isDesktop ? undefined : { position: 'relative', height: 'auto' }}>
-        {/* Grid texture */}
-        <div
-          className="absolute inset-0 opacity-60 z-0"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
 
         {isDesktop ? (
           /* ── Desktop: scroll-driven horizontal reveal ── */

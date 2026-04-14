@@ -677,14 +677,6 @@ export default function Products({ products }: Props) {
             transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
         >
-          {/* Grid texture background */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-              backgroundSize: '60px 60px',
-            }}
-          />
           <AnimatePresence mode="wait">
             {!expanded ? (
               /* --- DEFAULT: Product Thumbnails --- */

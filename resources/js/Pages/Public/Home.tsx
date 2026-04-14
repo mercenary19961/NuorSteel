@@ -447,14 +447,6 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       {/* Core Values Section — scroll-driven on desktop */}
       <div ref={coreValuesWrapperRef} className="lg:h-[400vh]">
         <section id="section-core-values" className="relative py-10 lg:py-16 bg-black overflow-hidden lg:sticky lg:top-0 lg:min-h-screen lg:flex lg:flex-col lg:justify-center">
-          {/* Subtle grid texture */}
-          <div
-            className="absolute inset-0 opacity-60"
-            style={{
-              backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-              backgroundSize: '60px 60px',
-            }}
-          />
           <div className="relative container mx-auto px-4">
             <h2 className="text-3xl lg:text-4xl font-black text-white text-center">
               {content?.core_values?.title || t('home.coreValues.title')}
@@ -558,14 +550,6 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
 
       {/* LinkedIn Feed Section */}
       <section ref={linkedinSectionRef} id="section-linkedin" className="relative py-16 lg:py-24 bg-black overflow-hidden">
-        {/* Subtle grid texture */}
-        <div
-          className="absolute inset-0 opacity-60"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
         <div className="relative container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
             {/* Left column: info + controls (flips to right in RTL) */}

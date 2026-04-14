@@ -67,13 +67,6 @@ export default function Certificates({ esg, quality, governance, content_en, con
 
       {/* Category Cards / Certificate Grid */}
       <section className="relative bg-black text-white pt-32 lg:pt-44 pb-24 lg:pb-32 min-h-screen">
-        <div
-          className="absolute inset-0 opacity-60"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
         <div className="relative container mx-auto px-4">
           <AnimatePresence mode="wait">
             {!activeCategory ? (
