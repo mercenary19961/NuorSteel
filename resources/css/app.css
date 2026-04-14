@@ -150,3 +150,22 @@ html[dir="rtl"] body {
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background: rgba(255 255 255 / 0.35);
 }
+
+/* Partners section — infinite scroll columns */
+@keyframes scroll-up {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+}
+
+@keyframes scroll-down {
+    0% { transform: translateY(-50%); }
+    100% { transform: translateY(0); }
+}
+
+.animate-scroll-up {
+    animation: scroll-up 25s linear infinite;
+}
+
+.animate-scroll-down {
+    animation: scroll-down 25s linear infinite;
+}

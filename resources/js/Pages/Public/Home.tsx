@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import HeroBottomLinks from '@/Components/Public/HeroBottomLinks';
 import RadialOrbitalTimeline from '@/Components/ui/radial-orbital-timeline';
+import PartnersSection from '@/Components/Public/PartnersSection';
 import { HeroTypewriter } from '@/Components/ui/typewriter';
 import { MagicCardGrid, MagicCard } from '@/Components/ui/magic-card';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -160,7 +161,8 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       content: content?.core_values?.people_teamwork_description || t('home.coreValues.peopleTeamwork.description'),
       category: 'People',
       icon: Users,
-      image: '/images/home/core-values/quality.webp',
+      image: '/images/home/core-values/people-teamwork.webp',
+      imageBg: true,
       relatedIds: [2, 6],
       status: 'completed' as const,
       energy: 90,
@@ -172,7 +174,8 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       content: content?.core_values?.trust_integrity_description || t('home.coreValues.trustIntegrity.description'),
       category: 'Trust',
       icon: Handshake,
-      image: '/images/home/core-values/innovation.webp',
+      image: '/images/home/core-values/trust-integrity.webp',
+      imageBg: true,
       relatedIds: [1, 5],
       status: 'completed' as const,
       energy: 88,
@@ -571,6 +574,9 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
           </Link>
         </div>
       </section>
+
+      {/* Partners & Clients Section */}
+      <PartnersSection />
 
       {/* LinkedIn Feed Section */}
       <section ref={linkedinSectionRef} id="section-linkedin" className="relative py-16 lg:py-24 bg-[#414042] overflow-hidden">

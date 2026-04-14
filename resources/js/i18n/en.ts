@@ -82,6 +82,10 @@ const en = {
         description: "High-quality steel billets produced through Electric Arc Furnace steelmaking and continuous casting. The essential semi-finished feedstock for rolling mills, manufactured to strict chemical and dimensional specifications.",
       },
     },
+    partners: {
+      title: "Our Partners",
+      description: "Our partnerships reflect our commitment to excellence, working alongside renowned organizations to deliver consistent quality and long-term value.",
+    },
     linkedin: {
       title: "Latest from LinkedIn",
       subtitle: "Stay updated with our latest news and insights",
