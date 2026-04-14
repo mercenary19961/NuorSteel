@@ -10,6 +10,7 @@ interface TimelineItem {
   category: string;
   icon: React.ElementType;
   image?: string;
+  imageBg?: boolean;
   relatedIds: number[];
   status: "completed" | "in-progress" | "pending";
   energy: number;
@@ -460,7 +461,7 @@ export default function RadialOrbitalTimeline({
                   className={`
                   rounded-full flex items-center justify-center overflow-hidden
                   ${item.image
-                    ? `${
+                    ? `${item.imageBg ? 'bg-primary' : ''} ${
                         isExpanded
                           ? "shadow-lg shadow-primary/30"
                           : ""
@@ -487,7 +488,7 @@ export default function RadialOrbitalTimeline({
                   style={{ width: effectiveNodeSize, height: effectiveNodeSize }}
                 >
                   {item.image ? (
-                    <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                    <img src={item.image} alt={item.title} className={`object-cover ${item.imageBg ? 'w-3/4 h-3/4' : 'w-full h-full'}`} />
                   ) : (
                     <Icon size={effectiveNodeSize < 56 ? 16 : 22} />
                   )}
