@@ -67,7 +67,7 @@ const en = {
       viewAll: "View All Products",
       tmtBars: {
         title: "TMT Bars",
-        description: "Thermo-Mechanically Treated reinforcement steel bars manufactured to BS 4449:2005, Grade B500B standards. Available in 8mm to 32mm diameters for residential, commercial, and infrastructure projects.",
+        description: "Thermo-Mechanically Treated reinforcement steel bars manufactured to ASTM A615 standards. Available in 8mm to 32mm diameters for residential, commercial, and infrastructure projects.",
       },
       billets: {
         title: "Billets",
@@ -209,14 +209,14 @@ const en = {
     specNote: "Other specifications are possible. Please contact Sales & Marketing for details.",
     tmtBars: {
       highlights: [
-        "Manufactured to BS 4449:2005, Grade B500B standards",
+        "Manufactured to ASTM A615 standards",
         "Available in diameters from 8mm to 32mm",
         "SASO compliant for Saudi construction projects",
         "Superior strength, ductility, and weldability",
       ],
       specIcons: {
         diameterRange: { title: "Diameter Range", value: "8mm - 32mm" },
-        standards: { title: "Standards", value: "BS 4449:2005 Grade B500B" },
+        standards: { title: "Standards", value: "ASTM A615" },
         barLength: { title: "Bar Length", value: "12m standard" },
       },
       specTable: {

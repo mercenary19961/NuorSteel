@@ -41,6 +41,13 @@ html {
 body {
     margin: 0;
     min-height: 100vh;
+    /* Designer spec: Medium (500) as default body weight for English (Montserrat) */
+    font-weight: 500;
+}
+
+/* Arabic body text uses Regular (400) per designer spec (Cairo reads better at 400) */
+[dir="rtl"] body {
+    font-weight: 400;
 }
 
 

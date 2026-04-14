@@ -67,13 +67,6 @@ export default function Certificates({ esg, quality, governance, content_en, con
 
       {/* Category Cards / Certificate Grid */}
       <section className="relative bg-black text-white pt-32 lg:pt-44 pb-24 lg:pb-32 min-h-screen">
-        <div
-          className="absolute inset-0 opacity-60"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
         <div className="relative container mx-auto px-4">
           <AnimatePresence mode="wait">
             {!activeCategory ? (
@@ -89,7 +82,7 @@ export default function Certificates({ esg, quality, governance, content_en, con
                   <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
                     {t('certificates.hero.label')}
                   </p>
-                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-6">
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-6">
                     {content?.overview?.title || t('certificates.hero.title')}
                   </h2>
                   <p className="text-lg text-gray-300 leading-relaxed">
@@ -203,7 +196,7 @@ export default function Certificates({ esg, quality, governance, content_en, con
 
                           {/* Content */}
                           <div className="p-5">
-                            <h3 className="font-semibold text-white text-sm leading-snug mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                            <h3 className="font-bold text-white text-sm leading-snug mb-2 group-hover:text-primary transition-colors line-clamp-2">
                               {getTitle(cert)}
                             </h3>
                             {getDesc(cert) && (

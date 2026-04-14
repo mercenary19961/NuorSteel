@@ -23,7 +23,7 @@ function MobileFlipCard({ children, index }: { children: React.ReactNode; index:
   return (
     <motion.div
       ref={ref}
-      className="rounded-2xl bg-black border border-white/10 p-5 flex items-start gap-4"
+      className="rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 p-5 flex items-start gap-4"
       initial={{ opacity: 0, rotateX: 60 }}
       animate={isInView ? { opacity: 1, rotateX: 0 } : {}}
       transition={{
@@ -86,23 +86,14 @@ export default function CapabilitiesSection() {
     };
   }, [handleScroll]);
 
-  // Heading fades out as cards start entering
-  const headingOpacity = Math.max(0, 1 - progress * 6);
-
-  // Each card gets a segment of the progress bar
-  const segmentSize = 1 / (CARD_COUNT + 1); // +1 so heading gets its own segment
+  // Cards start appearing at 5% scroll and finish by 90%
+  const cardRangeStart = 0.05;
+  const cardRangeEnd = 0.9;
+  const segmentSize = (cardRangeEnd - cardRangeStart) / CARD_COUNT;
 
   return (
-    <div ref={wrapperRef} className="relative" style={{ height: isDesktop ? `${(CARD_COUNT + 2) * 100}vh` : 'auto' }}>
+    <div ref={wrapperRef} className="relative" style={{ height: isDesktop ? '350vh' : 'auto' }}>
       <section className="sticky top-0 h-screen bg-black overflow-hidden" style={isDesktop ? undefined : { position: 'relative', height: 'auto' }}>
-        {/* Grid texture */}
-        <div
-          className="absolute inset-0 opacity-60 z-0"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
 
         {isDesktop ? (
           /* ── Desktop: scroll-driven horizontal reveal ── */
@@ -112,7 +103,7 @@ export default function CapabilitiesSection() {
               ref={headingRef}
               className="text-center mb-10"
             >
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 lg:mb-4">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-3 lg:mb-4">
                 {t('about.capabilities.title')}
               </h2>
               <p className="text-base lg:text-lg text-white/60 max-w-2xl mx-auto">
@@ -123,7 +114,7 @@ export default function CapabilitiesSection() {
             {/* Cards row */}
             <div className="flex gap-4 xl:gap-5 items-stretch">
               {capabilities.map(({ icon: Icon, key }, i) => {
-                const cardStart = (i + 1) * segmentSize;
+                const cardStart = cardRangeStart + i * segmentSize;
                 const cardProgress = Math.max(0, Math.min(1, (progress - cardStart) / segmentSize));
                 // Ease-out cubic
                 const eased = 1 - Math.pow(1 - cardProgress, 3);
@@ -135,7 +126,7 @@ export default function CapabilitiesSection() {
                 return (
                   <div
                     key={key}
-                    className="flex-1 min-w-0 rounded-2xl bg-black border border-white/10 p-5 xl:p-6 flex flex-col"
+                    className="flex-1 min-w-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 p-5 xl:p-6 flex flex-col"
                     style={{
                       transform: `translateX(${translateX}%)`,
                       opacity,
@@ -160,7 +151,7 @@ export default function CapabilitiesSection() {
           /* ── Mobile: flip-in cards ── */
           <div className="relative z-10 py-16 px-4">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-white mb-3">
+              <h2 className="text-2xl font-black text-white mb-3">
                 {t('about.capabilities.title')}
               </h2>
               <p className="text-base text-white/60 max-w-md mx-auto">

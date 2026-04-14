@@ -270,7 +270,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         <div className="relative z-10 flex-1 flex items-end pb-8 lg:items-start lg:pt-[25vh] lg:pb-0">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl">
-              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-tight">
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white leading-tight">
                 <HeroTypewriter
                   key={language}
                   lines={[t('home.hero.line1'), t('home.hero.line2')]}
@@ -334,7 +334,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             }}
           >
             <motion.h2
-              className="text-3xl lg:text-5xl font-bold text-white mb-6"
+              className="text-3xl lg:text-5xl font-black text-white mb-6"
               variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
             >
               {content?.about?.title || t('home.about.title')}
@@ -369,7 +369,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             >
               <MagicCard className="bg-white/5 backdrop-blur-sm p-5 lg:p-6 rounded-xl border border-white/10 h-full">
                 <div className="relative z-10">
-                  <h3 className="text-base lg:text-lg font-semibold text-white mb-2">
+                  <h3 className="text-base lg:text-lg font-bold text-white mb-2">
                     {content?.vision_mission?.vision_title || t('home.visionMission.visionTitle')}
                   </h3>
                   <p className="text-sm text-white/70 leading-relaxed">
@@ -386,7 +386,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             >
               <MagicCard className="bg-white/5 backdrop-blur-sm p-5 lg:p-6 rounded-xl border border-white/10 h-full">
                 <div className="relative z-10">
-                  <h3 className="text-base lg:text-lg font-semibold text-white mb-2">
+                  <h3 className="text-base lg:text-lg font-bold text-white mb-2">
                     {content?.vision_mission?.mission_title || t('home.visionMission.missionTitle')}
                   </h3>
                   <p className="text-sm text-white/70 leading-relaxed">
@@ -446,17 +446,9 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
 
       {/* Core Values Section — scroll-driven on desktop */}
       <div ref={coreValuesWrapperRef} className="lg:h-[400vh]">
-        <section id="section-core-values" className="relative py-10 lg:py-16 bg-black overflow-hidden lg:sticky lg:top-0 lg:min-h-screen lg:flex lg:flex-col lg:justify-center">
-          {/* Subtle grid texture */}
-          <div
-            className="absolute inset-0 opacity-60"
-            style={{
-              backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-              backgroundSize: '60px 60px',
-            }}
-          />
+        <section id="section-core-values" className="relative py-10 lg:py-16 bg-[#414042] overflow-hidden lg:sticky lg:top-0 lg:min-h-screen lg:flex lg:flex-col lg:justify-center">
           <div className="relative container mx-auto px-4">
-            <h2 className="text-3xl lg:text-4xl font-bold text-white text-center">
+            <h2 className="text-3xl lg:text-4xl font-black text-white text-center">
               {content?.core_values?.title || t('home.coreValues.title')}
             </h2>
             <MagicCardGrid>
@@ -467,8 +459,8 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </div>
 
       {/* Products Showcase */}
-      <section id="section-products" className="overflow-hidden bg-black">
-        <h2 className="text-3xl lg:text-4xl font-bold text-white text-center py-10 lg:py-14">
+      <section id="section-products" className="overflow-hidden bg-[#414042]">
+        <h2 className="text-3xl lg:text-4xl font-black text-white text-center py-10 lg:py-14">
           {content?.products?.title || t('home.products.title', 'Our Products')}
         </h2>
         <div className="flex flex-col lg:flex-row min-h-100 lg:min-h-137.5 lg:bg-white/20">
@@ -500,7 +492,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             />
             {/* Content */}
             <div className="relative z-10 h-full flex flex-col justify-center items-center p-8 lg:p-12 text-white text-center min-h-87.5 lg:min-h-0">
-              <h3 className="text-3xl lg:text-4xl font-bold mb-4 text-primary">
+              <h3 className="text-3xl lg:text-4xl font-black mb-4 text-primary">
                 {t('home.products.tmtBars.title')}
               </h3>
               <p className="text-sm lg:text-base text-white/80 max-w-md leading-relaxed">
@@ -541,7 +533,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             />
             {/* Content */}
             <div className="relative z-10 h-full flex flex-col justify-center items-center p-8 lg:p-12 text-white text-center min-h-87.5 lg:min-h-0">
-              <h3 className="text-3xl lg:text-4xl font-bold mb-4 text-primary">
+              <h3 className="text-3xl lg:text-4xl font-black mb-4 text-primary">
                 {t('home.products.billets.title')}
               </h3>
               <p className="text-sm lg:text-base text-white/80 max-w-md leading-relaxed">
@@ -557,20 +549,12 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </section>
 
       {/* LinkedIn Feed Section */}
-      <section ref={linkedinSectionRef} id="section-linkedin" className="relative py-16 lg:py-24 bg-black overflow-hidden">
-        {/* Subtle grid texture */}
-        <div
-          className="absolute inset-0 opacity-60"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
+      <section ref={linkedinSectionRef} id="section-linkedin" className="relative py-16 lg:py-24 bg-[#414042] overflow-hidden">
         <div className="relative container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
             {/* Left column: info + controls (flips to right in RTL) */}
             <div className="lg:w-2/5 text-center lg:text-start">
-              <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+              <h2 className="text-3xl lg:text-4xl font-black text-white mb-4">
                 {t('home.hero.bottomLinks.news')}
               </h2>
               <p className="text-lg text-white/60 mb-8">

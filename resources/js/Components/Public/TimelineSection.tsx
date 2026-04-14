@@ -65,7 +65,7 @@ function MobileTimeline() {
 
       <div className="relative z-10 min-h-[85vh] flex flex-col px-5 py-12">
         {/* Section title */}
-        <h2 className="text-2xl font-bold text-white mb-8 text-center">
+        <h2 className="text-2xl font-black text-white mb-8 text-center">
           {t('about.timeline.title')}
         </h2>
 

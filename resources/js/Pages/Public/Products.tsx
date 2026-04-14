@@ -83,7 +83,7 @@ function SpecDataTable({ tableData }: { tableData: { title: string; headers: str
 
   return (
     <div className="mb-8">
-      <h3 className="text-lg font-semibold text-white mb-4">{tableData.title}</h3>
+      <h3 className="text-lg font-bold text-white mb-4">{tableData.title}</h3>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
@@ -376,7 +376,7 @@ export default function Products({ products }: Props) {
 
             {/* Key Highlights */}
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">{t('products.overview.keyHighlights')}</h3>
+              <h3 className="text-lg font-bold text-white mb-4">{t('products.overview.keyHighlights')}</h3>
               <ul className="space-y-2">
                 {(t(`products.${productKey}.highlights`, { returnObjects: true }) as string[]).map((item, i) => (
                   <li key={i} className="flex items-start gap-2 text-white/80 text-sm">
@@ -488,7 +488,7 @@ export default function Products({ products }: Props) {
                     transition={{ duration: 0.3 }}
                     className="max-w-lg"
                   >
-                    <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 uppercase tracking-wide">
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black text-white mb-6 uppercase tracking-wide">
                       {getName(selectedProduct)}
                     </h2>
                     <p className="text-white/70 leading-relaxed mb-8 text-sm lg:text-base">
@@ -541,7 +541,7 @@ export default function Products({ products }: Props) {
                     transition={{ duration: 0.3 }}
                     className="w-full lg:max-w-[70%] pb-8"
                   >
-                    <h2 className="text-2xl lg:text-3xl xl:text-4xl font-bold text-white mb-6 uppercase tracking-wide">
+                    <h2 className="text-2xl lg:text-3xl xl:text-4xl font-black text-white mb-6 uppercase tracking-wide">
                       {getName(selectedProduct)}
                     </h2>
 
@@ -677,14 +677,6 @@ export default function Products({ products }: Props) {
             transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
         >
-          {/* Grid texture background */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-              backgroundSize: '60px 60px',
-            }}
-          />
           <AnimatePresence mode="wait">
             {!expanded ? (
               /* --- DEFAULT: Product Thumbnails --- */

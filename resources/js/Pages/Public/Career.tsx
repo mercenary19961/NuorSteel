@@ -145,7 +145,7 @@ export default function Career({ listings, content_en, content_ar }: Props) {
             <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
               {t('career.hero.label', 'Careers')}
             </p>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight mb-6">
               {content?.overview?.title || t('career.hero.title')}
             </h1>
             <p className="text-lg lg:text-xl text-gray-400 max-w-lg leading-relaxed">
@@ -157,19 +157,12 @@ export default function Career({ listings, content_en, content_ar }: Props) {
 
       {/* Job Listings Section */}
       <section className="relative bg-black text-white py-24 lg:py-32">
-        <div
-          className="absolute inset-0 opacity-60"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
         <div className="relative container mx-auto px-4">
           <div className="max-w-3xl mb-16">
             <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
               {t('career.hero.label', 'Careers')}
             </p>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-6">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-6">
               {t('career.openPositions')}
             </h2>
             <p className="text-lg text-gray-400 leading-relaxed">
@@ -191,7 +184,7 @@ export default function Career({ listings, content_en, content_ar }: Props) {
                     <div className="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center mb-5">
                       <Briefcase className="text-white" size={24} />
                     </div>
-                    <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+                    <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
                       {getJobTitle(job)}
                     </h3>
                     <div className="flex flex-wrap gap-3 text-xs text-gray-400 mb-4">
@@ -311,7 +304,7 @@ export default function Career({ listings, content_en, content_ar }: Props) {
 
               {/* Application form */}
               <div className="border-t border-white/10 pt-6">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                   <FileUp size={20} className="text-primary" />
                   {t('career.applyFor')} {getJobTitle(selectedJob)}
                 </h3>

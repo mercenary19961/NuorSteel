@@ -167,21 +167,13 @@ export default function VisionMissionSection() {
 
   return (
     <section ref={sectionRef} className="relative py-16 lg:py-24 bg-black overflow-hidden">
-      {/* Subtle grid texture */}
-      <div
-        className="absolute inset-0 opacity-60"
-        style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-        }}
-      />
       <div className="relative container mx-auto px-4">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center mb-10 lg:mb-14"
+          className="text-2xl sm:text-3xl lg:text-4xl font-black text-white text-center mb-10 lg:mb-14"
         >
           {t('about.visionMission.title')}
         </motion.h2>

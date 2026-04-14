@@ -74,7 +74,7 @@ export default function About() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: 'easeOut', delay: 0.3 }}
             >
-              <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight mb-6">
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-tight mb-6">
                 {t('about.intro.headline')}{' '}
                 {greenLetters}
               </h2>
@@ -84,7 +84,7 @@ export default function About() {
               <p className="text-xs sm:text-sm lg:text-base text-white/70 leading-relaxed mb-3 whitespace-pre-line">
                 {t('about.intro.body')}
               </p>
-              <p className="text-lg sm:text-xl lg:text-2xl text-white font-semibold whitespace-pre-line">
+              <p className="text-lg sm:text-xl lg:text-2xl text-white font-bold whitespace-pre-line">
                 {t('about.intro.highlight')}
               </p>
             </motion.div>
