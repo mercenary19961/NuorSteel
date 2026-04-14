@@ -82,27 +82,51 @@ export default function PartnersSection() {
   const columns = splitIntoColumns(partners, 3);
 
   return (
-    <section className="relative h-[600px] bg-[#414042] overflow-hidden">
-      {/* Right — Scrolling columns (full section height) */}
-      <div className="absolute top-0 right-0 bottom-0 w-full lg:w-3/5 grid grid-cols-3 gap-0 px-4 lg:pe-8">
-        {columns.map((col, i) => (
-          <ScrollColumn
-            key={i}
-            partners={col}
-            direction={i % 2 === 0 ? 'up' : 'down'}
-          />
-        ))}
-      </div>
-
-      {/* Left — Text (vertically centered) */}
-      <div className="relative z-10 container mx-auto px-4 h-full flex items-center">
-        <div className="lg:w-2/5 text-center lg:text-start">
-          <h2 className="text-3xl lg:text-4xl font-black text-white mb-4">
+    <section className="bg-[#414042] overflow-hidden">
+      {/* Mobile: stacked layout */}
+      <div className="lg:hidden">
+        <div className="px-6 pt-10 pb-6 text-center">
+          <h2 className="text-2xl sm:text-3xl font-black text-white mb-3">
             {t('home.partners.title')}
           </h2>
-          <p className="text-gray-300 text-base lg:text-lg leading-relaxed">
+          <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
             {t('home.partners.description')}
           </p>
+        </div>
+        <div className="h-[420px] grid grid-cols-3 gap-0 px-2">
+          {columns.map((col, i) => (
+            <ScrollColumn
+              key={i}
+              partners={col}
+              direction={i % 2 === 0 ? 'up' : 'down'}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop: side-by-side layout */}
+      <div className="hidden lg:block relative h-[600px]">
+        {/* Right — Scrolling columns (full section height) */}
+        <div className="absolute top-0 right-0 bottom-0 w-3/5 grid grid-cols-3 gap-0 pe-8">
+          {columns.map((col, i) => (
+            <ScrollColumn
+              key={i}
+              partners={col}
+              direction={i % 2 === 0 ? 'up' : 'down'}
+            />
+          ))}
+        </div>
+
+        {/* Left — Text (vertically centered) */}
+        <div className="relative z-10 container mx-auto px-4 h-full flex items-center">
+          <div className="w-2/5 text-start">
+            <h2 className="text-4xl font-black text-white mb-4">
+              {t('home.partners.title')}
+            </h2>
+            <p className="text-gray-300 text-lg leading-relaxed">
+              {t('home.partners.description')}
+            </p>
+          </div>
         </div>
       </div>
     </section>
