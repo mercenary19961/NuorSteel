@@ -476,7 +476,7 @@ export default function Products({ products }: Props) {
           )}
           <div className={`relative h-full flex flex-col lg:flex-row ${expanded ? 'lg:overflow-hidden' : ''}`}>
             {/* Text Content — left side of the left panel */}
-            <div className={`flex-1 flex flex-col px-4 py-8 sm:px-8 lg:py-12 lg:ps-[max(2rem,calc((100vw-1536px)/2+1rem))] lg:pe-8 ${expanded ? 'lg:overflow-y-auto scrollbar-thin justify-start pt-28!' : 'justify-center pt-24 lg:pt-0'}`}>
+            <div className={`flex-1 flex flex-col px-4 py-8 sm:px-8 lg:py-12 lg:ps-[max(2rem,calc((100vw-1536px)/2+1rem))] lg:pe-8 ${expanded ? 'lg:overflow-y-auto scrollbar-thin justify-start pt-28!' : 'justify-center pt-24 lg:justify-start lg:pt-56'}`}>
               <AnimatePresence mode="wait">
                 {!expanded ? (
                   /* --- DEFAULT: Hero Content --- */
@@ -488,10 +488,10 @@ export default function Products({ products }: Props) {
                     transition={{ duration: 0.3 }}
                     className="max-w-lg"
                   >
-                    <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black text-white mb-6 uppercase tracking-wide">
+                    <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white mb-6 uppercase tracking-wide">
                       {getName(selectedProduct)}
                     </h2>
-                    <p className="text-white/70 leading-relaxed mb-8 text-sm lg:text-base">
+                    <p className="text-white/70 leading-relaxed mb-8 text-base lg:text-lg xl:text-xl">
                       {getShortDesc(selectedProduct)}
                     </p>
                     <button
@@ -505,7 +505,7 @@ export default function Products({ products }: Props) {
                     </button>
 
                     {/* Mobile: Featured product image */}
-                    <div className="lg:hidden flex items-center justify-center mt-8">
+                    <div className="lg:hidden flex items-center justify-center mt-32 pb-4">
                       <AnimatePresence mode="wait">
                         <motion.div
                           key={`mobile-img-${selectedSlug}`}
@@ -602,14 +602,14 @@ export default function Products({ products }: Props) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.4 }}
-                className="relative"
+                className={`relative ${selectedSlug === 'billets' ? 'translate-y-12' : ''}`}
               >
                 {getProductImage(selectedProduct) ? (
                   <img
                     key={`hero-img-${selectedSlug}-${language}`}
                     src={getProductImage(selectedProduct)!}
                     alt={getName(selectedProduct)}
-                    className={`w-auto object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)] ${selectedSlug === 'billets' ? 'max-h-44 xl:max-h-52 2xl:max-h-64 max-w-[300px] xl:max-w-[400px]' : 'max-h-64 xl:max-h-80 2xl:max-h-96'}`}
+                    className="w-auto object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)] max-h-64 xl:max-h-80 2xl:max-h-96"
                   />
                 ) : (
                   <div className="w-48 h-48 rounded-full bg-white/5 flex items-center justify-center">
@@ -698,11 +698,11 @@ export default function Products({ products }: Props) {
                         onClick={() => handleSelectProduct(product.slug)}
                         className="group relative flex-1 min-w-0 max-w-44 transition-all duration-300 cursor-pointer"
                       >
-                        <div className="aspect-4/3 flex items-center justify-center">
+                        <div className="w-full flex items-center justify-center">
                           {getProductImage(product) ? (
-                            <img src={getProductImage(product)!} alt={getName(product)} className="w-full h-full object-contain" />
+                            <img src={getProductImage(product)!} alt={getName(product)} className="w-full object-contain" />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center">
+                            <div className="w-full h-24 flex items-center justify-center">
                               <Package className="text-white/30" size={36} />
                             </div>
                           )}
@@ -747,27 +747,27 @@ export default function Products({ products }: Props) {
                 </div>
 
                 {/* Desktop: Product thumbnails — stacked vertically, far right, centered */}
-                <div className="hidden lg:flex flex-col items-end justify-center h-full w-full pe-0 lg:pe-10 xl:pe-30 2xl:pe-30 3xl:pe-40 gap-4">
+                <div className="hidden lg:flex flex-col items-end justify-center h-full w-full pe-0 gap-20">
                   {products.map((product) => {
                     const isSelected = product.slug === selectedSlug;
                     return (
                       <button
                         key={product.slug}
                         onClick={() => handleSelectProduct(product.slug)}
-                        className="group relative w-36 xl:w-44 2xl:w-56 transition-all duration-300 cursor-pointer"
+                        className="group relative w-36 xl:w-64 2xl:w-80 transition-all duration-300 cursor-pointer"
                       >
-                        <div className="aspect-4/3 flex items-center justify-center">
+                        <div className="w-full flex items-center justify-center">
                           {getProductImage(product) ? (
-                            <img src={getProductImage(product)!} alt={getName(product)} className="w-full h-full object-contain" />
+                            <img src={getProductImage(product)!} alt={getName(product)} className="w-full object-contain" />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center">
+                            <div className="w-full h-24 flex items-center justify-center">
                               <Package className="text-white/30" size={36} />
                             </div>
                           )}
                         </div>
                         <h3
-                          className={`mt-2 uppercase tracking-wider text-center transition-all ${
-                            isSelected ? 'text-primary font-bold text-base xl:text-lg' : 'text-white font-normal text-xs'
+                          className={`mt-6 uppercase tracking-wider text-center font-black transition-all ${
+                            isSelected ? 'text-primary text-2xl xl:text-3xl 2xl:text-4xl' : 'text-white text-base xl:text-lg 2xl:text-xl'
                           }`}
                         >
                           {getName(product)}
