@@ -7,23 +7,24 @@ interface Partner {
   logoClass?: string;
 }
 
-const LG = 'max-h-36 max-w-36';
-const XL = 'max-h-44 max-w-44';
-const XXL = 'max-h-52 max-w-52';
+const LG = 'max-h-24 max-w-24 lg:max-h-36 lg:max-w-36';
+const XL = 'max-h-28 max-w-28 lg:max-h-44 lg:max-w-44';
+const XXL = 'max-h-32 max-w-32 lg:max-h-52 lg:max-w-52';
+const XXXL = 'max-h-36 max-w-36 lg:max-h-60 lg:max-w-60';
 
 const partners: Partner[] = [
   { name: 'Aramco', logo: '/images/home/partners/aramco.webp' },
-  { name: 'Vision 2030', logo: '/images/home/partners/vision 2030.webp', logoClass: XL },
+  { name: 'Vision 2030', logo: '/images/home/partners/vision 2030.webp', logoClass: XXL },
   { name: 'Saudi Made', logo: '/images/home/partners/SAUDI MADE.webp' },
-  { name: 'MODON', logo: '/images/home/partners/modon.webp', logoClass: 'max-h-60 max-w-60' },
+  { name: 'MODON', logo: '/images/home/partners/modon.webp', logoClass: XXXL },
   { name: 'NHC', logo: '/images/home/partners/nhc.webp', logoClass: XL },
   { name: 'Roshen', logo: '/images/home/partners/roshen.webp', logoClass: XL },
-  { name: 'ASTM', logo: '/images/home/partners/ASTM.webp', logoClass: XL },
-  { name: 'ISO', logo: '/images/home/partners/ISO.webp', logoClass: XL },
+  { name: 'ASTM', logo: '/images/home/partners/ASTM.webp', logoClass: XXL },
+  { name: 'ISO', logo: '/images/home/partners/ISO.webp', logoClass: XXL },
   { name: 'SASO', logo: '/images/home/partners/SASO LOGO.webp' },
   { name: 'EPD', logo: '/images/home/partners/epd.webp' },
-  { name: 'HPD', logo: '/images/home/partners/HPD.webp', logoClass: XXL },
-  { name: 'Qarya', logo: '/images/home/partners/qarya.webp', logoClass: XL },
+  { name: 'HPD', logo: '/images/home/partners/HPD.webp', logoClass: XXXL },
+  { name: 'Qarya', logo: '/images/home/partners/qarya.webp', logoClass: XXL },
   { name: 'Tasnee3', logo: '/images/home/partners/tasnee3.webp' },
   { name: 'Water Co', logo: '/images/home/partners/WATER CO.webp' },
   { name: 'Ministry of Industry', logo: '/images/home/partners/industry ministry.webp' },
@@ -61,12 +62,12 @@ function ScrollColumn({
         {items.map((partner, i) => (
           <div
             key={`${partner.name}-${i}`}
-            className="shrink-0 flex items-center justify-center bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.12)] transition-shadow w-36 h-44 p-4 mx-auto"
+            className="shrink-0 flex items-center justify-center bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.12)] transition-shadow w-28 h-36 p-3 lg:w-36 lg:h-44 lg:p-4 mx-auto"
           >
             <img
               src={partner.logo}
               alt={partner.name}
-              className={`object-contain ${partner.logoClass || 'max-h-28 max-w-32'}`}
+              className={`object-contain lg:max-h-none lg:max-w-none ${partner.logoClass || 'max-h-24 max-w-24 lg:max-h-28 lg:max-w-32'}`}
               loading="lazy"
               decoding="async"
             />
