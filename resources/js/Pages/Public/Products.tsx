@@ -84,10 +84,10 @@ function SpecDataTable({ tableData }: { tableData: { title: string; headers: str
   return (
     <div className="mb-8">
       <h3 className="text-lg font-bold text-white mb-4">{tableData.title}</h3>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto overflow-y-auto max-h-72 scrollbar-thin">
         <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-white/20">
+          <thead className="sticky top-0 z-10">
+            <tr className="bg-white/20 backdrop-blur-sm">
               {tableData.headers.map((header: string, i: number) => (
                 <th
                   key={i}
@@ -652,13 +652,14 @@ export default function Products({ products }: Props) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.4 }}
+                className={selectedSlug === 'billets' ? 'translate-y-10' : ''}
               >
                 {getProductImage(selectedProduct) ? (
                   <img
                     key={`expanded-img-${selectedSlug}-${language}`}
                     src={getProductImage(selectedProduct)!}
                     alt={getName(selectedProduct)}
-                    className="max-h-48 xl:max-h-60 w-auto object-contain drop-shadow-2xl"
+                    className={`object-contain drop-shadow-2xl ${selectedSlug === 'billets' ? 'max-h-32 xl:max-h-40 max-w-105 xl:max-w-130' : 'max-h-32 xl:max-h-48 2xl:max-h-60 w-auto'}`}
                   />
                 ) : (
                   <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center">

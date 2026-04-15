@@ -85,7 +85,7 @@ function RequestTypeSelect({
       </button>
 
       {open && (
-        <ul className="absolute z-50 mt-1 w-full max-h-60 overflow-auto scrollbar-thin bg-gray-900 border border-white/10 rounded-lg shadow-xl shadow-black/40 py-1">
+        <ul className="absolute z-50 mt-1 w-full max-h-60 overflow-auto scrollbar-thin bg-black border border-primary/40 rounded-lg shadow-xl shadow-primary/10 py-1">
           {requestTypes.map((option) => {
             const isSelected = option.value === value;
             return (
@@ -95,8 +95,8 @@ function RequestTypeSelect({
                 className={`
                   flex items-center justify-between gap-2 px-4 py-2.5 text-sm cursor-pointer transition-colors
                   ${isSelected
-                    ? 'bg-primary/10 text-primary font-medium'
-                    : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                    ? 'bg-primary/15 text-primary font-medium'
+                    : 'text-gray-300 hover:bg-primary/10 hover:text-white'
                   }
                 `}
               >
@@ -167,24 +167,20 @@ export default function Contact({ content_en, content_ar }: Props) {
       <Head title="Contact" />
 
       {/* Contact Content */}
-      <section className="bg-linear-to-r from-gray-900 to-gray-800 text-white pt-24 lg:pt-32 pb-24 lg:pb-32 min-h-screen">
+      <section className="bg-black text-white pt-24 lg:pt-32 pb-24 lg:pb-32 min-h-screen">
         <div className="container mx-auto px-4">
-          {/* Page header */}
-          <div className="max-w-2xl mb-12 lg:mb-16">
-            <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
-              {t('contact.hero.title', 'Get in Touch')}
-            </p>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-4">
-              {content?.overview?.title || t('contact.hero.title')}
-            </h1>
-            <p className="text-lg text-gray-400 leading-relaxed">
-              {content?.overview?.description || t('contact.hero.subtitle')}
-            </p>
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Contact Info */}
+            {/* Left: Header + Contact Info */}
             <div className="lg:col-span-1">
+              <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
+                {t('contact.hero.title')}
+              </p>
+              <h1 className="text-4xl sm:text-5xl lg:text-5xl font-black leading-tight mb-4">
+                {content?.overview?.title || t('contact.hero.h1')}
+              </h1>
+              <p className="text-base text-gray-400 leading-relaxed mb-10">
+                {content?.overview?.description || t('contact.hero.subtitle')}
+              </p>
               <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
                 {t('contact.info.title')}
               </p>
@@ -204,9 +200,13 @@ export default function Contact({ content_en, content_ar }: Props) {
                   </div>
                   <div>
                     <h3 className="font-medium text-white text-sm mb-1">{t('contact.info.phone')}</h3>
-                    <a href={`tel:${siteSettings.phone}`} className="text-gray-400 text-sm hover:text-primary transition-colors">
-                      {siteSettings.phone}
-                    </a>
+                    <div className="flex flex-col gap-0.5">
+                      {(siteSettings.phone || '+966543781868').split(',').map((p) => (
+                        <a key={p} href={`tel:${p.trim().replace(/\s/g, '')}`} className="text-gray-400 text-sm hover:text-primary transition-colors">
+                          {p.trim()}
+                        </a>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-xl p-5 flex items-start gap-4">
@@ -215,9 +215,13 @@ export default function Contact({ content_en, content_ar }: Props) {
                   </div>
                   <div>
                     <h3 className="font-medium text-white text-sm mb-1">{t('contact.info.email')}</h3>
-                    <a href={`mailto:${siteSettings.email || 'info@nuorsteel.com'}`} className="text-gray-400 text-sm hover:text-primary transition-colors">
-                      {siteSettings.email || 'info@nuorsteel.com'}
-                    </a>
+                    <div className="flex flex-col gap-0.5">
+                      {(siteSettings.email || 'info@nuorsteel.com').split(',').map((e) => (
+                        <a key={e} href={`mailto:${e.trim()}`} className="text-gray-400 text-sm hover:text-primary transition-colors">
+                          {e.trim()}
+                        </a>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

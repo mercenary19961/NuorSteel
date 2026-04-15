@@ -228,7 +228,7 @@
 - [x] Vision & Mission cards: equalized heights via `auto-rows-fr` + `h-full`, content top-aligned (removed `mt-auto` on description)
 - [x] About section description and CTA button: reduced sizes for balanced layout
 - [x] Favicon assets added: `favicon-32.png`, `favicon-16.png`, `apple-touch-icon.png`, `favicon.ico` with `<link>` tags in `app.blade.php`
-- [x] Container max-width capped at 1280px from `xl` upward — prevents abrupt layout jump at the `2xl` breakpoint (`app.css` media query)
+- [x] Container max-width raised to **1800px** from `xl` upward, fills 100% between `lg`–`xl` (1024–1280px) to eliminate side gap (`app.css` media query)
 - [x] About page: black grid texture background applied to all sections (Intro, Capabilities, Timeline, Vision & Mission) — replaces `bg-linear-to-r from-gray-900 to-gray-800` with `bg-black` + subtle 60px CSS grid overlay (`rgba(255,255,255,.1)`)
 - [x] Capabilities ScrollStack cards: `bg-zinc-800/90 backdrop-blur-sm` (was `bg-gray-800`) for glass effect over grid texture
 - [x] Career page: black grid texture background applied to hero and Open Positions sections
@@ -247,12 +247,20 @@
 - [x] CSRF 419 handling: `app.tsx` listens to Inertia `error` event and auto-reloads on 419 (expired CSRF token during language toggle) instead of showing a broken state
 - [x] Unified icon styling across public pages: Certificates, Career, and Quality card icons changed to `text-white` with `bg-white/5` containers (consistent look)
 - [x] Arabic product names updated: "قضبان حديد التسليح" → "حديد التسليح", "كتل الصلب" → "ستيل بِليت" (data migration `2026_04_11_120000_update_product_arabic_names.php`)
-- [x] Products page: new 3D render images (webp) for TMT Bars and Billets, language-aware (`tmt-bars-en.webp`/`tmt-bars-ar.webp`)
+- [x] Products page: new render images for TMT Bars and Billets in `public/images/products/renders/` (language-aware: `tmt-bars-en/ar.webp`, `billets-en/ar.webp`)
 - [x] Products page: right panel changed from warehouse image to black grid texture background
 - [x] Products page: faint warehouse overlay on orange left panel (only in Explore More expanded view, `opacity-10`)
 - [x] Products page: mobile redesign — orange bg, white buttons with orange text, clean thumbnails, product image inside orange panel, nav button below thumbnails
 - [x] Products page: RTL clip-path diagonal properly mirrored (fixed SVG path math for Arabic)
 - [x] Products page: tab button border flash fix (`border-transparent` on active state)
+- [x] Products page: hero image and mobile image clickable to trigger Explore More
+- [x] Products page: hero product image repositioned left-aligned using same `ps` formula as title; `translate-y-12` on billets to lower it
+- [x] Products page: thumbnails — removed `aspect-4/3` constraint (hugs natural image height for wide billets image), bumped sizes (`w-48 xl:w-64 2xl:w-80`), `font-black` labels, `gap-20` between products, `mt-6` between image and label
+- [x] Products page: thumbnail alignment — `lg:pe-4` at laptop width, `xl:pe-[max(...)]` uses 1800px container formula
+- [x] Products page: mobile hero text padding uses container-matching formula at `sm`/`md` breakpoints to align with navbar
+- [x] Products page: mobile Explore More detail — "Back to Products" moved to top-right of title row, title bumped to `text-4xl`
+- [x] Products page: spec table scrollable — `max-h-72 overflow-y-auto` with sticky `thead` (shows ~5 rows)
+- [x] Products page: expanded billets image constrained by `max-h` + `max-w` (wide aspect ratio fix) and `translate-y-10` down; per-product sizing in both hero and expanded views
 - [x] Homepage hero: background replaced with looping video (`/videos/hero-bg.mp4`, 3MB), poster image fallback for loading state
 - [x] Homepage Vision 2030: background switched from PNG to WebP, `object-center` instead of `object-top`
 - [x] About hero: scroll-driven text + logo animation on desktop, time-based on mobile (logo drops in + text slides up on page load)
@@ -261,7 +269,25 @@
 - [x] About capabilities: redesigned from vertical ScrollStack to horizontal scroll-driven reveal (cards slide in side by side), RTL-aware direction
 - [x] About capabilities: mobile flip-in animation (3D rotateX with staggered delays via IntersectionObserver)
 - [x] About timeline: auto-advance only starts when section is in viewport (IntersectionObserver)
+- [x] About section homepage background images updated to gray variant (`bg-desktop-en/ar.webp`, `bg-mobile-en/ar.webp`)
 - [x] About timeline mobile: swipeable card carousel with glass cards, dot indicators, touch navigation, auto-advance
+- [x] Timeline: per-year background images (`{year}-desktop/mobile-en/ar.webp`) crossfade as active event changes (AnimatePresence); "Present" uses original bg images; 20 images total in `public/images/about/journey/`
+
+### Partners Section (DONE)
+- [x] `PartnersSection` component (`resources/js/Components/Public/PartnersSection.tsx`) — 3-column auto-scrolling logo carousel inserted above News section on homepage
+- [x] 16 partner logos in `public/images/home/partners/` with per-logo size tiers (LG/XL/XXL/XXXL constants)
+- [x] Per-column hover pause (each ScrollColumn manages its own `paused` state independently)
+- [x] Desktop: absolute-positioned columns fill full section height (600px) with text panel on the left (2/5 width)
+- [x] Mobile: stacked layout — header + paragraph on top, 3 scrolling columns below (420px height)
+- [x] Scroll animations via CSS keyframes (`animate-scroll-up` / `animate-scroll-down`) in `app.css`
+- [x] Per-logo size classes scoped to `lg:` so mobile uses unified smaller constraints (`max-h-24 max-w-24` base, larger per-tier)
+
+### Core Values Expansion (DONE)
+- [x] Core values expanded from 4 to 6: added "People & Teamwork" and "Trust & Integrity"
+- [x] New icons in `public/images/home/core-values/people-teamwork.webp` + `trust-integrity.webp`
+- [x] `imageBg: true` prop on new values triggers programmatic orange (`bg-primary`) background on orbital node (no separate image required)
+- [x] Scroll-step wrapper updated to `600vh` (7 stages: idle + 6 values); `Math.min(6, step)` drives selection
+- [x] i18n keys added for both new values (EN + AR) in `en.ts` + `ar.ts`
 
 ### Site-Wide Visual Consistency (DONE)
 - [x] Unified `bg-linear-to-r from-gray-900 to-gray-800` gradient across all public page sections (Home, About, Quality, Career)
@@ -388,6 +414,19 @@ About Us | Products | Quality | Career | Certificates | [Contact Us]
 ### Recycling Page
 - Lives at `/about/recycling` (sub-page under About Us)
 - Not in main navigation
+
+---
+
+## Company Contact Info (Real / Production)
+
+| Field | Value |
+|-------|-------|
+| Phone | +966543781868 / +966545198760 |
+| Email | info@nuorsteel.com / Nuorsteel@hotmail.com |
+| Address (EN) | 59, Al Kharj Industrial City (Modon), Riyadh 16416 |
+| Address (AR) | ٥٩، مدينة الخرج الصناعية (مدن)، الرياض 16416 |
+
+These values are seeded via `2026_04_15_120000_update_real_contact_settings.php` and stored in the `settings` table (`company_phone`, `company_email`, `company_address_en/ar`). Displayed in footer and contact page — both support comma-separated multi-value.
 
 ---
 
@@ -723,4 +762,4 @@ public/images/shared/          → Shared images (logo/)
 
 ---
 
-> **Last updated:** 2026-04-13 — About page hero redesign (scroll-driven logo + bg image + green text effect), capabilities horizontal scroll reveal, timeline mobile swipeable cards, homepage hero looping video background, Vision 2030 bg webp switch
+> **Last updated:** 2026-04-15 — Partners section (3-column scrolling logos, mobile stacked), core values expanded to 6, per-year timeline backgrounds, products page hero/thumbnail/explore-more refinements, container max-width 1800px

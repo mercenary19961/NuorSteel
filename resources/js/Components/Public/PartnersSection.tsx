@@ -5,6 +5,7 @@ interface Partner {
   name: string;
   logo: string;
   logoClass?: string;
+  desktopLogoClass?: string;
 }
 
 const LG = 'max-h-24 max-w-24 lg:max-h-36 lg:max-w-36';
@@ -13,22 +14,22 @@ const XXL = 'max-h-32 max-w-32 lg:max-h-52 lg:max-w-52';
 const XXXL = 'max-h-36 max-w-36 lg:max-h-60 lg:max-w-60';
 
 const partners: Partner[] = [
-  { name: 'Aramco', logo: '/images/home/partners/aramco.webp' },
-  { name: 'Vision 2030', logo: '/images/home/partners/vision 2030.webp', logoClass: XXL },
-  { name: 'Saudi Made', logo: '/images/home/partners/SAUDI MADE.webp' },
+  { name: 'Aramco', logo: '/images/home/partners/aramco.webp', desktopLogoClass: 'lg:max-h-32 lg:max-w-32' },
+  { name: 'Vision 2030', logo: '/images/home/partners/vision 2030.webp', logoClass: XXL, desktopLogoClass: 'lg:max-h-28 lg:max-w-28' },
+  { name: 'Saudi Made', logo: '/images/home/partners/SAUDI MADE.webp', desktopLogoClass: 'lg:max-h-20 lg:max-w-20' },
   { name: 'MODON', logo: '/images/home/partners/modon.webp', logoClass: XXXL },
-  { name: 'NHC', logo: '/images/home/partners/nhc.webp', logoClass: XL },
+  { name: 'NHC', logo: '/images/home/partners/nhc.webp', logoClass: XL, desktopLogoClass: 'lg:max-h-24 lg:max-w-24' },
   { name: 'Roshen', logo: '/images/home/partners/roshen.webp', logoClass: XL },
   { name: 'ASTM', logo: '/images/home/partners/ASTM.webp', logoClass: XXL },
   { name: 'ISO', logo: '/images/home/partners/ISO.webp', logoClass: XXL },
-  { name: 'SASO', logo: '/images/home/partners/SASO LOGO.webp' },
-  { name: 'EPD', logo: '/images/home/partners/epd.webp' },
+  { name: 'SASO', logo: '/images/home/partners/SASO LOGO.webp', desktopLogoClass: 'lg:max-h-28 lg:max-w-28' },
+  { name: 'EPD', logo: '/images/home/partners/epd.webp', desktopLogoClass: 'lg:max-h-28 lg:max-w-28' },
   { name: 'HPD', logo: '/images/home/partners/HPD.webp', logoClass: XXXL },
   { name: 'Qarya', logo: '/images/home/partners/qarya.webp', logoClass: XXL },
-  { name: 'Tasnee3', logo: '/images/home/partners/tasnee3.webp' },
-  { name: 'Water Co', logo: '/images/home/partners/WATER CO.webp' },
-  { name: 'Ministry of Industry', logo: '/images/home/partners/industry ministry.webp' },
-  { name: 'Ministry of Transport', logo: '/images/home/partners/TRANSFER MINISTRY.webp', logoClass: LG },
+  { name: 'Tasnee3', logo: '/images/home/partners/tasnee3.webp', desktopLogoClass: 'lg:max-h-24 lg:max-w-24' },
+  { name: 'Water Co', logo: '/images/home/partners/WATER CO.webp', desktopLogoClass: 'lg:max-h-20 lg:max-w-20' },
+  { name: 'Ministry of Industry', logo: '/images/home/partners/industry ministry.webp', desktopLogoClass: 'lg:max-h-28 lg:max-w-28' },
+  { name: 'Ministry of Transport', logo: '/images/home/partners/TRANSFER MINISTRY.webp', logoClass: LG, desktopLogoClass: 'lg:max-h-20 lg:max-w-20' },
 ];
 
 // Split partners into 3 columns
@@ -67,7 +68,7 @@ function ScrollColumn({
             <img
               src={partner.logo}
               alt={partner.name}
-              className={`object-contain lg:max-h-none lg:max-w-none ${partner.logoClass || 'max-h-24 max-w-24 lg:max-h-28 lg:max-w-32'}`}
+              className={`object-contain ${partner.desktopLogoClass ? '' : 'lg:max-h-none lg:max-w-none'} ${partner.logoClass || 'max-h-24 max-w-24'} ${partner.desktopLogoClass || ''}`}
               loading="lazy"
               decoding="async"
             />
@@ -94,7 +95,7 @@ export default function PartnersSection() {
             {t('home.partners.description')}
           </p>
         </div>
-        <div className="h-[420px] grid grid-cols-3 gap-0 px-2">
+        <div className="h-105 grid grid-cols-3 gap-0 px-2">
           {columns.map((col, i) => (
             <ScrollColumn
               key={i}
@@ -106,7 +107,7 @@ export default function PartnersSection() {
       </div>
 
       {/* Desktop: side-by-side layout */}
-      <div className="hidden lg:block relative h-[600px]">
+      <div className="hidden lg:block relative h-150">
         {/* Right — Scrolling columns (full section height) */}
         <div className="absolute top-0 right-0 bottom-0 w-3/5 grid grid-cols-3 gap-0 pe-8">
           {columns.map((col, i) => (
