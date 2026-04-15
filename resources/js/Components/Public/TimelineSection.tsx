@@ -8,6 +8,15 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 const AUTO_ADVANCE_MS = 10_000;
 const EVENT_COUNT = 6;
 
+const YEAR_IMAGES = ['2010', '2014', '2016', '2020', '2023', null]; // index 5 = "Present", uses original bg
+
+function getJourneyBg(activeIndex: number, type: 'desktop' | 'mobile', lang: string) {
+  const year = YEAR_IMAGES[activeIndex];
+  const l = lang === 'ar' ? 'ar' : 'en';
+  if (!year) return `/images/about/journey/bg-${type}-${l}.webp`;
+  return `/images/about/journey/${year}-${type}-${l}.webp`;
+}
+
 /* ─────────────────────────────────────────────
    Mobile: Swipeable card carousel
    ───────────────────────────────────────────── */
@@ -55,13 +64,20 @@ function MobileTimeline() {
 
   return (
     <section className="relative bg-black overflow-hidden">
-      {/* Background image */}
-      <img
-        src={`/images/about/journey/bg-mobile-${language === 'ar' ? 'ar' : 'en'}.webp`}
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover"
-      />
+      {/* Background image — changes per active event */}
+      <AnimatePresence mode="sync">
+        <motion.img
+          key={`mobile-bg-${active}`}
+          src={getJourneyBg(active, 'mobile', language)}
+          alt=""
+          aria-hidden="true"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.6 }}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </AnimatePresence>
 
       <div className="relative z-10 min-h-[85vh] flex flex-col px-5 py-12">
         {/* Section title */}
@@ -288,14 +304,20 @@ function DesktopTimeline() {
   return (
     <div ref={wrapperRef} className="relative" style={{ height: `${EVENT_COUNT * 100}vh` }}>
       <section ref={sectionRef} className="sticky top-0 h-screen w-full overflow-hidden bg-black">
-        <picture>
-          <img
-            src={`/images/about/journey/bg-desktop-${language === 'ar' ? 'ar' : 'en'}.webp`}
+        {/* Background image — changes per active event */}
+        <AnimatePresence mode="sync">
+          <motion.img
+            key={`desktop-bg-${active}`}
+            src={getJourneyBg(active, 'desktop', language)}
             alt=""
             aria-hidden="true"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6 }}
             className="absolute inset-0 w-full h-full object-cover"
           />
-        </picture>
+        </AnimatePresence>
 
         <div className="relative z-10 flex flex-row h-full">
           <div className="flex-1" />
