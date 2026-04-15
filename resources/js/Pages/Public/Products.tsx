@@ -476,7 +476,7 @@ export default function Products({ products }: Props) {
           )}
           <div className={`relative h-full flex flex-col lg:flex-row ${expanded ? 'lg:overflow-hidden' : ''}`}>
             {/* Text Content — left side of the left panel */}
-            <div className={`flex-1 flex flex-col px-4 py-8 sm:px-8 lg:py-12 lg:ps-[max(2rem,calc((100vw-1536px)/2+1rem))] lg:pe-8 ${expanded ? 'lg:overflow-y-auto scrollbar-thin justify-start pt-28!' : 'justify-center pt-24 lg:justify-start lg:pt-56'}`}>
+            <div className={`flex-1 flex flex-col px-4 py-8 sm:px-[max(1rem,calc((100vw-640px)/2+1rem))] md:px-[max(1rem,calc((100vw-768px)/2+1rem))] lg:py-12 lg:ps-[max(2rem,calc((100vw-1800px)/2+1rem))] lg:pe-8 ${expanded ? 'lg:overflow-y-auto scrollbar-thin justify-start pt-28!' : 'justify-center pt-24 lg:justify-start lg:pt-56'}`}>
               <AnimatePresence mode="wait">
                 {!expanded ? (
                   /* --- DEFAULT: Hero Content --- */
@@ -519,7 +519,8 @@ export default function Products({ products }: Props) {
                               key={`mobile-hero-img-${selectedSlug}-${language}`}
                               src={getProductImage(selectedProduct)!}
                               alt={getName(selectedProduct)}
-                              className="max-h-52 w-auto object-contain"
+                              onClick={handleExplore}
+                              className="max-h-52 w-auto object-contain cursor-pointer"
                             />
                           ) : (
                             <div className="w-40 h-40 rounded-full bg-white/5 flex items-center justify-center">
@@ -541,9 +542,19 @@ export default function Products({ products }: Props) {
                     transition={{ duration: 0.3 }}
                     className="w-full lg:max-w-[70%] pb-8"
                   >
-                    <h2 className="text-2xl lg:text-3xl xl:text-4xl font-black text-white mb-6 uppercase tracking-wide">
-                      {getName(selectedProduct)}
-                    </h2>
+                    <div className="flex items-center justify-between gap-3 mb-6 lg:block">
+                      <h2 className="text-4xl lg:text-3xl xl:text-4xl font-black text-white uppercase tracking-wide">
+                        {getName(selectedProduct)}
+                      </h2>
+                      <button
+                        onClick={handleBack}
+                        className="lg:hidden shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white text-primary text-xs font-semibold hover:bg-white/90 transition-all cursor-pointer group"
+                      >
+                        <LayoutGrid size={12} />
+                        {t('products.backToProducts')}
+                        <ArrowRight className="-rotate-90 group-hover:-translate-y-0.5 transition-transform" size={12} />
+                      </button>
+                    </div>
 
                     <ProductTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
@@ -559,30 +570,20 @@ export default function Products({ products }: Props) {
                       </motion.div>
                     </AnimatePresence>
 
-                    {/* Mobile: Image + Back button (only visible below lg) */}
-                    <div className="lg:hidden flex items-end justify-between mt-12 pb-4">
-                      <button
-                        onClick={handleBack}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white text-primary text-xs font-semibold hover:bg-white/90 transition-all cursor-pointer group"
-                      >
-                        <LayoutGrid size={12} />
-                        {t('products.backToProducts')}
-                        <ArrowRight className="-rotate-90 group-hover:-translate-y-0.5 transition-transform" size={12} />
-                      </button>
-                      <div className="flex items-end justify-end">
-                        {getProductImage(selectedProduct) ? (
-                          <img
-                            key={`mobile-detail-img-${selectedSlug}-${language}`}
-                            src={getProductImage(selectedProduct)!}
-                            alt={getName(selectedProduct)}
-                            className="max-h-28 w-auto object-contain"
-                          />
-                        ) : (
-                          <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center">
-                            <Package className="text-white/20" size={24} />
-                          </div>
-                        )}
-                      </div>
+                    {/* Mobile: Product image (only visible below lg) */}
+                    <div className="lg:hidden flex items-end justify-end mt-12 pb-4">
+                      {getProductImage(selectedProduct) ? (
+                        <img
+                          key={`mobile-detail-img-${selectedSlug}-${language}`}
+                          src={getProductImage(selectedProduct)!}
+                          alt={getName(selectedProduct)}
+                          className="max-h-28 w-auto object-contain"
+                        />
+                      ) : (
+                        <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center">
+                          <Package className="text-white/20" size={24} />
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 )}
@@ -594,7 +595,7 @@ export default function Products({ products }: Props) {
 
         {/* Large Product Image — absolutely positioned over both panels, near the diagonal */}
         {!expanded && (
-          <div className="hidden lg:flex absolute z-20 bottom-1/4 items-end justify-start pointer-events-none max-w-[60%] left-[13%]">
+          <div className="hidden lg:flex absolute z-20 bottom-1/4 items-end justify-start pointer-events-none max-w-[60%] left-0 ps-[max(2rem,calc((100vw-1800px)/2+1rem))]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={`img-${selectedSlug}`}
@@ -609,7 +610,8 @@ export default function Products({ products }: Props) {
                     key={`hero-img-${selectedSlug}-${language}`}
                     src={getProductImage(selectedProduct)!}
                     alt={getName(selectedProduct)}
-                    className="w-auto object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)] max-h-64 xl:max-h-80 2xl:max-h-96"
+                    onClick={handleExplore}
+                    className="w-auto object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)] max-h-64 xl:max-h-80 2xl:max-h-96 pointer-events-auto cursor-pointer"
                   />
                 ) : (
                   <div className="w-48 h-48 rounded-full bg-white/5 flex items-center justify-center">
@@ -747,14 +749,14 @@ export default function Products({ products }: Props) {
                 </div>
 
                 {/* Desktop: Product thumbnails — stacked vertically, far right, centered */}
-                <div className="hidden lg:flex flex-col items-end justify-center h-full w-full pe-0 gap-20">
+                <div className="hidden lg:flex flex-col items-end justify-center h-full w-full lg:pe-4 xl:pe-[max(2rem,calc((100vw-1800px)/2+1rem))] gap-20">
                   {products.map((product) => {
                     const isSelected = product.slug === selectedSlug;
                     return (
                       <button
                         key={product.slug}
                         onClick={() => handleSelectProduct(product.slug)}
-                        className="group relative w-36 xl:w-64 2xl:w-80 transition-all duration-300 cursor-pointer"
+                        className="group relative w-48 xl:w-64 2xl:w-80 transition-all duration-300 cursor-pointer"
                       >
                         <div className="w-full flex items-center justify-center">
                           {getProductImage(product) ? (

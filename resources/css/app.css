@@ -20,10 +20,15 @@
     --color-foreground: #0f172a;
 }
 
-/* Cap container from xl upward — prevents abrupt layout jump at the 2xl breakpoint */
+/* Container widths: fill viewport between lg and xl (avoids side gap), cap at 1536px from xl upward */
+@media (width >= 64rem) {
+    .container {
+        max-width: 100%;
+    }
+}
 @media (width >= 80rem) {
     .container {
-        max-width: 1536px;
+        max-width: 1800px;
     }
 }
 
