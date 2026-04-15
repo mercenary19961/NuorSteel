@@ -8,7 +8,7 @@ const en = {
     quality: "Quality",
     career: "Career",
     certificates: "Certificates",
-    contact: "Contact",
+    contact: "Contact Us",
   },
   home: {
     hero: {
@@ -427,8 +427,9 @@ const en = {
   },
   contact: {
     hero: {
-      title: "Get in Touch",
-      subtitle: "We'd love to hear from you",
+      title: "Contact Us",
+      h1: "Let's Start a Conversation",
+      subtitle: "We'd love to hear from you. Please fill out the form below and we'll get back to you as soon as possible.",
     },
     info: {
       title: "Contact Information",

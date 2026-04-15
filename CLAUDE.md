@@ -417,6 +417,19 @@ About Us | Products | Quality | Career | Certificates | [Contact Us]
 
 ---
 
+## Company Contact Info (Real / Production)
+
+| Field | Value |
+|-------|-------|
+| Phone | +966543781868 / +966545198760 |
+| Email | info@nuorsteel.com / Nuorsteel@hotmail.com |
+| Address (EN) | 59, Al Kharj Industrial City (Modon), Riyadh 16416 |
+| Address (AR) | ٥٩، مدينة الخرج الصناعية (مدن)، الرياض 16416 |
+
+These values are seeded via `2026_04_15_120000_update_real_contact_settings.php` and stored in the `settings` table (`company_phone`, `company_email`, `company_address_en/ar`). Displayed in footer and contact page — both support comma-separated multi-value.
+
+---
+
 ## Email Routing
 
 | Form | Recipients |

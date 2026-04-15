@@ -97,30 +97,38 @@ export default function Footer() {
               </li>
               {siteSettings.phone && (
                 <li
-                  className={`flex items-center text-sm transition-all duration-700 ${
+                  className={`flex items-start text-sm transition-all duration-700 ${
                     highlightContact
                       ? 'text-white [text-shadow:0_0_12px_rgba(255,122,0,0.8),0_0_24px_rgba(255,122,0,0.4)]'
                       : 'text-gray-400'
                   }`}
                 >
-                  <Phone size={16} className="mr-2 shrink-0" />
-                  <a href={`tel:${siteSettings.phone.replace(/\s/g, '')}`} className="hover:text-white transition-colors">
-                    {siteSettings.phone}
-                  </a>
+                  <Phone size={16} className="mr-2 mt-0.5 shrink-0" />
+                  <span className="flex flex-col gap-0.5">
+                    {siteSettings.phone.split(',').map((p) => (
+                      <a key={p} href={`tel:${p.trim().replace(/\s/g, '')}`} className="hover:text-white transition-colors">
+                        {p.trim()}
+                      </a>
+                    ))}
+                  </span>
                 </li>
               )}
               {siteSettings.email && (
                 <li
-                  className={`flex items-center text-sm transition-all duration-700 ${
+                  className={`flex items-start text-sm transition-all duration-700 ${
                     highlightContact
                       ? 'text-white [text-shadow:0_0_12px_rgba(255,122,0,0.8),0_0_24px_rgba(255,122,0,0.4)]'
                       : 'text-gray-400'
                   }`}
                 >
-                  <Mail size={16} className="mr-2 shrink-0" />
-                  <a href={`mailto:${siteSettings.email}`} className="hover:text-white transition-colors">
-                    {siteSettings.email}
-                  </a>
+                  <Mail size={16} className="mr-2 mt-0.5 shrink-0" />
+                  <span className="flex flex-col gap-0.5">
+                    {siteSettings.email.split(',').map((e) => (
+                      <a key={e} href={`mailto:${e.trim()}`} className="hover:text-white transition-colors">
+                        {e.trim()}
+                      </a>
+                    ))}
+                  </span>
                 </li>
               )}
             </ul>
