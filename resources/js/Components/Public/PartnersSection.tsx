@@ -94,7 +94,7 @@ export default function PartnersSection() {
             {t('home.partners.description')}
           </p>
         </div>
-        <div className="h-[420px] grid grid-cols-3 gap-0 px-2">
+        <div className="h-105 grid grid-cols-3 gap-0 px-2">
           {columns.map((col, i) => (
             <ScrollColumn
               key={i}
@@ -106,7 +106,7 @@ export default function PartnersSection() {
       </div>
 
       {/* Desktop: side-by-side layout */}
-      <div className="hidden lg:block relative h-[600px]">
+      <div className="hidden lg:block relative h-150">
         {/* Right — Scrolling columns (full section height) */}
         <div className="absolute top-0 right-0 bottom-0 w-3/5 grid grid-cols-3 gap-0 pe-8">
           {columns.map((col, i) => (
