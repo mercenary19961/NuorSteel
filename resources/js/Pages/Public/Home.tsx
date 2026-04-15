@@ -575,8 +575,8 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         </div>
       </section>
 
-      {/* Partners & Clients Section */}
-      <PartnersSection />
+      {/* Partners & Clients Section — temporarily hidden */}
+      {/* <PartnersSection /> */}
 
       {/* LinkedIn Feed Section */}
       <section ref={linkedinSectionRef} id="section-linkedin" className="relative py-16 lg:py-24 bg-[#414042] overflow-hidden">

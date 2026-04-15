@@ -99,7 +99,7 @@ function MobileTimeline() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: isRtl ? 60 : -60 }}
               transition={{ duration: 0.35, ease: 'easeOut' }}
-              className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6"
+              className="p-6"
             >
               <div className="text-5xl font-bold text-primary/80 mb-3 leading-none">
                 {events[active].year}
