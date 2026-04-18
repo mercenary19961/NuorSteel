@@ -142,23 +142,41 @@ class LinkedinPostController extends Controller
 
     /**
      * Extract a LinkedIn URL from raw input (iframe embed code or plain URL).
+     * Returned URL is guaranteed to be https with a linkedin.com host (not just a substring).
      */
     private function extractUrlFromInput(string $input): ?string
     {
         $input = trim($input);
 
-        // If it's an iframe embed code, extract the src attribute
-        if (preg_match('/src=["\']([^"\']+linkedin\.com[^"\']+)["\']/i', $input, $matches)) {
-            // Strip query params like ?collapsed=1
-            return strtok($matches[1], '?');
+        $candidate = null;
+
+        // If it's an iframe embed code, extract the src attribute first
+        if (preg_match('/src=["\']([^"\']+)["\']/i', $input, $matches)) {
+            $candidate = $matches[1];
+        } elseif (preg_match('/https?:\/\/\S+/i', $input, $matches)) {
+            $candidate = $matches[0];
         }
 
-        // If it's already a LinkedIn URL
-        if (preg_match('/https?:\/\/[^\s]*linkedin\.com[^\s]*/i', $input, $matches)) {
-            return strtok($matches[0], '?');
+        if (!$candidate) {
+            return null;
         }
 
-        return null;
+        $candidate = strtok($candidate, '?');
+        $host = parse_url($candidate, PHP_URL_HOST);
+        $scheme = parse_url($candidate, PHP_URL_SCHEME);
+
+        if ($scheme !== 'https' || !$host) {
+            return null;
+        }
+
+        // Host must be linkedin.com or a subdomain of it (case-insensitive).
+        // Prevents spoofs like evil.com/?x=linkedin.com or linkedin.com.evil.com.
+        $host = strtolower($host);
+        if ($host !== 'linkedin.com' && !str_ends_with($host, '.linkedin.com')) {
+            return null;
+        }
+
+        return $candidate;
     }
 
     /**

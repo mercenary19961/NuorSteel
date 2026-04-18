@@ -25,6 +25,7 @@ export interface PageProps {
     address: string;
     linkedin_url: string;
   };
+  turnstileSiteKey: string | null;
   ziggy: {
     url: string;
     port: number | null;

@@ -8,12 +8,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class MediaServeController extends Controller
 {
+    // SVG intentionally excluded: SVGs can carry inline scripts/event handlers that
+    // execute when served as image/svg+xml on the site origin, enabling stored XSS.
     private const ALLOWED_MIME_TYPES = [
         'image/jpeg',
         'image/png',
         'image/webp',
         'image/gif',
-        'image/svg+xml',
         'application/pdf',
     ];
 

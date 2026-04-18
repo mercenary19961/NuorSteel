@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { MagicCardGrid, MagicCard } from '@/Components/ui/magic-card';
+import Turnstile from '@/Components/Public/Turnstile';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CareerListItem {
@@ -471,6 +472,7 @@ function ApplicationForm({ formRef, formError, processing, defaultJobTitle, onSu
         />
         <p className="text-xs text-gray-500 mt-1">{t('career.form.cvHint')}</p>
       </div>
+      <Turnstile theme="dark" />
       <button
         type="submit"
         disabled={processing}

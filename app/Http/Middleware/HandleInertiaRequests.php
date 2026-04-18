@@ -44,6 +44,7 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
             ],
             'siteSettings' => fn () => $this->getSiteSettings(),
+            'turnstileSiteKey' => fn () => config('services.turnstile.site_key'),
             'ziggy' => function () use ($request) {
                 $ziggy = new Ziggy;
 

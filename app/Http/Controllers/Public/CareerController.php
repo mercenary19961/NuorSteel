@@ -8,14 +8,20 @@ use App\Models\CareerApplication;
 use App\Models\SiteContent;
 use App\Models\Setting;
 use App\Mail\CareerApplicationReceived;
+use App\Services\TurnstileVerifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class CareerController extends Controller
 {
+    public function __construct(private TurnstileVerifier $turnstile)
+    {
+    }
+
     public function index(): Response
     {
         $listings = CareerListing::open()
@@ -77,7 +83,14 @@ class CareerController extends Controller
             'phone' => 'required|string|max:50',
             'job_title' => 'required|string|max:255',
             'cv' => 'required|file|mimes:pdf|mimetypes:application/pdf|max:5120',
+            'cf-turnstile-response' => 'nullable|string',
         ]);
+
+        if (!$this->turnstile->verify($request->input('cf-turnstile-response'), $request->ip())) {
+            throw ValidationException::withMessages([
+                'cf-turnstile-response' => ['Bot check failed. Please reload the page and try again.'],
+            ]);
+        }
 
         $listing = null;
         if ($slug) {
