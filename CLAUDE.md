@@ -53,7 +53,6 @@
 - [x] PublicLayout (Header + Footer + children)
 - [x] Home page (full-viewport hero, framer-motion animations, bottom nav links, interactive core values, products, CTA)
 - [x] About page (animated intro with highlighted keywords, vision, mission, capabilities scroll-stack, timeline, no governance)
-- [x] Recycling page (sub-page under About)
 - [x] Products listing (ISL-style angled split layout) + Product detail page
 - [x] Quality page (hero section + magic card assurance cards)
 - [x] Career page (hero section, magic card job listings, job detail modal, open application modal)
@@ -415,10 +414,6 @@ About Us | Products | Quality | Career | Certificates | [Contact Us]
 - **Undo system**: Soft-delete with undo button across all admin sections (`UndoService`)
 - **Change Log**: Persistent change tracking with time filters, card layout, revert/delete (`/admin/change-log`)
 
-### Recycling Page
-- Lives at `/about/recycling` (sub-page under About Us)
-- Not in main navigation
-
 ---
 
 ## Company Contact Info (Real / Production)
@@ -511,7 +506,6 @@ These values are seeded via `2026_04_15_120000_update_real_contact_settings.php`
 ```
 /                       → Home
 /about                  → About Us
-/about/recycling        → Recycling (sub-page)
 /products               → Product listing
 /products/{slug}        → Product detail
 /quality                → Quality & certifications
@@ -681,6 +675,7 @@ Security is extremely important for this project. Every code change must conside
 - **Auth state**: `usePage<PageProps>().props.auth.user` (shared by middleware)
 - **Site settings**: `usePage<PageProps>().props.siteSettings` (phone, email, address, LinkedIn — shared by middleware)
 - **Styling**: TailwindCSS v4 with custom `primary` color, Inter font
+- **Theme tokens** (in `@theme` block at `resources/css/app.css`): `bg-surface` (`#414042`, main page/section bg) and `bg-surface-dark` (`#2D2D2F`, footer / detail panels). Use these on public pages instead of `bg-black` — the public site is unified on grey, not pure black. `bg-black/40|50|70` transparency overlays are intentional and should stay.
 - **Icons**: Lucide React
 - **Animations**: framer-motion (isolated in `vendor-motion` Vite chunk), ScrollStack (sticky viewport + progress-based, isolated in `vendor-lenis` chunk)
 - **Smooth scroll**: Lenis library for ScrollStack container mode (window scroll mode uses native scroll events to avoid hijacking page scroll)
@@ -766,4 +761,4 @@ public/images/shared/          → Shared images (logo/)
 
 ---
 
-> **Last updated:** 2026-04-18 — Partners section hidden from homepage (`desktopLogoClass` prop added for per-logo desktop sizing), contact page black theme + orange dropdown + restructured layout + "Contact Us" label, real contact info seeded (multi-phone + multi-email, comma-separated in settings), mobile timeline card transparent (no glass)
+> **Last updated:** 2026-04-18 — Public site theme migrated from `bg-black` to `bg-surface` grey (new `--color-surface: #414042` + `--color-surface-dark: #2D2D2F` tokens in `@theme`), all public pages + section components + Home/Footer/Header/PartnersSection/radial-orbital-timeline updated. Orphaned Recycling page deleted (route + controller method + component + i18n keys). Partners section hidden from homepage, contact page restructured, real contact info seeded (multi-phone + multi-email), mobile timeline card transparent

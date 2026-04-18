@@ -53,7 +53,7 @@ export default function About() {
       <h1 className="sr-only">{t('about.hero.title')}</h1>
 
       {/* About Hero — static full-screen section */}
-      <section className="relative h-screen bg-black text-white overflow-hidden">
+      <section className="relative h-screen bg-surface text-white overflow-hidden">
         {/* Background image */}
         <picture>
           <source media="(max-width: 639px)" srcSet={`/images/about/hero/bg-mobile-${isRtl ? 'ar' : 'en'}.webp`} />

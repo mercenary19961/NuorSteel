@@ -446,7 +446,7 @@ export default function Products({ products }: Props) {
       <h1 className="sr-only">{t('products.hero.title')}</h1>
 
       {/* Main Split Section */}
-      <section className="relative flex flex-col lg:flex-row min-h-screen overflow-hidden bg-black">
+      <section className="relative flex flex-col lg:flex-row min-h-screen overflow-hidden bg-surface">
         {/* LEFT PANEL — Featured Product (wrapper for drop-shadow along diagonal) */}
         <div
           className="relative lg:z-10 bg-primary lg:bg-transparent"
@@ -674,7 +674,7 @@ export default function Products({ products }: Props) {
 
         {/* RIGHT PANEL — Product Navigation / Image (hidden on mobile when expanded) */}
         <div
-          className={`relative overflow-hidden lg:-ms-120 bg-black ${expanded ? 'hidden lg:block' : ''}`}
+          className={`relative overflow-hidden lg:-ms-120 bg-surface ${expanded ? 'hidden lg:block' : ''}`}
           style={{
             flex: rightFlex,
             transition: 'flex 0.6s cubic-bezier(0.4, 0, 0.2, 1)',

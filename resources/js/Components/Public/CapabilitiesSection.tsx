@@ -93,7 +93,7 @@ export default function CapabilitiesSection() {
 
   return (
     <div ref={wrapperRef} className="relative" style={{ height: isDesktop ? '350vh' : 'auto' }}>
-      <section className="sticky top-0 h-screen bg-black overflow-hidden" style={isDesktop ? undefined : { position: 'relative', height: 'auto' }}>
+      <section className="sticky top-0 h-screen bg-surface overflow-hidden" style={isDesktop ? undefined : { position: 'relative', height: 'auto' }}>
 
         {isDesktop ? (
           /* ── Desktop: scroll-driven horizontal reveal ── */

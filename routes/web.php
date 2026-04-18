@@ -35,7 +35,6 @@ use App\Http\Controllers\Admin\LinkedinPostController as AdminLinkedinPostContro
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [AboutController::class, 'index'])->name('about');
-Route::get('/about/recycling', [AboutController::class, 'recycling'])->name('about.recycling');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/quality', [QualityController::class, 'index'])->name('quality');

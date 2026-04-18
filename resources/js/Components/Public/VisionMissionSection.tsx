@@ -166,7 +166,7 @@ export default function VisionMissionSection() {
   }, [isInView]);
 
   return (
-    <section ref={sectionRef} className="relative py-16 lg:py-24 bg-black overflow-hidden">
+    <section ref={sectionRef} className="relative py-16 lg:py-24 bg-surface overflow-hidden">
       <div className="relative container mx-auto px-4">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}

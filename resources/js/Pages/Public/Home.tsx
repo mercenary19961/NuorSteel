@@ -473,7 +473,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
 
       {/* Core Values Section — scroll-driven on desktop */}
       <div ref={coreValuesWrapperRef} className="lg:h-[600vh]">
-        <section id="section-core-values" className="relative py-10 lg:py-16 bg-[#414042] overflow-hidden lg:sticky lg:top-0 lg:min-h-screen lg:flex lg:flex-col lg:justify-center">
+        <section id="section-core-values" className="relative py-10 lg:py-16 bg-surface overflow-hidden lg:sticky lg:top-0 lg:min-h-screen lg:flex lg:flex-col lg:justify-center">
           <div className="relative container mx-auto px-4">
             <h2 className="text-3xl lg:text-4xl font-black text-white text-center">
               {content?.core_values?.title || t('home.coreValues.title')}
@@ -486,7 +486,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       </div>
 
       {/* Products Showcase */}
-      <section id="section-products" className="overflow-hidden bg-[#414042]">
+      <section id="section-products" className="overflow-hidden bg-surface">
         <h2 className="text-3xl lg:text-4xl font-black text-white text-center py-10 lg:py-14">
           {content?.products?.title || t('home.products.title', 'Our Products')}
         </h2>
@@ -579,7 +579,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
       {/* <PartnersSection /> */}
 
       {/* LinkedIn Feed Section */}
-      <section ref={linkedinSectionRef} id="section-linkedin" className="relative py-16 lg:py-24 bg-[#414042] overflow-hidden">
+      <section ref={linkedinSectionRef} id="section-linkedin" className="relative py-16 lg:py-24 bg-surface overflow-hidden">
         <div className="relative container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
             {/* Left column: info + controls (flips to right in RTL) */}

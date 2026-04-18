@@ -63,7 +63,7 @@ function MobileTimeline() {
   };
 
   return (
-    <section className="relative bg-black overflow-hidden">
+    <section className="relative bg-surface overflow-hidden">
       {/* Background image — changes per active event */}
       <AnimatePresence mode="sync">
         <motion.img
@@ -303,7 +303,7 @@ function DesktopTimeline() {
 
   return (
     <div ref={wrapperRef} className="relative" style={{ height: `${EVENT_COUNT * 100}vh` }}>
-      <section ref={sectionRef} className="sticky top-0 h-screen w-full overflow-hidden bg-black">
+      <section ref={sectionRef} className="sticky top-0 h-screen w-full overflow-hidden bg-surface">
         {/* Background image — changes per active event */}
         <AnimatePresence mode="sync">
           <motion.img

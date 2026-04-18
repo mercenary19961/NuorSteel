@@ -391,14 +391,6 @@ const en = {
       successMessage: "Thank you for your application. We will review it and get back to you.",
     },
   },
-  recycling: {
-    backToAbout: "Back to About Us",
-    hero: {
-      title: "Recycling",
-      subtitle: "Our commitment to sustainable steel manufacturing through recycling",
-    },
-    comingSoon: "Recycling information coming soon.",
-  },
   certificates: {
     hero: {
       label: "Certifications",

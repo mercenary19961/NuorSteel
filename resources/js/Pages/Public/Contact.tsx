@@ -167,7 +167,7 @@ export default function Contact({ content_en, content_ar }: Props) {
       <Head title="Contact" />
 
       {/* Contact Content */}
-      <section className="bg-black text-white pt-24 lg:pt-32 pb-24 lg:pb-32 min-h-screen">
+      <section className="bg-surface text-white pt-24 lg:pt-32 pb-24 lg:pb-32 min-h-screen">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Left: Header + Contact Info */}
