@@ -658,6 +658,23 @@ Security is extremely important for this project. Every code change must conside
 - Use `rel="noopener noreferrer"` on external links
 - All form submissions must handle errors gracefully without exposing internals
 
+### Bot Protection (Cloudflare Turnstile)
+- All public POST forms (contact, career apply, newsletter) verify a Turnstile token server-side via [TurnstileVerifier](app/Services/TurnstileVerifier.php).
+- **Feature-flagged**: with no `TURNSTILE_SECRET_KEY` set, verification is a no-op and the widget is hidden — keeps local dev + pre-launch deploys working.
+- **To enable in production**:
+  1. Create a Turnstile site at https://dash.cloudflare.com → Turnstile → Add site (domain + invisible/managed mode).
+  2. Set `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` in Railway env vars.
+  3. CSP already allows the Turnstile domain (`challenges.cloudflare.com`).
+- The widget is rendered by [Components/Public/Turnstile.tsx](resources/js/Components/Public/Turnstile.tsx); the site key is shared via [HandleInertiaRequests](app/Http/Middleware/HandleInertiaRequests.php) (`turnstileSiteKey`).
+
+### CSP, trustProxies, login throttle
+- **CSP** is defined in [SecurityHeaders middleware](app/Http/Middleware/SecurityHeaders.php). If you add a third-party script/iframe/font, update the directive (`script-src`, `frame-src`, `font-src`).
+- **`trustProxies`** in [bootstrap/app.php](bootstrap/app.php) is locked to Cloudflare CIDRs + RFC 1918 (Railway internal hop). Refresh the CF list from https://www.cloudflare.com/ips/ if rate-limit logs show wrong client IPs. **Defense-in-depth TODO**: enforce CF-only origin access (Authenticated Origin Pulls or a secret header) so the Railway URL can't be hit directly with a spoofed `X-Forwarded-For`.
+- **Login throttle** in [LoginController](app/Http/Controllers/Auth/LoginController.php) keys per-email (5 attempts / 15 min) — covers IP rotation against a known admin email. Route-level `throttle:5,1` keys per-IP — covers an IP fanning out across many emails. Both layers run.
+
+### SVG uploads
+- The public media-serving endpoint ([MediaServeController](app/Http/Controllers/MediaServeController.php)) **explicitly excludes** `image/svg+xml` from the allowlist. SVGs can carry inline scripts that execute when loaded as a top-level navigation, regardless of `X-Content-Type-Options`. If admin upload starts accepting SVG in the future, sanitize them server-side (DOMPurify-in-PHP equivalent) before storage and force `Content-Disposition: attachment` on serving.
+
 ---
 
 ## Technical Notes

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, MapPin, Clock, Calendar, Send, CheckCircle } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import Turnstile from '@/Components/Public/Turnstile';
 
 interface Props {
   job: {
@@ -153,6 +154,7 @@ export default function JobDetail({ job }: Props) {
                     <input type="file" name="cv" required accept=".pdf,application/pdf" className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                     <p className="text-xs text-gray-500 mt-1">{t('career.form.cvHint')}</p>
                   </div>
+                  <Turnstile />
                   <button
                     type="submit"
                     disabled={processing}

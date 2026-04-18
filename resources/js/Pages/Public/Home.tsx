@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import HeroBottomLinks from '@/Components/Public/HeroBottomLinks';
 import RadialOrbitalTimeline from '@/Components/ui/radial-orbital-timeline';
-import PartnersSection from '@/Components/Public/PartnersSection';
+// import PartnersSection from '@/Components/Public/PartnersSection';
 import { HeroTypewriter } from '@/Components/ui/typewriter';
 import { MagicCardGrid, MagicCard } from '@/Components/ui/magic-card';
 import { useLanguage } from '@/contexts/LanguageContext';

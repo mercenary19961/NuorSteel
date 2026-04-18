@@ -11,7 +11,51 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->trustProxies(at: '*');
+        // Trust only Cloudflare's published IP ranges (production hops through CF)
+        // plus RFC 1918 / Railway internal ranges (the FrankenPHP container
+        // sees the Railway router as the immediate upstream). This prevents
+        // X-Forwarded-For spoofing from arbitrary internet clients.
+        //
+        // Note: this is one layer. To fully prevent spoofing, also enforce
+        // Cloudflare-only origin access (Authenticated Origin Pulls or a secret
+        // header verified at the app edge) so the Railway URL is unreachable
+        // outside of CF. Without that, an attacker who hits the Railway origin
+        // directly could still spoof X-Forwarded-For via the Railway proxy hop.
+        //
+        // Cloudflare list refreshed from https://www.cloudflare.com/ips/ — keep
+        // an eye on that page; CF rarely changes it but does occasionally add ranges.
+        $middleware->trustProxies(at: [
+            // RFC 1918 + Railway internal (immediate upstream proxy hop)
+            '10.0.0.0/8',
+            '172.16.0.0/12',
+            '192.168.0.0/16',
+            '127.0.0.1',
+            '100.64.0.0/10',
+            // Cloudflare IPv4
+            '173.245.48.0/20',
+            '103.21.244.0/22',
+            '103.22.200.0/22',
+            '103.31.4.0/22',
+            '141.101.64.0/18',
+            '108.162.192.0/18',
+            '190.93.240.0/20',
+            '188.114.96.0/20',
+            '197.234.240.0/22',
+            '198.41.128.0/17',
+            '162.158.0.0/15',
+            '104.16.0.0/13',
+            '104.24.0.0/14',
+            '172.64.0.0/13',
+            '131.0.72.0/22',
+            // Cloudflare IPv6
+            '2400:cb00::/32',
+            '2606:4700::/32',
+            '2803:f800::/32',
+            '2405:b500::/32',
+            '2405:8100::/32',
+            '2a06:98c0::/29',
+            '2c0f:f248::/32',
+        ]);
 
         $middleware->web(append: [
             \App\Http\Middleware\SecurityHeaders::class,

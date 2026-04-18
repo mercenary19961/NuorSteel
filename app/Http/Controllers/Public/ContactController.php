@@ -7,14 +7,20 @@ use App\Models\ContactSubmission;
 use App\Models\SiteContent;
 use App\Models\Setting;
 use App\Mail\ContactFormSubmitted;
+use App\Services\TurnstileVerifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ContactController extends Controller
 {
+    public function __construct(private TurnstileVerifier $turnstile)
+    {
+    }
+
     public function index(): Response
     {
         return Inertia::render('Public/Contact', [
@@ -35,7 +41,14 @@ class ContactController extends Controller
             'subject' => 'required|string|max:255',
             'message' => 'required|string|max:2000',
             'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|mimetypes:application/pdf,image/jpeg,image/png|max:5120',
+            'cf-turnstile-response' => 'nullable|string',
         ]);
+
+        if (!$this->turnstile->verify($request->input('cf-turnstile-response'), $request->ip())) {
+            throw ValidationException::withMessages([
+                'cf-turnstile-response' => ['Bot check failed. Please reload the page and try again.'],
+            ]);
+        }
 
         $filePath = null;
         if ($request->hasFile('file')) {

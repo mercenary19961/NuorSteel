@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Head, router, usePage } from '@inertiajs/react';
 import { Mail, Phone, MapPin, Send, CheckCircle, ChevronDown, Check } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import Turnstile from '@/Components/Public/Turnstile';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { PageProps } from '@/types';
 
@@ -359,6 +360,7 @@ export default function Contact({ content_en, content_ar }: Props) {
                       {t('contact.form.fileHint')}
                     </p>
                   </div>
+                  <Turnstile theme="dark" />
                   <button
                     type="submit"
                     disabled={processing}

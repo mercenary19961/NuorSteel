@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import Turnstile from '@/Components/Public/Turnstile';
 import type { PageProps } from '@/types';
 
 export default function Footer() {
@@ -11,6 +12,7 @@ export default function Footer() {
   const [highlightContact, setHighlightContact] = useState(false);
   const { data, setData, post, processing, reset, wasSuccessful } = useForm({
     email: '',
+    'cf-turnstile-response': '',
   });
 
   // Listen for highlight-contact event from hero "Contact Us" click
@@ -152,6 +154,7 @@ export default function Footer() {
                   required
                   className="px-4 py-2 bg-white/5 border border-white/10 rounded-md text-sm focus:outline-none focus:border-primary"
                 />
+                <Turnstile theme="dark" size="compact" onVerify={(token) => setData('cf-turnstile-response', token)} />
                 <button
                   type="submit"
                   disabled={processing}

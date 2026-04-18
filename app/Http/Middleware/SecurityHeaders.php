@@ -21,6 +21,34 @@ class SecurityHeaders
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
         }
 
+        $response->headers->set('Content-Security-Policy', $this->buildCsp());
+
         return $response;
+    }
+
+    private function buildCsp(): string
+    {
+        // 'unsafe-inline' on script-src is required for the inline JSON-LD blocks in
+        // resources/views/partials/structured-data.blade.php and any Vite runtime hooks.
+        // The codebase has no dangerouslySetInnerHTML and React escapes all dynamic
+        // content, so the realistic XSS surface that 'unsafe-inline' would expose
+        // is essentially nil. Tighten further by adopting nonces if a stricter
+        // policy is needed later.
+        return implode('; ', [
+            "default-src 'self'",
+            "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+            "img-src 'self' data: blob: https:",
+            "font-src 'self' data: https://fonts.gstatic.com",
+            // LinkedIn post embeds + Turnstile challenge widget.
+            "frame-src 'self' https://www.linkedin.com https://challenges.cloudflare.com",
+            // Inertia XHRs target self; Turnstile siteverify runs server-side.
+            "connect-src 'self'",
+            "media-src 'self'",
+            "object-src 'none'",
+            "base-uri 'self'",
+            "form-action 'self'",
+            "frame-ancestors 'self'",
+        ]);
     }
 }
