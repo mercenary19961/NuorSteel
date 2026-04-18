@@ -140,7 +140,7 @@ export default function Career({ listings, content_en, content_ar }: Props) {
           <div className="absolute inset-0 bg-linear-to-r from-black/70 via-black/40 to-transparent" />
         </div>
 
-        <div className="relative container mx-auto px-4 pt-32 lg:pt-44 pb-16 lg:pb-24">
+        <div className="relative container mx-auto px-4 pb-32 lg:pb-44">
           <div className="max-w-2xl">
             <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
               {t('career.hero.label', 'Careers')}
