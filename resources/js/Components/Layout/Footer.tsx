@@ -150,12 +150,12 @@ export default function Footer() {
                   onChange={(e) => setData('email', e.target.value)}
                   placeholder={t('footer.emailPlaceholder')}
                   required
-                  className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-sm focus:outline-none focus:border-blue-500"
+                  className="px-4 py-2 bg-white/5 border border-white/10 rounded-md text-sm focus:outline-none focus:border-primary"
                 />
                 <button
                   type="submit"
                   disabled={processing}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+                  className="px-4 py-2 bg-primary hover:bg-primary-dark rounded-md text-sm font-medium transition-colors disabled:opacity-50"
                 >
                   {processing ? '...' : t('footer.subscribe')}
                 </button>
@@ -165,7 +165,7 @@ export default function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-gray-800 mt-8 pt-4 pb-0 text-center text-sm text-gray-400">
+        <div className="border-t border-white/10 mt-8 pt-4 pb-0 text-center text-sm text-gray-400">
           <p>
             &copy; {currentYear} {t('company.name')}. {t('footer.allRightsReserved')}
           </p>
