@@ -39,12 +39,4 @@ class AboutController extends Controller
         ]);
     }
 
-    public function recycling(): Response
-    {
-        $locale = session('locale', 'en');
-
-        return Inertia::render('Public/Recycling', [
-            'content' => SiteContent::getPage('recycling', $locale),
-        ]);
-    }
 }

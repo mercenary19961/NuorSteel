@@ -53,7 +53,6 @@
 - [x] PublicLayout (Header + Footer + children)
 - [x] Home page (full-viewport hero, framer-motion animations, bottom nav links, interactive core values, products, CTA)
 - [x] About page (animated intro with highlighted keywords, vision, mission, capabilities scroll-stack, timeline, no governance)
-- [x] Recycling page (sub-page under About)
 - [x] Products listing (ISL-style angled split layout) + Product detail page
 - [x] Quality page (hero section + magic card assurance cards)
 - [x] Career page (hero section, magic card job listings, job detail modal, open application modal)
@@ -186,8 +185,10 @@
 - [x] About section: responsive background image added (`bg-desktop.png`/`bg-mobile.png`), left-aligned text layout with orange CTA button (`bg-primary`)
 - [x] Core values subtitle removed from homepage (cleaner layout)
 - [x] `useScrollDirection` hook: added `isIdle` state with configurable timeout (default 3s), added `isAtBottom` state, idle timer starts on load, mouse movement resets idle
-- [x] Contact page: full dark-theme redesign — unified gradient bg, dark form inputs (`bg-white/5`, `border-white/10`), clickable phone/email links, custom `RequestTypeSelect` dropdown with keyboard navigation
+- [x] Contact page: full dark-theme redesign — `bg-black`, dark form inputs (`bg-white/5`, `border-white/10`), clickable phone/email links (stacked when multiple), custom `RequestTypeSelect` dropdown with keyboard navigation and brand-orange styling (`border-primary/40`, `hover:bg-primary/10`, `bg-primary/15` selected)
 - [x] Contact page: bilingual content support (controller passes `content_en` + `content_ar`, client picks via `useLanguage()`)
+- [x] Contact page: structural adjustment — label + h1 + description live in the left column alongside contact info cards; form starts at the same row level as the header. Orange label `contact.hero.title` changed from "Get in Touch" → "Contact Us" to avoid duplication with h1 (which is CMS-driven, still "Get in Touch")
+- [x] Footer + Contact info cards: render multiple phones/emails stacked — settings store comma-separated values (`+966543781868,+966545198760` and `info@nuorsteel.com,Nuorsteel@hotmail.com`), split in UI
 - [x] Contact form: company field changed from required to optional; file upload now accepts PDF, JPG, PNG (was PDF-only)
 - [x] Hero: "Contact Us" link changed from scroll-to-footer anchor to direct `/contact` page link with outline button style (`border border-primary`)
 - [x] Hero bottom links: "Sustainability" renamed to "News" (links to `section-linkedin` instead of `section-sustainability`)
@@ -270,10 +271,10 @@
 - [x] About capabilities: mobile flip-in animation (3D rotateX with staggered delays via IntersectionObserver)
 - [x] About timeline: auto-advance only starts when section is in viewport (IntersectionObserver)
 - [x] About section homepage background images updated to gray variant (`bg-desktop-en/ar.webp`, `bg-mobile-en/ar.webp`)
-- [x] About timeline mobile: swipeable card carousel with glass cards, dot indicators, touch navigation, auto-advance
+- [x] About timeline mobile: swipeable card carousel (transparent card — no glass/blur/border), dot indicators, touch navigation, auto-advance
 - [x] Timeline: per-year background images (`{year}-desktop/mobile-en/ar.webp`) crossfade as active event changes (AnimatePresence); "Present" uses original bg images; 20 images total in `public/images/about/journey/`
 
-### Partners Section (DONE)
+### Partners Section (DONE, temporarily hidden)
 - [x] `PartnersSection` component (`resources/js/Components/Public/PartnersSection.tsx`) — 3-column auto-scrolling logo carousel inserted above News section on homepage
 - [x] 16 partner logos in `public/images/home/partners/` with per-logo size tiers (LG/XL/XXL/XXXL constants)
 - [x] Per-column hover pause (each ScrollColumn manages its own `paused` state independently)
@@ -281,6 +282,8 @@
 - [x] Mobile: stacked layout — header + paragraph on top, 3 scrolling columns below (420px height)
 - [x] Scroll animations via CSS keyframes (`animate-scroll-up` / `animate-scroll-down`) in `app.css`
 - [x] Per-logo size classes scoped to `lg:` so mobile uses unified smaller constraints (`max-h-24 max-w-24` base, larger per-tier)
+- [x] `desktopLogoClass` prop on `Partner` interface — allows per-logo desktop size override independent of mobile tier (skips `lg:max-h-none lg:max-w-none` base for those logos)
+- [x] **Section currently commented out in [Home.tsx](resources/js/Pages/Public/Home.tsx) — client will request to re-enable later**
 
 ### Core Values Expansion (DONE)
 - [x] Core values expanded from 4 to 6: added "People & Teamwork" and "Trust & Integrity"
@@ -411,10 +414,6 @@ About Us | Products | Quality | Career | Certificates | [Contact Us]
 - **Undo system**: Soft-delete with undo button across all admin sections (`UndoService`)
 - **Change Log**: Persistent change tracking with time filters, card layout, revert/delete (`/admin/change-log`)
 
-### Recycling Page
-- Lives at `/about/recycling` (sub-page under About Us)
-- Not in main navigation
-
 ---
 
 ## Company Contact Info (Real / Production)
@@ -507,7 +506,6 @@ These values are seeded via `2026_04_15_120000_update_real_contact_settings.php`
 ```
 /                       → Home
 /about                  → About Us
-/about/recycling        → Recycling (sub-page)
 /products               → Product listing
 /products/{slug}        → Product detail
 /quality                → Quality & certifications
@@ -677,6 +675,7 @@ Security is extremely important for this project. Every code change must conside
 - **Auth state**: `usePage<PageProps>().props.auth.user` (shared by middleware)
 - **Site settings**: `usePage<PageProps>().props.siteSettings` (phone, email, address, LinkedIn — shared by middleware)
 - **Styling**: TailwindCSS v4 with custom `primary` color, Inter font
+- **Theme tokens** (in `@theme` block at `resources/css/app.css`): `bg-surface` (`#414042`, main page/section bg) and `bg-surface-dark` (`#2D2D2F`, footer / detail panels). Use these on public pages instead of `bg-black` — the public site is unified on grey, not pure black. `bg-black/40|50|70` transparency overlays are intentional and should stay.
 - **Icons**: Lucide React
 - **Animations**: framer-motion (isolated in `vendor-motion` Vite chunk), ScrollStack (sticky viewport + progress-based, isolated in `vendor-lenis` chunk)
 - **Smooth scroll**: Lenis library for ScrollStack container mode (window scroll mode uses native scroll events to avoid hijacking page scroll)
@@ -762,4 +761,4 @@ public/images/shared/          → Shared images (logo/)
 
 ---
 
-> **Last updated:** 2026-04-15 — Partners section (3-column scrolling logos, mobile stacked), core values expanded to 6, per-year timeline backgrounds, products page hero/thumbnail/explore-more refinements, container max-width 1800px
+> **Last updated:** 2026-04-18 — Public site theme migrated from `bg-black` to `bg-surface` grey (new `--color-surface: #414042` + `--color-surface-dark: #2D2D2F` tokens in `@theme`), all public pages + section components + Home/Footer/Header/PartnersSection/radial-orbital-timeline updated. Orphaned Recycling page deleted (route + controller method + component + i18n keys). Partners section hidden from homepage, contact page restructured, real contact info seeded (multi-phone + multi-email), mobile timeline card transparent

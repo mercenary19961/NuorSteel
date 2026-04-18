@@ -124,7 +124,7 @@ export default function Career({ listings, content_en, content_ar }: Props) {
       <Head title="Career" />
 
       {/* Hero Section — matches Quality page pattern */}
-      <section className="relative h-screen bg-black text-white overflow-hidden flex items-center">
+      <section className="relative h-screen bg-surface text-white overflow-hidden flex items-center">
         <div className="absolute inset-0">
           <picture>
             <source media="(max-width: 639px)" srcSet={`/images/career/hero/hero-mobile-${language}.webp`} />
@@ -156,7 +156,7 @@ export default function Career({ listings, content_en, content_ar }: Props) {
       </section>
 
       {/* Job Listings Section */}
-      <section className="relative bg-black text-white py-24 lg:py-32">
+      <section className="relative bg-surface text-white py-24 lg:py-32">
         <div className="relative container mx-auto px-4">
           <div className="max-w-3xl mb-16">
             <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">

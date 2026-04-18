@@ -66,7 +66,7 @@ export default function Certificates({ esg, quality, governance, content_en, con
       <Head title={t('nav.certificates')} />
 
       {/* Category Cards / Certificate Grid */}
-      <section className="relative bg-black text-white pt-32 lg:pt-44 pb-24 lg:pb-32 min-h-screen">
+      <section className="relative bg-surface text-white pt-32 lg:pt-44 pb-24 lg:pb-32 min-h-screen">
         <div className="relative container mx-auto px-4">
           <AnimatePresence mode="wait">
             {!activeCategory ? (

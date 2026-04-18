@@ -38,8 +38,8 @@ export default function Header() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         mobileMenuOpen
-          ? 'bg-[#414042] border-b border-white/20'
-          : 'bg-linear-to-b from-[#414042]/80 to-[#414042]/50 border-b border-white/20'
+          ? 'bg-surface border-b border-white/20'
+          : 'bg-linear-to-b from-surface/80 to-surface/50 border-b border-white/20'
       } ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}
     >
       <div className="container mx-auto px-4">

@@ -18,6 +18,8 @@
     --color-secondary-dark: #8E9091;
     --color-background: #f8fafc;
     --color-foreground: #0f172a;
+    --color-surface: #414042;
+    --color-surface-dark: #2D2D2F;
 }
 
 /* Container widths: fill viewport between lg and xl (avoids side gap), cap at 1536px from xl upward */

@@ -84,7 +84,7 @@ export default function PartnersSection() {
   const columns = splitIntoColumns(partners, 3);
 
   return (
-    <section className="bg-[#414042] overflow-hidden">
+    <section className="bg-surface overflow-hidden">
       {/* Mobile: stacked layout */}
       <div className="lg:hidden">
         <div className="px-6 pt-10 pb-6 text-center">

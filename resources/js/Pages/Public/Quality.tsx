@@ -35,7 +35,7 @@ export default function Quality() {
       <Head title="Quality" />
 
       {/* Hero Section */}
-      <section className="relative h-screen bg-black text-white overflow-hidden flex items-center">
+      <section className="relative h-screen bg-surface text-white overflow-hidden flex items-center">
         {/* Background image */}
         <div className="absolute inset-0">
           <picture>
@@ -67,7 +67,7 @@ export default function Quality() {
       </section>
 
       {/* Quality & Manufacturing Assurance */}
-      <section className="relative bg-black text-white py-24 lg:py-32">
+      <section className="relative bg-surface text-white py-24 lg:py-32">
         <div className="relative container mx-auto px-4">
           {/* Section intro */}
           <div className="max-w-3xl mb-20">

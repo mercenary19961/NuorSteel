@@ -471,7 +471,7 @@ export default function RadialOrbitalTimeline({
                           ? "bg-primary text-white"
                           : isRelated
                           ? "bg-primary/50 text-white"
-                          : "bg-[#2D2D2F] text-white"
+                          : "bg-surface-dark text-white"
                       }
                       border-2
                       ${
@@ -509,7 +509,7 @@ export default function RadialOrbitalTimeline({
                 {/* Small card below node — mobile/tablet only (detail panel replaces it on lg+) */}
                 {isExpanded && !isDetailView && (
                   <div className="absolute left-1/2 -translate-x-1/2" style={{ top: effectiveNodeSize + 72 }}>
-                    <Card className="magic-card w-48 sm:w-64 bg-[#2D2D2F]/90 backdrop-blur-lg border-white/10 shadow-xl shadow-primary/10 overflow-visible">
+                    <Card className="magic-card w-48 sm:w-64 bg-surface-dark/90 backdrop-blur-lg border-white/10 shadow-xl shadow-primary/10 overflow-visible">
                       <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-px h-10 bg-white/50 z-10"></div>
                       <CardHeader className="pb-2 relative z-10">
                         <CardTitle className="text-sm text-white">
@@ -549,7 +549,7 @@ export default function RadialOrbitalTimeline({
             style={{ animation: 'detailSlideUp 500ms ease-out both' }}
           >
           <MagicCard
-            className="max-w-lg w-full rounded-2xl bg-[#2D2D2F] border border-white/10 shadow-2xl shadow-black/40 p-8 xl:p-10"
+            className="max-w-lg w-full rounded-2xl bg-surface-dark border border-white/10 shadow-2xl shadow-black/40 p-8 xl:p-10"
           >
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-4">
