@@ -317,10 +317,16 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
               >
                 <Link
                   href="/contact"
-                  className="inline-flex items-center mt-4 lg:mt-8 px-6 py-3 border border-primary text-white hover:bg-primary/10 font-semibold rounded-lg text-base group transition-all duration-300"
+                  className="relative inline-flex items-center mt-4 lg:mt-8 px-6 py-3 border border-primary text-white font-semibold rounded-lg text-base group overflow-hidden animate-cta-shimmer"
                 >
-                  {t('home.hero.contactLink')}
-                  <ArrowRight className="ltr:ml-2 rtl:mr-2 rtl:rotate-180 group-hover:ltr:translate-x-1 group-hover:rtl:-translate-x-1 transition-transform duration-200" size={20} />
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-0 bg-primary ltr:-translate-x-full rtl:translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out"
+                  />
+                  <span className="relative z-10 inline-flex items-center">
+                    {t('home.hero.contactLink')}
+                    <ArrowRight className="ltr:ml-2 rtl:mr-2 rtl:rotate-180 group-hover:ltr:translate-x-1 group-hover:rtl:-translate-x-1 transition-transform duration-200" size={20} />
+                  </span>
                 </Link>
               </motion.div>
             </div>

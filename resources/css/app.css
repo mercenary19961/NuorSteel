@@ -176,3 +176,21 @@ html[dir="rtl"] body {
 .animate-scroll-down {
     animation: scroll-down 25s linear infinite;
 }
+
+/* Hero CTA shimmer — diagonal highlight sweep */
+@keyframes cta-shimmer {
+    0% { transform: translateX(-150%) skewX(-20deg); }
+    60%, 100% { transform: translateX(250%) skewX(-20deg); }
+}
+
+.animate-cta-shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
+    animation: cta-shimmer 4.5s ease-in-out infinite;
+    pointer-events: none;
+}
