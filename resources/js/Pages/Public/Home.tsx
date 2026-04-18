@@ -442,7 +442,7 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
             alt=""
             loading="lazy"
             decoding="async"
-            className="absolute inset-0 w-full h-full object-cover object-center opacity-85"
+            className="absolute inset-0 w-full h-full object-cover object-bottom"
           />
         </picture>
 
