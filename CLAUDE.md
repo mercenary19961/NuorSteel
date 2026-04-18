@@ -274,6 +274,29 @@
 - [x] About timeline mobile: swipeable card carousel (transparent card — no glass/blur/border), dot indicators, touch navigation, auto-advance
 - [x] Timeline: per-year background images (`{year}-desktop/mobile-en/ar.webp`) crossfade as active event changes (AnimatePresence); "Present" uses original bg images; 20 images total in `public/images/about/journey/`
 
+### Grey Theme Media Swaps (DONE, 2026-04-18)
+- [x] Navbar logo replaced with new variants in `public/images/shared/logo/logo-{lg,sm}.{webp,png}` (filenames unchanged, no code edit needed)
+- [x] Homepage hero: looping background video swapped to grey variant (`/videos/hero-bg.mp4` = LOW 3.2MB; optional `/videos/hero-bg-hd.mp4` HD 10.2MB)
+- [x] Homepage Vision 2030 background swapped to grey desktop/mobile WebP + PNG fallback, anchored to bottom (`object-bottom` in [Home.tsx:445](resources/js/Pages/Public/Home.tsx#L445))
+- [x] About hero background swapped to grey (`public/images/about/hero/bg-{desktop,mobile}-{en,ar}.webp`)
+- [x] About timeline "Present" background swapped to grey (`public/images/about/journey/bg-{desktop,mobile}-{en,ar}.webp`)
+- [x] Quality hero background swapped to grey (`public/images/quality/hero/hero-{desktop,mobile}-{en,ar}.webp`)
+- [x] Cloudflare cache note: static assets are keyed WITHOUT query strings, so `?nocache=X` does NOT bust edge cache — use Cloudflare dashboard's Custom Purge by URL (paste the full asset URL) or browser hard refresh to verify new content
+
+### Hero CTA + Bottom Links Tint (DONE, 2026-04-18)
+- [x] Homepage hero "Contact Us" CTA: fill-on-hover orange sweep (`absolute bg-primary` sibling span with `ltr:-translate-x-full rtl:translate-x-full group-hover:translate-x-0`) + continuous diagonal shimmer via `animate-cta-shimmer::after` pseudo-element (new keyframe in [app.css:182-196](resources/css/app.css#L182-L196))
+- [x] Hero bottom-link images (About Us / Core Values / News) tinted with `grayscale-50 brightness-110` on the `<img>` to match grey theme while keeping the hover-reveal animation ([HeroBottomLinks.tsx:39](resources/js/Components/Public/HeroBottomLinks.tsx#L39))
+
+### Quality + Career Hero Alignment (DONE, 2026-04-18)
+- [x] Quality and Career hero text containers use asymmetric padding (`pb-32 lg:pb-44`) on the flex-centered column to nudge text upward from center (matches visual weight of other pages)
+- [x] Files: [Quality.tsx:54](resources/js/Pages/Public/Quality.tsx#L54), [Career.tsx](resources/js/Pages/Public/Career.tsx)
+
+### Footer Refresh (DONE, 2026-04-18)
+- [x] Newsletter input: `bg-gray-800 border-gray-700 focus:border-blue-500` → `bg-white/5 border-white/10 focus:border-primary` (matches dark card surfaces used elsewhere, orange focus)
+- [x] Subscribe button: `bg-blue-600 hover:bg-blue-700` → `bg-primary hover:bg-primary-dark` (brand orange)
+- [x] Copyright divider: `border-gray-800` (Tailwind `#1f2937` has a blue tint — read as a dark blue line on the dark footer) → `border-white/10` (neutral translucent white)
+- [x] File: [Footer.tsx](resources/js/Components/Layout/Footer.tsx)
+
 ### Partners Section (DONE, temporarily hidden)
 - [x] `PartnersSection` component (`resources/js/Components/Public/PartnersSection.tsx`) — 3-column auto-scrolling logo carousel inserted above News section on homepage
 - [x] 16 partner logos in `public/images/home/partners/` with per-logo size tiers (LG/XL/XXL/XXXL constants)
@@ -761,4 +784,4 @@ public/images/shared/          → Shared images (logo/)
 
 ---
 
-> **Last updated:** 2026-04-18 — Public site theme migrated from `bg-black` to `bg-surface` grey (new `--color-surface: #414042` + `--color-surface-dark: #2D2D2F` tokens in `@theme`), all public pages + section components + Home/Footer/Header/PartnersSection/radial-orbital-timeline updated. Orphaned Recycling page deleted (route + controller method + component + i18n keys). Partners section hidden from homepage, contact page restructured, real contact info seeded (multi-phone + multi-email), mobile timeline card transparent
+> **Last updated:** 2026-04-18 — Grey theme media swaps: navbar logo, homepage hero video, Vision 2030 bg (anchored to bottom), About hero bg, About journey "Present" bg, Quality hero bg (all in grey variants). Hero "Contact Us" CTA got fill-on-hover sweep + diagonal shimmer keyframe (`animate-cta-shimmer`). Hero bottom-link images tinted `grayscale-50 brightness-110` to match grey theme. Quality/Career hero text pushed up with asymmetric `pb-32 lg:pb-44`. Footer: newsletter input/button swapped from blue to orange (`bg-primary`, `focus:border-primary`), copyright divider `border-gray-800` → `border-white/10` (gray-800 `#1f2937` read as dark blue on dark bg)
