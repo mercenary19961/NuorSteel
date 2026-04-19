@@ -399,7 +399,8 @@
 ### Remaining
 - [x] Real images for hero background, bottom link hover panels, core values section, and product panels
 - [x] Logo image for header
-- [ ] Code splitting (chunk >500kB)
+- [x] Code splitting — `manualChunks` in [vite.config.ts](vite.config.ts) splits vendor bundles (react, inertia, motion, i18n, icons, lenis); largest chunk is `vendor-react` at 217kB / 70kB gzipped (well under 500kB threshold)
+- [x] Local dev Turnstile test keys documented in `.env.example` (Cloudflare's official always-pass / always-fail / force-challenge keys — no account/hostname config needed)
 - [ ] Structured data remaining placeholders (see above)
 - [ ] Final testing & go-live
 
