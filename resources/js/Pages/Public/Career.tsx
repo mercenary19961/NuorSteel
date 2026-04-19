@@ -402,6 +402,7 @@ interface ApplicationFormProps {
 }
 
 function ApplicationForm({ formRef, formError, processing, defaultJobTitle, onSubmit, t }: ApplicationFormProps) {
+  const [turnstileToken, setTurnstileToken] = useState('');
   return (
     <form ref={formRef} onSubmit={onSubmit} className="space-y-4">
       {formError && (
@@ -472,10 +473,10 @@ function ApplicationForm({ formRef, formError, processing, defaultJobTitle, onSu
         />
         <p className="text-xs text-gray-500 mt-1">{t('career.form.cvHint')}</p>
       </div>
-      <Turnstile theme="dark" />
+      <Turnstile theme="dark" onVerify={setTurnstileToken} />
       <button
         type="submit"
-        disabled={processing}
+        disabled={processing || !turnstileToken}
         className="w-full inline-flex items-center justify-center px-6 py-3 bg-primary hover:bg-primary/90 disabled:bg-primary/40 text-white rounded-lg font-medium transition-colors cursor-pointer"
       >
         {processing ? t('career.form.submitting') : t('career.form.submit')}

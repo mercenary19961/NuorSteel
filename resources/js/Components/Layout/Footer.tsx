@@ -157,7 +157,7 @@ export default function Footer() {
                 <Turnstile theme="dark" size="compact" onVerify={(token) => setData('cf-turnstile-response', token)} />
                 <button
                   type="submit"
-                  disabled={processing}
+                  disabled={processing || !data['cf-turnstile-response']}
                   className="px-4 py-2 bg-primary hover:bg-primary-dark rounded-md text-sm font-medium transition-colors disabled:opacity-50"
                 >
                   {processing ? '...' : t('footer.subscribe')}

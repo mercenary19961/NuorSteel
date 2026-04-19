@@ -19,9 +19,8 @@ class SecurityHeaders
 
         if (!app()->isLocal()) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+            $response->headers->set('Content-Security-Policy', $this->buildCsp());
         }
-
-        $response->headers->set('Content-Security-Policy', $this->buildCsp());
 
         return $response;
     }
@@ -34,6 +33,10 @@ class SecurityHeaders
         // content, so the realistic XSS surface that 'unsafe-inline' would expose
         // is essentially nil. Tighten further by adopting nonces if a stricter
         // policy is needed later.
+        //
+        // CSP is intentionally not sent in local dev — Vite's HMR origin
+        // (http://[::1]:5173) uses bracketed IPv6 syntax that Chrome rejects
+        // as an invalid CSP source.
         return implode('; ', [
             "default-src 'self'",
             "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",

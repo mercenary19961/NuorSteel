@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import type { PageProps } from '@/types';
 
@@ -17,7 +17,7 @@ interface TurnstileOptions {
   sitekey: string;
   callback?: (token: string) => void;
   'expired-callback'?: () => void;
-  'error-callback'?: () => void;
+  'error-callback'?: (errorCode?: string) => void;
   theme?: 'light' | 'dark' | 'auto';
   size?: 'normal' | 'compact' | 'flexible';
   appearance?: 'always' | 'execute' | 'interaction-only';
@@ -64,9 +64,10 @@ export default function Turnstile({ onVerify, theme = 'auto', size = 'flexible',
   const { turnstileSiteKey } = usePage<PageProps>().props;
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!turnstileSiteKey || !containerRef.current) return;
+    if (!turnstileSiteKey || !containerRef.current || errorCode) return;
 
     let cancelled = false;
     const container = containerRef.current;
@@ -80,6 +81,19 @@ export default function Turnstile({ onVerify, theme = 'auto', size = 'flexible',
         theme,
         size,
         appearance,
+        // Stop CF's internal retry loop on first failure — unmount and surface
+        // the code instead of letting it spam siteverify.
+        'error-callback': (code) => {
+          setErrorCode(typeof code === 'string' ? code : 'unknown');
+          if (widgetIdRef.current && window.turnstile) {
+            try {
+              window.turnstile.remove(widgetIdRef.current);
+            } catch {
+              // safe to ignore
+            }
+            widgetIdRef.current = null;
+          }
+        },
       });
     });
 
@@ -95,9 +109,17 @@ export default function Turnstile({ onVerify, theme = 'auto', size = 'flexible',
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [turnstileSiteKey]);
+  }, [turnstileSiteKey, errorCode]);
 
   if (!turnstileSiteKey) return null;
+
+  if (errorCode) {
+    return (
+      <p className="text-xs text-red-400">
+        Verification unavailable (code {errorCode}). Please refresh or contact support.
+      </p>
+    );
+  }
 
   return <div ref={containerRef} className="cf-turnstile" />;
 }
