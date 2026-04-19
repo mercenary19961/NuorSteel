@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\TurnstileVerifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -16,6 +17,10 @@ class LoginController extends Controller
     private const MAX_ATTEMPTS = 5;
     private const DECAY_SECONDS = 900; // 15 minutes
 
+    public function __construct(private TurnstileVerifier $turnstile)
+    {
+    }
+
     public function showLoginForm(): Response
     {
         return Inertia::render('Admin/Login');
@@ -26,6 +31,7 @@ class LoginController extends Controller
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
+            'cf-turnstile-response' => 'nullable|string',
         ]);
 
         $key = $this->throttleKey($request);
@@ -35,6 +41,14 @@ class LoginController extends Controller
             throw ValidationException::withMessages([
                 'email' => ['Too many login attempts. Please try again in '.ceil($seconds / 60).' minute(s).'],
             ])->status(429);
+        }
+
+        // Verify Turnstile BEFORE Auth::attempt so bots can't burn the per-email
+        // throttle budget (5 attempts / 15 min) with random passwords.
+        if (!$this->turnstile->verify($request->input('cf-turnstile-response'), $request->ip())) {
+            throw ValidationException::withMessages([
+                'cf-turnstile-response' => ['Bot check failed. Please reload the page and try again.'],
+            ]);
         }
 
         if (!Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {

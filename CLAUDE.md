@@ -297,6 +297,25 @@
 - [x] Copyright divider: `border-gray-800` (Tailwind `#1f2937` has a blue tint — read as a dark blue line on the dark footer) → `border-white/10` (neutral translucent white)
 - [x] File: [Footer.tsx](resources/js/Components/Layout/Footer.tsx)
 
+### Security Hardening — Public Surface (DONE, 2026-04-19)
+- [x] Cloudflare Turnstile fully wired into all public POST forms (Footer newsletter, Contact, Career, JobDetail) — server-side verification via [TurnstileVerifier](app/Services/TurnstileVerifier.php), client widget in [Components/Public/Turnstile.tsx](resources/js/Components/Public/Turnstile.tsx)
+- [x] Turnstile component refactored to `forwardRef<TurnstileHandle>` exposing `reset()` so parents can clear the single-use token after a backend error (`onError: () => turnstileRef.current?.reset()`) — single-use semantics meant the previous token was already burned
+- [x] Turnstile `expired-callback` clears parent token state + resets the widget when the 5-min token expires (re-disables the submit button until re-verification)
+- [x] Turnstile `error-callback` removes the widget after first failure (stops Cloudflare's internal retry loop spamming siteverify) and surfaces the error code inline
+- [x] Submit buttons gated on token presence — `disabled={processing || !token}` across Footer, Contact, Career, JobDetail (defense-in-depth + clearer UX, server verification still authoritative)
+- [x] CSP rebuilt in [SecurityHeaders middleware](app/Http/Middleware/SecurityHeaders.php) — explicit allowlist for Turnstile (`challenges.cloudflare.com` script + frame), Cloudflare Insights (`static.cloudflareinsights.com` script + `cloudflareinsights.com` connect), LinkedIn iframes, Google Fonts
+- [x] CSP intentionally skipped in local dev (`if (!app()->isLocal())`) — Vite HMR origin uses bracketed IPv6 (`http://[::1]:5173`) which Chrome rejects as invalid CSP source
+- [x] Permissions-Policy: added `xr-spatial-tracking=()` to suppress violation logs from third-party iframes (LinkedIn, Turnstile) probing the API
+- [x] `trustProxies` in [bootstrap/app.php](bootstrap/app.php) locked to Cloudflare published CIDRs (IPv4 + IPv6) + RFC 1918 (Railway internal hop) — replaces wildcard `'*'` to prevent X-Forwarded-For spoofing from arbitrary clients
+- [x] Login throttle in [LoginController](app/Http/Controllers/Auth/LoginController.php): per-email rate limit (5 attempts / 15 min) layered on top of route-level per-IP `throttle:5,1` — covers IP rotation against known admin email + IP fanning across many emails
+- [x] LinkedIn URL validation in [Admin/LinkedinPostController](app/Http/Controllers/Admin/LinkedinPostController.php): parses URL host + scheme instead of substring-matching `linkedin.com`, rejects spoofs like `evil.com/?x=linkedin.com` or `linkedin.com.evil.com`, requires `https://` + host equal to `linkedin.com` or `*.linkedin.com`
+- [x] SVG uploads explicitly excluded from public media-serving allowlist in [MediaServeController](app/Http/Controllers/MediaServeController.php) — SVGs can carry inline scripts that execute on top-level navigation
+- [x] `.env.example` documents Cloudflare's official Turnstile test keys (always-pass / always-fail / force-challenge) — local dev shouldn't pollute prod widget analytics
+
+### Misc (2026-04-19)
+- [x] Quality hero image: `object-cover object-bottom` so the portrait crop anchors to the bottom on all viewports (was top-anchored, cutting off subject's torso on narrow viewports) — [Quality.tsx](resources/js/Pages/Public/Quality.tsx)
+- [x] Code splitting verified — `manualChunks` already splits all vendor bundles (largest is `vendor-react` at 217kB / 70kB gzipped, well under 500kB Vite warning threshold)
+
 ### Partners Section (DONE, temporarily hidden)
 - [x] `PartnersSection` component (`resources/js/Components/Public/PartnersSection.tsx`) — 3-column auto-scrolling logo carousel inserted above News section on homepage
 - [x] 16 partner logos in `public/images/home/partners/` with per-logo size tiers (LG/XL/XXL/XXXL constants)
@@ -345,6 +364,7 @@
   - Number of employees
   - FAQ answers (city name)
   - OG image path
+- [ ] **TODO: Cookie consent banner** — when SEO/analytics work begins OR any ad/tracking API is integrated (Google Analytics, Google Ads, Meta Pixel, LinkedIn Insight Tag, etc.), add a consent service that captures user approval BEFORE loading the tracking scripts. Use the same approach as Hardrock (reference implementation). GDPR + Saudi PDPL compliance — no trackers should fire until consent is granted. Applies to: gtag.js, fbq, LinkedIn partner script, anything setting non-essential cookies.
 
 ### Settings Wired to Site (DONE)
 - [x] Contact settings (phone, email, address EN/AR, LinkedIn URL) drive Footer, Contact page, and SEO structured data
@@ -399,7 +419,8 @@
 ### Remaining
 - [x] Real images for hero background, bottom link hover panels, core values section, and product panels
 - [x] Logo image for header
-- [ ] Code splitting (chunk >500kB)
+- [x] Code splitting — `manualChunks` in [vite.config.ts](vite.config.ts) splits vendor bundles (react, inertia, motion, i18n, icons, lenis); largest chunk is `vendor-react` at 217kB / 70kB gzipped (well under 500kB threshold)
+- [x] Local dev Turnstile test keys documented in `.env.example` (Cloudflare's official always-pass / always-fail / force-challenge keys — no account/hostname config needed)
 - [ ] Structured data remaining placeholders (see above)
 - [ ] Final testing & go-live
 
@@ -661,16 +682,29 @@ Security is extremely important for this project. Every code change must conside
 ### Bot Protection (Cloudflare Turnstile)
 - All public POST forms (contact, career apply, newsletter) verify a Turnstile token server-side via [TurnstileVerifier](app/Services/TurnstileVerifier.php).
 - **Feature-flagged**: with no `TURNSTILE_SECRET_KEY` set, verification is a no-op and the widget is hidden — keeps local dev + pre-launch deploys working.
+- **Local dev**: `.env.example` documents Cloudflare's official test keys (always-pass `1x...`, always-fail `2x...`, force-challenge `3x...`) — use these instead of real keys to avoid polluting prod widget analytics + skip hostname allowlist setup.
 - **To enable in production**:
   1. Create a Turnstile site at https://dash.cloudflare.com → Turnstile → Add site (domain + invisible/managed mode).
   2. Set `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` in Railway env vars.
   3. CSP already allows the Turnstile domain (`challenges.cloudflare.com`).
 - The widget is rendered by [Components/Public/Turnstile.tsx](resources/js/Components/Public/Turnstile.tsx); the site key is shared via [HandleInertiaRequests](app/Http/Middleware/HandleInertiaRequests.php) (`turnstileSiteKey`).
+- **Component is `forwardRef<TurnstileHandle>`** — exposes `reset()` so parent forms can clear the single-use token after a backend error and force a new challenge. Used by Footer (newsletter), Contact, Career, and JobDetail forms via `turnstileRef.current?.reset()` in `onError` handlers.
+- **Submit button gating**: every form sets `disabled={processing || !token}` so users cannot POST without a valid Turnstile token (defense-in-depth + clearer UX). Server-side verification is still authoritative.
+- **Token expiry**: tokens expire after ~5 min. The `expired-callback` clears parent state + resets the widget, re-disabling the submit button until the user re-verifies.
+- **Error handling**: the `error-callback` removes the widget after the first failure (instead of letting Cloudflare's internal retry loop spam siteverify) and surfaces the error code inline.
 
 ### CSP, trustProxies, login throttle
-- **CSP** is defined in [SecurityHeaders middleware](app/Http/Middleware/SecurityHeaders.php). If you add a third-party script/iframe/font, update the directive (`script-src`, `frame-src`, `font-src`).
+- **CSP** is defined in [SecurityHeaders middleware](app/Http/Middleware/SecurityHeaders.php). If you add a third-party script/iframe/font, update the directive. Current allowlist:
+  - `script-src`: self + `'unsafe-inline'` (JSON-LD blocks) + `challenges.cloudflare.com` (Turnstile) + `static.cloudflareinsights.com` (CF Insights/RUM)
+  - `style-src`: self + `'unsafe-inline'` + `fonts.googleapis.com`
+  - `frame-src`: self + `www.linkedin.com` (post embeds) + `challenges.cloudflare.com` (Turnstile widget)
+  - `connect-src`: self + `cloudflareinsights.com` (RUM beacon POSTs)
+  - `font-src`: self + `data:` + `fonts.gstatic.com`
+- **CSP is intentionally NOT sent in local dev** (`if (!app()->isLocal())`) — Vite's HMR origin uses bracketed IPv6 syntax (`http://[::1]:5173`) that Chrome rejects as an invalid CSP source. Production hardening only.
+- **Permissions-Policy** suppresses `xr-spatial-tracking=()` to silence violation logs from third-party iframes (LinkedIn, Turnstile) probing the API.
 - **`trustProxies`** in [bootstrap/app.php](bootstrap/app.php) is locked to Cloudflare CIDRs + RFC 1918 (Railway internal hop). Refresh the CF list from https://www.cloudflare.com/ips/ if rate-limit logs show wrong client IPs. **Defense-in-depth TODO**: enforce CF-only origin access (Authenticated Origin Pulls or a secret header) so the Railway URL can't be hit directly with a spoofed `X-Forwarded-For`.
-- **Login throttle** in [LoginController](app/Http/Controllers/Auth/LoginController.php) keys per-email (5 attempts / 15 min) — covers IP rotation against a known admin email. Route-level `throttle:5,1` keys per-IP — covers an IP fanning out across many emails. Both layers run.
+- **Login throttle** in [LoginController](app/Http/Controllers/Auth/LoginController.php) keys per-email (5 attempts / 15 min) — covers IP rotation against a known admin email. Route-level `throttle:5,1` keys per-IP — covers an IP fanning out across many emails. Both layers run. **TODO**: add Turnstile to login form for additional bot protection (currently throttle-only).
+- **LinkedIn URL validation** in [Admin/LinkedinPostController](app/Http/Controllers/Admin/LinkedinPostController.php) parses URL host + scheme rather than substring-matching `linkedin.com`. Rejects spoofs like `evil.com/?x=linkedin.com` or `linkedin.com.evil.com`. Requires `https://` + host equal to `linkedin.com` or a `*.linkedin.com` subdomain.
 
 ### SVG uploads
 - The public media-serving endpoint ([MediaServeController](app/Http/Controllers/MediaServeController.php)) **explicitly excludes** `image/svg+xml` from the allowlist. SVGs can carry inline scripts that execute when loaded as a top-level navigation, regardless of `X-Content-Type-Options`. If admin upload starts accepting SVG in the future, sanitize them server-side (DOMPurify-in-PHP equivalent) before storage and force `Content-Disposition: attachment` on serving.
@@ -801,4 +835,4 @@ public/images/shared/          → Shared images (logo/)
 
 ---
 
-> **Last updated:** 2026-04-18 — Grey theme media swaps: navbar logo, homepage hero video, Vision 2030 bg (anchored to bottom), About hero bg, About journey "Present" bg, Quality hero bg (all in grey variants). Hero "Contact Us" CTA got fill-on-hover sweep + diagonal shimmer keyframe (`animate-cta-shimmer`). Hero bottom-link images tinted `grayscale-50 brightness-110` to match grey theme. Quality/Career hero text pushed up with asymmetric `pb-32 lg:pb-44`. Footer: newsletter input/button swapped from blue to orange (`bg-primary`, `focus:border-primary`), copyright divider `border-gray-800` → `border-white/10` (gray-800 `#1f2937` read as dark blue on dark bg)
+> **Last updated:** 2026-04-19 — Public-surface security hardening landed: Cloudflare Turnstile fully wired into all public POST forms (Footer/Contact/Career/JobDetail) with `forwardRef` `reset()` handle, single-use token UX (auto-reset on backend error, expired-callback for 5-min token expiry, error-callback to stop CF retry loop), submit buttons gated on token presence. CSP rebuilt with explicit allowlist (Turnstile script+frame, CF Insights script+connect, LinkedIn iframes, Google Fonts) + skipped in local dev (Vite IPv6 incompatibility). `xr-spatial-tracking=()` in Permissions-Policy to silence iframe violation logs. `trustProxies` locked to Cloudflare CIDRs + RFC 1918 (replaces wildcard, prevents X-Forwarded-For spoofing). Login throttle layered: per-email (5/15min) + per-IP (5/min). LinkedIn admin URL validation hardened (host + scheme parse, rejects substring spoofs). SVG uploads excluded from public media-serving allowlist. `.env.example` documents Cloudflare Turnstile test keys. Quality hero image anchored to `object-bottom` to fix portrait crop on narrow viewports. Code splitting verified — largest chunk `vendor-react` 217kB / 70kB gzipped (well under 500kB threshold).
