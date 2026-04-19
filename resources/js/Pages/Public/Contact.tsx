@@ -124,6 +124,7 @@ export default function Contact({ content_en, content_ar }: Props) {
   const [formError, setFormError] = useState('');
   const [processing, setProcessing] = useState(false);
   const [requestType, setRequestType] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -360,10 +361,10 @@ export default function Contact({ content_en, content_ar }: Props) {
                       {t('contact.form.fileHint')}
                     </p>
                   </div>
-                  <Turnstile theme="dark" />
+                  <Turnstile theme="dark" onVerify={setTurnstileToken} />
                   <button
                     type="submit"
-                    disabled={processing}
+                    disabled={processing || !turnstileToken}
                     className="inline-flex items-center px-6 py-3 bg-primary hover:bg-primary/90 disabled:bg-primary/40 text-white rounded-lg font-medium transition-colors cursor-pointer"
                   >
                     {processing ? t('contact.form.sending') : (content?.form?.submit_text || t('contact.form.submit'))}

@@ -27,6 +27,7 @@ export default function JobDetail({ job }: Props) {
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
   const [processing, setProcessing] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -154,10 +155,10 @@ export default function JobDetail({ job }: Props) {
                     <input type="file" name="cv" required accept=".pdf,application/pdf" className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                     <p className="text-xs text-gray-500 mt-1">{t('career.form.cvHint')}</p>
                   </div>
-                  <Turnstile />
+                  <Turnstile onVerify={setTurnstileToken} />
                   <button
                     type="submit"
-                    disabled={processing}
+                    disabled={processing || !turnstileToken}
                     className="w-full inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-md font-medium transition-colors"
                   >
                     {processing ? t('career.form.submitting') : t('career.form.submit')}
