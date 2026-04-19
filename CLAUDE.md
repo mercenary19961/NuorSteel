@@ -364,6 +364,7 @@
   - Number of employees
   - FAQ answers (city name)
   - OG image path
+- [ ] **TODO: Cookie consent banner** — when SEO/analytics work begins OR any ad/tracking API is integrated (Google Analytics, Google Ads, Meta Pixel, LinkedIn Insight Tag, etc.), add a consent service that captures user approval BEFORE loading the tracking scripts. Use the same approach as Hardrock (reference implementation). GDPR + Saudi PDPL compliance — no trackers should fire until consent is granted. Applies to: gtag.js, fbq, LinkedIn partner script, anything setting non-essential cookies.
 
 ### Settings Wired to Site (DONE)
 - [x] Contact settings (phone, email, address EN/AR, LinkedIn URL) drive Footer, Contact page, and SEO structured data
