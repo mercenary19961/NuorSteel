@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Head, router, usePage } from '@inertiajs/react';
 import { Mail, Phone, MapPin, Send, CheckCircle, ChevronDown, Check } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
-import Turnstile from '@/Components/Public/Turnstile';
+import Turnstile, { type TurnstileHandle } from '@/Components/Public/Turnstile';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { PageProps } from '@/types';
 
@@ -126,6 +126,7 @@ export default function Contact({ content_en, content_ar }: Props) {
   const [requestType, setRequestType] = useState('');
   const [turnstileToken, setTurnstileToken] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
+  const turnstileRef = useRef<TurnstileHandle>(null);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -156,7 +157,10 @@ export default function Contact({ content_en, content_ar }: Props) {
     router.post('/contact', formData as any, {
       forceFormData: true,
       onSuccess: () => setSubmitted(true),
-      onError: () => setFormError(t('contact.form.submitError')),
+      onError: () => {
+        setFormError(t('contact.form.submitError'));
+        turnstileRef.current?.reset();
+      },
       onFinish: () => setProcessing(false),
     });
   };
@@ -361,7 +365,7 @@ export default function Contact({ content_en, content_ar }: Props) {
                       {t('contact.form.fileHint')}
                     </p>
                   </div>
-                  <Turnstile theme="dark" onVerify={setTurnstileToken} />
+                  <Turnstile ref={turnstileRef} theme="dark" onVerify={setTurnstileToken} />
                   <button
                     type="submit"
                     disabled={processing || !turnstileToken}

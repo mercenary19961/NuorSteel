@@ -1,6 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import type { PageProps } from '@/types';
+
+export interface TurnstileHandle {
+  reset: () => void;
+}
 
 declare global {
   interface Window {
@@ -60,11 +64,33 @@ function loadTurnstileScript(): Promise<void> {
   });
 }
 
-export default function Turnstile({ onVerify, theme = 'auto', size = 'flexible', appearance = 'always' }: Props) {
+const Turnstile = forwardRef<TurnstileHandle, Props>(function Turnstile(
+  { onVerify, theme = 'auto', size = 'flexible', appearance = 'always' },
+  ref,
+) {
   const { turnstileSiteKey } = usePage<PageProps>().props;
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
+  const onVerifyRef = useRef(onVerify);
   const [errorCode, setErrorCode] = useState<string | null>(null);
+
+  // Keep callback ref current without retriggering the render effect.
+  useEffect(() => {
+    onVerifyRef.current = onVerify;
+  }, [onVerify]);
+
+  useImperativeHandle(ref, () => ({
+    reset: () => {
+      if (widgetIdRef.current && window.turnstile) {
+        try {
+          window.turnstile.reset(widgetIdRef.current);
+          onVerifyRef.current?.('');
+        } catch {
+          // widget may have been removed — safe to ignore
+        }
+      }
+    },
+  }), []);
 
   useEffect(() => {
     if (!turnstileSiteKey || !containerRef.current || errorCode) return;
@@ -77,10 +103,22 @@ export default function Turnstile({ onVerify, theme = 'auto', size = 'flexible',
 
       widgetIdRef.current = window.turnstile.render(container, {
         sitekey: turnstileSiteKey,
-        callback: (token) => onVerify?.(token),
+        callback: (token) => onVerifyRef.current?.(token),
         theme,
         size,
         appearance,
+        // Token expires after ~5 min — clear parent state and reissue so the
+        // submit button re-disables until the user re-verifies.
+        'expired-callback': () => {
+          onVerifyRef.current?.('');
+          if (widgetIdRef.current && window.turnstile) {
+            try {
+              window.turnstile.reset(widgetIdRef.current);
+            } catch {
+              // safe to ignore
+            }
+          }
+        },
         // Stop CF's internal retry loop on first failure — unmount and surface
         // the code instead of letting it spam siteverify.
         'error-callback': (code) => {
@@ -122,4 +160,6 @@ export default function Turnstile({ onVerify, theme = 'auto', size = 'flexible',
   }
 
   return <div ref={containerRef} className="cf-turnstile" />;
-}
+});
+
+export default Turnstile;

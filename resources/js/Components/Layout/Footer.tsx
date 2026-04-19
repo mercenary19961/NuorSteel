@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import { Linkedin, Mail, Phone, MapPin } from 'lucide-react';
-import Turnstile from '@/Components/Public/Turnstile';
+import Turnstile, { type TurnstileHandle } from '@/Components/Public/Turnstile';
 import type { PageProps } from '@/types';
 
 export default function Footer() {
@@ -10,6 +10,7 @@ export default function Footer() {
   const { siteSettings } = usePage<PageProps>().props;
   const currentYear = new Date().getFullYear();
   const [highlightContact, setHighlightContact] = useState(false);
+  const turnstileRef = useRef<TurnstileHandle>(null);
   const { data, setData, post, processing, reset, wasSuccessful } = useForm({
     email: '',
     'cf-turnstile-response': '',
@@ -31,6 +32,7 @@ export default function Footer() {
     post('/newsletter/subscribe', {
       preserveScroll: true,
       onSuccess: () => reset(),
+      onError: () => turnstileRef.current?.reset(),
     });
   };
 
@@ -154,7 +156,7 @@ export default function Footer() {
                   required
                   className="px-4 py-2 bg-white/5 border border-white/10 rounded-md text-sm focus:outline-none focus:border-primary"
                 />
-                <Turnstile theme="dark" size="compact" onVerify={(token) => setData('cf-turnstile-response', token)} />
+                <Turnstile ref={turnstileRef} theme="dark" size="compact" onVerify={(token) => setData('cf-turnstile-response', token)} />
                 <button
                   type="submit"
                   disabled={processing || !data['cf-turnstile-response']}
