@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { MagicCardGrid, MagicCard } from '@/Components/ui/magic-card';
-import Turnstile from '@/Components/Public/Turnstile';
+import Turnstile, { type TurnstileHandle } from '@/Components/Public/Turnstile';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CareerListItem {
@@ -65,6 +65,7 @@ export default function Career({ listings, content_en, content_ar }: Props) {
   const [formError, setFormError] = useState('');
   const [processing, setProcessing] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const turnstileRef = useRef<TurnstileHandle>(null);
 
   const getJobTitle = (job: CareerListItem) =>
     language === 'ar' ? (job.title_ar || job.title_en) : job.title_en;
@@ -99,7 +100,10 @@ export default function Career({ listings, content_en, content_ar }: Props) {
     router.post(url, formData as any, {
       forceFormData: true,
       onSuccess: () => setSubmitted(true),
-      onError: () => setFormError(t('career.form.submitError')),
+      onError: () => {
+        setFormError(t('career.form.submitError'));
+        turnstileRef.current?.reset();
+      },
       onFinish: () => setProcessing(false),
     });
   };
@@ -321,6 +325,7 @@ export default function Career({ listings, content_en, content_ar }: Props) {
                 ) : (
                   <ApplicationForm
                     formRef={formRef}
+                    turnstileRef={turnstileRef}
                     formError={formError}
                     processing={processing}
                     defaultJobTitle={getJobTitle(selectedJob)}
@@ -376,6 +381,7 @@ export default function Career({ listings, content_en, content_ar }: Props) {
               ) : (
                 <ApplicationForm
                   formRef={formRef}
+                  turnstileRef={turnstileRef}
                   formError={formError}
                   processing={processing}
                   onSubmit={(e) => handleSubmit(e)}
@@ -394,6 +400,7 @@ export default function Career({ listings, content_en, content_ar }: Props) {
 
 interface ApplicationFormProps {
   formRef: React.RefObject<HTMLFormElement | null>;
+  turnstileRef: React.RefObject<TurnstileHandle | null>;
   formError: string;
   processing: boolean;
   defaultJobTitle?: string;
@@ -401,7 +408,7 @@ interface ApplicationFormProps {
   t: (key: string) => string;
 }
 
-function ApplicationForm({ formRef, formError, processing, defaultJobTitle, onSubmit, t }: ApplicationFormProps) {
+function ApplicationForm({ formRef, turnstileRef, formError, processing, defaultJobTitle, onSubmit, t }: ApplicationFormProps) {
   const [turnstileToken, setTurnstileToken] = useState('');
   return (
     <form ref={formRef} onSubmit={onSubmit} className="space-y-4">
@@ -473,7 +480,7 @@ function ApplicationForm({ formRef, formError, processing, defaultJobTitle, onSu
         />
         <p className="text-xs text-gray-500 mt-1">{t('career.form.cvHint')}</p>
       </div>
-      <Turnstile theme="dark" onVerify={setTurnstileToken} />
+      <Turnstile ref={turnstileRef} theme="dark" onVerify={setTurnstileToken} />
       <button
         type="submit"
         disabled={processing || !turnstileToken}

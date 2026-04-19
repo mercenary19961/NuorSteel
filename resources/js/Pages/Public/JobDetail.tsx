@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, MapPin, Clock, Calendar, Send, CheckCircle } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
-import Turnstile from '@/Components/Public/Turnstile';
+import Turnstile, { type TurnstileHandle } from '@/Components/Public/Turnstile';
 
 interface Props {
   job: {
@@ -29,6 +29,7 @@ export default function JobDetail({ job }: Props) {
   const [processing, setProcessing] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
+  const turnstileRef = useRef<TurnstileHandle>(null);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -55,7 +56,10 @@ export default function JobDetail({ job }: Props) {
     router.post(`/career/${job.slug}/apply`, formData as any, {
       forceFormData: true,
       onSuccess: () => setSubmitted(true),
-      onError: () => setFormError(t('career.form.submitError')),
+      onError: () => {
+        setFormError(t('career.form.submitError'));
+        turnstileRef.current?.reset();
+      },
       onFinish: () => setProcessing(false),
     });
   };
@@ -155,7 +159,7 @@ export default function JobDetail({ job }: Props) {
                     <input type="file" name="cv" required accept=".pdf,application/pdf" className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                     <p className="text-xs text-gray-500 mt-1">{t('career.form.cvHint')}</p>
                   </div>
-                  <Turnstile onVerify={setTurnstileToken} />
+                  <Turnstile ref={turnstileRef} onVerify={setTurnstileToken} />
                   <button
                     type="submit"
                     disabled={processing || !turnstileToken}
