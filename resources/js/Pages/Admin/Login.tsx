@@ -1,15 +1,23 @@
 import { Head, useForm } from '@inertiajs/react';
 import { Lock, Mail } from 'lucide-react';
+import { useRef } from 'react';
+import Turnstile, { type TurnstileHandle } from '@/Components/Public/Turnstile';
 
 export default function Login() {
+  const turnstileRef = useRef<TurnstileHandle>(null);
   const { data, setData, post, processing, errors } = useForm({
     email: '',
     password: '',
+    'cf-turnstile-response': '',
   });
+
+  const turnstileError = (errors as Record<string, string>)['cf-turnstile-response'];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    post('/admin/login');
+    post('/admin/login', {
+      onError: () => turnstileRef.current?.reset(),
+    });
   };
 
   return (
@@ -25,9 +33,9 @@ export default function Login() {
             </div>
 
             {/* Error */}
-            {errors.email && (
+            {(errors.email || turnstileError) && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-700">{errors.email}</p>
+                <p className="text-sm text-red-700">{errors.email || turnstileError}</p>
               </div>
             )}
 
@@ -71,9 +79,15 @@ export default function Login() {
                 </div>
               </div>
 
+              <Turnstile
+                ref={turnstileRef}
+                theme="light"
+                onVerify={(token) => setData('cf-turnstile-response', token)}
+              />
+
               <button
                 type="submit"
-                disabled={processing}
+                disabled={processing || !data['cf-turnstile-response']}
                 className="w-full py-2.5 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
               >
                 {processing ? 'Signing in...' : 'Sign In'}
