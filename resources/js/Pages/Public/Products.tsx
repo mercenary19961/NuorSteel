@@ -142,13 +142,13 @@ function SpecDataTable({ tableData }: { tableData: { title: string; headers: str
 }
 
 // --- Tab Navigation Component ---
-function ProductTabs({ activeTab, onTabChange }: { activeTab: TabKey; onTabChange: (tab: TabKey) => void }) {
+function ProductTabs({ activeTab, onTabChange, showQuote = true }: { activeTab: TabKey; onTabChange: (tab: TabKey) => void; showQuote?: boolean }) {
   const { t } = useTranslation();
   const tabs: { key: TabKey; label: string }[] = [
     { key: 'overview', label: t('products.tabs.overview') },
     { key: 'specifications', label: t('products.tabs.specifications') },
     { key: 'features', label: t('products.tabs.features') },
-    { key: 'quote', label: t('products.tabs.requestQuote') },
+    ...(showQuote ? [{ key: 'quote' as TabKey, label: t('products.tabs.requestQuote') }] : []),
   ];
 
   return (
@@ -211,6 +211,14 @@ export default function Products({ products }: Props) {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  // Quote tab is hidden for billets — snap back to overview if a user had it open
+  // on TMT bars and then switched to billets.
+  useEffect(() => {
+    if (selectedSlug === 'billets' && activeTab === 'quote') {
+      setActiveTab('overview');
+    }
+  }, [selectedSlug, activeTab]);
 
   // Measure left panel for curved clip-path (useLayoutEffect to avoid flash)
   const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
@@ -556,7 +564,7 @@ export default function Products({ products }: Props) {
                       </button>
                     </div>
 
-                    <ProductTabs activeTab={activeTab} onTabChange={setActiveTab} />
+                    <ProductTabs activeTab={activeTab} onTabChange={setActiveTab} showQuote={selectedSlug !== 'billets'} />
 
                     <AnimatePresence mode="wait">
                       <motion.div

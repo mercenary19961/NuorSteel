@@ -114,8 +114,8 @@ class DemoContentSeeder extends Seeder
         Product::updateOrCreate(['slug' => 'billets'], [
             'name_en' => 'Billets',
             'name_ar' => 'ستيل بِليت',
-            'short_description_en' => 'High-quality steel billets — the essential semi-finished material for rolling mills.',
-            'short_description_ar' => 'كتل صلب عالية الجودة — المادة نصف المصنعة الأساسية لمصانع الدرفلة.',
+            'short_description_en' => 'High-quality steel billets. The essential semi-finished material for rolling mills.',
+            'short_description_ar' => 'كتل صلب عالية الجودة. المادة نصف المصنعة الأساسية لمصانع الدرفلة.',
             'description_en' => 'Nuor Steel produces premium steel billets through Electric Arc Furnace (EAF) steelmaking and continuous casting. Our billets serve as the primary feedstock for TMT bar production and are also available for sale to external rolling mills. Produced to strict chemical and dimensional specifications, ensuring consistent quality downstream.',
             'description_ar' => 'تنتج شركة نور للحديد كتل صلب عالية الجودة من خلال صناعة الصلب بفرن القوس الكهربائي والصب المستمر. تعد ستيل بِليت لدينا المادة الخام الأساسية لإنتاج قضبان التسليح، كما أنها متاحة للبيع لمصانع الدرفلة الخارجية. يتم إنتاجها وفق مواصفات كيميائية وأبعاد صارمة لضمان جودة متسقة.',
             'category' => 'billets',
