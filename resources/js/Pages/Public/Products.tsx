@@ -263,6 +263,13 @@ export default function Products({ products }: Props) {
     localRenderSlugs.has(p.slug)
       ? `/images/products/renders/${p.slug}-${language}.webp`
       : p.image;
+  // TMT bars shows a tagged variant in the default hero (desktop + mobile),
+  // but the plain bar everywhere else (thumbnails + Explore More detail).
+  const heroVariantSlugs = new Set(['tmt-bars']);
+  const getProductHeroImage = (p: ProductData) =>
+    heroVariantSlugs.has(p.slug)
+      ? `/images/products/renders/${p.slug}-hero-${language}.webp`
+      : getProductImage(p);
 
   // Warm opposite-language background + product renders during idle time.
   useEffect(() => {
@@ -522,10 +529,10 @@ export default function Products({ products }: Props) {
                           exit={{ opacity: 0, scale: 0.9 }}
                           transition={{ duration: 0.4 }}
                         >
-                          {getProductImage(selectedProduct) ? (
+                          {getProductHeroImage(selectedProduct) ? (
                             <img
                               key={`mobile-hero-img-${selectedSlug}-${language}`}
-                              src={getProductImage(selectedProduct)!}
+                              src={getProductHeroImage(selectedProduct)!}
                               alt={getName(selectedProduct)}
                               onClick={handleExplore}
                               className="max-h-52 w-auto object-contain cursor-pointer"
@@ -613,10 +620,10 @@ export default function Products({ products }: Props) {
                 transition={{ duration: 0.4 }}
                 className={`relative ${selectedSlug === 'billets' ? 'translate-y-12' : ''}`}
               >
-                {getProductImage(selectedProduct) ? (
+                {getProductHeroImage(selectedProduct) ? (
                   <img
                     key={`hero-img-${selectedSlug}-${language}`}
-                    src={getProductImage(selectedProduct)!}
+                    src={getProductHeroImage(selectedProduct)!}
                     alt={getName(selectedProduct)}
                     onClick={handleExplore}
                     className="w-auto object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)] max-h-64 xl:max-h-80 2xl:max-h-96 pointer-events-auto cursor-pointer"
