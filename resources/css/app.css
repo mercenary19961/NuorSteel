@@ -20,6 +20,7 @@
     --color-foreground: #0f172a;
     --color-surface: #414042;
     --color-surface-dark: #2D2D2F;
+    --breakpoint-3xl: 112.5rem; /* 1800px */
 }
 
 /* Container widths: fill viewport between lg and xl (avoids side gap), cap at 1536px from xl upward */

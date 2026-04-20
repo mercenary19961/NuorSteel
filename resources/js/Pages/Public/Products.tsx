@@ -670,7 +670,11 @@ export default function Products({ products }: Props) {
                     src={getProductHeroImage(selectedProduct)!}
                     alt={getName(selectedProduct)}
                     onClick={handleExplore}
-                    className={`w-auto object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)] pointer-events-auto cursor-pointer ${selectedSlug === 'tmt-bars' ? 'max-h-48 xl:max-h-56 2xl:max-h-64 min-[1800px]:max-h-96' : 'max-h-64 xl:max-h-80 2xl:max-h-96'}`}
+                    className={`w-auto object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)] pointer-events-auto cursor-pointer ${
+                      selectedSlug === 'billets'
+                        ? 'max-h-44 xl:max-h-52 2xl:max-h-64 max-w-75 xl:max-w-180'
+                        : 'max-h-64 xl:max-h-80 2xl:max-h-82 min-[1700px]:max-h-96'
+                    }`}
                   />
                 ) : (
                   <div className="w-48 h-48 rounded-full bg-white/5 flex items-center justify-center">
