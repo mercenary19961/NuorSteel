@@ -93,13 +93,19 @@ export default function About() {
       </section>
 
       {/* Vision & Mission */}
-      <VisionMissionSection />
+      <div id="vision-mission" className="scroll-mt-20">
+        <VisionMissionSection />
+      </div>
 
       {/* Capabilities */}
-      <CapabilitiesSection />
+      <div id="capabilities" className="scroll-mt-20">
+        <CapabilitiesSection />
+      </div>
 
       {/* Timeline */}
-      <TimelineSection />
+      <div id="journey" className="scroll-mt-20">
+        <TimelineSection />
+      </div>
     </PublicLayout>
   );
 }
