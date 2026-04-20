@@ -316,6 +316,26 @@
 - [x] Quality hero image: `object-cover object-bottom` so the portrait crop anchors to the bottom on all viewports (was top-anchored, cutting off subject's torso on narrow viewports) — [Quality.tsx](resources/js/Pages/Public/Quality.tsx)
 - [x] Code splitting verified — `manualChunks` already splits all vendor bundles (largest is `vendor-react` at 217kB / 70kB gzipped, well under 500kB Vite warning threshold)
 
+### Header Redesign — Dropdowns + Transparent-to-Glass (DONE, 2026-04-20)
+- [x] Navbar visual: transparent on top of page, morphs to glass (`bg-surface/70` + `backdrop-blur`) once user scrolls — replaces the previous always-visible gradient background
+- [x] Nav link typography: uppercase + tracked (`uppercase tracking-wider`) with a center-growing orange underline on hover (pseudo-element that scales from `scale-x-0` → `scale-x-100` originating at `origin-center`)
+- [x] Three dropdown menus on desktop:
+  - **About** — simple dropdown linking to in-page anchors (`#vision-mission`, `#capabilities`, `#journey`)
+  - **Products** — mega menu with product thumbnails + names + short taglines (TMT Bars, Billets)
+  - **Certificates** — simple dropdown linking to the three categories, deep-link via `?category=esg|quality|governance`
+- [x] Desktop dropdown UX: opens on hover, closes with a **150ms delay** on mouse-leave so the cursor can travel from trigger to panel without closing mid-transit
+- [x] Mobile: Option A accordion — dropdown headers expand inline, sub-links appear beneath (no off-canvas sub-sheets)
+- [x] About page: wrapped sub-sections in `scroll-mt-20` anchor divs (`#vision-mission`, `#capabilities`, `#journey`) so header links land below the fixed navbar — [About.tsx:12](resources/js/Pages/Public/About.tsx#L12)
+- [x] Certificates page: reads `?category=` URL param on mount to pre-select the category view (supports deep-linking from header dropdown) — [Certificates.tsx:11](resources/js/Pages/Public/Certificates.tsx#L11)
+- [x] `welcome.blade.php`: replaced arbitrary Tailwind values with canonical classes (minor cleanup)
+- [x] File: [Header.tsx](resources/js/Components/Layout/Header.tsx)
+
+### Products Page — Billets Tab Fix (DONE, 2026-04-19)
+- [x] `ProductTabs` accepts `showQuote` prop — when `false`, the **Request Quote** tab is filtered out of the tab list (billets don't support quote requests)
+- [x] Applied via `<ProductTabs ... showQuote={selectedSlug !== 'billets'} />` in [Products.tsx:564](resources/js/Pages/Public/Products.tsx#L564)
+- [x] Safety `useEffect`: if user has **Request Quote** active on TMT bars and switches to billets, snap `activeTab` back to `overview` (prevents rendering a hidden tab's content)
+- [x] DemoContentSeeder: replaced em-dash with period in billets short description (EN + AR) — avoids typographic inconsistency
+
 ### Partners Section (DONE, temporarily hidden)
 - [x] `PartnersSection` component (`resources/js/Components/Public/PartnersSection.tsx`) — 3-column auto-scrolling logo carousel inserted above News section on homepage
 - [x] 16 partner logos in `public/images/home/partners/` with per-logo size tiers (LG/XL/XXL/XXXL constants)
@@ -835,4 +855,4 @@ public/images/shared/          → Shared images (logo/)
 
 ---
 
-> **Last updated:** 2026-04-19 — Public-surface security hardening landed: Cloudflare Turnstile fully wired into all public POST forms (Footer/Contact/Career/JobDetail) with `forwardRef` `reset()` handle, single-use token UX (auto-reset on backend error, expired-callback for 5-min token expiry, error-callback to stop CF retry loop), submit buttons gated on token presence. CSP rebuilt with explicit allowlist (Turnstile script+frame, CF Insights script+connect, LinkedIn iframes, Google Fonts) + skipped in local dev (Vite IPv6 incompatibility). `xr-spatial-tracking=()` in Permissions-Policy to silence iframe violation logs. `trustProxies` locked to Cloudflare CIDRs + RFC 1918 (replaces wildcard, prevents X-Forwarded-For spoofing). Login throttle layered: per-email (5/15min) + per-IP (5/min). LinkedIn admin URL validation hardened (host + scheme parse, rejects substring spoofs). SVG uploads excluded from public media-serving allowlist. `.env.example` documents Cloudflare Turnstile test keys. Quality hero image anchored to `object-bottom` to fix portrait crop on narrow viewports. Code splitting verified — largest chunk `vendor-react` 217kB / 70kB gzipped (well under 500kB threshold).
+> **Last updated:** 2026-04-20 — Header redesign: transparent-to-glass navbar (`bg-surface/70 + backdrop-blur` on scroll), uppercase tracked links with center-growing orange underline on hover, three dropdowns (About simple, Products mega with thumbnails, Certificates simple). Desktop hover opens with 150ms close delay for cursor travel; mobile Option A accordion. About sub-sections wrapped in `scroll-mt-20` anchor divs (`#vision-mission`, `#capabilities`, `#journey`) for header deep-links; Certificates reads `?category=` URL param for deep-linking. Products page: `ProductTabs` now conditionally hides the **Request Quote** tab on billets via `showQuote` prop, with safety `useEffect` that snaps `activeTab` back to `overview` if user switches from TMT bars (quote open) to billets. Prior (2026-04-19): public-surface security hardening — Cloudflare Turnstile wired into all public POST forms with `forwardRef` `reset()` + single-use token UX, CSP rebuilt with explicit allowlist (skipped in local dev), `trustProxies` locked to Cloudflare CIDRs, login throttle layered (per-email + per-IP), LinkedIn URL host/scheme validation, SVG uploads blocked from public serving.
