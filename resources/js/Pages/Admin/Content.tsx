@@ -51,6 +51,10 @@ const KEY_LABELS: Record<string, string> = {
   innovation_description: 'وصف الابتكار',
   strategic_growth_title: 'عنوان النمو الاستراتيجي',
   strategic_growth_description: 'وصف النمو الاستراتيجي',
+  people_teamwork_title: 'عنوان الأفراد والعمل الجماعي',
+  people_teamwork_description: 'وصف الأفراد والعمل الجماعي',
+  trust_integrity_title: 'عنوان الثقة والنزاهة',
+  trust_integrity_description: 'وصف الثقة والنزاهة',
   vision_title: 'عنوان الرؤية',
   vision_description: 'وصف الرؤية',
   mission_title: 'عنوان الرسالة',
@@ -62,7 +66,7 @@ const KEY_LABELS: Record<string, string> = {
 // Section display order per page (matches website layout)
 const SECTION_ORDER: Record<string, string[]> = {
   home: ['about', 'vision_mission', 'vision2030', 'core_values'],
-  about: ['overview', 'vision', 'mission', 'timeline', 'governance'],
+  about: ['overview', 'vision', 'mission', 'timeline'],
   products: ['overview'],
   quality: ['overview', 'certifications'],
   certificates: ['overview', 'esg', 'quality', 'governance'],

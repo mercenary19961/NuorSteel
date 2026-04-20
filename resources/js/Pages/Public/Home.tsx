@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import HeroBottomLinks from '@/Components/Public/HeroBottomLinks';
 import RadialOrbitalTimeline from '@/Components/ui/radial-orbital-timeline';
-// import PartnersSection from '@/Components/Public/PartnersSection';
+import PartnersSection, { type PartnerData } from '@/Components/Public/PartnersSection';
 import { HeroTypewriter } from '@/Components/ui/typewriter';
 import { MagicCardGrid, MagicCard } from '@/Components/ui/magic-card';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -19,6 +19,7 @@ interface Props {
   content_ar: ContentMap;
   featured_products: { id: number; name: string; slug: string; short_description: string | null; image: string | null }[];
   linkedin_posts: LinkedinPost[];
+  partners: PartnerData[];
 }
 
 
@@ -73,7 +74,7 @@ function HeroVideo() {
   );
 }
 
-export default function Home({ content_en, content_ar, linkedin_posts }: Props) {
+export default function Home({ content_en, content_ar, linkedin_posts, partners }: Props) {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const content = language === 'ar' ? content_ar : content_en;
@@ -581,8 +582,8 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         </div>
       </section>
 
-      {/* Partners & Clients Section — temporarily hidden */}
-      {/* <PartnersSection /> */}
+      {/* Partners & Clients Section */}
+      <PartnersSection partners={partners} />
 
       {/* LinkedIn Feed Section */}
       <section ref={linkedinSectionRef} id="section-linkedin" className="relative py-16 lg:py-24 bg-surface overflow-hidden">

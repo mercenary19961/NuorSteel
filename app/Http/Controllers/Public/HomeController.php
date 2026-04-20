@@ -7,6 +7,7 @@ use App\Models\SiteContent;
 use App\Models\Product;
 use App\Models\Certificate;
 use App\Models\LinkedinCache;
+use App\Models\Partner;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -42,6 +43,17 @@ class HomeController extends Controller
                     'thumbnail' => $c->thumbnail?->url,
                 ]),
             'linkedin_posts' => LinkedinCache::getLatestPosts(5),
+            'partners' => Partner::visible()
+                ->ordered()
+                ->with('logoMedia')
+                ->get()
+                ->map(fn($p) => [
+                    'id' => $p->id,
+                    'name_en' => $p->name_en,
+                    'name_ar' => $p->name_ar,
+                    'logo' => $p->logoMedia?->url,
+                    'size_tier' => $p->size_tier,
+                ]),
         ]);
     }
 }

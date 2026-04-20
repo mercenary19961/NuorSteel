@@ -20,6 +20,35 @@ interface ProductSpec {
   value: string;
 }
 
+interface Highlight {
+  text_en: string;
+  text_ar: string;
+}
+
+interface SpecIcon {
+  icon: string;
+  title_en: string;
+  title_ar: string;
+  value_en: string;
+  value_ar: string;
+}
+
+interface SpecTable {
+  title_en: string;
+  title_ar: string;
+  headers_en: string[];
+  headers_ar: string[];
+  rows: string[][];
+}
+
+interface Feature {
+  icon: string;
+  title_en: string;
+  title_ar: string;
+  description_en: string;
+  description_ar: string;
+}
+
 interface ProductData {
   id: number;
   name_en: string;
@@ -31,6 +60,11 @@ interface ProductData {
   description_ar: string | null;
   category: string | null;
   image: string | null;
+  highlights: Highlight[];
+  spec_icons: SpecIcon[];
+  spec_table: SpecTable | null;
+  features: Feature[];
+  show_quote_tab: boolean;
   images: ProductImage[];
   specifications: {
     chemical: ProductSpec[];
@@ -45,20 +79,25 @@ interface Props {
 
 type TabKey = 'overview' | 'specifications' | 'features' | 'quote';
 
-// --- Feature Icons Map ---
-const featureIcons: Record<string, React.ElementType> = {
-  thermoMechanical: Flame,
-  ductility: Zap,
-  weldability: Target,
-  corrosionResistance: Shield,
-  eafSteelmaking: Flame,
-  continuousCasting: Box,
-  chemicalControl: Microscope,
-  dimensionalConsistency: Ruler,
+// --- Icon registry (shared between spec_icons and features) ---
+const iconRegistry: Record<string, React.ElementType> = {
+  ruler: Ruler,
+  shield: Shield,
+  package: Package,
+  microscope: Microscope,
+  target: Target,
+  flame: Flame,
+  box: Box,
+  zap: Zap,
+  checkCircle: CheckCircle,
 };
 
+const resolveIcon = (key: string | undefined): React.ElementType =>
+  (key && iconRegistry[key]) || Package;
+
 // --- Spec Data Table Component ---
-function SpecDataTable({ tableData }: { tableData: { title: string; headers: string[]; rows: string[][] } }) {
+function SpecDataTable({ tableData }: { tableData: { title: string; headers: string[]; rows: string[][] } | null }) {
+  if (!tableData || !tableData.headers?.length) return null;
   const [expandedHeader, setExpandedHeader] = useState<number | null>(null);
   const [truncatedHeaders, setTruncatedHeaders] = useState<Set<number>>(new Set());
   const headerRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -212,13 +251,12 @@ export default function Products({ products }: Props) {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Quote tab is hidden for billets — snap back to overview if a user had it open
-  // on TMT bars and then switched to billets.
+  // If a user had Quote tab open and switches to a product where it's hidden, snap back.
   useEffect(() => {
-    if (selectedSlug === 'billets' && activeTab === 'quote') {
+    if (selectedProduct && !selectedProduct.show_quote_tab && activeTab === 'quote') {
       setActiveTab('overview');
     }
-  }, [selectedSlug, activeTab]);
+  }, [selectedProduct, activeTab]);
 
   // Measure left panel for curved clip-path (useLayoutEffect to avoid flash)
   const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
@@ -290,12 +328,15 @@ export default function Products({ products }: Props) {
     };
   }, [language]);
 
-  // Slug-based i18n key map
-  const slugToKey: Record<string, string> = {
-    'tmt-bars': 'tmtBars',
-    'billets': 'billets',
+  // Language-aware getters for product content
+  const getTableData = (p: ProductData) => {
+    if (!p.spec_table) return null;
+    return {
+      title: language === 'ar' ? p.spec_table.title_ar : p.spec_table.title_en,
+      headers: language === 'ar' ? p.spec_table.headers_ar : p.spec_table.headers_en,
+      rows: p.spec_table.rows,
+    };
   };
-  const productKey = slugToKey[selectedProduct?.slug] ?? 'tmtBars';
 
   const handleExplore = () => {
     setExpanded(true);
@@ -375,41 +416,44 @@ export default function Products({ products }: Props) {
             </div>
 
             {/* Spec Highlight Icons */}
-            <div className="grid grid-cols-3 gap-6 mt-8">
-              {Object.entries(t(`products.${productKey}.specIcons`, { returnObjects: true }) as Record<string, { title: string; value: string }>).map(([key, icon]) => (
-                <div key={key} className="text-center">
-                  <div className="w-14 h-14 mx-auto mb-3 border border-white/40 rounded-lg flex items-center justify-center">
-                    {key === 'diameterRange' || key === 'crossSection' ? <Ruler className="text-white" size={24} /> :
-                     key === 'standards' || key === 'chemicalControl' ? <Shield className="text-white" size={24} /> :
-                     <Package className="text-white" size={24} />}
-                  </div>
-                  <h4 className="text-white font-semibold text-sm mb-1">{icon.title}</h4>
-                  <p className="text-white/60 text-xs">{icon.value}</p>
-                </div>
-              ))}
-            </div>
+            {selectedProduct.spec_icons.length > 0 && (
+              <div className="grid grid-cols-3 gap-6 mt-8">
+                {selectedProduct.spec_icons.map((icon, idx) => {
+                  const Icon = resolveIcon(icon.icon);
+                  return (
+                    <div key={idx} className="text-center">
+                      <div className="w-14 h-14 mx-auto mb-3 border border-white/40 rounded-lg flex items-center justify-center">
+                        <Icon className="text-white" size={24} />
+                      </div>
+                      <h4 className="text-white font-semibold text-sm mb-1">{language === 'ar' ? icon.title_ar : icon.title_en}</h4>
+                      <p className="text-white/60 text-xs">{language === 'ar' ? icon.value_ar : icon.value_en}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Key Highlights */}
-            <div>
-              <h3 className="text-lg font-bold text-white mb-4">{t('products.overview.keyHighlights')}</h3>
-              <ul className="space-y-2">
-                {(t(`products.${productKey}.highlights`, { returnObjects: true }) as string[]).map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-white/80 text-sm">
-                    <CheckCircle className="text-white shrink-0 mt-0.5" size={16} />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {selectedProduct.highlights.length > 0 && (
+              <div>
+                <h3 className="text-lg font-bold text-white mb-4">{t('products.overview.keyHighlights')}</h3>
+                <ul className="space-y-2">
+                  {selectedProduct.highlights.map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-white/80 text-sm">
+                      <CheckCircle className="text-white shrink-0 mt-0.5" size={16} />
+                      {language === 'ar' ? item.text_ar : item.text_en}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         );
 
       case 'specifications':
         return (
           <div>
-            <SpecDataTable
-              tableData={t(`products.${productKey}.specTable`, { returnObjects: true }) as { title: string; headers: string[]; rows: string[][] }}
-            />
+            <SpecDataTable tableData={getTableData(selectedProduct)} />
             <p className="text-white/70 text-sm italic mt-4">{t('products.specNote')}</p>
           </div>
         );
@@ -417,16 +461,16 @@ export default function Products({ products }: Props) {
       case 'features':
         return (
           <MagicCardGrid className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {Object.entries(t(`products.${productKey}.features`, { returnObjects: true }) as Record<string, { title: string; description: string }>).map(([key, feature]) => {
-              const Icon = featureIcons[key] ?? Zap;
+            {selectedProduct.features.map((feature, idx) => {
+              const Icon = resolveIcon(feature.icon);
               return (
-                <MagicCard key={key} className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
+                <MagicCard key={idx} className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
                   <div className="relative z-10">
                     <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center mb-4">
                       <Icon className="text-white" size={20} />
                     </div>
-                    <h4 className="text-white font-semibold mb-2">{feature.title}</h4>
-                    <p className="text-white/60 text-sm leading-relaxed">{feature.description}</p>
+                    <h4 className="text-white font-semibold mb-2">{language === 'ar' ? feature.title_ar : feature.title_en}</h4>
+                    <p className="text-white/60 text-sm leading-relaxed">{language === 'ar' ? feature.description_ar : feature.description_en}</p>
                   </div>
                 </MagicCard>
               );
@@ -571,7 +615,7 @@ export default function Products({ products }: Props) {
                       </button>
                     </div>
 
-                    <ProductTabs activeTab={activeTab} onTabChange={setActiveTab} showQuote={selectedSlug !== 'billets'} />
+                    <ProductTabs activeTab={activeTab} onTabChange={setActiveTab} showQuote={selectedProduct.show_quote_tab} />
 
                     <AnimatePresence mode="wait">
                       <motion.div
@@ -618,7 +662,7 @@ export default function Products({ products }: Props) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.4 }}
-                className={`relative ${selectedSlug === 'billets' ? 'translate-y-12' : ''}`}
+                className={`relative ${selectedSlug === 'billets' ? 'translate-y-12' : selectedSlug === 'tmt-bars' ? 'translate-y-52' : ''}`}
               >
                 {getProductHeroImage(selectedProduct) ? (
                   <img
@@ -626,7 +670,7 @@ export default function Products({ products }: Props) {
                     src={getProductHeroImage(selectedProduct)!}
                     alt={getName(selectedProduct)}
                     onClick={handleExplore}
-                    className="w-auto object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)] max-h-64 xl:max-h-80 2xl:max-h-96 pointer-events-auto cursor-pointer"
+                    className={`w-auto object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)] pointer-events-auto cursor-pointer ${selectedSlug === 'tmt-bars' ? 'max-h-48 xl:max-h-56 2xl:max-h-64 min-[1800px]:max-h-96' : 'max-h-64 xl:max-h-80 2xl:max-h-96'}`}
                   />
                 ) : (
                   <div className="w-48 h-48 rounded-full bg-white/5 flex items-center justify-center">

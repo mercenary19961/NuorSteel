@@ -26,6 +26,11 @@ class ProductController extends Controller
                 'description_ar' => $product->description_ar,
                 'category' => $product->category,
                 'image' => $product->featuredImage?->url,
+                'highlights' => $product->highlights ?? [],
+                'spec_icons' => $product->spec_icons ?? [],
+                'spec_table' => $product->spec_table,
+                'features' => $product->features ?? [],
+                'show_quote_tab' => $product->show_quote_tab,
                 'images' => $product->images->map(fn($img) => [
                     'id' => $img->id,
                     'url' => $img->media?->url,
@@ -85,6 +90,11 @@ class ProductController extends Controller
                 'description' => $product->description,
                 'category' => $product->category,
                 'featured_image' => $product->featuredImage?->url,
+                'highlights' => $product->highlights ?? [],
+                'spec_icons' => $product->spec_icons ?? [],
+                'spec_table' => $product->spec_table,
+                'features' => $product->features ?? [],
+                'show_quote_tab' => $product->show_quote_tab,
                 'images' => $product->images->map(fn($img) => [
                     'id' => $img->id,
                     'url' => $img->url,

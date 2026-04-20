@@ -24,6 +24,8 @@ export interface PageProps {
     email: string;
     address: string;
     linkedin_url: string;
+    google_maps_embed_url: string;
+    google_maps_place_url: string;
   };
   turnstileSiteKey: string | null;
   ziggy: {
@@ -129,6 +131,35 @@ export interface ChangeLog {
 }
 
 // Products
+export interface ProductHighlight {
+  text_en: string;
+  text_ar: string;
+}
+
+export interface ProductSpecIcon {
+  icon: string;
+  title_en: string;
+  title_ar: string;
+  value_en: string;
+  value_ar: string;
+}
+
+export interface ProductSpecTable {
+  title_en: string;
+  title_ar: string;
+  headers_en: string[];
+  headers_ar: string[];
+  rows: string[][];
+}
+
+export interface ProductFeature {
+  icon: string;
+  title_en: string;
+  title_ar: string;
+  description_en: string;
+  description_ar: string;
+}
+
 export interface Product {
   id: number;
   name_en: string;
@@ -140,6 +171,11 @@ export interface Product {
   description_ar: string | null;
   category: string | null;
   featured_image_id: number | null;
+  highlights: ProductHighlight[] | null;
+  spec_icons: ProductSpecIcon[] | null;
+  spec_table: ProductSpecTable | null;
+  features: ProductFeature[] | null;
+  show_quote_tab: boolean;
   is_active: boolean;
   is_featured: boolean;
   sort_order: number;
@@ -289,6 +325,21 @@ export interface LinkedinPost {
   posted_at: string;
   is_active: boolean;
   sort_order: number;
+}
+
+// Partners
+export interface Partner {
+  id: number;
+  name_en: string;
+  name_ar: string;
+  logo_path: string;
+  logo_media_id: number | null;
+  size_tier: "sm" | "md" | "lg" | "xl";
+  sort_order: number;
+  is_visible: boolean;
+  created_at: string;
+  updated_at: string;
+  logo_media?: Media;
 }
 
 // Site Content

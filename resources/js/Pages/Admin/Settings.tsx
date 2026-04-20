@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Save, Settings as SettingsIcon, X, Plus, Info, Phone, Mail, MapPin, Linkedin, Inbox, Briefcase, type LucideIcon } from 'lucide-react';
+import { Save, Settings as SettingsIcon, X, Plus, Info, Phone, Mail, MapPin, Linkedin, Inbox, Briefcase, Map, ExternalLink, type LucideIcon } from 'lucide-react';
 import UndoButton from '@/Components/Admin/UndoButton';
 import type { Setting, UndoMeta } from '@/types';
 
@@ -153,6 +153,8 @@ export default function Settings({ settings, undoMeta }: Props) {
     linkedin_url: Linkedin,
     contact_recipients: Inbox,
     career_recipients: Briefcase,
+    google_maps_embed_url: Map,
+    google_maps_place_url: ExternalLink,
   };
 
   if (Object.keys(settings).length === 0) {

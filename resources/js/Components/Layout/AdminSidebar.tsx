@@ -12,6 +12,7 @@ import {
   Mail,
   MessageSquare,
   Linkedin,
+  Handshake,
   Newspaper,
   Settings,
   History,
@@ -54,6 +55,7 @@ const navGroups: { label: string; items: NavItem[] }[] = [
     items: [
       { label: 'Products', path: '/admin/products', icon: <Package size={20} /> },
       { label: 'Certificates', path: '/admin/certificates', icon: <Award size={20} /> },
+      { label: 'Partners', path: '/admin/partners', icon: <Handshake size={20} /> },
     ],
   },
   {

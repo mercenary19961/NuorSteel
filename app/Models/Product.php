@@ -22,6 +22,11 @@ class Product extends Model
         'description_ar',
         'category',
         'featured_image_id',
+        'highlights',
+        'spec_icons',
+        'spec_table',
+        'features',
+        'show_quote_tab',
         'is_active',
         'is_featured',
         'sort_order',
@@ -34,6 +39,11 @@ class Product extends Model
         return [
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
+            'show_quote_tab' => 'boolean',
+            'highlights' => 'array',
+            'spec_icons' => 'array',
+            'spec_table' => 'array',
+            'features' => 'array',
         ];
     }
 

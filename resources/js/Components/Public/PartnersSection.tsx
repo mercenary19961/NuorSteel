@@ -1,40 +1,28 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-interface Partner {
-  name: string;
-  logo: string;
-  logoClass?: string;
-  desktopLogoClass?: string;
+export interface PartnerData {
+  id: number;
+  name_en: string;
+  name_ar: string;
+  logo: string | null;
+  size_tier: 'sm' | 'md' | 'lg' | 'xl';
 }
 
-const LG = 'max-h-24 max-w-24 lg:max-h-36 lg:max-w-36';
-const XL = 'max-h-28 max-w-28 lg:max-h-44 lg:max-w-44';
-const XXL = 'max-h-32 max-w-32 lg:max-h-52 lg:max-w-52';
-const XXXL = 'max-h-36 max-w-36 lg:max-h-60 lg:max-w-60';
+interface Props {
+  partners: PartnerData[];
+}
 
-const partners: Partner[] = [
-  { name: 'Aramco', logo: '/images/home/partners/aramco.webp', desktopLogoClass: 'lg:max-h-32 lg:max-w-32' },
-  { name: 'Vision 2030', logo: '/images/home/partners/vision 2030.webp', logoClass: XXL, desktopLogoClass: 'lg:max-h-28 lg:max-w-28' },
-  { name: 'Saudi Made', logo: '/images/home/partners/SAUDI MADE.webp', desktopLogoClass: 'lg:max-h-20 lg:max-w-20' },
-  { name: 'MODON', logo: '/images/home/partners/modon.webp', logoClass: XXXL },
-  { name: 'NHC', logo: '/images/home/partners/nhc.webp', logoClass: XL, desktopLogoClass: 'lg:max-h-24 lg:max-w-24' },
-  { name: 'Roshen', logo: '/images/home/partners/roshen.webp', logoClass: XL },
-  { name: 'ASTM', logo: '/images/home/partners/ASTM.webp', logoClass: XXL },
-  { name: 'ISO', logo: '/images/home/partners/ISO.webp', logoClass: XXL },
-  { name: 'SASO', logo: '/images/home/partners/SASO LOGO.webp', desktopLogoClass: 'lg:max-h-28 lg:max-w-28' },
-  { name: 'EPD', logo: '/images/home/partners/epd.webp', desktopLogoClass: 'lg:max-h-28 lg:max-w-28' },
-  { name: 'HPD', logo: '/images/home/partners/HPD.webp', logoClass: XXXL },
-  { name: 'Qarya', logo: '/images/home/partners/qarya.webp', logoClass: XXL },
-  { name: 'Tasnee3', logo: '/images/home/partners/tasnee3.webp', desktopLogoClass: 'lg:max-h-24 lg:max-w-24' },
-  { name: 'Water Co', logo: '/images/home/partners/WATER CO.webp', desktopLogoClass: 'lg:max-h-20 lg:max-w-20' },
-  { name: 'Ministry of Industry', logo: '/images/home/partners/industry ministry.webp', desktopLogoClass: 'lg:max-h-28 lg:max-w-28' },
-  { name: 'Ministry of Transport', logo: '/images/home/partners/TRANSFER MINISTRY.webp', logoClass: LG, desktopLogoClass: 'lg:max-h-20 lg:max-w-20' },
-];
+const SIZE_CLASSES: Record<PartnerData['size_tier'], string> = {
+  sm: 'max-h-20 max-w-20 lg:max-h-28 lg:max-w-28',
+  md: 'max-h-24 max-w-24 lg:max-h-36 lg:max-w-36',
+  lg: 'max-h-28 max-w-28 lg:max-h-44 lg:max-w-44',
+  xl: 'max-h-32 max-w-32 lg:max-h-52 lg:max-w-52',
+};
 
-// Split partners into 3 columns
-function splitIntoColumns(items: Partner[], cols: number): Partner[][] {
-  const columns: Partner[][] = Array.from({ length: cols }, () => []);
+function splitIntoColumns(items: PartnerData[], cols: number): PartnerData[][] {
+  const columns: PartnerData[][] = Array.from({ length: cols }, () => []);
   items.forEach((item, i) => columns[i % cols].push(item));
   return columns;
 }
@@ -42,12 +30,13 @@ function splitIntoColumns(items: Partner[], cols: number): Partner[][] {
 function ScrollColumn({
   partners,
   direction,
+  language,
 }: {
-  partners: Partner[];
+  partners: PartnerData[];
   direction: 'up' | 'down';
+  language: 'en' | 'ar';
 }) {
   const [paused, setPaused] = useState(false);
-  // Duplicate items for seamless loop
   const items = [...partners, ...partners];
 
   return (
@@ -62,16 +51,18 @@ function ScrollColumn({
       >
         {items.map((partner, i) => (
           <div
-            key={`${partner.name}-${i}`}
+            key={`${partner.id}-${i}`}
             className="shrink-0 flex items-center justify-center bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.12)] transition-shadow w-28 h-36 p-3 lg:w-36 lg:h-44 lg:p-4 mx-auto"
           >
-            <img
-              src={partner.logo}
-              alt={partner.name}
-              className={`object-contain ${partner.desktopLogoClass ? '' : 'lg:max-h-none lg:max-w-none'} ${partner.logoClass || 'max-h-24 max-w-24'} ${partner.desktopLogoClass || ''}`}
-              loading="lazy"
-              decoding="async"
-            />
+            {partner.logo && (
+              <img
+                src={partner.logo}
+                alt={language === 'ar' ? partner.name_ar : partner.name_en}
+                className={`object-contain ${SIZE_CLASSES[partner.size_tier] ?? SIZE_CLASSES.md}`}
+                loading="lazy"
+                decoding="async"
+              />
+            )}
           </div>
         ))}
       </div>
@@ -79,8 +70,12 @@ function ScrollColumn({
   );
 }
 
-export default function PartnersSection() {
+export default function PartnersSection({ partners }: Props) {
   const { t } = useTranslation();
+  const { language } = useLanguage();
+
+  if (!partners || partners.length === 0) return null;
+
   const columns = splitIntoColumns(partners, 3);
 
   return (
@@ -101,6 +96,7 @@ export default function PartnersSection() {
               key={i}
               partners={col}
               direction={i % 2 === 0 ? 'up' : 'down'}
+              language={language}
             />
           ))}
         </div>
@@ -108,18 +104,17 @@ export default function PartnersSection() {
 
       {/* Desktop: side-by-side layout */}
       <div className="hidden lg:block relative h-150">
-        {/* Right — Scrolling columns (full section height) */}
         <div className="absolute top-0 right-0 bottom-0 w-3/5 grid grid-cols-3 gap-0 pe-8">
           {columns.map((col, i) => (
             <ScrollColumn
               key={i}
               partners={col}
               direction={i % 2 === 0 ? 'up' : 'down'}
+              language={language}
             />
           ))}
         </div>
 
-        {/* Left — Text (vertically centered) */}
         <div className="relative z-10 container mx-auto px-4 h-full flex items-center">
           <div className="w-2/5 text-start">
             <h2 className="text-4xl font-black text-white mb-4">
