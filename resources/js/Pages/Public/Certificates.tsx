@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Head } from '@inertiajs/react';
 import { Leaf, ShieldCheck, FileText, ArrowLeft, Download, X, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -44,6 +44,15 @@ export default function Certificates({ esg, quality, governance, content_en, con
 
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
   const [viewingCert, setViewingCert] = useState<CertificateItem | null>(null);
+
+  // Deep-link support: ?category=esg|quality|governance opens that category directly.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const param = new URLSearchParams(window.location.search).get('category');
+    if (param === 'esg' || param === 'quality' || param === 'governance') {
+      setActiveCategory(param);
+    }
+  }, []);
 
   // Helpers
   const getTitle = (c: CertificateItem) => language === 'ar' ? c.title_ar : c.title_en;
