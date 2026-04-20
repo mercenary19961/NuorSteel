@@ -11,6 +11,7 @@ type NavChild = {
   href: string;
   description?: string;
   image?: string;
+  imageScale?: string;
 };
 
 type NavItem = {
@@ -67,12 +68,14 @@ function buildNavItems(t: (k: string) => string, lang: 'en' | 'ar'): NavItem[] {
             href: '/products?product=tmt-bars',
             description: L.products.tmtDesc[lang],
             image: `/images/products/renders/tmt-bars-${lang}.webp`,
+            imageScale: 'scale-[3]',
           },
           {
             label: t('home.products.billets.title'),
             href: '/products?product=billets',
             description: L.products.billetsDesc[lang],
             image: `/images/products/renders/billets-${lang}.webp`,
+            imageScale: 'scale-150',
           },
         ],
       },
@@ -386,7 +389,7 @@ function MegaPanel({ children, onNavigate }: { children: NavChild[]; onNavigate:
                 <img
                   src={child.image}
                   alt={child.label}
-                  className="max-w-full max-h-full object-contain"
+                  className={`w-full h-full object-contain ${child.imageScale ?? 'scale-150'}`}
                 />
               </div>
             )}
