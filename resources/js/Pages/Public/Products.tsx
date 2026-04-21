@@ -219,12 +219,11 @@ interface TmtMarking {
 }
 
 const TMT_MARKINGS: TmtMarking[] = [
-  { leftPct: 15, labelEn: 'Country of Origin', labelAr: 'بلد المنشأ', valueEn: 'KSA — Kingdom of Saudi Arabia', valueAr: 'KSA — المملكة العربية السعودية' },
-  { leftPct: 32, labelEn: 'Brand Name (EN)', labelAr: 'الاسم التجاري (إنجليزي)', valueEn: 'NUOR', valueAr: 'NUOR' },
-  { leftPct: 48, labelEn: 'Brand Name (AR)', labelAr: 'الاسم التجاري (عربي)', valueEn: 'نور', valueAr: 'نور' },
-  { leftPct: 64, labelEn: 'Rebar Size', labelAr: 'مقاس القضيب', valueEn: 'Diameter in millimetres', valueAr: 'القطر بالملم' },
-  { leftPct: 78, labelEn: 'Type of Steel', labelAr: 'نوع الصلب', valueEn: 'S — SASO / ASTM A615M', valueAr: 'S — SASO / ASTM A615M' },
-  { leftPct: 92, labelEn: 'Max. Yield Strength', labelAr: 'أقصى إجهاد خضوع', valueEn: '4 — Grade 60 (420 MPa)', valueAr: '٤ — الدرجة 60 (420 ميجا باسكال)' },
+  { leftPct: 21, labelEn: 'Country of Origin', labelAr: 'بلد المنشأ', valueEn: 'KSA, Kingdom of Saudi Arabia', valueAr: 'KSA، المملكة العربية السعودية' },
+  { leftPct: 44, labelEn: 'Brand Name', labelAr: 'الاسم التجاري', valueEn: 'NUOR / نور', valueAr: 'NUOR / نور' },
+  { leftPct: 70, labelEn: 'Rebar Size', labelAr: 'مقاس القضيب', valueEn: 'Diameter in millimetres', valueAr: 'القطر بالملم' },
+  { leftPct: 82, labelEn: 'Type of Steel', labelAr: 'نوع الصلب', valueEn: 'S, SASO / ASTM A615M', valueAr: 'S، SASO / ASTM A615M' },
+  { leftPct: 92, labelEn: 'Max. Yield Strength', labelAr: 'أقصى إجهاد خضوع', valueEn: '4, Grade 60 (420 MPa)', valueAr: '٤، الدرجة 60 (420 ميجا باسكال)' },
 ];
 
 function TmtMarkingDots({ language }: { language: string }) {
