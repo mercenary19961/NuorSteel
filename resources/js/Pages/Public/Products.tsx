@@ -209,6 +209,65 @@ function ProductTabs({ activeTab, onTabChange, showQuote = true }: { activeTab: 
   );
 }
 
+// --- TMT Bar Marking Dots (overlay for the tagged rebar image) ---
+interface TmtMarking {
+  leftPct: number;
+  labelEn: string;
+  labelAr: string;
+  valueEn: string;
+  valueAr: string;
+}
+
+const TMT_MARKINGS: TmtMarking[] = [
+  { leftPct: 15, labelEn: 'Country of Origin', labelAr: 'بلد المنشأ', valueEn: 'KSA — Kingdom of Saudi Arabia', valueAr: 'KSA — المملكة العربية السعودية' },
+  { leftPct: 32, labelEn: 'Brand Name (EN)', labelAr: 'الاسم التجاري (إنجليزي)', valueEn: 'NUOR', valueAr: 'NUOR' },
+  { leftPct: 48, labelEn: 'Brand Name (AR)', labelAr: 'الاسم التجاري (عربي)', valueEn: 'نور', valueAr: 'نور' },
+  { leftPct: 64, labelEn: 'Rebar Size', labelAr: 'مقاس القضيب', valueEn: 'Diameter in millimetres', valueAr: 'القطر بالملم' },
+  { leftPct: 78, labelEn: 'Type of Steel', labelAr: 'نوع الصلب', valueEn: 'S — SASO / ASTM A615M', valueAr: 'S — SASO / ASTM A615M' },
+  { leftPct: 92, labelEn: 'Max. Yield Strength', labelAr: 'أقصى إجهاد خضوع', valueEn: '4 — Grade 60 (420 MPa)', valueAr: '٤ — الدرجة 60 (420 ميجا باسكال)' },
+];
+
+function TmtMarkingDots({ language }: { language: string }) {
+  const [hovered, setHovered] = useState<number | null>(null);
+  return (
+    <div className="absolute inset-0 pointer-events-none">
+      {TMT_MARKINGS.map((m, i) => (
+        <div
+          key={i}
+          className="absolute pointer-events-auto"
+          style={{ left: `${m.leftPct}%`, top: '50%', transform: 'translate(-50%, -50%)' }}
+          onMouseEnter={() => setHovered(i)}
+          onMouseLeave={() => setHovered(null)}
+        >
+          <div className="relative cursor-pointer">
+            <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-75" />
+            <span className="relative block w-3 h-3 rounded-full bg-primary ring-2 ring-white/70" />
+          </div>
+          <AnimatePresence>
+            {hovered === i && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 4 }}
+                transition={{ duration: 0.15 }}
+                className="absolute left-1/2 -translate-x-1/2 top-full mt-4 whitespace-nowrap bg-surface-dark text-white rounded-lg px-4 py-2 shadow-2xl border border-primary/40 z-50"
+              >
+                <div className="text-[10px] uppercase tracking-wider text-primary font-semibold">
+                  {language === 'ar' ? m.labelAr : m.labelEn}
+                </div>
+                <div className="text-sm font-medium mt-0.5">
+                  {language === 'ar' ? m.valueAr : m.valueEn}
+                </div>
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-transparent border-b-surface-dark" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // --- Main Component ---
 export default function Products({ products }: Props) {
   const { t } = useTranslation();
@@ -718,12 +777,15 @@ export default function Products({ products }: Props) {
                 className={selectedSlug === 'billets' ? 'translate-y-10' : ''}
               >
                 {getProductImage(selectedProduct) ? (
-                  <img
-                    key={`expanded-img-${selectedSlug}-${language}`}
-                    src={getProductImage(selectedProduct)!}
-                    alt={getName(selectedProduct)}
-                    className={`object-contain drop-shadow-2xl ${selectedSlug === 'billets' ? 'max-h-32 xl:max-h-40 max-w-105 xl:max-w-130' : 'max-h-32 xl:max-h-48 2xl:max-h-60 w-auto'}`}
-                  />
+                  <div className="relative">
+                    <img
+                      key={`expanded-img-${selectedSlug}-${language}`}
+                      src={getProductImage(selectedProduct)!}
+                      alt={getName(selectedProduct)}
+                      className={`object-contain drop-shadow-2xl ${selectedSlug === 'billets' ? 'max-h-32 xl:max-h-40 max-w-105 xl:max-w-130' : 'max-h-32 xl:max-h-48 2xl:max-h-60 w-auto'}`}
+                    />
+                    {selectedSlug === 'tmt-bars' && <TmtMarkingDots language={language} />}
+                  </div>
                 ) : (
                   <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center">
                     <Package className="text-white/20" size={32} />
