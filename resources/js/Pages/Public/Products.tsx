@@ -228,41 +228,67 @@ const TMT_MARKINGS: TmtMarking[] = [
 
 function TmtMarkingDots({ language }: { language: string }) {
   const [hovered, setHovered] = useState<number | null>(null);
+  const WAVE_STEP = 0.35; // seconds between each dot's ping start → sequential wave
+  const WAVE_DURATION = 2.2;
   return (
     <div className="absolute inset-0 pointer-events-none">
-      {TMT_MARKINGS.map((m, i) => (
-        <div
-          key={i}
-          className="absolute pointer-events-auto"
-          style={{ left: `${m.leftPct}%`, top: '50%', transform: 'translate(-50%, -50%)' }}
-          onMouseEnter={() => setHovered(i)}
-          onMouseLeave={() => setHovered(null)}
-        >
-          <div className="relative cursor-pointer">
-            <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-75" />
-            <span className="relative block w-3 h-3 rounded-full bg-primary ring-2 ring-white/70" />
+      {TMT_MARKINGS.map((m, i) => {
+        const isHovered = hovered === i;
+        const isDimmed = hovered !== null && !isHovered;
+        const baseDelay = i * WAVE_STEP;
+        return (
+          <div
+            key={i}
+            className="absolute pointer-events-auto"
+            style={{ left: `${m.leftPct}%`, top: '50%', transform: 'translate(-50%, -50%)' }}
+            onMouseEnter={() => setHovered(i)}
+            onMouseLeave={() => setHovered(null)}
+          >
+            <div
+              className={`relative cursor-pointer transition-all duration-300 ${
+                isHovered ? 'scale-[1.35]' : 'scale-100'
+              } ${isDimmed ? 'opacity-25' : 'opacity-100'}`}
+            >
+              {/* Outer ping — sequential wave across the bar */}
+              <span
+                className="absolute inset-0 rounded-full bg-primary animate-ping opacity-60"
+                style={{ animationDelay: `${baseDelay}s`, animationDuration: `${WAVE_DURATION}s` }}
+              />
+              {/* Inner ping — staggered 1s behind for double-heartbeat feel */}
+              <span
+                className="absolute inset-0 rounded-full bg-primary animate-ping opacity-35"
+                style={{ animationDelay: `${baseDelay + 1}s`, animationDuration: `${WAVE_DURATION}s` }}
+              />
+              {/* Solid dot — breathes when idle, glows when hovered */}
+              <span
+                className={`relative block w-3 h-3 rounded-full bg-primary ring-2 transition-shadow duration-300 ${
+                  isHovered ? 'ring-white shadow-[0_0_18px_5px_rgba(255,122,0,0.75)]' : 'ring-white/70'
+                } ${hovered === null ? 'animate-dot-breathe' : ''}`}
+                style={hovered === null ? { animationDelay: `${i * 0.25}s` } : undefined}
+              />
+            </div>
+            <AnimatePresence>
+              {isHovered && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 4 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute left-1/2 -translate-x-1/2 top-full mt-4 whitespace-nowrap bg-surface-dark text-white rounded-lg px-4 py-2 shadow-2xl border border-primary/40 z-50"
+                >
+                  <div className="text-[10px] uppercase tracking-wider text-primary font-semibold">
+                    {language === 'ar' ? m.labelAr : m.labelEn}
+                  </div>
+                  <div className="text-sm font-medium mt-0.5">
+                    {language === 'ar' ? m.valueAr : m.valueEn}
+                  </div>
+                  <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-transparent border-b-surface-dark" />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-          <AnimatePresence>
-            {hovered === i && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 4 }}
-                transition={{ duration: 0.15 }}
-                className="absolute left-1/2 -translate-x-1/2 top-full mt-4 whitespace-nowrap bg-surface-dark text-white rounded-lg px-4 py-2 shadow-2xl border border-primary/40 z-50"
-              >
-                <div className="text-[10px] uppercase tracking-wider text-primary font-semibold">
-                  {language === 'ar' ? m.labelAr : m.labelEn}
-                </div>
-                <div className="text-sm font-medium mt-0.5">
-                  {language === 'ar' ? m.valueAr : m.valueEn}
-                </div>
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-transparent border-b-surface-dark" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

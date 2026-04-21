@@ -178,6 +178,16 @@ html[dir="rtl"] body {
     animation: scroll-down 25s linear infinite;
 }
 
+/* TMT marking dot — idle breathing loop (grows + shrinks when no dot is hovered) */
+@keyframes dot-breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.35); }
+}
+
+.animate-dot-breathe {
+    animation: dot-breathe 2.2s ease-in-out infinite;
+}
+
 /* Hero CTA shimmer — diagonal highlight sweep */
 @keyframes cta-shimmer {
     0% { transform: translateX(-150%) skewX(-20deg); }
