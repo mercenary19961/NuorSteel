@@ -24,27 +24,53 @@ interface Props {
 
 
 function HeroVideo() {
+  const [isMobile, setIsMobile] = useState(false);
   const loRef = useRef<HTMLVideoElement>(null);
   const hdRef = useRef<HTMLVideoElement>(null);
   const [hdReady, setHdReady] = useState(false);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(max-width: 639px)');
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) return;
     const hdVideo = hdRef.current;
     if (!hdVideo) return;
-
-    const onCanPlay = () => {
-      // Sync HD playback time with the low-res video, then swap
-      if (loRef.current) {
-        hdVideo.currentTime = loRef.current.currentTime;
-      }
-      hdVideo.play().then(() => setHdReady(true)).catch(() => {});
+    const onLoadedData = () => {
+      if (loRef.current) hdVideo.currentTime = loRef.current.currentTime;
+      hdVideo.play().then(() => {
+        setHdReady(true);
+        // Free the GPU — no point decoding a hidden video
+        if (loRef.current) loRef.current.pause();
+      }).catch(() => {});
     };
-
-    hdVideo.addEventListener('canplaythrough', onCanPlay, { once: true });
+    hdVideo.addEventListener('loadeddata', onLoadedData, { once: true });
     hdVideo.load();
+    return () => hdVideo.removeEventListener('loadeddata', onLoadedData);
+  }, [isMobile]);
 
-    return () => hdVideo.removeEventListener('canplaythrough', onCanPlay);
-  }, []);
+  if (isMobile) {
+    return (
+      <div className="absolute inset-0">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+        >
+          <source src="/videos/hero-bg-mobile.mp4" type="video/mp4" />
+        </video>
+      </div>
+    );
+  }
 
   return (
     <div className="absolute inset-0">
