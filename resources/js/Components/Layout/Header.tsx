@@ -147,10 +147,10 @@ export default function Header() {
 
   // Transparent at top; blurred glass when scrolled (or mobile drawer open).
   const bgClass = mobileMenuOpen
-    ? 'bg-surface/95 backdrop-blur-md border-b border-white/10'
+    ? 'bg-surface/95 backdrop-blur-md'
     : isAtTop
       ? 'bg-transparent'
-      : 'bg-surface/70 backdrop-blur-md border-b border-white/10';
+      : 'bg-surface/70 backdrop-blur-md';
 
   return (
     <header
@@ -160,8 +160,15 @@ export default function Header() {
     >
       <div className="container mx-auto px-4">
         <div className={`flex items-center justify-between transition-all duration-300 ${isAtTop ? 'h-16 lg:h-20' : 'h-12 lg:h-14'}`}>
-          {/* Logo */}
-          <Link href="/" className="flex items-center" onClick={closeMobile}>
+          {/* Logo — products page wraps the mark in a gray plate so it doesn't
+              get washed out against the orange hero panel */}
+          <Link
+            href="/"
+            className={`flex items-center rounded-md transition-colors duration-300 ${
+              isProductsPage ? 'bg-neutral-600 border border-white/30 px-3 py-1.5' : ''
+            }`}
+            onClick={closeMobile}
+          >
             <picture>
               <source
                 srcSet={isAtTop ? '/images/shared/logo/logo-lg.webp' : '/images/shared/logo/logo-sm.webp'}
@@ -192,9 +199,9 @@ export default function Header() {
                   <Link
                     href={item.path}
                     className={`group relative inline-flex items-center gap-1 py-2 text-xs uppercase tracking-[0.14em] font-medium transition-colors duration-200 ${
-                      active ? 'text-white' : 'text-white/75 hover:text-white'
+                      active ? 'text-white' : isAtTop ? 'text-white/90 hover:text-white' : 'text-white/75 hover:text-white'
                     }`}
-                    style={{ textShadow: isAtTop ? '0 1px 2px rgba(0,0,0,0.35)' : undefined }}
+                    style={{ textShadow: isAtTop ? '0 1px 3px rgba(0,0,0,0.8), 0 2px 12px rgba(0,0,0,0.5)' : undefined }}
                   >
                     <span>{t(item.labelKey)}</span>
                     {item.dropdown && (
