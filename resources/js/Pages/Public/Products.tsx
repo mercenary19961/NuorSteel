@@ -738,7 +738,7 @@ export default function Products({ products }: Props) {
 
         {/* Large Product Image — absolutely positioned over both panels, near the diagonal */}
         {!expanded && (
-          <div className="hidden lg:flex absolute z-20 bottom-1/4 items-end justify-start pointer-events-none max-w-[60%] left-0 ps-[max(2rem,calc((100vw-1800px)/2+1rem))]">
+          <div className="hidden lg:flex absolute z-20 bottom-1/4 items-end justify-start pointer-events-none max-w-[60%] start-0 ps-[max(2rem,calc((100vw-1800px)/2+1rem))]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={`img-${selectedSlug}`}
