@@ -4,10 +4,10 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import MediaPicker from '@/Components/Admin/MediaPicker';
-import { ArrowLeft, Plus, Trash2, Image, ImageOff, X } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Image, ImageOff, X, GripVertical } from 'lucide-react';
 import CustomSelect from '@/Components/Admin/CustomSelect';
 import UndoButton from '@/Components/Admin/UndoButton';
-import type { Product, Media, UndoMeta } from '@/types';
+import type { Product, Media, UndoMeta, ProductHighlight, ProductSpecIcon, ProductSpecTable, ProductFeature } from '@/types';
 
 interface Props {
   item: Product | null;
@@ -23,10 +23,31 @@ interface ProductForm {
   description_ar: string;
   category: string;
   featured_image_id: number | null;
+  highlights: ProductHighlight[];
+  spec_icons: ProductSpecIcon[];
+  spec_table: ProductSpecTable;
+  features: ProductFeature[];
+  show_quote_tab: boolean;
   is_active: boolean;
   is_featured: boolean;
   sort_order: number;
 }
+
+const ICON_OPTIONS = [
+  { value: 'ruler', label: 'Ruler (dimensions)' },
+  { value: 'shield', label: 'Shield (standards)' },
+  { value: 'package', label: 'Package (length/quantity)' },
+  { value: 'microscope', label: 'Microscope (chemical)' },
+  { value: 'target', label: 'Target (applications)' },
+  { value: 'flame', label: 'Flame (thermal)' },
+  { value: 'box', label: 'Box (casting)' },
+  { value: 'zap', label: 'Zap (electrical)' },
+  { value: 'checkCircle', label: 'Check (verification)' },
+];
+
+const emptySpecTable = (): ProductSpecTable => ({
+  title_en: '', title_ar: '', headers_en: [], headers_ar: [], rows: [],
+});
 
 interface SpecForm {
   property_en: string;
@@ -61,6 +82,11 @@ function initForm(item: Product | null): ProductForm {
       description_ar: '',
       category: '',
       featured_image_id: null,
+      highlights: [],
+      spec_icons: [],
+      spec_table: emptySpecTable(),
+      features: [],
+      show_quote_tab: true,
       is_active: true,
       is_featured: false,
       sort_order: 0,
@@ -75,6 +101,11 @@ function initForm(item: Product | null): ProductForm {
     description_ar: item.description_ar ?? '',
     category: item.category ?? '',
     featured_image_id: item.featured_image_id,
+    highlights: item.highlights ?? [],
+    spec_icons: item.spec_icons ?? [],
+    spec_table: item.spec_table ?? emptySpecTable(),
+    features: item.features ?? [],
+    show_quote_tab: item.show_quote_tab ?? true,
     is_active: item.is_active,
     is_featured: item.is_featured,
     sort_order: item.sort_order,
@@ -102,7 +133,7 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
   const initialForm = useRef(initForm(item));
   const [specs, setSpecs] = useState<SpecForm[]>(() => initSpecs(item));
   const initialSpecs = useRef(initSpecs(item));
-  const [activeTab, setActiveTab] = useState<'details' | 'images' | 'specs'>('details');
+  const [activeTab, setActiveTab] = useState<'details' | 'content' | 'images' | 'specs'>('details');
   const [featuredImageUrl, setFeaturedImageUrl] = useState<string | null>(
     item?.featured_image?.url ?? null,
   );
@@ -176,6 +207,97 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
     setSpecs(specs.map((s, i) => (i === index ? { ...s, [field]: value } : s)));
   };
 
+  // Highlights
+  const addHighlight = () =>
+    setForm((f) => ({ ...f, highlights: [...f.highlights, { text_en: '', text_ar: '' }] }));
+  const updateHighlight = (i: number, field: keyof ProductHighlight, value: string) =>
+    setForm((f) => ({
+      ...f,
+      highlights: f.highlights.map((h, idx) => (idx === i ? { ...h, [field]: value } : h)),
+    }));
+  const removeHighlight = (i: number) =>
+    setForm((f) => ({ ...f, highlights: f.highlights.filter((_, idx) => idx !== i) }));
+
+  // Spec Icons
+  const addSpecIcon = () =>
+    setForm((f) => ({
+      ...f,
+      spec_icons: [
+        ...f.spec_icons,
+        { icon: 'ruler', title_en: '', title_ar: '', value_en: '', value_ar: '' },
+      ],
+    }));
+  const updateSpecIcon = (i: number, field: keyof ProductSpecIcon, value: string) =>
+    setForm((f) => ({
+      ...f,
+      spec_icons: f.spec_icons.map((s, idx) => (idx === i ? { ...s, [field]: value } : s)),
+    }));
+  const removeSpecIcon = (i: number) =>
+    setForm((f) => ({ ...f, spec_icons: f.spec_icons.filter((_, idx) => idx !== i) }));
+
+  // Spec Table
+  const updateSpecTable = (patch: Partial<ProductSpecTable>) =>
+    setForm((f) => ({ ...f, spec_table: { ...f.spec_table, ...patch } }));
+
+  const addTableColumn = () => {
+    updateSpecTable({
+      headers_en: [...form.spec_table.headers_en, ''],
+      headers_ar: [...form.spec_table.headers_ar, ''],
+      rows: form.spec_table.rows.map((r) => [...r, '']),
+    });
+  };
+
+  const removeTableColumn = (col: number) => {
+    updateSpecTable({
+      headers_en: form.spec_table.headers_en.filter((_, i) => i !== col),
+      headers_ar: form.spec_table.headers_ar.filter((_, i) => i !== col),
+      rows: form.spec_table.rows.map((r) => r.filter((_, i) => i !== col)),
+    });
+  };
+
+  const updateHeader = (lang: 'en' | 'ar', col: number, value: string) => {
+    const key = lang === 'en' ? 'headers_en' : 'headers_ar';
+    updateSpecTable({
+      [key]: form.spec_table[key].map((h, i) => (i === col ? value : h)),
+    });
+  };
+
+  const addTableRow = () => {
+    const colCount = form.spec_table.headers_en.length || 1;
+    updateSpecTable({
+      rows: [...form.spec_table.rows, Array(colCount).fill('')],
+    });
+  };
+
+  const removeTableRow = (row: number) => {
+    updateSpecTable({ rows: form.spec_table.rows.filter((_, i) => i !== row) });
+  };
+
+  const updateCell = (row: number, col: number, value: string) => {
+    updateSpecTable({
+      rows: form.spec_table.rows.map((r, ri) =>
+        ri === row ? r.map((c, ci) => (ci === col ? value : c)) : r,
+      ),
+    });
+  };
+
+  // Features
+  const addFeature = () =>
+    setForm((f) => ({
+      ...f,
+      features: [
+        ...f.features,
+        { icon: 'checkCircle', title_en: '', title_ar: '', description_en: '', description_ar: '' },
+      ],
+    }));
+  const updateFeature = (i: number, field: keyof ProductFeature, value: string) =>
+    setForm((f) => ({
+      ...f,
+      features: f.features.map((ft, idx) => (idx === i ? { ...ft, [field]: value } : ft)),
+    }));
+  const removeFeature = (i: number) =>
+    setForm((f) => ({ ...f, features: f.features.filter((_, idx) => idx !== i) }));
+
   const isDetailsDirty = !isEditing || JSON.stringify(form) !== JSON.stringify(initialForm.current);
   const isSpecsDirty = !isEditing || JSON.stringify(specs) !== JSON.stringify(initialSpecs.current);
 
@@ -205,10 +327,10 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
           )}
         </div>
 
-        {/* Tabs (only show images/specs for existing products) */}
+        {/* Tabs (only show content/images/specs for existing products) */}
         {isEditing && (
-          <div className="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1 w-fit">
-            {(['details', 'images', 'specs'] as const).map((tab) => (
+          <div className="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1 w-fit flex-wrap">
+            {(['details', 'content', 'images', 'specs'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -218,7 +340,7 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                {tab === 'details' ? 'Details' : tab === 'images' ? 'Images' : 'Specifications'}
+                {tab === 'details' ? 'Details' : tab === 'content' ? 'Content' : tab === 'images' ? 'Images' : 'Specifications (legacy)'}
               </button>
             ))}
           </div>
@@ -322,7 +444,7 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
                 />
               </div>
 
-              <div className="flex items-end gap-6 pb-2">
+              <div className="flex items-end flex-wrap gap-6 pb-2">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
@@ -341,6 +463,15 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
                   />
                   <span className="text-sm text-gray-700">Featured</span>
                 </label>
+                <label className="flex items-center gap-2 cursor-pointer" title="Shows a 'Request Quote' tab on the public product page">
+                  <input
+                    type="checkbox"
+                    checked={form.show_quote_tab}
+                    onChange={(e) => setForm((f) => ({ ...f, show_quote_tab: e.target.checked }))}
+                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                  />
+                  <span className="text-sm text-gray-700">Show "Request Quote" tab</span>
+                </label>
               </div>
             </div>
 
@@ -358,6 +489,376 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
                 className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50"
               >
                 {saving ? 'Saving...' : isEditing ? 'Update Product' : 'Create Product'}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* Content Tab */}
+        {activeTab === 'content' && item && (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Highlights */}
+            <section className="bg-white rounded-xl border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Highlights</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Bullet points shown on the product overview tab.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={addHighlight}
+                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  <Plus size={14} />
+                  Add
+                </button>
+              </div>
+              {form.highlights.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-6">No highlights yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {form.highlights.map((h, i) => (
+                    <div key={i} className="flex items-start gap-3 border border-gray-200 rounded-lg p-3">
+                      <GripVertical size={16} className="text-gray-300 mt-2.5 shrink-0" />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1">
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Text (EN)</label>
+                          <input
+                            type="text"
+                            value={h.text_en}
+                            onChange={(e) => updateHighlight(i, 'text_en', e.target.value)}
+                            className={inputClass}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Text (AR)</label>
+                          <input
+                            type="text"
+                            value={h.text_ar}
+                            onChange={(e) => updateHighlight(i, 'text_ar', e.target.value)}
+                            dir="rtl"
+                            className={inputClass}
+                          />
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeHighlight(i)}
+                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg shrink-0 mt-1"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            {/* Spec Icons */}
+            <section className="bg-white rounded-xl border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Spec Icons</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Summary tiles (icon + title + value) at the top of the overview tab.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={addSpecIcon}
+                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  <Plus size={14} />
+                  Add
+                </button>
+              </div>
+              {form.spec_icons.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-6">No spec icons yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {form.spec_icons.map((s, i) => (
+                    <div key={i} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <CustomSelect
+                          value={s.icon}
+                          onChange={(val) => updateSpecIcon(i, 'icon', val)}
+                          options={ICON_OPTIONS}
+                          className="w-64"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeSpecIcon(i)}
+                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Title (EN)</label>
+                          <input
+                            type="text"
+                            value={s.title_en}
+                            onChange={(e) => updateSpecIcon(i, 'title_en', e.target.value)}
+                            className={inputClass}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Title (AR)</label>
+                          <input
+                            type="text"
+                            value={s.title_ar}
+                            onChange={(e) => updateSpecIcon(i, 'title_ar', e.target.value)}
+                            dir="rtl"
+                            className={inputClass}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Value (EN)</label>
+                          <input
+                            type="text"
+                            value={s.value_en}
+                            onChange={(e) => updateSpecIcon(i, 'value_en', e.target.value)}
+                            className={inputClass}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Value (AR)</label>
+                          <input
+                            type="text"
+                            value={s.value_ar}
+                            onChange={(e) => updateSpecIcon(i, 'value_ar', e.target.value)}
+                            dir="rtl"
+                            className={inputClass}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            {/* Spec Table */}
+            <section className="bg-white rounded-xl border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Spec Table</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Tabular data shown on the Specifications tab.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Title (EN)</label>
+                  <input
+                    type="text"
+                    value={form.spec_table.title_en}
+                    onChange={(e) => updateSpecTable({ title_en: e.target.value })}
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Title (AR)</label>
+                  <input
+                    type="text"
+                    value={form.spec_table.title_ar}
+                    onChange={(e) => updateSpecTable({ title_ar: e.target.value })}
+                    dir="rtl"
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 mb-3">
+                <button
+                  type="button"
+                  onClick={addTableColumn}
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  <Plus size={12} />
+                  Add Column
+                </button>
+                <button
+                  type="button"
+                  onClick={addTableRow}
+                  disabled={form.spec_table.headers_en.length === 0}
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-40"
+                >
+                  <Plus size={12} />
+                  Add Row
+                </button>
+              </div>
+
+              {form.spec_table.headers_en.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-6">
+                  Click "Add Column" to start building the table.
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse text-sm">
+                    <thead>
+                      <tr>
+                        {form.spec_table.headers_en.map((_, col) => (
+                          <th key={col} className="border border-gray-200 p-2 bg-gray-50 align-top min-w-40">
+                            <div className="space-y-1.5">
+                              <input
+                                type="text"
+                                placeholder={`Header ${col + 1} (EN)`}
+                                value={form.spec_table.headers_en[col] ?? ''}
+                                onChange={(e) => updateHeader('en', col, e.target.value)}
+                                className={inputClass}
+                              />
+                              <input
+                                type="text"
+                                placeholder={`Header ${col + 1} (AR)`}
+                                value={form.spec_table.headers_ar[col] ?? ''}
+                                onChange={(e) => updateHeader('ar', col, e.target.value)}
+                                dir="rtl"
+                                className={inputClass}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeTableColumn(col)}
+                                className="w-full text-xs text-red-500 hover:bg-red-50 rounded py-1"
+                              >
+                                Remove column
+                              </button>
+                            </div>
+                          </th>
+                        ))}
+                        <th className="w-8"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {form.spec_table.rows.map((row, ri) => (
+                        <tr key={ri}>
+                          {form.spec_table.headers_en.map((_, ci) => (
+                            <td key={ci} className="border border-gray-200 p-1">
+                              <input
+                                type="text"
+                                value={row[ci] ?? ''}
+                                onChange={(e) => updateCell(ri, ci, e.target.value)}
+                                className={inputClass}
+                              />
+                            </td>
+                          ))}
+                          <td className="border border-gray-200 p-1 text-center">
+                            <button
+                              type="button"
+                              onClick={() => removeTableRow(ri)}
+                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+
+            {/* Features */}
+            <section className="bg-white rounded-xl border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Features</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Cards shown on the Features tab of the product page.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={addFeature}
+                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  <Plus size={14} />
+                  Add
+                </button>
+              </div>
+              {form.features.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-6">No features yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {form.features.map((ft, i) => (
+                    <div key={i} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <CustomSelect
+                          value={ft.icon}
+                          onChange={(val) => updateFeature(i, 'icon', val)}
+                          options={ICON_OPTIONS}
+                          className="w-64"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeFeature(i)}
+                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Title (EN)</label>
+                          <input
+                            type="text"
+                            value={ft.title_en}
+                            onChange={(e) => updateFeature(i, 'title_en', e.target.value)}
+                            className={inputClass}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Title (AR)</label>
+                          <input
+                            type="text"
+                            value={ft.title_ar}
+                            onChange={(e) => updateFeature(i, 'title_ar', e.target.value)}
+                            dir="rtl"
+                            className={inputClass}
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Description (EN)</label>
+                          <textarea
+                            value={ft.description_en}
+                            onChange={(e) => updateFeature(i, 'description_en', e.target.value)}
+                            rows={3}
+                            className={inputClass}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-500 mb-1">Description (AR)</label>
+                          <textarea
+                            value={ft.description_ar}
+                            onChange={(e) => updateFeature(i, 'description_ar', e.target.value)}
+                            dir="rtl"
+                            rows={3}
+                            className={inputClass}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            {/* Save bar */}
+            <div className="bg-white rounded-xl border border-gray-200 p-4 flex justify-end gap-3 sticky bottom-4">
+              <button
+                type="submit"
+                disabled={saving || !isDetailsDirty}
+                className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50"
+              >
+                {saving ? 'Saving...' : 'Save Content'}
               </button>
             </div>
           </form>

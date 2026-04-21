@@ -67,6 +67,7 @@ class HandleInertiaRequests extends Middleware
                 'company_phone', 'company_email',
                 'company_address_en', 'company_address_ar',
                 'linkedin_url',
+                'google_maps_embed_url', 'google_maps_place_url',
             ])->pluck('value', 'key')->toArray();
         }
 
@@ -77,6 +78,8 @@ class HandleInertiaRequests extends Middleware
             'email' => $this->cachedSettings['company_email'] ?? '',
             'address' => $this->cachedSettings[$addressKey] ?? '',
             'linkedin_url' => $this->cachedSettings['linkedin_url'] ?? '',
+            'google_maps_embed_url' => $this->cachedSettings['google_maps_embed_url'] ?? '',
+            'google_maps_place_url' => $this->cachedSettings['google_maps_place_url'] ?? '',
         ];
     }
 }

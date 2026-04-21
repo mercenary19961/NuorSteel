@@ -43,8 +43,8 @@ class SecurityHeaders
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             "img-src 'self' data: blob: https:",
             "font-src 'self' data: https://fonts.gstatic.com",
-            // LinkedIn post embeds + Turnstile challenge widget.
-            "frame-src 'self' https://www.linkedin.com https://challenges.cloudflare.com",
+            // LinkedIn post embeds + Turnstile challenge widget + Google Maps embed (footer mini-map).
+            "frame-src 'self' https://www.linkedin.com https://challenges.cloudflare.com https://www.google.com",
             // Inertia XHRs target self; Turnstile siteverify runs server-side.
             // cloudflareinsights.com receives RUM beacons sent by the analytics script.
             "connect-src 'self' https://cloudflareinsights.com",

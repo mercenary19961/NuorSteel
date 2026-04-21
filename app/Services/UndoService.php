@@ -14,6 +14,7 @@ use App\Models\TimelineEvent;
 use App\Models\ContactSubmission;
 use App\Models\LinkedinCache;
 use App\Models\NewsletterSubscriber;
+use App\Models\Partner;
 use Illuminate\Support\Facades\Auth;
 
 class UndoService
@@ -139,6 +140,7 @@ class UndoService
             'contact' => ContactSubmission::class,
             'newsletter' => NewsletterSubscriber::class,
             'linkedin' => LinkedinCache::class,
+            'partner' => Partner::class,
             default => null,
         };
 
@@ -161,6 +163,7 @@ class UndoService
             'contact' => '/admin/contacts',
             'newsletter' => '/admin/newsletter',
             'linkedin' => '/admin/linkedin-posts',
+            'partner' => '/admin/partners',
             default => null,
         };
     }

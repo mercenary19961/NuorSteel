@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import HeroBottomLinks from '@/Components/Public/HeroBottomLinks';
 import RadialOrbitalTimeline from '@/Components/ui/radial-orbital-timeline';
-// import PartnersSection from '@/Components/Public/PartnersSection';
+import PartnersSection, { type PartnerData } from '@/Components/Public/PartnersSection';
 import { HeroTypewriter } from '@/Components/ui/typewriter';
 import { MagicCardGrid, MagicCard } from '@/Components/ui/magic-card';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -19,31 +19,58 @@ interface Props {
   content_ar: ContentMap;
   featured_products: { id: number; name: string; slug: string; short_description: string | null; image: string | null }[];
   linkedin_posts: LinkedinPost[];
+  partners: PartnerData[];
 }
 
 
 function HeroVideo() {
+  const [isMobile, setIsMobile] = useState(false);
   const loRef = useRef<HTMLVideoElement>(null);
   const hdRef = useRef<HTMLVideoElement>(null);
   const [hdReady, setHdReady] = useState(false);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(max-width: 639px)');
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) return;
     const hdVideo = hdRef.current;
     if (!hdVideo) return;
-
-    const onCanPlay = () => {
-      // Sync HD playback time with the low-res video, then swap
-      if (loRef.current) {
-        hdVideo.currentTime = loRef.current.currentTime;
-      }
-      hdVideo.play().then(() => setHdReady(true)).catch(() => {});
+    const onLoadedData = () => {
+      if (loRef.current) hdVideo.currentTime = loRef.current.currentTime;
+      hdVideo.play().then(() => {
+        setHdReady(true);
+        // Free the GPU — no point decoding a hidden video
+        if (loRef.current) loRef.current.pause();
+      }).catch(() => {});
     };
-
-    hdVideo.addEventListener('canplaythrough', onCanPlay, { once: true });
+    hdVideo.addEventListener('loadeddata', onLoadedData, { once: true });
     hdVideo.load();
+    return () => hdVideo.removeEventListener('loadeddata', onLoadedData);
+  }, [isMobile]);
 
-    return () => hdVideo.removeEventListener('canplaythrough', onCanPlay);
-  }, []);
+  if (isMobile) {
+    return (
+      <div className="absolute inset-0">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+        >
+          <source src="/videos/hero-bg-mobile.mp4" type="video/mp4" />
+        </video>
+      </div>
+    );
+  }
 
   return (
     <div className="absolute inset-0">
@@ -73,7 +100,7 @@ function HeroVideo() {
   );
 }
 
-export default function Home({ content_en, content_ar, linkedin_posts }: Props) {
+export default function Home({ content_en, content_ar, linkedin_posts, partners }: Props) {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const content = language === 'ar' ? content_ar : content_en;
@@ -581,8 +608,8 @@ export default function Home({ content_en, content_ar, linkedin_posts }: Props) 
         </div>
       </section>
 
-      {/* Partners & Clients Section — temporarily hidden */}
-      {/* <PartnersSection /> */}
+      {/* Partners & Clients Section */}
+      <PartnersSection partners={partners} />
 
       {/* LinkedIn Feed Section */}
       <section ref={linkedinSectionRef} id="section-linkedin" className="relative py-16 lg:py-24 bg-surface overflow-hidden">

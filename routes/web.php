@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\UndoController as AdminUndoController;
 use App\Http\Controllers\Admin\ChangeLogController as AdminChangeLogController;
 use App\Http\Controllers\Admin\LinkedinPostController as AdminLinkedinPostController;
+use App\Http\Controllers\Admin\PartnerController as AdminPartnerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -148,6 +149,13 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::delete('/linkedin-posts/{id}', [AdminLinkedinPostController::class, 'destroy'])->name('linkedin-posts.destroy');
     Route::post('/linkedin-posts/{id}/toggle', [AdminLinkedinPostController::class, 'toggleVisibility'])->name('linkedin-posts.toggle');
     Route::post('/linkedin-posts/reorder', [AdminLinkedinPostController::class, 'reorder'])->name('linkedin-posts.reorder');
+
+    // Partners
+    Route::get('/partners', [AdminPartnerController::class, 'index'])->name('partners.index');
+    Route::post('/partners', [AdminPartnerController::class, 'store'])->name('partners.store');
+    Route::put('/partners/{id}', [AdminPartnerController::class, 'update'])->name('partners.update');
+    Route::delete('/partners/{id}', [AdminPartnerController::class, 'destroy'])->name('partners.destroy');
+    Route::post('/partners/reorder', [AdminPartnerController::class, 'reorder'])->name('partners.reorder');
 
     // Contacts
     Route::get('/contacts', [AdminContactController::class, 'index'])->name('contacts.index');

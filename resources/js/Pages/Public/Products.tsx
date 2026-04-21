@@ -20,6 +20,35 @@ interface ProductSpec {
   value: string;
 }
 
+interface Highlight {
+  text_en: string;
+  text_ar: string;
+}
+
+interface SpecIcon {
+  icon: string;
+  title_en: string;
+  title_ar: string;
+  value_en: string;
+  value_ar: string;
+}
+
+interface SpecTable {
+  title_en: string;
+  title_ar: string;
+  headers_en: string[];
+  headers_ar: string[];
+  rows: string[][];
+}
+
+interface Feature {
+  icon: string;
+  title_en: string;
+  title_ar: string;
+  description_en: string;
+  description_ar: string;
+}
+
 interface ProductData {
   id: number;
   name_en: string;
@@ -31,6 +60,11 @@ interface ProductData {
   description_ar: string | null;
   category: string | null;
   image: string | null;
+  highlights: Highlight[];
+  spec_icons: SpecIcon[];
+  spec_table: SpecTable | null;
+  features: Feature[];
+  show_quote_tab: boolean;
   images: ProductImage[];
   specifications: {
     chemical: ProductSpec[];
@@ -45,20 +79,25 @@ interface Props {
 
 type TabKey = 'overview' | 'specifications' | 'features' | 'quote';
 
-// --- Feature Icons Map ---
-const featureIcons: Record<string, React.ElementType> = {
-  thermoMechanical: Flame,
-  ductility: Zap,
-  weldability: Target,
-  corrosionResistance: Shield,
-  eafSteelmaking: Flame,
-  continuousCasting: Box,
-  chemicalControl: Microscope,
-  dimensionalConsistency: Ruler,
+// --- Icon registry (shared between spec_icons and features) ---
+const iconRegistry: Record<string, React.ElementType> = {
+  ruler: Ruler,
+  shield: Shield,
+  package: Package,
+  microscope: Microscope,
+  target: Target,
+  flame: Flame,
+  box: Box,
+  zap: Zap,
+  checkCircle: CheckCircle,
 };
 
+const resolveIcon = (key: string | undefined): React.ElementType =>
+  (key && iconRegistry[key]) || Package;
+
 // --- Spec Data Table Component ---
-function SpecDataTable({ tableData }: { tableData: { title: string; headers: string[]; rows: string[][] } }) {
+function SpecDataTable({ tableData }: { tableData: { title: string; headers: string[]; rows: string[][] } | null }) {
+  if (!tableData || !tableData.headers?.length) return null;
   const [expandedHeader, setExpandedHeader] = useState<number | null>(null);
   const [truncatedHeaders, setTruncatedHeaders] = useState<Set<number>>(new Set());
   const headerRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -170,6 +209,90 @@ function ProductTabs({ activeTab, onTabChange, showQuote = true }: { activeTab: 
   );
 }
 
+// --- TMT Bar Marking Dots (overlay for the tagged rebar image) ---
+interface TmtMarking {
+  leftPct: number;
+  labelEn: string;
+  labelAr: string;
+  valueEn: string;
+  valueAr: string;
+}
+
+const TMT_MARKINGS: TmtMarking[] = [
+  { leftPct: 21, labelEn: 'Country of Origin', labelAr: 'بلد المنشأ', valueEn: 'KSA, Kingdom of Saudi Arabia', valueAr: 'KSA، المملكة العربية السعودية' },
+  { leftPct: 44, labelEn: 'Brand Name', labelAr: 'الاسم التجاري', valueEn: 'NUOR / نور', valueAr: 'NUOR / نور' },
+  { leftPct: 70, labelEn: 'Rebar Size', labelAr: 'مقاس القضيب', valueEn: 'Diameter in millimetres', valueAr: 'القطر بالملم' },
+  { leftPct: 82, labelEn: 'Type of Steel', labelAr: 'نوع الصلب', valueEn: 'S, SASO / ASTM A615M', valueAr: 'S، SASO / ASTM A615M' },
+  { leftPct: 92, labelEn: 'Max. Yield Strength', labelAr: 'أقصى إجهاد خضوع', valueEn: '4, Grade 60 (420 MPa)', valueAr: '٤، الدرجة 60 (420 ميجا باسكال)' },
+];
+
+function TmtMarkingDots({ language }: { language: string }) {
+  const [hovered, setHovered] = useState<number | null>(null);
+  const WAVE_STEP = 0.35; // seconds between each dot's ping start → sequential wave
+  const WAVE_DURATION = 2.2;
+  return (
+    <div className="absolute inset-0 pointer-events-none">
+      {TMT_MARKINGS.map((m, i) => {
+        const isHovered = hovered === i;
+        const isDimmed = hovered !== null && !isHovered;
+        const baseDelay = i * WAVE_STEP;
+        return (
+          <div
+            key={i}
+            className="absolute pointer-events-auto"
+            style={{ left: `${m.leftPct}%`, top: '50%', transform: 'translate(-50%, -50%)' }}
+            onMouseEnter={() => setHovered(i)}
+            onMouseLeave={() => setHovered(null)}
+          >
+            <div
+              className={`relative cursor-pointer transition-all duration-300 ${
+                isHovered ? 'scale-[1.35]' : 'scale-100'
+              } ${isDimmed ? 'opacity-25' : 'opacity-100'}`}
+            >
+              {/* Outer ping — sequential wave across the bar */}
+              <span
+                className="absolute inset-0 rounded-full bg-primary animate-ping opacity-60"
+                style={{ animationDelay: `${baseDelay}s`, animationDuration: `${WAVE_DURATION}s` }}
+              />
+              {/* Inner ping — staggered 1s behind for double-heartbeat feel */}
+              <span
+                className="absolute inset-0 rounded-full bg-primary animate-ping opacity-35"
+                style={{ animationDelay: `${baseDelay + 1}s`, animationDuration: `${WAVE_DURATION}s` }}
+              />
+              {/* Solid dot — breathes when idle, glows when hovered */}
+              <span
+                className={`relative block w-3 h-3 rounded-full bg-primary ring-2 transition-shadow duration-300 ${
+                  isHovered ? 'ring-white shadow-[0_0_18px_5px_rgba(255,122,0,0.75)]' : 'ring-white/70'
+                } ${hovered === null ? 'animate-dot-breathe' : ''}`}
+                style={hovered === null ? { animationDelay: `${i * 0.25}s` } : undefined}
+              />
+            </div>
+            <AnimatePresence>
+              {isHovered && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 4 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute left-1/2 -translate-x-1/2 top-full mt-4 whitespace-nowrap bg-surface-dark text-white rounded-lg px-4 py-2 shadow-2xl border border-primary/40 z-50"
+                >
+                  <div className="text-[10px] uppercase tracking-wider text-primary font-semibold">
+                    {language === 'ar' ? m.labelAr : m.labelEn}
+                  </div>
+                  <div className="text-sm font-medium mt-0.5">
+                    {language === 'ar' ? m.valueAr : m.valueEn}
+                  </div>
+                  <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-transparent border-b-surface-dark" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // --- Main Component ---
 export default function Products({ products }: Props) {
   const { t } = useTranslation();
@@ -212,13 +335,12 @@ export default function Products({ products }: Props) {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Quote tab is hidden for billets — snap back to overview if a user had it open
-  // on TMT bars and then switched to billets.
+  // If a user had Quote tab open and switches to a product where it's hidden, snap back.
   useEffect(() => {
-    if (selectedSlug === 'billets' && activeTab === 'quote') {
+    if (selectedProduct && !selectedProduct.show_quote_tab && activeTab === 'quote') {
       setActiveTab('overview');
     }
-  }, [selectedSlug, activeTab]);
+  }, [selectedProduct, activeTab]);
 
   // Measure left panel for curved clip-path (useLayoutEffect to avoid flash)
   const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
@@ -263,6 +385,13 @@ export default function Products({ products }: Props) {
     localRenderSlugs.has(p.slug)
       ? `/images/products/renders/${p.slug}-${language}.webp`
       : p.image;
+  // TMT bars shows a tagged variant in the default hero (desktop + mobile),
+  // but the plain bar everywhere else (thumbnails + Explore More detail).
+  const heroVariantSlugs = new Set(['tmt-bars']);
+  const getProductHeroImage = (p: ProductData) =>
+    heroVariantSlugs.has(p.slug)
+      ? `/images/products/renders/${p.slug}-hero-${language}.webp`
+      : getProductImage(p);
 
   // Warm opposite-language background + product renders during idle time.
   useEffect(() => {
@@ -283,12 +412,15 @@ export default function Products({ products }: Props) {
     };
   }, [language]);
 
-  // Slug-based i18n key map
-  const slugToKey: Record<string, string> = {
-    'tmt-bars': 'tmtBars',
-    'billets': 'billets',
+  // Language-aware getters for product content
+  const getTableData = (p: ProductData) => {
+    if (!p.spec_table) return null;
+    return {
+      title: language === 'ar' ? p.spec_table.title_ar : p.spec_table.title_en,
+      headers: language === 'ar' ? p.spec_table.headers_ar : p.spec_table.headers_en,
+      rows: p.spec_table.rows,
+    };
   };
-  const productKey = slugToKey[selectedProduct?.slug] ?? 'tmtBars';
 
   const handleExplore = () => {
     setExpanded(true);
@@ -368,41 +500,44 @@ export default function Products({ products }: Props) {
             </div>
 
             {/* Spec Highlight Icons */}
-            <div className="grid grid-cols-3 gap-6 mt-8">
-              {Object.entries(t(`products.${productKey}.specIcons`, { returnObjects: true }) as Record<string, { title: string; value: string }>).map(([key, icon]) => (
-                <div key={key} className="text-center">
-                  <div className="w-14 h-14 mx-auto mb-3 border border-white/40 rounded-lg flex items-center justify-center">
-                    {key === 'diameterRange' || key === 'crossSection' ? <Ruler className="text-white" size={24} /> :
-                     key === 'standards' || key === 'chemicalControl' ? <Shield className="text-white" size={24} /> :
-                     <Package className="text-white" size={24} />}
-                  </div>
-                  <h4 className="text-white font-semibold text-sm mb-1">{icon.title}</h4>
-                  <p className="text-white/60 text-xs">{icon.value}</p>
-                </div>
-              ))}
-            </div>
+            {selectedProduct.spec_icons.length > 0 && (
+              <div className="grid grid-cols-3 gap-6 mt-8">
+                {selectedProduct.spec_icons.map((icon, idx) => {
+                  const Icon = resolveIcon(icon.icon);
+                  return (
+                    <div key={idx} className="text-center">
+                      <div className="w-14 h-14 mx-auto mb-3 border border-white/40 rounded-lg flex items-center justify-center">
+                        <Icon className="text-white" size={24} />
+                      </div>
+                      <h4 className="text-white font-semibold text-sm mb-1">{language === 'ar' ? icon.title_ar : icon.title_en}</h4>
+                      <p className="text-white/60 text-xs">{language === 'ar' ? icon.value_ar : icon.value_en}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Key Highlights */}
-            <div>
-              <h3 className="text-lg font-bold text-white mb-4">{t('products.overview.keyHighlights')}</h3>
-              <ul className="space-y-2">
-                {(t(`products.${productKey}.highlights`, { returnObjects: true }) as string[]).map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-white/80 text-sm">
-                    <CheckCircle className="text-white shrink-0 mt-0.5" size={16} />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {selectedProduct.highlights.length > 0 && (
+              <div>
+                <h3 className="text-lg font-bold text-white mb-4">{t('products.overview.keyHighlights')}</h3>
+                <ul className="space-y-2">
+                  {selectedProduct.highlights.map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-white/80 text-sm">
+                      <CheckCircle className="text-white shrink-0 mt-0.5" size={16} />
+                      {language === 'ar' ? item.text_ar : item.text_en}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         );
 
       case 'specifications':
         return (
           <div>
-            <SpecDataTable
-              tableData={t(`products.${productKey}.specTable`, { returnObjects: true }) as { title: string; headers: string[]; rows: string[][] }}
-            />
+            <SpecDataTable tableData={getTableData(selectedProduct)} />
             <p className="text-white/70 text-sm italic mt-4">{t('products.specNote')}</p>
           </div>
         );
@@ -410,16 +545,16 @@ export default function Products({ products }: Props) {
       case 'features':
         return (
           <MagicCardGrid className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {Object.entries(t(`products.${productKey}.features`, { returnObjects: true }) as Record<string, { title: string; description: string }>).map(([key, feature]) => {
-              const Icon = featureIcons[key] ?? Zap;
+            {selectedProduct.features.map((feature, idx) => {
+              const Icon = resolveIcon(feature.icon);
               return (
-                <MagicCard key={key} className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
+                <MagicCard key={idx} className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
                   <div className="relative z-10">
                     <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center mb-4">
                       <Icon className="text-white" size={20} />
                     </div>
-                    <h4 className="text-white font-semibold mb-2">{feature.title}</h4>
-                    <p className="text-white/60 text-sm leading-relaxed">{feature.description}</p>
+                    <h4 className="text-white font-semibold mb-2">{language === 'ar' ? feature.title_ar : feature.title_en}</h4>
+                    <p className="text-white/60 text-sm leading-relaxed">{language === 'ar' ? feature.description_ar : feature.description_en}</p>
                   </div>
                 </MagicCard>
               );
@@ -522,10 +657,10 @@ export default function Products({ products }: Props) {
                           exit={{ opacity: 0, scale: 0.9 }}
                           transition={{ duration: 0.4 }}
                         >
-                          {getProductImage(selectedProduct) ? (
+                          {getProductHeroImage(selectedProduct) ? (
                             <img
                               key={`mobile-hero-img-${selectedSlug}-${language}`}
-                              src={getProductImage(selectedProduct)!}
+                              src={getProductHeroImage(selectedProduct)!}
                               alt={getName(selectedProduct)}
                               onClick={handleExplore}
                               className="max-h-52 w-auto object-contain cursor-pointer"
@@ -564,7 +699,7 @@ export default function Products({ products }: Props) {
                       </button>
                     </div>
 
-                    <ProductTabs activeTab={activeTab} onTabChange={setActiveTab} showQuote={selectedSlug !== 'billets'} />
+                    <ProductTabs activeTab={activeTab} onTabChange={setActiveTab} showQuote={selectedProduct.show_quote_tab} />
 
                     <AnimatePresence mode="wait">
                       <motion.div
@@ -603,7 +738,7 @@ export default function Products({ products }: Props) {
 
         {/* Large Product Image — absolutely positioned over both panels, near the diagonal */}
         {!expanded && (
-          <div className="hidden lg:flex absolute z-20 bottom-1/4 items-end justify-start pointer-events-none max-w-[60%] left-0 ps-[max(2rem,calc((100vw-1800px)/2+1rem))]">
+          <div className="hidden lg:flex absolute z-20 bottom-1/4 items-end justify-start pointer-events-none max-w-[60%] start-0 ps-[max(2rem,calc((100vw-1800px)/2+1rem))]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={`img-${selectedSlug}`}
@@ -611,15 +746,19 @@ export default function Products({ products }: Props) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.4 }}
-                className={`relative ${selectedSlug === 'billets' ? 'translate-y-12' : ''}`}
+                className={`relative ${selectedSlug === 'billets' ? 'translate-y-12' : selectedSlug === 'tmt-bars' ? 'translate-y-52' : ''}`}
               >
-                {getProductImage(selectedProduct) ? (
+                {getProductHeroImage(selectedProduct) ? (
                   <img
                     key={`hero-img-${selectedSlug}-${language}`}
-                    src={getProductImage(selectedProduct)!}
+                    src={getProductHeroImage(selectedProduct)!}
                     alt={getName(selectedProduct)}
                     onClick={handleExplore}
-                    className="w-auto object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)] max-h-64 xl:max-h-80 2xl:max-h-96 pointer-events-auto cursor-pointer"
+                    className={`w-auto object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)] pointer-events-auto cursor-pointer ${
+                      selectedSlug === 'billets'
+                        ? 'max-h-44 xl:max-h-52 2xl:max-h-64 max-w-75 xl:max-w-180'
+                        : 'max-h-64 xl:max-h-80 2xl:max-h-82 min-[1700px]:max-h-96'
+                    }`}
                   />
                 ) : (
                   <div className="w-48 h-48 rounded-full bg-white/5 flex items-center justify-center">
@@ -663,12 +802,15 @@ export default function Products({ products }: Props) {
                 className={selectedSlug === 'billets' ? 'translate-y-10' : ''}
               >
                 {getProductImage(selectedProduct) ? (
-                  <img
-                    key={`expanded-img-${selectedSlug}-${language}`}
-                    src={getProductImage(selectedProduct)!}
-                    alt={getName(selectedProduct)}
-                    className={`object-contain drop-shadow-2xl ${selectedSlug === 'billets' ? 'max-h-32 xl:max-h-40 max-w-105 xl:max-w-130' : 'max-h-32 xl:max-h-48 2xl:max-h-60 w-auto'}`}
-                  />
+                  <div className="relative">
+                    <img
+                      key={`expanded-img-${selectedSlug}-${language}`}
+                      src={getProductImage(selectedProduct)!}
+                      alt={getName(selectedProduct)}
+                      className={`object-contain drop-shadow-2xl ${selectedSlug === 'billets' ? 'max-h-32 xl:max-h-40 max-w-105 xl:max-w-130' : 'max-h-32 xl:max-h-48 2xl:max-h-60 w-auto'}`}
+                    />
+                    {selectedSlug === 'tmt-bars' && <TmtMarkingDots language={language} />}
+                  </div>
                 ) : (
                   <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center">
                     <Package className="text-white/20" size={32} />

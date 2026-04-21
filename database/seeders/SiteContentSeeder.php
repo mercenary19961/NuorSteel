@@ -35,6 +35,10 @@ class SiteContentSeeder extends Seeder
             ['page' => 'home', 'section' => 'core_values', 'key' => 'innovation_description', 'content_en' => 'We embrace advanced technologies and digital solutions to optimize our processes and develop efficient, future-ready steel solutions.', 'content_ar' => 'نتبنى التقنيات المتقدمة والحلول الرقمية لتحسين عملياتنا وتطوير حلول حديدية فعالة ومستعدة للمستقبل.', 'type' => 'textarea'],
             ['page' => 'home', 'section' => 'core_values', 'key' => 'strategic_growth_title', 'content_en' => 'Strategic Growth', 'content_ar' => 'النمو الاستراتيجي', 'type' => 'text'],
             ['page' => 'home', 'section' => 'core_values', 'key' => 'strategic_growth_description', 'content_en' => 'We focus on sustainable, long-term growth by building strong partnerships and aligning our expansion with national and regional development objectives.', 'content_ar' => 'نركز على النمو المستدام طويل الأمد من خلال بناء شراكات قوية ومواءمة توسعنا مع أهداف التنمية الوطنية والإقليمية.', 'type' => 'textarea'],
+            ['page' => 'home', 'section' => 'core_values', 'key' => 'people_teamwork_title', 'content_en' => 'People & Teamwork', 'content_ar' => 'الأفراد والعمل الجماعي', 'type' => 'text'],
+            ['page' => 'home', 'section' => 'core_values', 'key' => 'people_teamwork_description', 'content_en' => 'Empowering our people and fostering a culture of collaboration to achieve shared success. We believe that strong teams, aligned goals, and continuous development are the foundation of sustainable growth.', 'content_ar' => 'تمكين موظفينا وتعزيز ثقافة التعاون لتحقيق النجاح المشترك. نؤمن بأن الفرق القوية والأهداف المتوافقة والتطوير المستمر هي أساس النمو المستدام.', 'type' => 'textarea'],
+            ['page' => 'home', 'section' => 'core_values', 'key' => 'trust_integrity_title', 'content_en' => 'Trust & Integrity', 'content_ar' => 'الثقة والنزاهة', 'type' => 'text'],
+            ['page' => 'home', 'section' => 'core_values', 'key' => 'trust_integrity_description', 'content_en' => 'Building long-term relationships through transparency, accountability, and ethical business practices. We are committed to acting with honesty in every interaction, ensuring reliability and confidence in everything we deliver.', 'content_ar' => 'بناء علاقات طويلة الأمد من خلال الشفافية والمساءلة والممارسات التجارية الأخلاقية. نلتزم بالتصرف بأمانة في كل تعامل، لضمان الموثوقية والثقة في كل ما نقدمه.', 'type' => 'textarea'],
 
             // About Page
             ['page' => 'about', 'section' => 'overview', 'key' => 'title', 'content_en' => 'About Us', 'content_ar' => 'من نحن', 'type' => 'text'],
@@ -47,9 +51,6 @@ class SiteContentSeeder extends Seeder
             ['page' => 'about', 'section' => 'mission', 'key' => 'description', 'content_en' => 'To deliver high-quality steel products that meet international standards while contributing to sustainable development and customer satisfaction.', 'content_ar' => 'تقديم منتجات حديدية عالية الجودة تلبي المعايير الدولية مع المساهمة في التنمية المستدامة ورضا العملاء.', 'type' => 'textarea'],
 
             ['page' => 'about', 'section' => 'timeline', 'key' => 'title', 'content_en' => 'Our Journey', 'content_ar' => 'رحلتنا', 'type' => 'text'],
-
-            ['page' => 'about', 'section' => 'governance', 'key' => 'title', 'content_en' => 'Governance', 'content_ar' => 'الحوكمة', 'type' => 'text'],
-            ['page' => 'about', 'section' => 'governance', 'key' => 'description', 'content_en' => 'Our commitment to ethical business practices and transparent governance.', 'content_ar' => 'التزامنا بممارسات الأعمال الأخلاقية والحوكمة الشفافة.', 'type' => 'text'],
 
             // Products Page
             ['page' => 'products', 'section' => 'overview', 'key' => 'title', 'content_en' => 'Our Products', 'content_ar' => 'منتجاتنا', 'type' => 'text'],
@@ -99,5 +100,6 @@ class SiteContentSeeder extends Seeder
             ->whereIn('section', ['hero', 'products', 'certificates', 'newsletter', 'cta'])
             ->delete();
         SiteContent::where('page', 'recycling')->delete();
+        SiteContent::where('page', 'about')->where('section', 'governance')->delete();
     }
 }

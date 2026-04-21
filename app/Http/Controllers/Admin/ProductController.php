@@ -54,25 +54,9 @@ class ProductController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name_en' => 'required|string|max:255',
-            'name_ar' => 'required|string|max:255',
-            'short_description_en' => 'nullable|string',
-            'short_description_ar' => 'nullable|string',
-            'description_en' => 'nullable|string',
-            'description_ar' => 'nullable|string',
-            'category' => 'nullable|string|max:100',
-            'featured_image_id' => 'nullable|exists:media,id',
-            'is_active' => 'boolean',
-            'is_featured' => 'boolean',
-            'sort_order' => 'integer',
-        ]);
+        $request->validate($this->productValidationRules());
 
-        $data = $request->only([
-            'name_en', 'name_ar', 'short_description_en', 'short_description_ar',
-            'description_en', 'description_ar', 'category', 'featured_image_id',
-            'is_active', 'is_featured', 'sort_order',
-        ]);
+        $data = $request->only($this->productFillableFields());
         $data['slug'] = Str::slug($data['name_en']);
         $data['created_by'] = $request->user()->id;
         $data['updated_by'] = $request->user()->id;
@@ -95,31 +79,18 @@ class ProductController extends Controller
 
     public function update(Request $request, int $id): RedirectResponse
     {
-        $request->validate([
-            'name_en' => 'required|string|max:255',
-            'name_ar' => 'required|string|max:255',
-            'short_description_en' => 'nullable|string',
-            'short_description_ar' => 'nullable|string',
-            'description_en' => 'nullable|string',
-            'description_ar' => 'nullable|string',
-            'category' => 'nullable|string|max:100',
-            'featured_image_id' => 'nullable|exists:media,id',
-            'is_active' => 'boolean',
-            'is_featured' => 'boolean',
-            'sort_order' => 'integer',
-        ]);
+        $request->validate($this->productValidationRules());
 
         $product = Product::findOrFail($id);
+        $trackedFields = $this->productFillableFields();
 
-        $trackedFields = [
-            'name_en', 'name_ar', 'short_description_en', 'short_description_ar',
-            'description_en', 'description_ar', 'category', 'featured_image_id',
-            'is_active', 'is_featured', 'sort_order',
-        ];
+        // JSON fields are serialized for undo snapshotting so change-detection works on blobs.
+        $jsonFields = ['highlights', 'spec_icons', 'spec_table', 'features'];
 
         $oldData = ['id' => $product->id];
         foreach ($trackedFields as $field) {
-            $oldData[$field] = (string) ($product->$field ?? '');
+            $value = $product->$field;
+            $oldData[$field] = in_array($field, $jsonFields) ? json_encode($value) : (string) ($value ?? '');
         }
 
         $data = $request->only($trackedFields);
@@ -128,7 +99,8 @@ class ProductController extends Controller
 
         $newData = ['id' => $product->id];
         foreach ($trackedFields as $field) {
-            $newData[$field] = (string) ($data[$field] ?? '');
+            $value = $data[$field] ?? null;
+            $newData[$field] = in_array($field, $jsonFields) ? json_encode($value) : (string) ($value ?? '');
         }
 
         $hasChanges = $this->undoService->saveState('product', $product->id, $oldData, $newData);
@@ -140,6 +112,64 @@ class ProductController extends Controller
         $product->update($data);
 
         return redirect()->back()->with('success', 'Product updated successfully.');
+    }
+
+    protected function productFillableFields(): array
+    {
+        return [
+            'name_en', 'name_ar', 'short_description_en', 'short_description_ar',
+            'description_en', 'description_ar', 'category', 'featured_image_id',
+            'highlights', 'spec_icons', 'spec_table', 'features', 'show_quote_tab',
+            'is_active', 'is_featured', 'sort_order',
+        ];
+    }
+
+    protected function productValidationRules(): array
+    {
+        return [
+            'name_en' => 'required|string|max:255',
+            'name_ar' => 'required|string|max:255',
+            'short_description_en' => 'nullable|string',
+            'short_description_ar' => 'nullable|string',
+            'description_en' => 'nullable|string',
+            'description_ar' => 'nullable|string',
+            'category' => 'nullable|string|max:100',
+            'featured_image_id' => 'nullable|exists:media,id',
+
+            'highlights' => 'nullable|array',
+            'highlights.*.text_en' => 'required_with:highlights|string|max:500',
+            'highlights.*.text_ar' => 'required_with:highlights|string|max:500',
+
+            'spec_icons' => 'nullable|array',
+            'spec_icons.*.icon' => 'required_with:spec_icons|string|max:50',
+            'spec_icons.*.title_en' => 'required_with:spec_icons|string|max:100',
+            'spec_icons.*.title_ar' => 'required_with:spec_icons|string|max:100',
+            'spec_icons.*.value_en' => 'required_with:spec_icons|string|max:100',
+            'spec_icons.*.value_ar' => 'required_with:spec_icons|string|max:100',
+
+            'spec_table' => 'nullable|array',
+            'spec_table.title_en' => 'nullable|string|max:200',
+            'spec_table.title_ar' => 'nullable|string|max:200',
+            'spec_table.headers_en' => 'nullable|array',
+            'spec_table.headers_en.*' => 'string|max:200',
+            'spec_table.headers_ar' => 'nullable|array',
+            'spec_table.headers_ar.*' => 'string|max:200',
+            'spec_table.rows' => 'nullable|array',
+            'spec_table.rows.*' => 'array',
+            'spec_table.rows.*.*' => 'nullable|string|max:200',
+
+            'features' => 'nullable|array',
+            'features.*.icon' => 'required_with:features|string|max:50',
+            'features.*.title_en' => 'required_with:features|string|max:150',
+            'features.*.title_ar' => 'required_with:features|string|max:150',
+            'features.*.description_en' => 'required_with:features|string|max:1000',
+            'features.*.description_ar' => 'required_with:features|string|max:1000',
+
+            'show_quote_tab' => 'boolean',
+            'is_active' => 'boolean',
+            'is_featured' => 'boolean',
+            'sort_order' => 'integer',
+        ];
     }
 
     public function destroy(int $id): RedirectResponse
