@@ -139,6 +139,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     // Applications
     Route::get('/applications', [AdminCareerController::class, 'applications'])->name('applications.index');
     Route::put('/applications/{id}', [AdminCareerController::class, 'updateApplication'])->name('applications.update');
+    Route::post('/applications/{id}/viewed', [AdminCareerController::class, 'markApplicationViewed'])->name('applications.viewed');
     Route::get('/applications/{id}/cv', [AdminCareerController::class, 'downloadCv'])->name('applications.download-cv');
     Route::delete('/applications/{id}', [AdminCareerController::class, 'deleteApplication'])->name('applications.destroy');
 

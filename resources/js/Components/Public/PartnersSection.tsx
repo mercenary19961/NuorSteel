@@ -22,10 +22,10 @@ interface BeltItem {
 }
 
 const TIER_CLASS: Record<PartnerData['size_tier'], string> = {
-  sm: 'max-h-12 md:max-h-16 lg:max-h-20',
-  md: 'max-h-14 md:max-h-20 lg:max-h-24',
-  lg: 'max-h-16 md:max-h-24 lg:max-h-28',
-  xl: 'max-h-20 md:max-h-28 lg:max-h-32',
+  sm: 'max-h-10 max-w-20 md:max-h-14 md:max-w-28 lg:max-h-16 lg:max-w-32',
+  md: 'max-h-14 max-w-28 md:max-h-20 md:max-w-36 lg:max-h-20 lg:max-w-40',
+  lg: 'max-h-16 max-w-32 md:max-h-24 md:max-w-44 lg:max-h-24 lg:max-w-48',
+  xl: 'max-h-20 max-w-40 md:max-h-28 md:max-w-52 lg:max-h-32 lg:max-w-full',
 };
 
 const DEFAULT_PARTNERS: BeltItem[] = [
@@ -69,7 +69,7 @@ function MarqueeBelt({ items }: { items: BeltItem[] }) {
                 src={item.logo}
                 alt={item.name}
                 title={item.name}
-                className={`max-w-full object-contain ${item.sizeClass}`}
+                className={`object-contain ${item.sizeClass}`}
                 loading="lazy"
                 decoding="async"
               />

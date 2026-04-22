@@ -99,7 +99,8 @@ export default function ProductsIndex({ products, categories, filters, undoMeta,
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {products.data.map((item) => {
-              const imageUrl = item.featured_image?.url;
+              const imageUrl =
+                item.featured_image?.url ?? item.images?.[0]?.media?.url ?? null;
 
               return (
                 <div

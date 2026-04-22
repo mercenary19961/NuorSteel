@@ -3,7 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
 import UndoButton from '@/Components/Admin/UndoButton';
-import { ChevronDown, ChevronRight, Save, Eye, ExternalLink, Maximize2, Minimize2, MousePointerClick, Home, Building2, ShieldCheck, Briefcase, Award, Mail, Package, type LucideIcon } from 'lucide-react';
+import { ChevronDown, ChevronRight, Save, Eye, ExternalLink, Maximize2, Minimize2, MousePointerClick, Home, Building2, ShieldCheck, Briefcase, Award, Mail, Package, Info, type LucideIcon } from 'lucide-react';
 import type { SiteContent, UndoMeta } from '@/types';
 
 const PAGE_CONFIG: Record<string, { label: string; labelAr: string; icon: LucideIcon }> = {
@@ -218,6 +218,24 @@ export default function Content({ content: contentByPage, undoMeta }: Props) {
         </div>
       )}
 
+      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex gap-2">
+        <Info size={16} className="text-blue-500 shrink-0 mt-0.5" />
+        <div className="text-xs text-blue-900 leading-relaxed">
+          <p>
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded bg-gray-100 text-gray-500 border border-gray-200 align-middle">
+              <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+              Default
+            </span>
+            {' '}means the field is empty and the public site shows the built-in translation. {' '}
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded bg-primary/10 text-primary border border-primary/20 align-middle">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              Override
+            </span>
+            {' '}means your custom text is live on the site. Clear a field and save to restore the default.
+          </p>
+        </div>
+      </div>
+
       {/* Quick page selector */}
       <div className="flex flex-wrap gap-2 mb-4">
         {pages.map((page) => {
@@ -290,17 +308,23 @@ export default function Content({ content: contentByPage, undoMeta }: Props) {
                           )}
                         </h3>
                         <div className="space-y-4">
-                          {sectionItems.map((item) => (
-                            <BilingualEditor
-                              key={item.id}
-                              label={`${item.key}${KEY_LABELS[item.key] ? ` / ${KEY_LABELS[item.key]}` : ''} (${item.type})`}
-                              valueEn={getItemValue(item, 'content_en')}
-                              valueAr={getItemValue(item, 'content_ar')}
-                              onChangeEn={(v) => handleChange(item, 'content_en', v)}
-                              onChangeAr={(v) => handleChange(item, 'content_ar', v)}
-                              type={item.type}
-                            />
-                          ))}
+                          {sectionItems.map((item) => {
+                            const currentEn = getItemValue(item, 'content_en');
+                            const currentAr = getItemValue(item, 'content_ar');
+                            return (
+                              <BilingualEditor
+                                key={item.id}
+                                label={`${item.key}${KEY_LABELS[item.key] ? ` / ${KEY_LABELS[item.key]}` : ''} (${item.type})`}
+                                valueEn={currentEn}
+                                valueAr={currentAr}
+                                onChangeEn={(v) => handleChange(item, 'content_en', v)}
+                                onChangeAr={(v) => handleChange(item, 'content_ar', v)}
+                                type={item.type}
+                                isDefaultEn={!currentEn || currentEn.trim() === ''}
+                                isDefaultAr={!currentAr || currentAr.trim() === ''}
+                              />
+                            );
+                          })}
                         </div>
                       </div>
                     ))}

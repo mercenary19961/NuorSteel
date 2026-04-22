@@ -30,13 +30,6 @@ const formatDate = (dateStr: string) => {
   });
 };
 
-const statusColors: Record<string, string> = {
-  new: 'border-t-blue-500',
-  reviewed: 'border-t-yellow-500',
-  shortlisted: 'border-t-green-500',
-  rejected: 'border-t-red-500',
-};
-
 export default function Applications({ applications, filters, undoMeta, undoModelId }: Props) {
   const [viewItem, setViewItem] = useState<CareerApplication | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<CareerApplication | null>(null);
@@ -80,6 +73,14 @@ export default function Applications({ applications, filters, undoMeta, undoMode
   const openView = (item: CareerApplication) => {
     setViewItem(item);
     setNotes(item.admin_notes ?? '');
+
+    if (item.status === 'new' && !item.viewed_at) {
+      router.post(
+        `/admin/applications/${item.id}/viewed`,
+        {},
+        { preserveScroll: true, preserveState: true },
+      );
+    }
   };
 
   const handleFilterChange = (newFilters: Record<string, string | undefined>) => {
@@ -153,11 +154,21 @@ export default function Applications({ applications, filters, undoMeta, undoMode
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {applications.data.map((item) => (
+          {applications.data.map((item) => {
+            const isUnviewedNew = item.status === 'new' && !item.viewed_at;
+            return (
             <div
               key={item.id}
-              className={`bg-white rounded-xl border border-gray-200 border-t-4 ${statusColors[item.status] ?? 'border-t-gray-300'} hover:shadow-md transition-all overflow-hidden flex flex-col`}
+              className={`relative bg-white rounded-xl border border-gray-200 hover:shadow-md transition-all overflow-hidden flex flex-col ${
+                isUnviewedNew ? 'border-t-4 border-t-primary animate-new-pulse' : ''
+              }`}
             >
+              {isUnviewedNew && (
+                <span
+                  className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary shadow-[0_0_0_4px_rgba(255,122,0,0.2)] animate-pulse"
+                  title="New application — needs review"
+                />
+              )}
               <div className="p-4 flex-1 flex flex-col">
                 {/* Header: name + status */}
                 <div className="flex items-start justify-between mb-3">
@@ -224,7 +235,8 @@ export default function Applications({ applications, filters, undoMeta, undoMode
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

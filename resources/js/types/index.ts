@@ -283,6 +283,7 @@ export interface CareerApplication {
   status: "new" | "reviewed" | "shortlisted" | "rejected";
   admin_notes: string | null;
   reviewed_by: number | null;
+  viewed_at: string | null;
   created_at: string;
   updated_at: string;
   career_listing?: CareerListing;

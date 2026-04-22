@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import Pagination from '@/Components/Admin/Pagination';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import CustomSelect from '@/Components/Admin/CustomSelect';
-import { ChevronDown, ChevronUp, Undo2, ArrowRight, RotateCcw, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Undo2, ArrowRight, RotateCcw, Trash2, AlertTriangle } from 'lucide-react';
 import type { PageProps, PaginatedData, ChangeLog as ChangeLogType, UndoFieldChange, User } from '@/types';
 
 const SECTION_COLORS: Record<string, string> = {
@@ -36,7 +36,12 @@ export default function ChangeLog({ logs, users, sectionLabels, filters }: Props
   const [revertTarget, setRevertTarget] = useState<ChangeLogType | null>(null);
   const [reverting, setReverting] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<ChangeLogType | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    if (!deleteTarget) setDeleteConfirmText('');
+  }, [deleteTarget]);
 
   const modelType = filters.model_type ?? '';
   const changedBy = filters.changed_by ?? '';
@@ -321,16 +326,71 @@ export default function ChangeLog({ logs, users, sectionLabels, filters }: Props
         onCancel={() => setRevertTarget(null)}
       />
 
-      <ConfirmDialog
-        open={!!deleteTarget}
-        title="Delete Log Entry"
-        message="This will permanently delete this change log entry. This action cannot be undone."
-        confirmLabel="Delete"
-        variant="danger"
-        loading={deleting}
-        onConfirm={handleDelete}
-        onCancel={() => setDeleteTarget(null)}
-      />
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => !deleting && setDeleteTarget(null)}
+          />
+          <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+            <div className="flex items-start gap-4">
+              <div className="shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                <AlertTriangle size={20} className="text-red-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900">Delete log entry</h3>
+                <p className="mt-1 text-sm text-gray-600">
+                  This will permanently remove a{' '}
+                  <strong>
+                    {sectionLabels[deleteTarget.model_type] ?? deleteTarget.model_type}
+                  </strong>{' '}
+                  entry from{' '}
+                  <strong>{deleteTarget.user?.name ?? 'Unknown'}</strong>.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-900 leading-relaxed">
+              <p>
+                <strong>This cannot be undone.</strong> The entry will be gone from history, so you
+                will lose the ability to revert to this state later. Only delete entries you are
+                certain you will never need.
+              </p>
+            </div>
+
+            <div className="mt-4">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Type <span className="font-mono text-red-600">delete</span> to confirm
+              </label>
+              <input
+                type="text"
+                autoFocus
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-500"
+                placeholder="delete"
+              />
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                disabled={deleting}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting || deleteConfirmText.trim().toLowerCase() !== 'delete'}
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deleting ? 'Deleting...' : 'Delete entry'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }

@@ -232,6 +232,18 @@ class CareerController extends Controller
         return redirect()->back()->with('success', 'Application updated successfully.');
     }
 
+    public function markApplicationViewed(int $id): RedirectResponse
+    {
+        $application = CareerApplication::findOrFail($id);
+
+        if ($application->status === 'new' && $application->viewed_at === null) {
+            $application->viewed_at = now();
+            $application->save();
+        }
+
+        return redirect()->back();
+    }
+
     public function downloadCv(int $id): mixed
     {
         $application = CareerApplication::findOrFail($id);
