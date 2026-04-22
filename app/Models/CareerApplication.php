@@ -88,6 +88,8 @@ class CareerApplication extends Model
 
     public function scopeOrdered(Builder $query): Builder
     {
-        return $query->orderByDesc('created_at');
+        return $query
+            ->orderByRaw("CASE WHEN status = 'new' THEN 0 ELSE 1 END")
+            ->orderByDesc('created_at');
     }
 }

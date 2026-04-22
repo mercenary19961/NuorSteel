@@ -180,6 +180,20 @@ html[dir="rtl"] body {
     animation: dot-breathe 2.2s ease-in-out infinite;
 }
 
+/* New-application attention pulse — subtle glow + ring on unreviewed admin cards */
+@keyframes new-application-pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(255, 122, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(255, 122, 0, 0), 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+}
+
+.animate-new-pulse {
+    animation: new-application-pulse 2.2s ease-in-out infinite;
+}
+
 /* Hero CTA shimmer — diagonal highlight sweep */
 @keyframes cta-shimmer {
     0% { transform: translateX(-150%) skewX(-20deg); }
