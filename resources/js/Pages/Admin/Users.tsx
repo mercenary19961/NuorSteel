@@ -201,13 +201,15 @@ export default function UsersPage({ users }: Props) {
                               >
                                 {user.is_active ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
                               </button>
-                              <button
-                                onClick={() => setDeleteTarget(user)}
-                                className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
-                                title="Delete"
-                              >
-                                <Trash2 size={16} />
-                              </button>
+                              {user.role !== 'admin' && (
+                                <button
+                                  onClick={() => setDeleteTarget(user)}
+                                  className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
+                                  title="Delete"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              )}
                             </>
                           )}
                         </div>

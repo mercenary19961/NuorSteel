@@ -44,7 +44,6 @@ class AdminAccessTest extends TestCase
         return [
             'dashboard'    => ['/admin'],
             'content'      => ['/admin/content'],
-            'timeline'     => ['/admin/timeline'],
             'media'        => ['/admin/media'],
             'products'     => ['/admin/products'],
             'certificates' => ['/admin/certificates'],

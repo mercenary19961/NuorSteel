@@ -10,7 +10,6 @@ use App\Models\Media;
 use App\Models\Certificate;
 use App\Models\CareerListing;
 use App\Models\CareerApplication;
-use App\Models\TimelineEvent;
 use App\Models\ContactSubmission;
 use App\Models\LinkedinCache;
 use App\Models\NewsletterSubscriber;
@@ -136,7 +135,6 @@ class UndoService
             'career' => CareerListing::class,
             'application' => CareerApplication::class,
             'media' => Media::class,
-            'timeline' => TimelineEvent::class,
             'contact' => ContactSubmission::class,
             'newsletter' => NewsletterSubscriber::class,
             'linkedin' => LinkedinCache::class,
@@ -159,7 +157,6 @@ class UndoService
             'career' => '/admin/careers',
             'application' => '/admin/applications',
             'media' => '/admin/media',
-            'timeline' => '/admin/timeline',
             'contact' => '/admin/contacts',
             'newsletter' => '/admin/newsletter',
             'linkedin' => '/admin/linkedin-posts',

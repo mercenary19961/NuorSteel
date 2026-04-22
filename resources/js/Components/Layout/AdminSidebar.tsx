@@ -3,7 +3,6 @@ import type { PageProps } from '@/types';
 import {
   LayoutDashboard,
   FileText,
-  Clock,
   Image,
   Package,
   Award,
@@ -45,7 +44,6 @@ const navGroups: { label: string; items: NavItem[] }[] = [
     label: 'Content',
     items: [
       { label: 'Site Content', path: '/admin/content', icon: <FileText size={20} /> },
-      { label: 'Timeline', path: '/admin/timeline', icon: <Clock size={20} /> },
       { label: 'Media Library', path: '/admin/media', icon: <Image size={20} /> },
       { label: 'LinkedIn Posts', path: '/admin/linkedin-posts', icon: <Linkedin size={20} /> },
     ],

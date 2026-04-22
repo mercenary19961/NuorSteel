@@ -10,7 +10,6 @@ use App\Models\LinkedinCache;
 use App\Models\Media;
 use App\Models\NewsletterSubscriber;
 use App\Models\Setting;
-use App\Models\TimelineEvent;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -34,130 +33,6 @@ class AdminCrudTest extends TestCase
     private function createEditor(): User
     {
         return User::factory()->create(['role' => 'editor', 'is_active' => true]);
-    }
-
-    // ===============================================================
-    // Timeline CRUD
-    // ===============================================================
-
-    public function test_timeline_index_renders(): void
-    {
-        $admin = $this->createAdmin();
-
-        $response = $this->actingAs($admin)->get('/admin/timeline');
-
-        $response->assertOk();
-        $response->assertInertia(fn (Assert $page) => $page->component('Admin/Timeline'));
-    }
-
-    public function test_timeline_store_creates_event(): void
-    {
-        $admin = $this->createAdmin();
-
-        $response = $this->actingAs($admin)->post('/admin/timeline', [
-            'year' => '2025',
-            'title_en' => 'New Facility',
-            'title_ar' => 'منشأة جديدة',
-            'description_en' => 'Opened a new facility.',
-            'description_ar' => 'تم افتتاح منشأة جديدة.',
-            'sort_order' => 1,
-        ]);
-
-        $response->assertRedirect();
-        $response->assertSessionHas('success');
-        $this->assertDatabaseHas('timeline_events', [
-            'year' => '2025',
-            'title_en' => 'New Facility',
-            'created_by' => $admin->id,
-        ]);
-    }
-
-    public function test_timeline_store_validates_required_fields(): void
-    {
-        $admin = $this->createAdmin();
-
-        $response = $this->actingAs($admin)->post('/admin/timeline', []);
-
-        $response->assertSessionHasErrors(['year', 'title_en', 'title_ar', 'description_en', 'description_ar']);
-    }
-
-    public function test_timeline_update_modifies_event(): void
-    {
-        $admin = $this->createAdmin();
-
-        $event = TimelineEvent::create([
-            'year' => '2020',
-            'title_en' => 'Old Title',
-            'title_ar' => 'عنوان قديم',
-            'description_en' => 'Old desc',
-            'description_ar' => 'وصف قديم',
-            'sort_order' => 1,
-            'created_by' => $admin->id,
-            'updated_by' => $admin->id,
-        ]);
-
-        $response = $this->actingAs($admin)->put("/admin/timeline/{$event->id}", [
-            'year' => '2021',
-            'title_en' => 'Updated Title',
-            'title_ar' => 'عنوان محدث',
-            'description_en' => 'Updated desc',
-            'description_ar' => 'وصف محدث',
-            'sort_order' => 2,
-        ]);
-
-        $response->assertRedirect();
-        $this->assertDatabaseHas('timeline_events', [
-            'id' => $event->id,
-            'year' => '2021',
-            'title_en' => 'Updated Title',
-            'updated_by' => $admin->id,
-        ]);
-    }
-
-    public function test_timeline_destroy_deletes_event(): void
-    {
-        $admin = $this->createAdmin();
-
-        $event = TimelineEvent::create([
-            'year' => '2020',
-            'title_en' => 'Temp Event',
-            'title_ar' => 'حدث مؤقت',
-            'description_en' => 'To be deleted',
-            'description_ar' => 'سيتم حذفه',
-            'sort_order' => 1,
-            'created_by' => $admin->id,
-            'updated_by' => $admin->id,
-        ]);
-
-        $response = $this->actingAs($admin)->delete("/admin/timeline/{$event->id}");
-
-        $response->assertRedirect();
-        $this->assertSoftDeleted('timeline_events', ['id' => $event->id]);
-    }
-
-    public function test_timeline_reorder_updates_sort_order(): void
-    {
-        $admin = $this->createAdmin();
-
-        $event1 = TimelineEvent::create([
-            'year' => '2020', 'title_en' => 'First', 'title_ar' => 'أول',
-            'description_en' => 'D', 'description_ar' => 'و', 'sort_order' => 0,
-            'created_by' => $admin->id, 'updated_by' => $admin->id,
-        ]);
-        $event2 = TimelineEvent::create([
-            'year' => '2021', 'title_en' => 'Second', 'title_ar' => 'ثاني',
-            'description_en' => 'D', 'description_ar' => 'و', 'sort_order' => 1,
-            'created_by' => $admin->id, 'updated_by' => $admin->id,
-        ]);
-
-        // Reverse order
-        $response = $this->actingAs($admin)->post('/admin/timeline/reorder', [
-            'order' => [$event2->id, $event1->id],
-        ]);
-
-        $response->assertRedirect();
-        $this->assertDatabaseHas('timeline_events', ['id' => $event2->id, 'sort_order' => 0]);
-        $this->assertDatabaseHas('timeline_events', ['id' => $event1->id, 'sort_order' => 1]);
     }
 
     // ===============================================================

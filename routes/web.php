@@ -14,7 +14,6 @@ use App\Http\Controllers\MediaServeController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\SiteContentController as AdminContentController;
-use App\Http\Controllers\Admin\TimelineController as AdminTimelineController;
 use App\Http\Controllers\Admin\MediaController as AdminMediaController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\CertificateController as AdminCertificateController;
@@ -88,13 +87,6 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/undo/{model}/{id}', [AdminUndoController::class, 'status'])->name('undo.status');
     Route::post('/undo/{model}/{id}', [AdminUndoController::class, 'restore'])->name('undo.restore');
     Route::delete('/undo/{model}/{id}', [AdminUndoController::class, 'clear'])->name('undo.clear');
-
-    // Timeline
-    Route::get('/timeline', [AdminTimelineController::class, 'index'])->name('timeline.index');
-    Route::post('/timeline', [AdminTimelineController::class, 'store'])->name('timeline.store');
-    Route::put('/timeline/{id}', [AdminTimelineController::class, 'update'])->name('timeline.update');
-    Route::delete('/timeline/{id}', [AdminTimelineController::class, 'destroy'])->name('timeline.destroy');
-    Route::post('/timeline/reorder', [AdminTimelineController::class, 'reorder'])->name('timeline.reorder');
 
     // Media
     Route::get('/media', [AdminMediaController::class, 'index'])->name('media.index');

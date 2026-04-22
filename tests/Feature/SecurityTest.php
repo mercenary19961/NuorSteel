@@ -258,33 +258,6 @@ class SecurityTest extends TestCase
     }
 
     // ===============================================================
-    // 6. Timeline Controller — $request->only() (no mass assignment)
-    // ===============================================================
-
-    public function test_timeline_store_ignores_extra_fields(): void
-    {
-        $admin = $this->createAdmin();
-
-        $response = $this->actingAs($admin)->post('/admin/timeline', [
-            'year' => '2025',
-            'title_en' => 'Test Event',
-            'title_ar' => 'حدث تجريبي',
-            'description_en' => 'Test description',
-            'description_ar' => 'وصف تجريبي',
-            'sort_order' => 1,
-            // These should be ignored
-            'created_by' => 999,
-            'updated_by' => 999,
-        ]);
-
-        $response->assertRedirect();
-
-        // The created_by should be the authenticated admin, not 999
-        $this->assertDatabaseMissing('timeline_events', ['created_by' => 999]);
-        $this->assertDatabaseHas('timeline_events', ['created_by' => $admin->id]);
-    }
-
-    // ===============================================================
     // 7. Certificate Controller — $request->only()
     // ===============================================================
 
@@ -516,13 +489,13 @@ class SecurityTest extends TestCase
 
     public function test_admin_post_routes_require_auth(): void
     {
-        $response = $this->post('/admin/timeline', [
-            'year' => '2025',
+        $response = $this->post('/admin/careers', [
             'title_en' => 'Test',
             'title_ar' => 'تجربة',
             'description_en' => 'Desc',
             'description_ar' => 'وصف',
-            'sort_order' => 1,
+            'employment_type' => 'full-time',
+            'status' => 'open',
         ]);
 
         $response->assertRedirect('/admin/login');
@@ -530,7 +503,7 @@ class SecurityTest extends TestCase
 
     public function test_admin_delete_routes_require_auth(): void
     {
-        $response = $this->delete('/admin/timeline/1');
+        $response = $this->delete('/admin/careers/1');
 
         $response->assertRedirect('/admin/login');
     }
