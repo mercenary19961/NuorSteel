@@ -94,6 +94,10 @@ class UserController extends Controller
             return redirect()->back()->with('error', 'You cannot delete your own account.');
         }
 
+        if ($user->role === 'admin') {
+            return redirect()->back()->with('error', 'Admin accounts cannot be deleted. Demote the user to editor first or remove them from the database directly.');
+        }
+
         $user->delete();
 
         return redirect()->back()->with('success', 'User deleted successfully.');
