@@ -1,11 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
-import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import MediaPicker from '@/Components/Admin/MediaPicker';
 import CustomSelect from '@/Components/Admin/CustomSelect';
 import UndoButton from '@/Components/Admin/UndoButton';
-import { Plus, Trash2, Eye, EyeOff, Edit2, Image as ImageIcon, X, Info } from 'lucide-react';
+import { Plus, Trash2, Eye, EyeOff, Edit2, Image as ImageIcon, X, Info, AlertTriangle } from 'lucide-react';
 import type { Partner, Media, UndoMeta } from '@/types';
 
 interface Props {
@@ -47,7 +46,12 @@ export default function Partners({ partners, undoMeta, undoModelId }: Props) {
   const [form, setForm] = useState<PartnerForm>(emptyForm);
   const [showLogoPicker, setShowLogoPicker] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Partner | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [processing, setProcessing] = useState(false);
+
+  useEffect(() => {
+    if (!deleteTarget) setDeleteConfirmText('');
+  }, [deleteTarget]);
 
   const openCreate = () => {
     setEditing(null);
@@ -190,12 +194,12 @@ export default function Partners({ partners, undoMeta, undoModelId }: Props) {
                   p.is_visible ? 'border-gray-200' : 'border-gray-200 opacity-60'
                 }`}
               >
-                <div className="aspect-square bg-gray-50 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
+                <div className="aspect-square bg-gray-50 rounded-lg flex items-center justify-center mb-3 overflow-hidden p-6">
                   {p.logo_media?.url ? (
                     <img
                       src={p.logo_media.url}
                       alt={p.name_en}
-                      className="max-h-24 max-w-24 object-contain"
+                      className="max-h-full max-w-full object-contain"
                     />
                   ) : (
                     <ImageIcon size={32} className="text-gray-300" />
@@ -372,16 +376,81 @@ export default function Partners({ partners, undoMeta, undoModelId }: Props) {
           title="Select Partner Logo"
         />
 
-        <ConfirmDialog
-          open={!!deleteTarget}
-          title="Delete Partner"
-          message={`Are you sure you want to remove "${deleteTarget?.name_en}"?`}
-          confirmLabel="Delete"
-          variant="danger"
-          loading={processing}
-          onConfirm={handleDelete}
-          onCancel={() => setDeleteTarget(null)}
-        />
+        {deleteTarget && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div
+              className="absolute inset-0 bg-black/50"
+              onClick={() => !processing && setDeleteTarget(null)}
+            />
+            <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+              <div className="flex items-start gap-4">
+                <div className="shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                  <AlertTriangle size={20} className="text-red-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900">Delete Partner</h3>
+                  <p className="mt-1 text-sm text-gray-600">
+                    This will remove <strong>{deleteTarget.name_en}</strong> from the homepage
+                    Partners belt.
+                  </p>
+                </div>
+              </div>
+
+              {deleteTarget.logo_media?.url && (
+                <div className="mt-4 flex items-center justify-center bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <img
+                    src={deleteTarget.logo_media.url}
+                    alt={deleteTarget.name_en}
+                    className="max-h-16 max-w-40 object-contain"
+                  />
+                </div>
+              )}
+
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900 leading-relaxed">
+                <p>
+                  <strong>This is reversible.</strong> An "Undo" button will appear in the header,
+                  and every deletion is permanently recorded in the{' '}
+                  <a href="/admin/change-log" className="underline font-medium">
+                    Change Log
+                  </a>{' '}
+                  where it can be restored later.
+                </p>
+              </div>
+
+              <div className="mt-4">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Type <span className="font-mono text-red-600">{deleteTarget.name_en}</span> to
+                  confirm
+                </label>
+                <input
+                  type="text"
+                  autoFocus
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-500"
+                  placeholder={deleteTarget.name_en}
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={() => setDeleteTarget(null)}
+                  disabled={processing}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={processing || deleteConfirmText.trim() !== deleteTarget.name_en}
+                  className="px-4 py-2 text-sm font-medium rounded-lg bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {processing ? 'Deleting...' : 'Delete partner'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );
