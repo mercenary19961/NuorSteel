@@ -12,7 +12,7 @@ class UndoController extends Controller
 {
     private const ALLOWED_MODELS = [
         'settings', 'site_content', 'product', 'media', 'certificate',
-        'career', 'application', 'timeline', 'contact', 'newsletter', 'linkedin',
+        'career', 'application', 'contact', 'newsletter', 'linkedin',
     ];
 
     private const ADMIN_ONLY_MODELS = [

@@ -22,7 +22,6 @@ class ChangeLogController extends Controller
         'certificate' => 'Certificates',
         'career' => 'Job Listings',
         'application' => 'Applications',
-        'timeline' => 'Timeline',
         'contact' => 'Contacts',
         'newsletter' => 'Newsletter',
     ];
