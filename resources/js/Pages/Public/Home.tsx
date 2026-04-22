@@ -473,7 +473,7 @@ export default function Home({ content_en, content_ar, linkedin_posts, partners 
           />
         </picture>
 
-        <div className="relative z-10 flex-1 flex flex-col justify-start pt-20 lg:justify-center lg:pt-0 container mx-auto px-4">
+        <div className="relative z-10 flex-1 flex flex-col justify-start pt-20 lg:justify-start lg:pt-44 container mx-auto px-4">
           {/* Mobile: logo centered, then text below */}
           <div className="lg:hidden flex flex-col items-center">
             <img src="/images/home/vision2030/vision2030-logo.png" alt="Saudi Vision 2030" loading="lazy" decoding="async" className="h-36 object-contain" />
@@ -489,7 +489,7 @@ export default function Home({ content_en, content_ar, linkedin_posts, partners 
 
           {/* Desktop: text left, logo right — same row */}
           <div className="hidden lg:flex justify-between items-center">
-            <div className="w-1/2 space-y-6">
+            <div className="w-1/2 max-w-2xl space-y-6">
               <p className="text-xl leading-relaxed text-white/90">
                 {content?.vision2030?.paragraph1 || t('home.vision2030.paragraph1')}
               </p>
