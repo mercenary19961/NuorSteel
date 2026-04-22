@@ -14,55 +14,66 @@ interface Props {
   partners: PartnerData[];
 }
 
-const SIZE_CLASSES: Record<PartnerData['size_tier'], string> = {
-  sm: 'max-h-20 max-w-20 lg:max-h-28 lg:max-w-28',
-  md: 'max-h-24 max-w-24 lg:max-h-36 lg:max-w-36',
-  lg: 'max-h-28 max-w-28 lg:max-h-44 lg:max-w-44',
-  xl: 'max-h-32 max-w-32 lg:max-h-52 lg:max-w-52',
-};
-
-function splitIntoColumns(items: PartnerData[], cols: number): PartnerData[][] {
-  const columns: PartnerData[][] = Array.from({ length: cols }, () => []);
-  items.forEach((item, i) => columns[i % cols].push(item));
-  return columns;
+interface BeltItem {
+  key: string;
+  name: string;
+  logo: string;
+  sizeClass: string;
 }
 
-function ScrollColumn({
-  partners,
-  direction,
-  language,
-}: {
-  partners: PartnerData[];
-  direction: 'up' | 'down';
-  language: 'en' | 'ar';
-}) {
+const TIER_CLASS: Record<PartnerData['size_tier'], string> = {
+  sm: 'max-h-12 md:max-h-16 lg:max-h-20',
+  md: 'max-h-14 md:max-h-20 lg:max-h-24',
+  lg: 'max-h-16 md:max-h-24 lg:max-h-28',
+  xl: 'max-h-20 md:max-h-28 lg:max-h-32',
+};
+
+const DEFAULT_PARTNERS: BeltItem[] = [
+  { key: 'aramco', name: 'Aramco', logo: '/images/home/partners/aramco.webp', sizeClass: TIER_CLASS.md },
+  { key: 'vision-2030', name: 'Vision 2030', logo: '/images/home/partners/vision 2030.webp', sizeClass: TIER_CLASS.lg },
+  { key: 'saudi-made', name: 'Saudi Made', logo: '/images/home/partners/SAUDI MADE.webp', sizeClass: TIER_CLASS.md },
+  { key: 'modon', name: 'MODON', logo: '/images/home/partners/modon.webp', sizeClass: TIER_CLASS.xl },
+  { key: 'nhc', name: 'NHC', logo: '/images/home/partners/nhc.webp', sizeClass: TIER_CLASS.lg },
+  { key: 'roshen', name: 'Roshen', logo: '/images/home/partners/roshen.webp', sizeClass: TIER_CLASS.lg },
+  { key: 'astm', name: 'ASTM', logo: '/images/home/partners/ASTM.webp', sizeClass: TIER_CLASS.lg },
+  { key: 'iso', name: 'ISO', logo: '/images/home/partners/ISO.webp', sizeClass: TIER_CLASS.lg },
+  { key: 'saso', name: 'SASO', logo: '/images/home/partners/SASO LOGO.webp', sizeClass: TIER_CLASS.md },
+  { key: 'epd', name: 'EPD', logo: '/images/home/partners/epd.webp', sizeClass: TIER_CLASS.md },
+  { key: 'hpd', name: 'HPD', logo: '/images/home/partners/HPD.webp', sizeClass: TIER_CLASS.xl },
+  { key: 'qarya', name: 'Qarya', logo: '/images/home/partners/qarya.webp', sizeClass: TIER_CLASS.lg },
+  { key: 'tasnee3', name: 'Tasnee3', logo: '/images/home/partners/tasnee3.webp', sizeClass: TIER_CLASS.md },
+  { key: 'water-co', name: 'Water Co', logo: '/images/home/partners/WATER CO.webp', sizeClass: TIER_CLASS.md },
+  { key: 'industry-ministry', name: 'Ministry of Industry', logo: '/images/home/partners/industry ministry.webp', sizeClass: TIER_CLASS.md },
+  { key: 'transport-ministry', name: 'Ministry of Transport', logo: '/images/home/partners/TRANSFER MINISTRY.webp', sizeClass: TIER_CLASS.md },
+];
+
+function MarqueeBelt({ items }: { items: BeltItem[] }) {
   const [paused, setPaused] = useState(false);
-  const items = [...partners, ...partners];
+  const doubled = [...items, ...items];
 
   return (
-    <div
-      className="h-full overflow-hidden px-2"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-    >
+    <div className="overflow-hidden relative" dir="ltr">
       <div
-        className={`flex flex-col gap-3 py-2 ${direction === 'up' ? 'animate-scroll-up' : 'animate-scroll-down'}`}
+        className="flex items-center w-max animate-marquee-left"
         style={{ animationPlayState: paused ? 'paused' : 'running' }}
       >
-        {items.map((partner, i) => (
+        {doubled.map((item, index) => (
           <div
-            key={`${partner.id}-${i}`}
-            className="shrink-0 flex items-center justify-center bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.12)] transition-shadow w-28 h-36 p-3 lg:w-36 lg:h-44 lg:p-4 mx-auto"
+            key={`${item.key}-${index}`}
+            className="shrink-0 mr-6 md:mr-8 lg:mr-10"
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
           >
-            {partner.logo && (
+            <div className="flex items-center justify-center h-24 w-40 sm:h-28 sm:w-48 md:h-32 md:w-56 lg:h-36 lg:w-60 px-5 py-4 rounded-xl bg-white/95 shadow-[0_4px_16px_rgba(0,0,0,0.18)] ring-1 ring-white/10 hover:shadow-[0_6px_24px_rgba(0,0,0,0.28)] transition-shadow duration-300">
               <img
-                src={partner.logo}
-                alt={language === 'ar' ? partner.name_ar : partner.name_en}
-                className={`object-contain ${SIZE_CLASSES[partner.size_tier] ?? SIZE_CLASSES.md}`}
+                src={item.logo}
+                alt={item.name}
+                title={item.name}
+                className={`max-w-full object-contain ${item.sizeClass}`}
                 loading="lazy"
                 decoding="async"
               />
-            )}
+            </div>
           </div>
         ))}
       </div>
@@ -74,58 +85,32 @@ export default function PartnersSection({ partners }: Props) {
   const { t } = useTranslation();
   const { language } = useLanguage();
 
-  if (!partners || partners.length === 0) return null;
+  const items: BeltItem[] =
+    partners && partners.length > 0
+      ? partners
+          .filter((p) => p.logo)
+          .map((p) => ({
+            key: String(p.id),
+            name: language === 'ar' ? p.name_ar : p.name_en,
+            logo: p.logo as string,
+            sizeClass: TIER_CLASS[p.size_tier] ?? TIER_CLASS.md,
+          }))
+      : DEFAULT_PARTNERS;
 
-  const columns = splitIntoColumns(partners, 3);
+  if (items.length === 0) return null;
 
   return (
-    <section className="bg-surface overflow-hidden">
-      {/* Mobile: stacked layout */}
-      <div className="lg:hidden">
-        <div className="px-6 pt-10 pb-6 text-center">
-          <h2 className="text-2xl sm:text-3xl font-black text-white mb-3">
-            {t('home.partners.title')}
-          </h2>
-          <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-            {t('home.partners.description')}
-          </p>
-        </div>
-        <div className="h-105 grid grid-cols-3 gap-0 px-2">
-          {columns.map((col, i) => (
-            <ScrollColumn
-              key={i}
-              partners={col}
-              direction={i % 2 === 0 ? 'up' : 'down'}
-              language={language}
-            />
-          ))}
-        </div>
+    <section className="relative py-14 md:py-20 lg:py-24 bg-surface overflow-hidden">
+      <div className="container mx-auto px-4 text-center mb-10 md:mb-14">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4">
+          {t('home.partners.title')}
+        </h2>
+        <p className="text-gray-300 text-base md:text-lg max-w-3xl mx-auto leading-relaxed">
+          {t('home.partners.description')}
+        </p>
       </div>
 
-      {/* Desktop: side-by-side layout */}
-      <div className="hidden lg:block relative h-150">
-        <div className="absolute top-0 right-0 bottom-0 w-3/5 grid grid-cols-3 gap-0 pe-8">
-          {columns.map((col, i) => (
-            <ScrollColumn
-              key={i}
-              partners={col}
-              direction={i % 2 === 0 ? 'up' : 'down'}
-              language={language}
-            />
-          ))}
-        </div>
-
-        <div className="relative z-10 container mx-auto px-4 h-full flex items-center">
-          <div className="w-2/5 text-start">
-            <h2 className="text-4xl font-black text-white mb-4">
-              {t('home.partners.title')}
-            </h2>
-            <p className="text-gray-300 text-lg leading-relaxed">
-              {t('home.partners.description')}
-            </p>
-          </div>
-        </div>
-      </div>
+      <MarqueeBelt items={items} />
     </section>
   );
 }

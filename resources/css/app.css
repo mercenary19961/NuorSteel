@@ -159,23 +159,15 @@ html[dir="rtl"] body {
     background: rgba(255 255 255 / 0.35);
 }
 
-/* Partners section — infinite scroll columns */
-@keyframes scroll-up {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-50%); }
+/* Partners section — single horizontal marquee belt */
+@keyframes marquee-left {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
 }
 
-@keyframes scroll-down {
-    0% { transform: translateY(-50%); }
-    100% { transform: translateY(0); }
-}
-
-.animate-scroll-up {
-    animation: scroll-up 25s linear infinite;
-}
-
-.animate-scroll-down {
-    animation: scroll-down 25s linear infinite;
+.animate-marquee-left {
+    animation: marquee-left 45s linear infinite;
+    will-change: transform;
 }
 
 /* TMT marking dot — idle breathing loop (grows + shrinks when no dot is hovered) */
