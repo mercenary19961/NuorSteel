@@ -5,7 +5,7 @@ import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
 import MediaPicker from '@/Components/Admin/MediaPicker';
 import CustomSelect from '@/Components/Admin/CustomSelect';
 import UndoButton from '@/Components/Admin/UndoButton';
-import { Plus, Trash2, Eye, EyeOff, Edit2, Image as ImageIcon, X } from 'lucide-react';
+import { Plus, Trash2, Eye, EyeOff, Edit2, Image as ImageIcon, X, Info } from 'lucide-react';
 import type { Partner, Media, UndoMeta } from '@/types';
 
 interface Props {
@@ -163,6 +163,19 @@ export default function Partners({ partners, undoMeta, undoModelId }: Props) {
           </div>
         </div>
 
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex gap-2">
+          <Info size={16} className="text-blue-500 shrink-0 mt-0.5" />
+          <div className="text-xs text-blue-900 leading-relaxed">
+            <p className="font-medium mb-1">Recommended logo specs</p>
+            <ul className="list-disc list-inside space-y-0.5 text-blue-800/90">
+              <li><strong>Dimensions:</strong> ~600 × 200 px (landscape, ~3:1 ratio)</li>
+              <li><strong>Format:</strong> WebP or PNG with a <strong>transparent background</strong></li>
+              <li><strong>Logo color:</strong> dark — the belt renders logos on a white card</li>
+              <li><strong>File size:</strong> under 50 KB; trim tight to the logo (no extra padding)</li>
+            </ul>
+          </div>
+        </div>
+
         {partners.length === 0 ? (
           <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
             <ImageIcon size={40} className="mx-auto text-gray-300 mb-3" />
@@ -246,6 +259,9 @@ export default function Partners({ partners, undoMeta, undoModelId }: Props) {
               <div className="p-5 space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Logo</label>
+                  <p className="text-xs text-gray-500 mb-2">
+                    Recommended: ~600×200 px, WebP/PNG, transparent background, dark logo.
+                  </p>
                   {form.logo_url ? (
                     <div className="flex items-center gap-3">
                       <img
