@@ -25,6 +25,10 @@ class CareerApplication extends Model
         'cv_path',
     ];
 
+    protected $casts = [
+        'viewed_at' => 'datetime',
+    ];
+
     public function careerListing(): BelongsTo
     {
         return $this->belongsTo(CareerListing::class);
@@ -89,7 +93,7 @@ class CareerApplication extends Model
     public function scopeOrdered(Builder $query): Builder
     {
         return $query
-            ->orderByRaw("CASE WHEN status = 'new' THEN 0 ELSE 1 END")
+            ->orderByRaw("CASE WHEN status = 'new' AND viewed_at IS NULL THEN 0 WHEN status = 'new' THEN 1 ELSE 2 END")
             ->orderByDesc('created_at');
     }
 }

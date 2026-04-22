@@ -73,6 +73,14 @@ export default function Applications({ applications, filters, undoMeta, undoMode
   const openView = (item: CareerApplication) => {
     setViewItem(item);
     setNotes(item.admin_notes ?? '');
+
+    if (item.status === 'new' && !item.viewed_at) {
+      router.post(
+        `/admin/applications/${item.id}/viewed`,
+        {},
+        { preserveScroll: true, preserveState: true },
+      );
+    }
   };
 
   const handleFilterChange = (newFilters: Record<string, string | undefined>) => {
@@ -147,15 +155,15 @@ export default function Applications({ applications, filters, undoMeta, undoMode
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {applications.data.map((item) => {
-            const isNew = item.status === 'new';
+            const isUnviewedNew = item.status === 'new' && !item.viewed_at;
             return (
             <div
               key={item.id}
               className={`relative bg-white rounded-xl border border-gray-200 hover:shadow-md transition-all overflow-hidden flex flex-col ${
-                isNew ? 'border-t-4 border-t-primary animate-new-pulse' : ''
+                isUnviewedNew ? 'border-t-4 border-t-primary animate-new-pulse' : ''
               }`}
             >
-              {isNew && (
+              {isUnviewedNew && (
                 <span
                   className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary shadow-[0_0_0_4px_rgba(255,122,0,0.2)] animate-pulse"
                   title="New application — needs review"
