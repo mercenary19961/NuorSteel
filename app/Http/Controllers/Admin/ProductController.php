@@ -20,7 +20,7 @@ class ProductController extends Controller
     ) {}
     public function index(Request $request): Response
     {
-        $query = Product::with('featuredImage');
+        $query = Product::with(['featuredImage', 'images.media']);
 
         if ($request->has('category')) {
             $query->where('category', $request->category);
