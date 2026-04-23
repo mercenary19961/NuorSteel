@@ -477,6 +477,7 @@
 - [x] Local dev Turnstile test keys documented in `.env.example` (Cloudflare's official always-pass / always-fail / force-challenge keys — no account/hostname config needed)
 - [ ] Structured data remaining placeholders (see above)
 - [ ] Final testing & go-live
+- [ ] **Polish [docs/ADMIN_PANEL_GUIDE.md](docs/ADMIN_PANEL_GUIDE.md)** before handing to client: (1) strip em-dashes / en-dashes across prose (client prefers cleaner punctuation — use commas, parens, or colons instead); (2) replace every placeholder with real production values — the live admin URL (currently `https://nuorsteel.com/admin/login`), real contact email/phone/addresses if they drift from Settings, actual Newsletter provider if one is picked (Mailchimp/Brevo/MailerLite), and any screenshots once the final UI is frozen. Goal: client can read the guide top-to-bottom without needing to substitute anything. Regenerate [docs/ADMIN_PANEL_GUIDE.docx](docs/ADMIN_PANEL_GUIDE.docx) via `pandoc docs/ADMIN_PANEL_GUIDE.md -o docs/ADMIN_PANEL_GUIDE.docx --toc --toc-depth=2` after edits
 
 ---
 
