@@ -329,8 +329,21 @@ const en = {
       governance: {
         title: "Governance & Ethics",
         subtitle: "How we structure decision-making, accountability, and ethical conduct across the organisation.",
-        comingSoonTitle: "Governance Framework Coming Soon",
-        comingSoonBody: "Our formal governance policies and board framework are currently being documented. We'll publish the full set of documents here once finalised.",
+        pillars: {
+          board: {
+            title: "Board Oversight",
+            body: "Senior leadership and an independent advisory board oversee strategy, performance, and long-term direction, ensuring clear accountability at every level.",
+          },
+          ethics: {
+            title: "Ethics & Integrity",
+            body: "A published code of conduct guides every employee, supplier, and partner, with zero tolerance for bribery, fraud, or conflicts of interest.",
+          },
+          compliance: {
+            title: "Regulatory Compliance",
+            body: "Full alignment with Saudi regulations, Vision 2030 localisation mandates, and international standards, audited annually by accredited third parties.",
+          },
+        },
+        commitment: "Our governance model is reviewed continuously to reflect evolving standards and the expectations of our stakeholders.",
       },
     },
     viewPdf: "View document",
@@ -341,7 +354,7 @@ const en = {
       },
       ncec: {
         title: "NCEC Certificate",
-        description: "National Center for Environmental Compliance registration — verified emissions and waste reporting.",
+        description: "National Center for Environmental Compliance registration with verified emissions and waste reporting.",
       },
       epd: {
         title: "Environmental Product Declaration (EPD)",

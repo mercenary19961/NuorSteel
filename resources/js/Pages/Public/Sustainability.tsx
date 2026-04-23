@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Head } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Leaf, HardHat, Scale, FileText, Eye, X } from 'lucide-react';
+import { Leaf, HardHat, Scale, FileText, Eye, X, ShieldCheck, FileCheck2, Landmark } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
 
 type TabKey = 'environment' | 'safety' | 'governance';
@@ -123,7 +123,11 @@ export default function Sustainability() {
               {activeTab === 'governance' ? (
                 <GovernancePlaceholder />
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
+                <div
+                  className={`grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 mx-auto ${
+                    DOCS[activeTab].length === 2 ? 'max-w-4xl' : 'lg:grid-cols-3 max-w-6xl'
+                  }`}
+                >
                   {DOCS[activeTab].map((doc) => (
                     <DocCard key={doc.key} doc={doc} onView={() => setViewingPdf(doc)} />
                   ))}
@@ -219,26 +223,45 @@ function DocCard({ doc, onView }: { doc: Doc; onView: () => void }) {
   );
 }
 
+const GOVERNANCE_PILLARS: { key: string; icon: typeof Leaf }[] = [
+  { key: 'board',         icon: Landmark },
+  { key: 'ethics',        icon: Scale },
+  { key: 'compliance',    icon: FileCheck2 },
+];
+
 function GovernancePlaceholder() {
   const { t } = useTranslation();
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="relative bg-white/5 border border-white/10 rounded-2xl p-10 lg:p-14 text-center overflow-hidden">
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,122,0,0.12),transparent_70%)] pointer-events-none"
-        />
-        <div className="relative">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 border border-primary/30 mb-6">
-            <Scale size={36} className="text-primary" />
+    <div className="max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+        {GOVERNANCE_PILLARS.map(({ key, icon: Icon }) => (
+          <div
+            key={key}
+            className="relative bg-white/5 border border-white/10 rounded-2xl p-6 lg:p-7 hover:border-primary/40 transition-colors overflow-hidden"
+          >
+            <div
+              aria-hidden
+              className="absolute -top-12 -end-12 w-40 h-40 bg-[radial-gradient(circle,rgba(255,122,0,0.12),transparent_70%)] pointer-events-none"
+            />
+            <div className="relative">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 border border-primary/30 mb-4">
+                <Icon size={22} className="text-primary" />
+              </div>
+              <h3 className="text-lg lg:text-xl font-bold mb-2">
+                {t(`sustainability.sections.governance.pillars.${key}.title`)}
+              </h3>
+              <p className="text-sm text-gray-300 leading-relaxed">
+                {t(`sustainability.sections.governance.pillars.${key}.body`)}
+              </p>
+            </div>
           </div>
-          <h3 className="text-2xl lg:text-3xl font-black mb-4">
-            {t('sustainability.sections.governance.comingSoonTitle')}
-          </h3>
-          <p className="text-gray-300 leading-relaxed">
-            {t('sustainability.sections.governance.comingSoonBody')}
-          </p>
-        </div>
+        ))}
+      </div>
+      <div className="mt-10 lg:mt-12 flex items-start gap-3 max-w-3xl mx-auto bg-white/5 border border-white/10 rounded-xl px-5 py-4">
+        <ShieldCheck size={20} className="text-primary shrink-0 mt-0.5" />
+        <p className="text-sm lg:text-base text-gray-300 leading-relaxed">
+          {t('sustainability.sections.governance.commitment')}
+        </p>
       </div>
     </div>
   );
