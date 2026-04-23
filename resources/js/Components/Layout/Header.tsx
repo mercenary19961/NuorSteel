@@ -81,19 +81,21 @@ function buildNavItems(t: (k: string) => string, lang: 'en' | 'ar'): NavItem[] {
       },
     },
     { path: '/quality', labelKey: 'nav.quality' },
+    { path: '/sustainability', labelKey: 'nav.sustainability' },
     { path: '/career', labelKey: 'nav.career' },
-    {
-      path: '/certificates',
-      labelKey: 'nav.certificates',
-      dropdown: {
-        type: 'simple',
-        children: [
-          { label: L.certificates.esg[lang], href: '/certificates?category=esg' },
-          { label: L.certificates.quality[lang], href: '/certificates?category=quality' },
-          { label: L.certificates.governance[lang], href: '/certificates?category=governance' },
-        ],
-      },
-    },
+    // Certificates nav hidden — re-enable by restoring the block below and the L.certificates object:
+    // {
+    //   path: '/certificates',
+    //   labelKey: 'nav.certificates',
+    //   dropdown: {
+    //     type: 'simple',
+    //     children: [
+    //       { label: L.certificates.esg[lang], href: '/certificates?category=esg' },
+    //       { label: L.certificates.quality[lang], href: '/certificates?category=quality' },
+    //       { label: L.certificates.governance[lang], href: '/certificates?category=governance' },
+    //     ],
+    //   },
+    // },
   ];
 }
 

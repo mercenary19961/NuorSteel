@@ -8,6 +8,7 @@ const en = {
     quality: "Quality",
     career: "Career",
     certificates: "Certificates",
+    sustainability: "Sustainability",
     contact: "Contact Us",
   },
   home: {
@@ -302,6 +303,57 @@ const en = {
           title: "Dimensional Consistency",
           description: "Tight tolerances on cross-section dimensions for reliable downstream rolling performance.",
         },
+      },
+    },
+  },
+  sustainability: {
+    hero: {
+      label: "Sustainability",
+      title: "Our Commitment to People, Planet & Principles",
+      subtitle: "From environmental performance to workplace safety and corporate governance, our responsibility extends beyond the mill floor.",
+    },
+    tabs: {
+      environment: "Environment",
+      safety: "Safety",
+      governance: "Governance",
+    },
+    sections: {
+      environment: {
+        title: "Caring for the Environment",
+        subtitle: "Certified environmental management, transparent product declarations, and verified emissions data across every stage of production.",
+      },
+      safety: {
+        title: "Protecting Our People",
+        subtitle: "Occupational health and safety systems that keep every worker, visitor, and contractor on site safe every shift.",
+      },
+      governance: {
+        title: "Governance & Ethics",
+        subtitle: "How we structure decision-making, accountability, and ethical conduct across the organisation.",
+        comingSoonTitle: "Governance Framework Coming Soon",
+        comingSoonBody: "Our formal governance policies and board framework are currently being documented. We'll publish the full set of documents here once finalised.",
+      },
+    },
+    viewPdf: "View document",
+    docs: {
+      iso14001: {
+        title: "ISO 14001",
+        description: "Environmental Management System certification covering impact, waste, and resource efficiency.",
+      },
+      ncec: {
+        title: "NCEC Certificate",
+        description: "National Center for Environmental Compliance registration — verified emissions and waste reporting.",
+      },
+      epd: {
+        title: "Environmental Product Declaration (EPD)",
+        description: "Independently verified life-cycle impact data for our reinforcement steel products.",
+      },
+      iso45001: {
+        title: "ISO 45001",
+        description: "Occupational Health & Safety Management System certification for our manufacturing operations.",
+      },
+      hpd: {
+        title: "Health Product Declaration (HPD)",
+        description: "Transparent disclosure of material composition and health impacts of our rebar products.",
       },
     },
   },

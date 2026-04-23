@@ -191,8 +191,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/certificates" className="text-gray-400 hover:text-white text-sm transition-colors">
-                  {t('nav.certificates')}
+                <Link href="/sustainability" className="text-gray-400 hover:text-white text-sm transition-colors">
+                  {t('nav.sustainability')}
                 </Link>
               </li>
             </ul>
