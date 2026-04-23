@@ -169,9 +169,9 @@ function SpecDataTable({ tableData }: { tableData: { title: string; headers: str
           </thead>
           <tbody>
             {tableData.rows.map((row: string[], rowIndex: number) => (
-              <tr key={rowIndex} className="border-b border-white/15 hover:bg-white/10 transition-colors">
+              <tr key={rowIndex} className="border-b border-white/25 hover:bg-white/10 transition-colors">
                 {row.map((cell: string, cellIndex: number) => (
-                  <td key={cellIndex} className={`py-3 px-4 text-sm ${cellIndex === 0 ? 'font-medium text-white' : 'text-white/70'}`}>
+                  <td key={cellIndex} className={`py-3 px-4 text-sm ${cellIndex === 0 ? 'font-medium text-white' : 'text-white'}`}>
                     {cell}
                   </td>
                 ))}
@@ -519,7 +519,7 @@ export default function Products({ products }: Props) {
             {/* Description */}
             <div className="space-y-4">
               {getDesc(selectedProduct)?.split('\n').filter(Boolean).map((paragraph, i) => (
-                <p key={i} className="text-white/80 leading-relaxed">{paragraph}</p>
+                <p key={i} className="text-white leading-relaxed">{paragraph}</p>
               ))}
             </div>
 
@@ -534,7 +534,7 @@ export default function Products({ products }: Props) {
                         <Icon className="text-white" size={24} />
                       </div>
                       <h4 className="text-white font-semibold text-sm mb-1">{language === 'ar' ? icon.title_ar : icon.title_en}</h4>
-                      <p className="text-white/60 text-xs">{language === 'ar' ? icon.value_ar : icon.value_en}</p>
+                      <p className="text-white text-xs">{language === 'ar' ? icon.value_ar : icon.value_en}</p>
                     </div>
                   );
                 })}
@@ -547,7 +547,7 @@ export default function Products({ products }: Props) {
                 <h3 className="text-lg font-bold text-white mb-4">{t('products.overview.keyHighlights')}</h3>
                 <ul className="space-y-2">
                   {selectedProduct.highlights.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-white/80 text-sm">
+                    <li key={i} className="flex items-start gap-2 text-white text-sm">
                       <CheckCircle className="text-white shrink-0 mt-0.5" size={16} />
                       {language === 'ar' ? item.text_ar : item.text_en}
                     </li>
@@ -562,7 +562,7 @@ export default function Products({ products }: Props) {
         return (
           <div>
             <SpecDataTable tableData={getTableData(selectedProduct)} />
-            <p className="text-white/70 text-sm italic mt-4">{t('products.specNote')}</p>
+            <p className="text-white text-sm italic mt-4">{t('products.specNote')}</p>
           </div>
         );
 
@@ -570,7 +570,7 @@ export default function Products({ products }: Props) {
         return (
           <div>
             <SpecDataTable tableData={getTable2Data(selectedProduct)} />
-            <p className="text-white/70 text-sm italic mt-4">{t('products.specNote')}</p>
+            <p className="text-white text-sm italic mt-4">{t('products.specNote')}</p>
           </div>
         );
 
@@ -586,7 +586,7 @@ export default function Products({ products }: Props) {
                       <Icon className="text-white" size={20} />
                     </div>
                     <h4 className="text-white font-semibold mb-2">{language === 'ar' ? feature.title_ar : feature.title_en}</h4>
-                    <p className="text-white/60 text-sm leading-relaxed">{language === 'ar' ? feature.description_ar : feature.description_en}</p>
+                    <p className="text-white text-sm leading-relaxed">{language === 'ar' ? feature.description_ar : feature.description_en}</p>
                   </div>
                 </MagicCard>
               );
@@ -598,7 +598,7 @@ export default function Products({ products }: Props) {
         return (
           <div className="max-w-lg">
             <h3 className="text-2xl font-bold text-white mb-4">{t('products.requestQuote.title')}</h3>
-            <p className="text-white/70 leading-relaxed mb-8">{t('products.requestQuote.description')}</p>
+            <p className="text-white leading-relaxed mb-8">{t('products.requestQuote.description')}</p>
             <Link
               href="/contact"
               className="inline-flex items-center px-8 py-3 bg-white hover:bg-white/90 text-primary rounded-full font-semibold transition-colors"
@@ -666,7 +666,7 @@ export default function Products({ products }: Props) {
                     <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white mb-6 uppercase tracking-wide">
                       {getName(selectedProduct)}
                     </h2>
-                    <p className="text-white/70 leading-relaxed mb-8 text-base lg:text-lg xl:text-xl">
+                    <p className="text-white leading-relaxed mb-8 text-base lg:text-lg xl:text-xl">
                       {getShortDesc(selectedProduct)}
                     </p>
                     <button
