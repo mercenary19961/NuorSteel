@@ -29,6 +29,7 @@ class ProductController extends Controller
                 'highlights' => $product->highlights ?? [],
                 'spec_icons' => $product->spec_icons ?? [],
                 'spec_table' => $product->spec_table,
+                'spec_table_2' => $product->spec_table_2,
                 'features' => $product->features ?? [],
                 'show_quote_tab' => $product->show_quote_tab,
                 'images' => $product->images->map(fn($img) => [
@@ -93,6 +94,7 @@ class ProductController extends Controller
                 'highlights' => $product->highlights ?? [],
                 'spec_icons' => $product->spec_icons ?? [],
                 'spec_table' => $product->spec_table,
+                'spec_table_2' => $product->spec_table_2,
                 'features' => $product->features ?? [],
                 'show_quote_tab' => $product->show_quote_tab,
                 'images' => $product->images->map(fn($img) => [

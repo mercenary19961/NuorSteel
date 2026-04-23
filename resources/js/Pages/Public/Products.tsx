@@ -34,11 +34,14 @@ interface SpecIcon {
 }
 
 interface SpecTable {
+  tab_label_en?: string;
+  tab_label_ar?: string;
   title_en: string;
   title_ar: string;
   headers_en: string[];
   headers_ar: string[];
   rows: string[][];
+  rows_ar?: string[][];
 }
 
 interface Feature {
@@ -63,6 +66,7 @@ interface ProductData {
   highlights: Highlight[];
   spec_icons: SpecIcon[];
   spec_table: SpecTable | null;
+  spec_table_2: SpecTable | null;
   features: Feature[];
   show_quote_tab: boolean;
   images: ProductImage[];
@@ -77,7 +81,7 @@ interface Props {
   products: ProductData[];
 }
 
-type TabKey = 'overview' | 'specifications' | 'features' | 'quote';
+type TabKey = 'overview' | 'specifications' | 'specifications2' | 'features' | 'quote';
 
 // --- Icon registry (shared between spec_icons and features) ---
 const iconRegistry: Record<string, React.ElementType> = {
@@ -181,11 +185,24 @@ function SpecDataTable({ tableData }: { tableData: { title: string; headers: str
 }
 
 // --- Tab Navigation Component ---
-function ProductTabs({ activeTab, onTabChange, showQuote = true }: { activeTab: TabKey; onTabChange: (tab: TabKey) => void; showQuote?: boolean }) {
+function ProductTabs({
+  activeTab,
+  onTabChange,
+  showQuote = true,
+  specsLabel,
+  specs2Label,
+}: {
+  activeTab: TabKey;
+  onTabChange: (tab: TabKey) => void;
+  showQuote?: boolean;
+  specsLabel?: string;
+  specs2Label?: string;
+}) {
   const { t } = useTranslation();
   const tabs: { key: TabKey; label: string }[] = [
     { key: 'overview', label: t('products.tabs.overview') },
-    { key: 'specifications', label: t('products.tabs.specifications') },
+    { key: 'specifications', label: specsLabel || t('products.tabs.specifications') },
+    ...(specs2Label ? [{ key: 'specifications2' as TabKey, label: specs2Label }] : []),
     { key: 'features', label: t('products.tabs.features') },
     ...(showQuote ? [{ key: 'quote' as TabKey, label: t('products.tabs.requestQuote') }] : []),
   ];
@@ -335,11 +352,11 @@ export default function Products({ products }: Props) {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // If a user had Quote tab open and switches to a product where it's hidden, snap back.
+  // If the active tab is unavailable on the selected product, snap back to overview.
   useEffect(() => {
-    if (selectedProduct && !selectedProduct.show_quote_tab && activeTab === 'quote') {
-      setActiveTab('overview');
-    }
+    if (!selectedProduct) return;
+    if (activeTab === 'quote' && !selectedProduct.show_quote_tab) setActiveTab('overview');
+    if (activeTab === 'specifications2' && !selectedProduct.spec_table_2) setActiveTab('overview');
   }, [selectedProduct, activeTab]);
 
   // Measure left panel for curved clip-path (useLayoutEffect to avoid flash)
@@ -413,13 +430,20 @@ export default function Products({ products }: Props) {
   }, [language]);
 
   // Language-aware getters for product content
-  const getTableData = (p: ProductData) => {
-    if (!p.spec_table) return null;
+  const extractTable = (table: SpecTable | null) => {
+    if (!table) return null;
+    const rows = language === 'ar' && table.rows_ar?.length ? table.rows_ar : table.rows;
     return {
-      title: language === 'ar' ? p.spec_table.title_ar : p.spec_table.title_en,
-      headers: language === 'ar' ? p.spec_table.headers_ar : p.spec_table.headers_en,
-      rows: p.spec_table.rows,
+      title: language === 'ar' ? table.title_ar : table.title_en,
+      headers: language === 'ar' ? table.headers_ar : table.headers_en,
+      rows,
     };
+  };
+  const getTableData = (p: ProductData) => extractTable(p.spec_table);
+  const getTable2Data = (p: ProductData) => extractTable(p.spec_table_2);
+  const getTabLabel = (table: SpecTable | null) => {
+    if (!table) return undefined;
+    return language === 'ar' ? table.tab_label_ar : table.tab_label_en;
   };
 
   const handleExplore = () => {
@@ -538,6 +562,14 @@ export default function Products({ products }: Props) {
         return (
           <div>
             <SpecDataTable tableData={getTableData(selectedProduct)} />
+            <p className="text-white/70 text-sm italic mt-4">{t('products.specNote')}</p>
+          </div>
+        );
+
+      case 'specifications2':
+        return (
+          <div>
+            <SpecDataTable tableData={getTable2Data(selectedProduct)} />
             <p className="text-white/70 text-sm italic mt-4">{t('products.specNote')}</p>
           </div>
         );
@@ -699,7 +731,13 @@ export default function Products({ products }: Props) {
                       </button>
                     </div>
 
-                    <ProductTabs activeTab={activeTab} onTabChange={setActiveTab} showQuote={selectedProduct.show_quote_tab} />
+                    <ProductTabs
+                      activeTab={activeTab}
+                      onTabChange={setActiveTab}
+                      showQuote={selectedProduct.show_quote_tab}
+                      specsLabel={getTabLabel(selectedProduct.spec_table)}
+                      specs2Label={getTabLabel(selectedProduct.spec_table_2)}
+                    />
 
                     <AnimatePresence mode="wait">
                       <motion.div

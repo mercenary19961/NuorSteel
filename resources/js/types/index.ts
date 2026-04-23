@@ -145,11 +145,14 @@ export interface ProductSpecIcon {
 }
 
 export interface ProductSpecTable {
+  tab_label_en?: string;
+  tab_label_ar?: string;
   title_en: string;
   title_ar: string;
   headers_en: string[];
   headers_ar: string[];
   rows: string[][];
+  rows_ar?: string[][];
 }
 
 export interface ProductFeature {
@@ -174,6 +177,7 @@ export interface Product {
   highlights: ProductHighlight[] | null;
   spec_icons: ProductSpecIcon[] | null;
   spec_table: ProductSpecTable | null;
+  spec_table_2: ProductSpecTable | null;
   features: ProductFeature[] | null;
   show_quote_tab: boolean;
   is_active: boolean;

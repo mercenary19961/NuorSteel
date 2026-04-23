@@ -85,7 +85,7 @@ class ProductController extends Controller
         $trackedFields = $this->productFillableFields();
 
         // JSON fields are serialized for undo snapshotting so change-detection works on blobs.
-        $jsonFields = ['highlights', 'spec_icons', 'spec_table', 'features'];
+        $jsonFields = ['highlights', 'spec_icons', 'spec_table', 'spec_table_2', 'features'];
 
         $oldData = ['id' => $product->id];
         foreach ($trackedFields as $field) {
@@ -119,7 +119,7 @@ class ProductController extends Controller
         return [
             'name_en', 'name_ar', 'short_description_en', 'short_description_ar',
             'description_en', 'description_ar', 'category', 'featured_image_id',
-            'highlights', 'spec_icons', 'spec_table', 'features', 'show_quote_tab',
+            'highlights', 'spec_icons', 'spec_table', 'spec_table_2', 'features', 'show_quote_tab',
             'is_active', 'is_featured', 'sort_order',
         ];
     }
@@ -148,6 +148,8 @@ class ProductController extends Controller
             'spec_icons.*.value_ar' => 'required_with:spec_icons|string|max:100',
 
             'spec_table' => 'nullable|array',
+            'spec_table.tab_label_en' => 'nullable|string|max:100',
+            'spec_table.tab_label_ar' => 'nullable|string|max:100',
             'spec_table.title_en' => 'nullable|string|max:200',
             'spec_table.title_ar' => 'nullable|string|max:200',
             'spec_table.headers_en' => 'nullable|array',
@@ -157,6 +159,25 @@ class ProductController extends Controller
             'spec_table.rows' => 'nullable|array',
             'spec_table.rows.*' => 'array',
             'spec_table.rows.*.*' => 'nullable|string|max:200',
+            'spec_table.rows_ar' => 'nullable|array',
+            'spec_table.rows_ar.*' => 'array',
+            'spec_table.rows_ar.*.*' => 'nullable|string|max:200',
+
+            'spec_table_2' => 'nullable|array',
+            'spec_table_2.tab_label_en' => 'nullable|string|max:100',
+            'spec_table_2.tab_label_ar' => 'nullable|string|max:100',
+            'spec_table_2.title_en' => 'nullable|string|max:200',
+            'spec_table_2.title_ar' => 'nullable|string|max:200',
+            'spec_table_2.headers_en' => 'nullable|array',
+            'spec_table_2.headers_en.*' => 'string|max:200',
+            'spec_table_2.headers_ar' => 'nullable|array',
+            'spec_table_2.headers_ar.*' => 'string|max:200',
+            'spec_table_2.rows' => 'nullable|array',
+            'spec_table_2.rows.*' => 'array',
+            'spec_table_2.rows.*.*' => 'nullable|string|max:200',
+            'spec_table_2.rows_ar' => 'nullable|array',
+            'spec_table_2.rows_ar.*' => 'array',
+            'spec_table_2.rows_ar.*.*' => 'nullable|string|max:200',
 
             'features' => 'nullable|array',
             'features.*.icon' => 'required_with:features|string|max:50',
