@@ -342,6 +342,36 @@ const en = {
       },
       closing: "Our objective is not only to meet standards but to provide contractors and consultants with confidence that the material will perform as designed throughout the life of the structure.",
     },
+    showcase: {
+      label: "Our Certifications",
+      title: "Recognized by Leading Standards",
+      subtitle: "A portfolio of certifications that validates every claim we make about quality, compliance, and origin.",
+      viewPdf: "View Full Certificate",
+      download: "Download",
+      scrollHint: "Scroll to explore",
+      items: {
+        iso9001: {
+          title: "ISO 9001 Certification",
+          description: "International standard for quality management systems. Recognized globally as the benchmark for consistent quality across operations, documentation, and continuous improvement.",
+        },
+        sasoLicense: {
+          title: "SASO License",
+          description: "Official Saudi Standards, Metrology and Quality Organization license confirming our products meet the Kingdom's regulatory and safety standards.",
+        },
+        alHotyCalibration: {
+          title: "Al Hoty Calibration Certificate",
+          description: "Independent third-party calibration certificate verifying the accuracy of our in-house testing and measurement equipment.",
+        },
+        sasoTest: {
+          title: "SASO Test Certificate",
+          description: "Annual conformity testing issued by SASO, validating the mechanical and chemical performance of our rebar production.",
+        },
+        saudiMade: {
+          title: "Saudi Made Certificate",
+          description: "National certification program recognizing products manufactured in Saudi Arabia, supporting Vision 2030 and local industry growth.",
+        },
+      },
+    },
   },
   career: {
     hero: {

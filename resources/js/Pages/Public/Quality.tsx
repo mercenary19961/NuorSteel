@@ -1,14 +1,71 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Head } from '@inertiajs/react';
-import { Gauge, FlaskConical, Ruler, Flame, ShieldCheck, FileCheck } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Gauge, FlaskConical, Ruler, Flame, ShieldCheck, FileCheck, FileText, Eye, Download, X, ChevronDown } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { MagicCardGrid, MagicCard } from '@/Components/ui/magic-card';
 import { useLanguage } from '@/contexts/LanguageContext';
 
+type ShowcaseKey = 'iso9001' | 'sasoLicense' | 'alHotyCalibration' | 'sasoTest' | 'saudiMade';
+
+const SHOWCASE: { key: ShowcaseKey; pdf: string }[] = [
+  { key: 'iso9001',           pdf: '/documents/quality/iso-9001.pdf' },
+  { key: 'sasoLicense',       pdf: '/documents/quality/saso-license.pdf' },
+  { key: 'alHotyCalibration', pdf: '/documents/quality/al-hoty-calibration.pdf' },
+  { key: 'sasoTest',          pdf: '/documents/quality/saso-test-certificate.pdf' },
+  { key: 'saudiMade',         pdf: '/documents/quality/saudi-made.pdf' },
+];
+
 export default function Quality() {
   const { t } = useTranslation();
   const { language } = useLanguage();
+
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [activeCert, setActiveCert] = useState(0);
+  const [viewingPdf, setViewingPdf] = useState<string | null>(null);
+  const showcaseWrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const check = () => setIsDesktop(window.innerWidth >= 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  // Scroll-driven active-cert stepping (desktop only)
+  useEffect(() => {
+    if (typeof window === 'undefined' || !isDesktop) return;
+    const handleScroll = () => {
+      const wrapper = showcaseWrapperRef.current;
+      if (!wrapper) return;
+      const rect = wrapper.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const stickyTravel = wrapper.offsetHeight - viewportHeight;
+      if (stickyTravel <= 0) return;
+      const scrolled = -rect.top;
+      if (scrolled <= 0) { setActiveCert(0); return; }
+      const stepSize = stickyTravel / SHOWCASE.length;
+      const step = Math.floor(scrolled / stepSize);
+      setActiveCert(Math.max(0, Math.min(SHOWCASE.length - 1, step)));
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isDesktop]);
+
+  // Lock body scroll while PDF modal is open
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (viewingPdf) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [viewingPdf]);
+
+  const viewingEntry = viewingPdf ? SHOWCASE.find(c => c.pdf === viewingPdf) : null;
 
   // Warm opposite-language hero image during idle time so the language
   // toggle is instant without hurting initial LCP.
@@ -143,6 +200,200 @@ export default function Quality() {
           </div>
         </div>
       </section>
+
+      {/* Certifications Showcase — scroll-driven carousel on desktop, stacked cards on mobile */}
+      <div ref={showcaseWrapperRef} className="lg:h-[500vh]">
+        <section className="relative bg-surface text-white overflow-hidden lg:sticky lg:top-0 lg:h-screen lg:flex lg:flex-col lg:justify-center">
+          <div className="container mx-auto px-4 w-full py-20 lg:py-24">
+            {/* Section intro */}
+            <div className="max-w-3xl mb-12 lg:mb-16">
+              <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
+                {t('quality.showcase.label')}
+              </p>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-4">
+                {t('quality.showcase.title')}
+              </h2>
+              <p className="text-base lg:text-lg text-gray-300 leading-relaxed">
+                {t('quality.showcase.subtitle')}
+              </p>
+            </div>
+
+            {/* Desktop: 2-column scroll-driven split */}
+            <div className="hidden lg:grid lg:grid-cols-[1fr_minmax(0,520px)] gap-12 xl:gap-16 items-center">
+              {/* Left: info panel */}
+              <div className="relative min-h-75">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={SHOWCASE[activeCert].key}
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -24 }}
+                    transition={{ duration: 0.35, ease: 'easeOut' }}
+                  >
+                    <div className="text-primary/70 text-sm font-semibold tracking-[0.3em] mb-3">
+                      {String(activeCert + 1).padStart(2, '0')} / {String(SHOWCASE.length).padStart(2, '0')}
+                    </div>
+                    <h3 className="text-3xl xl:text-4xl font-black mb-5 leading-tight">
+                      {t(`quality.showcase.items.${SHOWCASE[activeCert].key}.title`)}
+                    </h3>
+                    <p className="text-gray-300 leading-relaxed text-base lg:text-lg mb-8">
+                      {t(`quality.showcase.items.${SHOWCASE[activeCert].key}.description`)}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* Progress indicator dots */}
+                <div className="flex items-center gap-2 mt-2">
+                  {SHOWCASE.map((_, i) => (
+                    <div
+                      key={i}
+                      className={`h-1 rounded-full transition-all duration-500 ${
+                        i === activeCert ? 'bg-primary w-12' : 'bg-white/20 w-5'
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                {/* Scroll hint — fades out after first change */}
+                {activeCert === 0 && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="flex items-center gap-2 text-gray-500 text-sm mt-8"
+                  >
+                    <ChevronDown size={16} className="animate-bounce" />
+                    {t('quality.showcase.scrollHint')}
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Right: PDF preview card */}
+              <div className="relative flex justify-center">
+                <AnimatePresence mode="wait">
+                  <motion.button
+                    key={SHOWCASE[activeCert].key}
+                    initial={{ opacity: 0, scale: 0.95, rotateY: 8 }}
+                    animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, rotateY: -8 }}
+                    transition={{ duration: 0.4, ease: 'easeOut' }}
+                    onClick={() => setViewingPdf(SHOWCASE[activeCert].pdf)}
+                    aria-label={t('quality.showcase.viewPdf')}
+                    className="relative w-full max-w-120 aspect-3/4 rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-white cursor-pointer group"
+                  >
+                    <iframe
+                      src={`${SHOWCASE[activeCert].pdf}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+                      className="absolute top-0 left-0 w-[200%] h-[200%] origin-top-left scale-50 pointer-events-none border-0"
+                      title={t(`quality.showcase.items.${SHOWCASE[activeCert].key}.title`)}
+                      tabIndex={-1}
+                    />
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/45 transition-colors duration-300 flex items-center justify-center pointer-events-none">
+                      <div className="opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 bg-primary text-white px-5 py-2.5 rounded-full text-sm font-semibold inline-flex items-center gap-2 shadow-lg">
+                        <Eye size={16} />
+                        {t('quality.showcase.viewPdf')}
+                      </div>
+                    </div>
+                  </motion.button>
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Mobile: stacked cards */}
+            <div className="lg:hidden flex flex-col gap-6">
+              {SHOWCASE.map((cert) => (
+                <button
+                  key={cert.key}
+                  onClick={() => setViewingPdf(cert.pdf)}
+                  className="text-start bg-white/5 border border-white/10 rounded-xl overflow-hidden active:scale-[0.99] transition-transform"
+                  aria-label={t('quality.showcase.viewPdf')}
+                >
+                  <div className="relative aspect-3/4 w-full bg-white overflow-hidden">
+                    <iframe
+                      src={`${cert.pdf}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+                      className="absolute top-0 left-0 w-[200%] h-[200%] origin-top-left scale-50 pointer-events-none border-0"
+                      title={t(`quality.showcase.items.${cert.key}.title`)}
+                      tabIndex={-1}
+                    />
+                  </div>
+                  <div className="p-5">
+                    <h3 className="text-xl font-bold mb-2">
+                      {t(`quality.showcase.items.${cert.key}.title`)}
+                    </h3>
+                    <p className="text-sm text-gray-400 leading-relaxed mb-4">
+                      {t(`quality.showcase.items.${cert.key}.description`)}
+                    </p>
+                    <span className="inline-flex items-center gap-2 text-primary text-sm font-semibold">
+                      <Eye size={14} />
+                      {t('quality.showcase.viewPdf')}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* PDF Viewer Modal */}
+      <AnimatePresence>
+        {viewingPdf && viewingEntry && (
+          <motion.div
+            key="pdf-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={() => setViewingPdf(null)}
+          >
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="relative bg-gray-900 border border-white/10 rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-gray-900/95 backdrop-blur-sm shrink-0">
+                <div className="flex items-center gap-3 min-w-0">
+                  <FileText size={20} className="text-primary shrink-0" />
+                  <h3 className="text-white font-semibold truncate">
+                    {t(`quality.showcase.items.${viewingEntry.key}.title`)}
+                  </h3>
+                </div>
+                <div className="flex items-center gap-3 shrink-0 ms-4">
+                  <a
+                    href={viewingPdf}
+                    download
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 text-sm font-medium transition-colors"
+                  >
+                    <Download size={16} />
+                    <span className="hidden sm:inline">{t('quality.showcase.download')}</span>
+                  </a>
+                  <button
+                    onClick={() => setViewingPdf(null)}
+                    aria-label="Close"
+                    className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+              </div>
+              <div className="flex-1 min-h-0">
+                <iframe
+                  src={viewingPdf}
+                  className="w-full h-full min-h-[60vh] border-0"
+                  title={t(`quality.showcase.items.${viewingEntry.key}.title`)}
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </PublicLayout>
   );
 }
