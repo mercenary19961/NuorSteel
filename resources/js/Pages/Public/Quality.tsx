@@ -202,26 +202,26 @@ export default function Quality() {
       </section>
 
       {/* Certifications Showcase — scroll-driven carousel on desktop, stacked cards on mobile */}
-      <div ref={showcaseWrapperRef} className="lg:h-[500vh]">
-        <section className="relative bg-surface text-white overflow-hidden lg:sticky lg:top-0 lg:h-screen lg:flex lg:flex-col lg:justify-center">
-          <div className="container mx-auto px-4 w-full py-20 lg:py-24">
+      <div ref={showcaseWrapperRef} className="lg:h-[400vh]">
+        <section className="relative bg-surface text-white overflow-hidden lg:sticky lg:top-0 lg:h-screen lg:flex lg:flex-col">
+          <div className="container mx-auto px-4 w-full py-20 lg:py-0 lg:pt-24 lg:pb-10 lg:flex lg:flex-col lg:flex-1 lg:min-h-0">
             {/* Section intro */}
-            <div className="max-w-3xl mb-12 lg:mb-16">
-              <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
+            <div className="max-w-3xl mb-10 lg:mb-6 lg:shrink-0">
+              <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-3">
                 {t('quality.showcase.label')}
               </p>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-4">
+              <h2 className="text-3xl sm:text-4xl lg:text-3xl xl:text-4xl font-black leading-tight mb-3">
                 {t('quality.showcase.title')}
               </h2>
-              <p className="text-base lg:text-lg text-gray-300 leading-relaxed">
+              <p className="text-base lg:text-sm text-gray-300 lg:text-gray-400 leading-relaxed max-w-2xl">
                 {t('quality.showcase.subtitle')}
               </p>
             </div>
 
-            {/* Desktop: 2-column scroll-driven split */}
-            <div className="hidden lg:grid lg:grid-cols-[1fr_minmax(0,520px)] gap-12 xl:gap-16 items-center">
+            {/* Desktop: 50/50 scroll-driven split */}
+            <div className="hidden lg:grid lg:grid-cols-2 gap-10 xl:gap-14 items-center lg:flex-1 lg:min-h-0">
               {/* Left: info panel */}
-              <div className="relative min-h-75">
+              <div className="relative">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={SHOWCASE[activeCert].key}
@@ -230,25 +230,25 @@ export default function Quality() {
                     exit={{ opacity: 0, y: -24 }}
                     transition={{ duration: 0.35, ease: 'easeOut' }}
                   >
-                    <div className="text-primary/70 text-sm font-semibold tracking-[0.3em] mb-3">
+                    <div className="text-primary/70 text-xs font-semibold tracking-[0.3em] mb-2">
                       {String(activeCert + 1).padStart(2, '0')} / {String(SHOWCASE.length).padStart(2, '0')}
                     </div>
-                    <h3 className="text-3xl xl:text-4xl font-black mb-5 leading-tight">
+                    <h3 className="text-2xl xl:text-3xl font-black mb-3 leading-tight">
                       {t(`quality.showcase.items.${SHOWCASE[activeCert].key}.title`)}
                     </h3>
-                    <p className="text-gray-300 leading-relaxed text-base lg:text-lg mb-8">
+                    <p className="text-gray-300 leading-relaxed text-sm xl:text-base mb-5">
                       {t(`quality.showcase.items.${SHOWCASE[activeCert].key}.description`)}
                     </p>
                   </motion.div>
                 </AnimatePresence>
 
                 {/* Progress indicator dots */}
-                <div className="flex items-center gap-2 mt-2">
+                <div className="flex items-center gap-2">
                   {SHOWCASE.map((_, i) => (
                     <div
                       key={i}
                       className={`h-1 rounded-full transition-all duration-500 ${
-                        i === activeCert ? 'bg-primary w-12' : 'bg-white/20 w-5'
+                        i === activeCert ? 'bg-primary w-10' : 'bg-white/20 w-4'
                       }`}
                     />
                   ))}
@@ -261,16 +261,16 @@ export default function Quality() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ delay: 0.6 }}
-                    className="flex items-center gap-2 text-gray-500 text-sm mt-8"
+                    className="flex items-center gap-2 text-gray-500 text-xs mt-5"
                   >
-                    <ChevronDown size={16} className="animate-bounce" />
+                    <ChevronDown size={14} className="animate-bounce" />
                     {t('quality.showcase.scrollHint')}
                   </motion.div>
                 )}
               </div>
 
-              {/* Right: PDF preview card */}
-              <div className="relative flex justify-center">
+              {/* Right: PDF preview card — height constrained to column so it never overflows viewport */}
+              <div className="relative flex justify-center items-center h-full">
                 <AnimatePresence mode="wait">
                   <motion.button
                     key={SHOWCASE[activeCert].key}
@@ -280,10 +280,10 @@ export default function Quality() {
                     transition={{ duration: 0.4, ease: 'easeOut' }}
                     onClick={() => setViewingPdf(SHOWCASE[activeCert].pdf)}
                     aria-label={t('quality.showcase.viewPdf')}
-                    className="relative w-full max-w-120 aspect-3/4 rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-white cursor-pointer group"
+                    className="relative h-full max-h-full aspect-3/4 rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-white cursor-pointer group"
                   >
                     <iframe
-                      src={`${SHOWCASE[activeCert].pdf}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+                      src={`${SHOWCASE[activeCert].pdf}#toolbar=0&navpanes=0&scrollbar=0&view=Fit&page=1`}
                       className="absolute top-0 left-0 w-[200%] h-[200%] origin-top-left scale-50 pointer-events-none border-0"
                       title={t(`quality.showcase.items.${SHOWCASE[activeCert].key}.title`)}
                       tabIndex={-1}
@@ -311,7 +311,7 @@ export default function Quality() {
                 >
                   <div className="relative aspect-3/4 w-full bg-white overflow-hidden">
                     <iframe
-                      src={`${cert.pdf}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+                      src={`${cert.pdf}#toolbar=0&navpanes=0&scrollbar=0&view=Fit&page=1`}
                       className="absolute top-0 left-0 w-[200%] h-[200%] origin-top-left scale-50 pointer-events-none border-0"
                       title={t(`quality.showcase.items.${cert.key}.title`)}
                       tabIndex={-1}
