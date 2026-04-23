@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Head } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Gauge, FlaskConical, Ruler, Flame, ShieldCheck, FileCheck, FileText, Eye, Download, X, ChevronDown } from 'lucide-react';
+import { Gauge, FlaskConical, Ruler, Flame, ShieldCheck, FileCheck, FileText, Eye, X, ChevronDown } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { MagicCardGrid, MagicCard } from '@/Components/ui/magic-card';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -364,24 +364,13 @@ export default function Quality() {
                     {t(`quality.showcase.items.${viewingEntry.key}.title`)}
                   </h3>
                 </div>
-                <div className="flex items-center gap-3 shrink-0 ms-4">
-                  <a
-                    href={viewingPdf}
-                    download
-                    onClick={(e) => e.stopPropagation()}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 text-sm font-medium transition-colors"
-                  >
-                    <Download size={16} />
-                    <span className="hidden sm:inline">{t('quality.showcase.download')}</span>
-                  </a>
-                  <button
-                    onClick={() => setViewingPdf(null)}
-                    aria-label="Close"
-                    className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
+                <button
+                  onClick={() => setViewingPdf(null)}
+                  aria-label="Close"
+                  className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0 ms-4"
+                >
+                  <X size={20} />
+                </button>
               </div>
               <div className="flex-1 min-h-0">
                 <iframe

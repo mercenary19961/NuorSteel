@@ -39,9 +39,9 @@ export default function Footer() {
   return (
     <footer id="site-footer" className="bg-surface-dark text-white">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8">
           {/* Company Info */}
-          <div>
+          <div className="lg:col-span-3">
             <h3 className="text-lg font-bold mb-4">{t('company.name')}</h3>
             <p className="text-gray-400 text-sm mb-4">
               {t('footer.description')}
@@ -60,9 +60,9 @@ export default function Footer() {
           </div>
 
           {/* Contact Info */}
-          <div>
+          <div className="lg:col-span-4">
             <h4 className="text-lg font-semibold mb-4">{t('footer.contactUs')}</h4>
-            <div className="grid grid-cols-2 gap-3 items-start">
+            <div className="grid grid-cols-[minmax(0,1fr)_12rem] gap-4 items-start">
               <ul className="space-y-3 min-w-0">
                 <li className="flex items-start text-sm text-gray-400">
                   <MapPin size={16} className="mr-2 mt-0.5 shrink-0" />
@@ -127,7 +127,7 @@ export default function Footer() {
           </div>
 
           {/* Newsletter */}
-          <div>
+          <div className="lg:col-span-3">
             <h4 className="text-lg font-semibold mb-4">{t('footer.newsletter')}</h4>
             <p className="text-gray-400 text-sm mb-4">
               {t('footer.newsletterDescription')}
@@ -167,7 +167,7 @@ export default function Footer() {
           </div>
 
           {/* Quick Links */}
-          <div>
+          <div className="lg:col-span-2">
             <h4 className="text-lg font-semibold mb-4">{t('footer.quickLinks')}</h4>
             <ul className="space-y-2">
               <li>
