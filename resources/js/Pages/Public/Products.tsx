@@ -185,18 +185,21 @@ function SpecDataTable({ tableData }: { tableData: { title: string; headers: str
 }
 
 // --- Tab Navigation Component ---
+// `cycleProgress` (0..1) fills the NEXT tab with the active style over the auto-cycle window.
 function ProductTabs({
   activeTab,
   onTabChange,
   showQuote = true,
   specsLabel,
   specs2Label,
+  cycleProgress = 0,
 }: {
   activeTab: TabKey;
   onTabChange: (tab: TabKey) => void;
   showQuote?: boolean;
   specsLabel?: string;
   specs2Label?: string;
+  cycleProgress?: number;
 }) {
   const { t } = useTranslation();
   const tabs: { key: TabKey; label: string }[] = [
@@ -207,21 +210,39 @@ function ProductTabs({
     ...(showQuote ? [{ key: 'quote' as TabKey, label: t('products.tabs.requestQuote') }] : []),
   ];
 
+  const activeIdx = tabs.findIndex((tab) => tab.key === activeTab);
+  const nextIdx = activeIdx === -1 ? -1 : (activeIdx + 1) % tabs.length;
+
   return (
     <div className="flex flex-wrap gap-3 mb-8">
-      {tabs.map((tab) => (
-        <button
-          key={tab.key}
-          onClick={() => onTabChange(tab.key)}
-          className={`relative px-5 py-2 rounded-full text-sm font-medium transition-all cursor-pointer outline-none border ${
-            activeTab === tab.key
-              ? 'bg-white text-gray-900 border-transparent'
-              : 'border-white/30 text-white/80 hover:border-white/60 hover:text-white'
-          }`}
-        >
-          {tab.label}
-        </button>
-      ))}
+      {tabs.map((tab, i) => {
+        const isActive = activeTab === tab.key;
+        const isNext = i === nextIdx && !isActive;
+        const fill = isActive ? 1 : isNext ? cycleProgress : 0;
+        // Interpolate white (255,255,255) → gray-900 (17,24,39) for text
+        const r = Math.round(255 + (17 - 255) * fill);
+        const g = Math.round(255 + (24 - 255) * fill);
+        const b = Math.round(255 + (39 - 255) * fill);
+        // Border fades from white/30 to transparent as fill grows
+        const borderAlpha = 0.3 * (1 - fill);
+        return (
+          <button
+            key={tab.key}
+            onClick={() => onTabChange(tab.key)}
+            className="relative overflow-hidden px-5 py-2 rounded-full text-sm font-medium cursor-pointer outline-none border group"
+            style={{ borderColor: `rgba(255, 255, 255, ${borderAlpha})` }}
+          >
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 rounded-full bg-white pointer-events-none"
+              style={{ opacity: fill }}
+            />
+            <span className="relative z-10" style={{ color: `rgb(${r}, ${g}, ${b})` }}>
+              {tab.label}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -321,6 +342,8 @@ export default function Products({ products }: Props) {
   const [selectedSlug, setSelectedSlug] = useState(initialSlug);
   const [expanded, setExpanded] = useState(initialExpanded);
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
+  const [autoCycle, setAutoCycle] = useState(true);
+  const [cycleProgress, setCycleProgress] = useState(0);
   const [isLg, setIsLg] = useState(false);
   const detailRef = useRef<HTMLDivElement>(null);
   const leftPanelRef = useRef<HTMLDivElement>(null);
@@ -387,10 +410,56 @@ export default function Products({ products }: Props) {
     return () => clearTimeout(timer);
   }, [expanded, selectedSlug]);
 
-  // Reset tab when switching product
+  // Reset tab + re-enable auto-cycle when switching product or opening the detail view
   useEffect(() => {
     setActiveTab('overview');
+    setAutoCycle(true);
   }, [selectedSlug]);
+
+  useEffect(() => {
+    if (expanded) setAutoCycle(true);
+  }, [expanded]);
+
+  // Auto-cycle tabs every 4s while expanded; the fill morphs the next tab into the active style.
+  const CYCLE_DURATION_MS = 4000;
+  useEffect(() => {
+    if (!expanded || !autoCycle || !selectedProduct) {
+      setCycleProgress(0);
+      return;
+    }
+    const availableTabs: TabKey[] = [
+      'overview',
+      'specifications',
+      ...(selectedProduct.spec_table_2 ? (['specifications2'] as TabKey[]) : []),
+      'features',
+      ...(selectedProduct.show_quote_tab ? (['quote'] as TabKey[]) : []),
+    ];
+    const currentIdx = availableTabs.indexOf(activeTab);
+    if (currentIdx === -1) return;
+
+    const start = performance.now();
+    let rafId: number;
+    const tick = (now: number) => {
+      const elapsed = now - start;
+      if (elapsed >= CYCLE_DURATION_MS) {
+        const nextIdx = (currentIdx + 1) % availableTabs.length;
+        setCycleProgress(0);
+        setActiveTab(availableTabs[nextIdx]);
+        return;
+      }
+      setCycleProgress(elapsed / CYCLE_DURATION_MS);
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [expanded, autoCycle, activeTab, selectedProduct]);
+
+  // Manual tab click stops the auto-cycle (so users can read without the carousel snatching it away)
+  const handleTabChange = (tab: TabKey) => {
+    setAutoCycle(false);
+    setCycleProgress(0);
+    setActiveTab(tab);
+  };
 
   // Helpers
   const getName = (p: ProductData) => language === 'ar' ? p.name_ar : p.name_en;
@@ -733,10 +802,11 @@ export default function Products({ products }: Props) {
 
                     <ProductTabs
                       activeTab={activeTab}
-                      onTabChange={setActiveTab}
+                      onTabChange={handleTabChange}
                       showQuote={selectedProduct.show_quote_tab}
                       specsLabel={getTabLabel(selectedProduct.spec_table)}
                       specs2Label={getTabLabel(selectedProduct.spec_table_2)}
+                      cycleProgress={cycleProgress}
                     />
 
                     <AnimatePresence mode="wait">
