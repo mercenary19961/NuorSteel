@@ -5,7 +5,8 @@ use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\ProductController;
 use App\Http\Controllers\Public\QualityController;
-use App\Http\Controllers\Public\CertificateController;
+use App\Http\Controllers\Public\SustainabilityController;
+// use App\Http\Controllers\Public\CertificateController; // Certificates page hidden — re-enable when client wants it public
 use App\Http\Controllers\Public\CareerController;
 use App\Http\Controllers\Public\ContactController;
 use App\Http\Controllers\Public\NewsletterController;
@@ -38,10 +39,14 @@ Route::get('/about', [AboutController::class, 'index'])->name('about');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/quality', [QualityController::class, 'index'])->name('quality');
+Route::get('/sustainability', [SustainabilityController::class, 'index'])->name('sustainability');
 Route::get('/career', [CareerController::class, 'index'])->name('career.index');
 Route::get('/career/{slug}', [CareerController::class, 'show'])->name('career.show');
-Route::get('/certificates', [CertificateController::class, 'index'])->name('certificates');
-Route::get('/certificates/{id}/file', [CertificateController::class, 'viewFile'])->name('certificates.view-file')->where('id', '[0-9]+');
+// Certificates page hidden — admin panel still manages the data at /admin/certificates,
+// but the public route + file-serving endpoint are disabled so direct-URL access 404s.
+// Re-enable by uncommenting + restoring the CertificateController use above.
+// Route::get('/certificates', [CertificateController::class, 'index'])->name('certificates');
+// Route::get('/certificates/{id}/file', [CertificateController::class, 'viewFile'])->name('certificates.view-file')->where('id', '[0-9]+');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 
 // Form submissions (rate limited)

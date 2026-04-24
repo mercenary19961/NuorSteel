@@ -8,6 +8,7 @@ const en = {
     quality: "Quality",
     career: "Career",
     certificates: "Certificates",
+    sustainability: "Sustainability",
     contact: "Contact Us",
   },
   home: {
@@ -305,6 +306,70 @@ const en = {
       },
     },
   },
+  sustainability: {
+    hero: {
+      label: "Sustainability",
+      title: "Our Commitment to People, Planet & Principles",
+      subtitle: "From environmental performance to workplace safety and corporate governance, our responsibility extends beyond the mill floor.",
+    },
+    tabs: {
+      environment: "Environment",
+      safety: "Safety",
+      governance: "Governance",
+    },
+    sections: {
+      environment: {
+        title: "Caring for the Environment",
+        subtitle: "Certified environmental management, transparent product declarations, and verified emissions data across every stage of production.",
+      },
+      safety: {
+        title: "Protecting Our People",
+        subtitle: "Occupational health and safety systems that keep every worker, visitor, and contractor on site safe every shift.",
+      },
+      governance: {
+        title: "Governance & Ethics",
+        subtitle: "How we structure decision-making, accountability, and ethical conduct across the organisation.",
+        pillars: {
+          board: {
+            title: "Board Oversight",
+            body: "Senior leadership and an independent advisory board oversee strategy, performance, and long-term direction, ensuring clear accountability at every level.",
+          },
+          ethics: {
+            title: "Ethics & Integrity",
+            body: "A published code of conduct guides every employee, supplier, and partner, with zero tolerance for bribery, fraud, or conflicts of interest.",
+          },
+          compliance: {
+            title: "Regulatory Compliance",
+            body: "Full alignment with Saudi regulations, Vision 2030 localisation mandates, and international standards, audited annually by accredited third parties.",
+          },
+        },
+        commitment: "Our governance model is reviewed continuously to reflect evolving standards and the expectations of our stakeholders.",
+      },
+    },
+    viewPdf: "View document",
+    docs: {
+      iso14001: {
+        title: "ISO 14001",
+        description: "Environmental Management System certification covering impact, waste, and resource efficiency.",
+      },
+      ncec: {
+        title: "NCEC Certificate",
+        description: "National Center for Environmental Compliance registration with verified emissions and waste reporting.",
+      },
+      epd: {
+        title: "Environmental Product Declaration (EPD)",
+        description: "Independently verified life-cycle impact data for our reinforcement steel products.",
+      },
+      iso45001: {
+        title: "ISO 45001",
+        description: "Occupational Health & Safety Management System certification for our manufacturing operations.",
+      },
+      hpd: {
+        title: "Health Product Declaration (HPD)",
+        description: "Transparent disclosure of material composition and health impacts of our rebar products.",
+      },
+    },
+  },
   quality: {
     hero: {
       label: "Quality Assurance",
@@ -341,6 +406,36 @@ const en = {
         description: "Every shipment is traceable and documented.",
       },
       closing: "Our objective is not only to meet standards but to provide contractors and consultants with confidence that the material will perform as designed throughout the life of the structure.",
+    },
+    showcase: {
+      label: "Our Certifications",
+      title: "Recognized by Leading Standards",
+      subtitle: "A portfolio of certifications that validates every claim we make about quality, compliance, and origin.",
+      viewPdf: "View Full Certificate",
+      download: "Download",
+      scrollHint: "Scroll to explore",
+      items: {
+        iso9001: {
+          title: "ISO 9001 Certification",
+          description: "International standard for quality management systems. Recognized globally as the benchmark for consistent quality across operations, documentation, and continuous improvement.",
+        },
+        sasoLicense: {
+          title: "SASO License",
+          description: "Official Saudi Standards, Metrology and Quality Organization license confirming our products meet the Kingdom's regulatory and safety standards.",
+        },
+        alHotyCalibration: {
+          title: "Al Hoty Calibration Certificate",
+          description: "Independent third-party calibration certificate verifying the accuracy of our in-house testing and measurement equipment.",
+        },
+        sasoTest: {
+          title: "SASO Test Certificate",
+          description: "Annual conformity testing issued by SASO, validating the mechanical and chemical performance of our rebar production.",
+        },
+        saudiMade: {
+          title: "Saudi Made Certificate",
+          description: "National certification program recognizing products manufactured in Saudi Arabia, supporting Vision 2030 and local industry growth.",
+        },
+      },
     },
   },
   career: {

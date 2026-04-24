@@ -34,11 +34,14 @@ interface SpecIcon {
 }
 
 interface SpecTable {
+  tab_label_en?: string;
+  tab_label_ar?: string;
   title_en: string;
   title_ar: string;
   headers_en: string[];
   headers_ar: string[];
   rows: string[][];
+  rows_ar?: string[][];
 }
 
 interface Feature {
@@ -63,6 +66,7 @@ interface ProductData {
   highlights: Highlight[];
   spec_icons: SpecIcon[];
   spec_table: SpecTable | null;
+  spec_table_2: SpecTable | null;
   features: Feature[];
   show_quote_tab: boolean;
   images: ProductImage[];
@@ -77,7 +81,7 @@ interface Props {
   products: ProductData[];
 }
 
-type TabKey = 'overview' | 'specifications' | 'features' | 'quote';
+type TabKey = 'overview' | 'specifications' | 'specifications2' | 'features' | 'quote';
 
 // --- Icon registry (shared between spec_icons and features) ---
 const iconRegistry: Record<string, React.ElementType> = {
@@ -165,9 +169,9 @@ function SpecDataTable({ tableData }: { tableData: { title: string; headers: str
           </thead>
           <tbody>
             {tableData.rows.map((row: string[], rowIndex: number) => (
-              <tr key={rowIndex} className="border-b border-white/15 hover:bg-white/10 transition-colors">
+              <tr key={rowIndex} className="border-b border-white/25 hover:bg-white/10 transition-colors">
                 {row.map((cell: string, cellIndex: number) => (
-                  <td key={cellIndex} className={`py-3 px-4 text-sm ${cellIndex === 0 ? 'font-medium text-white' : 'text-white/70'}`}>
+                  <td key={cellIndex} className={`py-3 px-4 text-sm ${cellIndex === 0 ? 'font-medium text-white' : 'text-white'}`}>
                     {cell}
                   </td>
                 ))}
@@ -181,30 +185,64 @@ function SpecDataTable({ tableData }: { tableData: { title: string; headers: str
 }
 
 // --- Tab Navigation Component ---
-function ProductTabs({ activeTab, onTabChange, showQuote = true }: { activeTab: TabKey; onTabChange: (tab: TabKey) => void; showQuote?: boolean }) {
+// `cycleProgress` (0..1) fills the NEXT tab with the active style over the auto-cycle window.
+function ProductTabs({
+  activeTab,
+  onTabChange,
+  showQuote = true,
+  specsLabel,
+  specs2Label,
+  cycleProgress = 0,
+}: {
+  activeTab: TabKey;
+  onTabChange: (tab: TabKey) => void;
+  showQuote?: boolean;
+  specsLabel?: string;
+  specs2Label?: string;
+  cycleProgress?: number;
+}) {
   const { t } = useTranslation();
   const tabs: { key: TabKey; label: string }[] = [
     { key: 'overview', label: t('products.tabs.overview') },
-    { key: 'specifications', label: t('products.tabs.specifications') },
+    { key: 'specifications', label: specsLabel || t('products.tabs.specifications') },
+    ...(specs2Label ? [{ key: 'specifications2' as TabKey, label: specs2Label }] : []),
     { key: 'features', label: t('products.tabs.features') },
     ...(showQuote ? [{ key: 'quote' as TabKey, label: t('products.tabs.requestQuote') }] : []),
   ];
 
+  const activeIdx = tabs.findIndex((tab) => tab.key === activeTab);
+  const nextIdx = activeIdx === -1 ? -1 : (activeIdx + 1) % tabs.length;
+
   return (
     <div className="flex flex-wrap gap-3 mb-8">
-      {tabs.map((tab) => (
-        <button
-          key={tab.key}
-          onClick={() => onTabChange(tab.key)}
-          className={`relative px-5 py-2 rounded-full text-sm font-medium transition-all cursor-pointer outline-none border ${
-            activeTab === tab.key
-              ? 'bg-white text-gray-900 border-transparent'
-              : 'border-white/30 text-white/80 hover:border-white/60 hover:text-white'
-          }`}
-        >
-          {tab.label}
-        </button>
-      ))}
+      {tabs.map((tab, i) => {
+        const isActive = activeTab === tab.key;
+        const isNext = i === nextIdx && !isActive;
+        const fill = isActive ? 1 : isNext ? cycleProgress : 0;
+        // Interpolate white (255,255,255) → gray-900 (17,24,39) for text
+        const r = Math.round(255 + (17 - 255) * fill);
+        const g = Math.round(255 + (24 - 255) * fill);
+        const b = Math.round(255 + (39 - 255) * fill);
+        // Border fades from white/30 to transparent as fill grows
+        const borderAlpha = 0.3 * (1 - fill);
+        return (
+          <button
+            key={tab.key}
+            onClick={() => onTabChange(tab.key)}
+            className="relative overflow-hidden px-5 py-2 rounded-full text-sm font-medium cursor-pointer outline-none border group"
+            style={{ borderColor: `rgba(255, 255, 255, ${borderAlpha})` }}
+          >
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 rounded-full bg-white pointer-events-none"
+              style={{ opacity: fill }}
+            />
+            <span className="relative z-10" style={{ color: `rgb(${r}, ${g}, ${b})` }}>
+              {tab.label}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -304,6 +342,8 @@ export default function Products({ products }: Props) {
   const [selectedSlug, setSelectedSlug] = useState(initialSlug);
   const [expanded, setExpanded] = useState(initialExpanded);
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
+  const [autoCycle, setAutoCycle] = useState(true);
+  const [cycleProgress, setCycleProgress] = useState(0);
   const [isLg, setIsLg] = useState(false);
   const detailRef = useRef<HTMLDivElement>(null);
   const leftPanelRef = useRef<HTMLDivElement>(null);
@@ -335,11 +375,11 @@ export default function Products({ products }: Props) {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // If a user had Quote tab open and switches to a product where it's hidden, snap back.
+  // If the active tab is unavailable on the selected product, snap back to overview.
   useEffect(() => {
-    if (selectedProduct && !selectedProduct.show_quote_tab && activeTab === 'quote') {
-      setActiveTab('overview');
-    }
+    if (!selectedProduct) return;
+    if (activeTab === 'quote' && !selectedProduct.show_quote_tab) setActiveTab('overview');
+    if (activeTab === 'specifications2' && !selectedProduct.spec_table_2) setActiveTab('overview');
   }, [selectedProduct, activeTab]);
 
   // Measure left panel for curved clip-path (useLayoutEffect to avoid flash)
@@ -370,10 +410,56 @@ export default function Products({ products }: Props) {
     return () => clearTimeout(timer);
   }, [expanded, selectedSlug]);
 
-  // Reset tab when switching product
+  // Reset tab + re-enable auto-cycle when switching product or opening the detail view
   useEffect(() => {
     setActiveTab('overview');
+    setAutoCycle(true);
   }, [selectedSlug]);
+
+  useEffect(() => {
+    if (expanded) setAutoCycle(true);
+  }, [expanded]);
+
+  // Auto-cycle tabs every 4s while expanded; the fill morphs the next tab into the active style.
+  const CYCLE_DURATION_MS = 4000;
+  useEffect(() => {
+    if (!expanded || !autoCycle || !selectedProduct) {
+      setCycleProgress(0);
+      return;
+    }
+    const availableTabs: TabKey[] = [
+      'overview',
+      'specifications',
+      ...(selectedProduct.spec_table_2 ? (['specifications2'] as TabKey[]) : []),
+      'features',
+      ...(selectedProduct.show_quote_tab ? (['quote'] as TabKey[]) : []),
+    ];
+    const currentIdx = availableTabs.indexOf(activeTab);
+    if (currentIdx === -1) return;
+
+    const start = performance.now();
+    let rafId: number;
+    const tick = (now: number) => {
+      const elapsed = now - start;
+      if (elapsed >= CYCLE_DURATION_MS) {
+        const nextIdx = (currentIdx + 1) % availableTabs.length;
+        setCycleProgress(0);
+        setActiveTab(availableTabs[nextIdx]);
+        return;
+      }
+      setCycleProgress(elapsed / CYCLE_DURATION_MS);
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [expanded, autoCycle, activeTab, selectedProduct]);
+
+  // Manual tab click stops the auto-cycle (so users can read without the carousel snatching it away)
+  const handleTabChange = (tab: TabKey) => {
+    setAutoCycle(false);
+    setCycleProgress(0);
+    setActiveTab(tab);
+  };
 
   // Helpers
   const getName = (p: ProductData) => language === 'ar' ? p.name_ar : p.name_en;
@@ -413,13 +499,20 @@ export default function Products({ products }: Props) {
   }, [language]);
 
   // Language-aware getters for product content
-  const getTableData = (p: ProductData) => {
-    if (!p.spec_table) return null;
+  const extractTable = (table: SpecTable | null) => {
+    if (!table) return null;
+    const rows = language === 'ar' && table.rows_ar?.length ? table.rows_ar : table.rows;
     return {
-      title: language === 'ar' ? p.spec_table.title_ar : p.spec_table.title_en,
-      headers: language === 'ar' ? p.spec_table.headers_ar : p.spec_table.headers_en,
-      rows: p.spec_table.rows,
+      title: language === 'ar' ? table.title_ar : table.title_en,
+      headers: language === 'ar' ? table.headers_ar : table.headers_en,
+      rows,
     };
+  };
+  const getTableData = (p: ProductData) => extractTable(p.spec_table);
+  const getTable2Data = (p: ProductData) => extractTable(p.spec_table_2);
+  const getTabLabel = (table: SpecTable | null) => {
+    if (!table) return undefined;
+    return language === 'ar' ? table.tab_label_ar : table.tab_label_en;
   };
 
   const handleExplore = () => {
@@ -495,7 +588,7 @@ export default function Products({ products }: Props) {
             {/* Description */}
             <div className="space-y-4">
               {getDesc(selectedProduct)?.split('\n').filter(Boolean).map((paragraph, i) => (
-                <p key={i} className="text-white/80 leading-relaxed">{paragraph}</p>
+                <p key={i} className="text-white leading-relaxed">{paragraph}</p>
               ))}
             </div>
 
@@ -510,7 +603,7 @@ export default function Products({ products }: Props) {
                         <Icon className="text-white" size={24} />
                       </div>
                       <h4 className="text-white font-semibold text-sm mb-1">{language === 'ar' ? icon.title_ar : icon.title_en}</h4>
-                      <p className="text-white/60 text-xs">{language === 'ar' ? icon.value_ar : icon.value_en}</p>
+                      <p className="text-white text-xs">{language === 'ar' ? icon.value_ar : icon.value_en}</p>
                     </div>
                   );
                 })}
@@ -523,7 +616,7 @@ export default function Products({ products }: Props) {
                 <h3 className="text-lg font-bold text-white mb-4">{t('products.overview.keyHighlights')}</h3>
                 <ul className="space-y-2">
                   {selectedProduct.highlights.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-white/80 text-sm">
+                    <li key={i} className="flex items-start gap-2 text-white text-sm">
                       <CheckCircle className="text-white shrink-0 mt-0.5" size={16} />
                       {language === 'ar' ? item.text_ar : item.text_en}
                     </li>
@@ -538,7 +631,15 @@ export default function Products({ products }: Props) {
         return (
           <div>
             <SpecDataTable tableData={getTableData(selectedProduct)} />
-            <p className="text-white/70 text-sm italic mt-4">{t('products.specNote')}</p>
+            <p className="text-white text-sm italic mt-4">{t('products.specNote')}</p>
+          </div>
+        );
+
+      case 'specifications2':
+        return (
+          <div>
+            <SpecDataTable tableData={getTable2Data(selectedProduct)} />
+            <p className="text-white text-sm italic mt-4">{t('products.specNote')}</p>
           </div>
         );
 
@@ -554,7 +655,7 @@ export default function Products({ products }: Props) {
                       <Icon className="text-white" size={20} />
                     </div>
                     <h4 className="text-white font-semibold mb-2">{language === 'ar' ? feature.title_ar : feature.title_en}</h4>
-                    <p className="text-white/60 text-sm leading-relaxed">{language === 'ar' ? feature.description_ar : feature.description_en}</p>
+                    <p className="text-white text-sm leading-relaxed">{language === 'ar' ? feature.description_ar : feature.description_en}</p>
                   </div>
                 </MagicCard>
               );
@@ -566,7 +667,7 @@ export default function Products({ products }: Props) {
         return (
           <div className="max-w-lg">
             <h3 className="text-2xl font-bold text-white mb-4">{t('products.requestQuote.title')}</h3>
-            <p className="text-white/70 leading-relaxed mb-8">{t('products.requestQuote.description')}</p>
+            <p className="text-white leading-relaxed mb-8">{t('products.requestQuote.description')}</p>
             <Link
               href="/contact"
               className="inline-flex items-center px-8 py-3 bg-white hover:bg-white/90 text-primary rounded-full font-semibold transition-colors"
@@ -634,7 +735,7 @@ export default function Products({ products }: Props) {
                     <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white mb-6 uppercase tracking-wide">
                       {getName(selectedProduct)}
                     </h2>
-                    <p className="text-white/70 leading-relaxed mb-8 text-base lg:text-lg xl:text-xl">
+                    <p className="text-white leading-relaxed mb-8 text-base lg:text-lg xl:text-xl">
                       {getShortDesc(selectedProduct)}
                     </p>
                     <button
@@ -699,7 +800,14 @@ export default function Products({ products }: Props) {
                       </button>
                     </div>
 
-                    <ProductTabs activeTab={activeTab} onTabChange={setActiveTab} showQuote={selectedProduct.show_quote_tab} />
+                    <ProductTabs
+                      activeTab={activeTab}
+                      onTabChange={handleTabChange}
+                      showQuote={selectedProduct.show_quote_tab}
+                      specsLabel={getTabLabel(selectedProduct.spec_table)}
+                      specs2Label={getTabLabel(selectedProduct.spec_table_2)}
+                      cycleProgress={cycleProgress}
+                    />
 
                     <AnimatePresence mode="wait">
                       <motion.div

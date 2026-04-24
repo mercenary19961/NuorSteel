@@ -25,6 +25,7 @@ class Product extends Model
         'highlights',
         'spec_icons',
         'spec_table',
+        'spec_table_2',
         'features',
         'show_quote_tab',
         'is_active',
@@ -43,6 +44,7 @@ class Product extends Model
             'highlights' => 'array',
             'spec_icons' => 'array',
             'spec_table' => 'array',
+            'spec_table_2' => 'array',
             'features' => 'array',
         ];
     }
