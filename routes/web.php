@@ -13,6 +13,7 @@ use App\Http\Controllers\Public\NewsletterController;
 use App\Http\Controllers\Public\LocaleController;
 use App\Http\Controllers\MediaServeController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\SiteContentController as AdminContentController;
 use App\Http\Controllers\Admin\MediaController as AdminMediaController;
@@ -70,6 +71,11 @@ Route::post('/locale/{locale}', [LocaleController::class, 'switch'])->name('loca
 Route::middleware('guest')->group(function () {
     Route::get('/admin/login', [LoginController::class, 'showLoginForm'])->name('login')->middleware('throttle:5,1');
     Route::post('/admin/login', [LoginController::class, 'login'])->middleware('throttle:5,1');
+
+    Route::get('/forgot-password', [PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->name('password.email')->middleware('throttle:5,15');
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update')->middleware('throttle:5,15');
 });
 
 Route::post('/admin/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
