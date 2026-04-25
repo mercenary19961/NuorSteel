@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password_changed_at',
         'last_login_at',
         'last_login_ip',
+        'invited_at',
     ];
 
     protected $hidden = [
@@ -41,6 +42,7 @@ class User extends Authenticatable
             'must_change_password' => 'boolean',
             'password_changed_at' => 'datetime',
             'last_login_at' => 'datetime',
+            'invited_at' => 'datetime',
         ];
     }
 

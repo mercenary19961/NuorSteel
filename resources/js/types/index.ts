@@ -9,6 +9,8 @@ export interface User {
   must_change_password?: boolean;
   last_login_at?: string | null;
   last_login_ip?: string | null;
+  invited_at?: string | null;
+  is_pending_invite?: boolean;
   created_at: string;
 }
 

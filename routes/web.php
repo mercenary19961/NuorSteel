@@ -12,6 +12,7 @@ use App\Http\Controllers\Public\ContactController;
 use App\Http\Controllers\Public\NewsletterController;
 use App\Http\Controllers\Public\LocaleController;
 use App\Http\Controllers\MediaServeController;
+use App\Http\Controllers\Auth\AdminInviteController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -76,6 +77,15 @@ Route::middleware('guest')->group(function () {
     Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->name('password.email')->middleware('throttle:5,15');
     Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
     Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update')->middleware('throttle:5,15');
+
+    // Invite acceptance — signed URLs from AdminInviteEmail. The 'signed' middleware
+    // verifies signature + expiry; an expired or tampered link 403s.
+    Route::get('/admin/invite/{user}/accept', [AdminInviteController::class, 'showAcceptForm'])
+        ->name('admin.invite.accept')
+        ->middleware('signed');
+    Route::post('/admin/invite/{user}/accept', [AdminInviteController::class, 'accept'])
+        ->name('admin.invite.accept.post')
+        ->middleware(['signed', 'throttle:5,15']);
 });
 
 Route::post('/admin/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
@@ -188,6 +198,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::put('/users/{id}', [AdminUserController::class, 'update'])->name('users.update');
         Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
         Route::post('/users/{id}/toggle', [AdminUserController::class, 'toggleStatus'])->name('users.toggle');
+        Route::post('/users/{id}/resend-invite', [AdminUserController::class, 'resendInvite'])->name('users.resend-invite');
 
         // Change Log
         Route::get('/change-log', [AdminChangeLogController::class, 'index'])->name('change-log.index');

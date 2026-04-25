@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Auth\AdminInviteController;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -24,6 +26,9 @@ class UserController extends Controller
             'must_change_password' => $user->must_change_password,
             'last_login_at' => $user->last_login_at?->toIso8601String(),
             'last_login_ip' => $user->last_login_ip,
+            'invited_at' => $user->invited_at?->toIso8601String(),
+            // "Pending invite" = was invited and has never logged in.
+            'is_pending_invite' => $user->invited_at !== null && $user->last_login_at === null,
             'created_at' => $user->created_at->format('Y-m-d'),
         ]);
 
@@ -35,17 +40,38 @@ class UserController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        // password_method drives the branching: 'invite' = email a signed accept URL,
+        // 'manual' = admin types a password now. Default is 'invite' (the safer path).
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => ['required', 'confirmed', Password::defaults()],
             'role' => 'required|in:admin,editor',
             'is_active' => 'boolean',
+            'password_method' => 'required|in:invite,manual',
+            'password' => ['required_if:password_method,manual', 'confirmed', Password::defaults()],
         ]);
 
-        // When admin sets the password manually, force the new user to change it
-        // on their first login (slice 5 enforces the gate). Cleared if/when slice 4's
-        // invite flow lands and the admin instead sends an invite email.
+        if ($request->input('password_method') === 'invite') {
+            // Random unguessable password placeholder — invitee replaces it via
+            // /admin/invite/{user}/accept. must_change_password=true is defensive
+            // (cleared by the accept flow); is_active stays true so the moment they
+            // accept they can use the account.
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make(Str::random(64)),
+                'role' => $request->role,
+                'is_active' => $request->boolean('is_active', true),
+                'must_change_password' => true,
+            ]);
+
+            AdminInviteController::sendInvite($user, $request->user());
+
+            return redirect()->back()->with('success', "Invite sent to {$user->email}. The link expires in " . AdminInviteController::EXPIRY_HOURS . " hours.");
+        }
+
+        // Manual path — admin types a password. Force first-login change so the
+        // admin's chosen password isn't permanent.
         User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -56,7 +82,25 @@ class UserController extends Controller
             'password_changed_at' => now(),
         ]);
 
-        return redirect()->back()->with('success', 'User created successfully.');
+        return redirect()->back()->with('success', 'User created successfully. They will be asked to change their password on first login.');
+    }
+
+    /**
+     * POST /admin/users/{id}/resend-invite — regenerate the signed invite URL
+     * and re-email it. Useful when the original 48h window expires.
+     */
+    public function resendInvite(Request $request, int $id): RedirectResponse
+    {
+        $user = User::findOrFail($id);
+
+        // Only "pending invite" users qualify — must be invited and never logged in.
+        if ($user->invited_at === null || $user->last_login_at !== null) {
+            return redirect()->back()->with('error', 'This user is not pending an invite.');
+        }
+
+        AdminInviteController::sendInvite($user, $request->user());
+
+        return redirect()->back()->with('success', "Invite re-sent to {$user->email}.");
     }
 
     public function update(Request $request, int $id): RedirectResponse
