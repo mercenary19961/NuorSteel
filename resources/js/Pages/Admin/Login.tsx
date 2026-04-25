@@ -1,10 +1,13 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Lock, Mail } from 'lucide-react';
 import { useRef } from 'react';
 import Turnstile, { type TurnstileHandle } from '@/Components/Public/Turnstile';
+import type { PageProps } from '@/types';
 
 export default function Login() {
   const turnstileRef = useRef<TurnstileHandle>(null);
+  const { flash } = usePage<PageProps>().props;
+  const status = (flash as Record<string, string | undefined>)?.status;
   const { data, setData, post, processing, errors } = useForm({
     email: '',
     password: '',
@@ -31,6 +34,13 @@ export default function Login() {
               <h1 className="text-2xl font-bold text-gray-900">Nuor Steel</h1>
               <p className="text-sm text-gray-500 mt-1">Admin Panel</p>
             </div>
+
+            {/* Status banner — e.g. "Your password has been reset" */}
+            {status && (
+              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm text-green-700">{status}</p>
+              </div>
+            )}
 
             {/* Error */}
             {(errors.email || turnstileError) && (
@@ -61,9 +71,17 @@ export default function Login() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                    Password
+                  </label>
+                  <Link
+                    href="/forgot-password"
+                    className="text-xs text-primary hover:text-primary-dark transition-colors"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
                 <div className="relative">
                   <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input

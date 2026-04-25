@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Head } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Gauge, FlaskConical, Ruler, Flame, ShieldCheck, FileCheck, FileText, Eye, X, ChevronDown } from 'lucide-react';
+import { Gauge, FlaskConical, Ruler, Flame, ShieldCheck, FileCheck, FileText, Eye, X, ChevronDown, ArrowRight } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { MagicCardGrid, MagicCard } from '@/Components/ui/magic-card';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -23,8 +23,12 @@ export default function Quality() {
 
   const [isDesktop, setIsDesktop] = useState(false);
   const [activeCert, setActiveCert] = useState(0);
-  const [viewingPdf, setViewingPdf] = useState<string | null>(null);
+  const [viewingPdf, setViewingPdf] = useState<{ url: string; title: string } | null>(null);
   const showcaseWrapperRef = useRef<HTMLDivElement>(null);
+
+  const MANUFACTURING_PROCESS_PDF = '/documents/quality/manufacturing-process.pdf';
+  const openShowcasePdf = (entry: { key: ShowcaseKey; pdf: string }) =>
+    setViewingPdf({ url: entry.pdf, title: t(`quality.showcase.items.${entry.key}.title`) });
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -65,7 +69,6 @@ export default function Quality() {
     }
   }, [viewingPdf]);
 
-  const viewingEntry = viewingPdf ? SHOWCASE.find(c => c.pdf === viewingPdf) : null;
 
   // Warm opposite-language hero image during idle time so the language
   // toggle is instant without hurting initial LCP.
@@ -116,9 +119,28 @@ export default function Quality() {
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight mb-6 whitespace-pre-line">
               {t('quality.hero.title')}
             </h1>
-            <p className="text-lg lg:text-xl text-gray-400 max-w-lg leading-relaxed">
+            <p className="text-lg lg:text-xl text-gray-400 max-w-lg leading-relaxed mb-8">
               {t('quality.hero.subtitle')}
             </p>
+            <button
+              type="button"
+              onClick={() =>
+                setViewingPdf({
+                  url: MANUFACTURING_PROCESS_PDF,
+                  title: t('quality.hero.manufacturingProcess.title', 'Manufacturing Process'),
+                })
+              }
+              className="relative inline-flex items-center mt-4 lg:mt-8 px-6 py-3 border border-primary text-white font-semibold rounded-lg text-base group overflow-hidden animate-cta-shimmer cursor-pointer"
+            >
+              <span
+                aria-hidden="true"
+                className="absolute inset-0 bg-primary ltr:-translate-x-full rtl:translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out"
+              />
+              <span className="relative z-10 inline-flex items-center">
+                {t('quality.hero.manufacturingProcess.button', 'View Manufacturing Process')}
+                <ArrowRight className="ltr:ml-2 rtl:mr-2 rtl:rotate-180 group-hover:ltr:translate-x-1 group-hover:rtl:-translate-x-1 transition-transform duration-200" size={20} />
+              </span>
+            </button>
           </div>
         </div>
       </section>
@@ -278,7 +300,7 @@ export default function Quality() {
                     animate={{ opacity: 1, scale: 1, rotateY: 0 }}
                     exit={{ opacity: 0, scale: 0.95, rotateY: -8 }}
                     transition={{ duration: 0.4, ease: 'easeOut' }}
-                    onClick={() => setViewingPdf(SHOWCASE[activeCert].pdf)}
+                    onClick={() => openShowcasePdf(SHOWCASE[activeCert])}
                     aria-label={t('quality.showcase.viewPdf')}
                     className="relative h-full max-h-full aspect-3/4 rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-white cursor-pointer group"
                   >
@@ -305,7 +327,7 @@ export default function Quality() {
               {SHOWCASE.map((cert) => (
                 <button
                   key={cert.key}
-                  onClick={() => setViewingPdf(cert.pdf)}
+                  onClick={() => openShowcasePdf(cert)}
                   className="text-start bg-white/5 border border-white/10 rounded-xl overflow-hidden active:scale-[0.99] transition-transform"
                   aria-label={t('quality.showcase.viewPdf')}
                 >
@@ -338,7 +360,7 @@ export default function Quality() {
 
       {/* PDF Viewer Modal */}
       <AnimatePresence>
-        {viewingPdf && viewingEntry && (
+        {viewingPdf && (
           <motion.div
             key="pdf-modal"
             initial={{ opacity: 0 }}
@@ -361,7 +383,7 @@ export default function Quality() {
                 <div className="flex items-center gap-3 min-w-0">
                   <FileText size={20} className="text-primary shrink-0" />
                   <h3 className="text-white font-semibold truncate">
-                    {t(`quality.showcase.items.${viewingEntry.key}.title`)}
+                    {viewingPdf.title}
                   </h3>
                 </div>
                 <button
@@ -374,9 +396,9 @@ export default function Quality() {
               </div>
               <div className="flex-1 min-h-0">
                 <iframe
-                  src={viewingPdf}
+                  src={viewingPdf.url}
                   className="w-full h-full min-h-[60vh] border-0"
-                  title={t(`quality.showcase.items.${viewingEntry.key}.title`)}
+                  title={viewingPdf.title}
                 />
               </div>
             </motion.div>

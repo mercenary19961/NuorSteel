@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
-import { Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import { Linkedin, Facebook, Instagram, Mail, Phone, MapPin } from 'lucide-react';
 import Turnstile, { type TurnstileHandle } from '@/Components/Public/Turnstile';
 import type { PageProps } from '@/types';
 
@@ -46,17 +46,42 @@ export default function Footer() {
             <p className="text-gray-400 text-sm mb-4">
               {t('footer.description')}
             </p>
-            {siteSettings.linkedin_url && (
-              <a
-                href={siteSettings.linkedin_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center text-gray-400 hover:text-white transition-colors"
-              >
-                <Linkedin size={20} className="mr-2" />
-                {t('footer.followLinkedIn')}
-              </a>
-            )}
+            {/* Social media icons — all URLs pulled from admin Settings; each icon only renders if the URL is set */}
+            <div className="flex items-center gap-2">
+              {siteSettings.linkedin_url && (
+                <a
+                  href={siteSettings.linkedin_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
+                  className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-primary hover:border-primary transition-colors"
+                >
+                  <Linkedin size={16} />
+                </a>
+              )}
+              {siteSettings.facebook_url && (
+                <a
+                  href={siteSettings.facebook_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-primary hover:border-primary transition-colors"
+                >
+                  <Facebook size={16} />
+                </a>
+              )}
+              {siteSettings.instagram_url && (
+                <a
+                  href={siteSettings.instagram_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-primary hover:border-primary transition-colors"
+                >
+                  <Instagram size={16} />
+                </a>
+              )}
+            </div>
           </div>
 
           {/* Contact Info */}

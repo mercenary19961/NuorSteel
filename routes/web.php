@@ -12,7 +12,12 @@ use App\Http\Controllers\Public\ContactController;
 use App\Http\Controllers\Public\NewsletterController;
 use App\Http\Controllers\Public\LocaleController;
 use App\Http\Controllers\MediaServeController;
+use App\Http\Controllers\Auth\AdminInviteController;
+use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Middleware\AdminIdleTimeout;
+use App\Http\Middleware\ForcePasswordChange;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\SiteContentController as AdminContentController;
 use App\Http\Controllers\Admin\MediaController as AdminMediaController;
@@ -68,11 +73,35 @@ Route::post('/locale/{locale}', [LocaleController::class, 'switch'])->name('loca
 */
 
 Route::middleware('guest')->group(function () {
-    Route::get('/admin/login', [LoginController::class, 'showLoginForm'])->name('login')->middleware('throttle:5,1');
-    Route::post('/admin/login', [LoginController::class, 'login'])->middleware('throttle:5,1');
+    Route::get('/admin/login', [LoginController::class, 'showLoginForm'])->name('login')->middleware('throttle:10,15');
+    // Per-IP: 10 attempts / 15 min (matches the per-email window in LoginController).
+    // Slightly more lenient than 5/15 so colleagues sharing an office IP don't lock each
+    // other out from a single forgetful retry session.
+    Route::post('/admin/login', [LoginController::class, 'login'])->middleware('throttle:10,15');
+
+    Route::get('/forgot-password', [PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->name('password.email')->middleware('throttle:5,15');
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update')->middleware('throttle:5,15');
+
+    // Invite acceptance — signed URLs from AdminInviteEmail. The 'signed' middleware
+    // verifies signature + expiry; an expired or tampered link 403s.
+    Route::get('/admin/invite/{user}/accept', [AdminInviteController::class, 'showAcceptForm'])
+        ->name('admin.invite.accept')
+        ->middleware('signed');
+    Route::post('/admin/invite/{user}/accept', [AdminInviteController::class, 'accept'])
+        ->name('admin.invite.accept.post')
+        ->middleware(['signed', 'throttle:5,15']);
 });
 
 Route::post('/admin/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
+
+// Change-password routes — registered under 'auth' but OUTSIDE the ForcePasswordChange
+// guard so a flagged user can actually reach the form (the guard would otherwise loop them).
+Route::middleware('auth')->group(function () {
+    Route::get('/admin/change-password', [ChangePasswordController::class, 'show'])->name('admin.change-password.show');
+    Route::post('/admin/change-password', [ChangePasswordController::class, 'update'])->name('admin.change-password.update')->middleware('throttle:5,15');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -80,7 +109,7 @@ Route::post('/admin/logout', [LoginController::class, 'logout'])->name('logout')
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', AdminIdleTimeout::class, ForcePasswordChange::class])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     // Content
@@ -182,6 +211,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::put('/users/{id}', [AdminUserController::class, 'update'])->name('users.update');
         Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
         Route::post('/users/{id}/toggle', [AdminUserController::class, 'toggleStatus'])->name('users.toggle');
+        Route::post('/users/{id}/resend-invite', [AdminUserController::class, 'resendInvite'])->name('users.resend-invite');
 
         // Change Log
         Route::get('/change-log', [AdminChangeLogController::class, 'index'])->name('change-log.index');

@@ -375,6 +375,10 @@ const ar = {
       label: "ضمان الجودة",
       title: "معايير الجودة\nوالتصنيع",
       subtitle: "دقة هندسية وأداء متسق في كل منتج نقدمه.",
+      manufacturingProcess: {
+        button: "عرض عملية التصنيع",
+        title: "عملية التصنيع",
+      },
     },
     assurance: {
       label: "نهجنا",

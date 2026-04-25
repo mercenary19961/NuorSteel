@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
-import { Plus, Edit2, Trash2, ToggleLeft, ToggleRight, Shield, User as UserIcon } from 'lucide-react';
+import { Plus, Edit2, Trash2, ToggleLeft, ToggleRight, Shield, Lock, Mail, User as UserIcon } from 'lucide-react';
 import CustomSelect from '@/Components/Admin/CustomSelect';
 import type { User, PageProps } from '@/types';
 
@@ -13,6 +13,7 @@ interface UserFormData {
   password_confirmation: string;
   role: 'admin' | 'editor';
   is_active: boolean;
+  password_method: 'invite' | 'manual';
 }
 
 const emptyForm: UserFormData = {
@@ -22,6 +23,7 @@ const emptyForm: UserFormData = {
   password_confirmation: '',
   role: 'editor',
   is_active: true,
+  password_method: 'invite',
 };
 
 interface Props {
@@ -52,13 +54,15 @@ export default function UsersPage({ users }: Props) {
       password_confirmation: '',
       role: user.role,
       is_active: user.is_active,
+      password_method: 'manual', // editing always uses manual (admin types optional new password)
     });
     setShowModal(true);
   };
 
   const handleSubmit = () => {
     if (!form.name.trim() || !form.email.trim()) return;
-    if (!editingUser && !form.password) return;
+    // For new users: invite mode needs no password; manual mode requires one.
+    if (!editingUser && form.password_method === 'manual' && !form.password) return;
     if (form.password && form.password !== form.password_confirmation) return;
 
     if (editingUser) {
@@ -79,20 +83,39 @@ export default function UsersPage({ users }: Props) {
         onSuccess: () => setShowModal(false),
       });
     } else {
-      router.post('/admin/users', {
+      const payload: Record<string, string | boolean> = {
         name: form.name,
         email: form.email,
-        password: form.password,
-        password_confirmation: form.password_confirmation,
         role: form.role,
         is_active: form.is_active,
-      }, {
+        password_method: form.password_method,
+      };
+      if (form.password_method === 'manual') {
+        payload.password = form.password;
+        payload.password_confirmation = form.password_confirmation;
+      }
+      router.post('/admin/users', payload, {
         preserveScroll: true,
         onStart: () => setProcessing(true),
         onFinish: () => setProcessing(false),
         onSuccess: () => setShowModal(false),
       });
     }
+  };
+
+  const handleResendInvite = (user: User) => {
+    router.post(`/admin/users/${user.id}/resend-invite`, {}, { preserveScroll: true });
+  };
+
+  // Compact relative-time formatter — avoids pulling in date-fns for one usage.
+  const relativeTime = (iso: string | null | undefined): string => {
+    if (!iso) return 'Never';
+    const diffSeconds = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+    if (diffSeconds < 60) return 'Just now';
+    if (diffSeconds < 3600) return `${Math.floor(diffSeconds / 60)} min ago`;
+    if (diffSeconds < 86400) return `${Math.floor(diffSeconds / 3600)} hr ago`;
+    if (diffSeconds < 2592000) return `${Math.floor(diffSeconds / 86400)} days ago`;
+    return new Date(iso).toLocaleDateString();
   };
 
   const handleToggle = (user: User) => {
@@ -138,6 +161,7 @@ export default function UsersPage({ users }: Props) {
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">User</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Role</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Status</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Last login</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Created</th>
                   <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">Actions</th>
                 </tr>
@@ -145,6 +169,8 @@ export default function UsersPage({ users }: Props) {
               <tbody>
                 {users.map((user) => {
                   const isSelf = user.id === currentUser?.id;
+                  // Admin accounts are self-managed: another admin can't edit/toggle/delete this row.
+                  const isOtherAdmin = user.role === 'admin' && !isSelf;
                   return (
                     <tr key={user.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
                       <td className="py-3 px-4">
@@ -172,43 +198,75 @@ export default function UsersPage({ users }: Props) {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          user.is_active
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {user.is_active ? 'Active' : 'Inactive'}
-                        </span>
+                        {user.is_pending_invite ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                            <Mail size={11} />
+                            Pending invite
+                          </span>
+                        ) : (
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            user.is_active
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {user.is_active ? 'Active' : 'Inactive'}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-700">
+                        <div>{relativeTime(user.last_login_at)}</div>
+                        {user.last_login_ip && (
+                          <div className="text-xs text-gray-400 mt-0.5">From {user.last_login_ip}</div>
+                        )}
                       </td>
                       <td className="py-3 px-4 text-sm text-gray-500">
                         {new Date(user.created_at).toLocaleDateString()}
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => openEdit(user)}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50"
-                            title="Edit"
-                          >
-                            <Edit2 size={16} />
-                          </button>
-                          {!isSelf && (
+                          {isOtherAdmin ? (
+                            <span
+                              className="inline-flex items-center gap-1.5 text-xs text-gray-400 px-2 py-1 rounded-md bg-gray-50 border border-gray-200"
+                              title="Admin accounts are self-managed. Only this admin can edit their own row."
+                            >
+                              <Lock size={12} />
+                              Self-managed
+                            </span>
+                          ) : (
                             <>
-                              <button
-                                onClick={() => handleToggle(user)}
-                                className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50"
-                                title={user.is_active ? 'Deactivate' : 'Activate'}
-                              >
-                                {user.is_active ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
-                              </button>
-                              {user.role !== 'admin' && (
+                              {user.is_pending_invite && !isSelf && (
                                 <button
-                                  onClick={() => setDeleteTarget(user)}
-                                  className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
-                                  title="Delete"
+                                  onClick={() => handleResendInvite(user)}
+                                  className="p-1.5 text-amber-600 hover:text-amber-800 rounded-lg hover:bg-amber-50"
+                                  title="Resend invite"
                                 >
-                                  <Trash2 size={16} />
+                                  <Mail size={16} />
                                 </button>
+                              )}
+                              <button
+                                onClick={() => openEdit(user)}
+                                className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50"
+                                title="Edit"
+                              >
+                                <Edit2 size={16} />
+                              </button>
+                              {!isSelf && (
+                                <>
+                                  <button
+                                    onClick={() => handleToggle(user)}
+                                    className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50"
+                                    title={user.is_active ? 'Deactivate' : 'Activate'}
+                                  >
+                                    {user.is_active ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
+                                  </button>
+                                  <button
+                                    onClick={() => setDeleteTarget(user)}
+                                    className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
+                                    title="Delete"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                </>
                               )}
                             </>
                           )}
@@ -249,27 +307,73 @@ export default function UsersPage({ users }: Props) {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Password {editingUser && <span className="text-gray-400">(leave blank to keep current)</span>}
-                  </label>
-                  <input
-                    type="password"
-                    value={form.password}
-                    onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
-                  />
-                </div>
-                {form.password && (
+                {/* Password method picker — only on Create. Edit always uses the manual path. */}
+                {!editingUser && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-                    <input
-                      type="password"
-                      value={form.password_confirmation}
-                      onChange={(e) => setForm((f) => ({ ...f, password_confirmation: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Password setup</label>
+                    <div className="grid grid-cols-1 gap-2">
+                      <label className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
+                        form.password_method === 'invite' ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-gray-300'
+                      }`}>
+                        <input
+                          type="radio"
+                          name="password_method"
+                          value="invite"
+                          checked={form.password_method === 'invite'}
+                          onChange={() => setForm((f) => ({ ...f, password_method: 'invite', password: '', password_confirmation: '' }))}
+                          className="mt-0.5 accent-primary"
+                        />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">Send invite email <span className="text-xs text-primary font-semibold ml-1">(recommended)</span></p>
+                          <p className="text-xs text-gray-500 mt-0.5">User receives a link to set their own password. Link expires in 48 hours.</p>
+                        </div>
+                      </label>
+                      <label className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
+                        form.password_method === 'manual' ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-gray-300'
+                      }`}>
+                        <input
+                          type="radio"
+                          name="password_method"
+                          value="manual"
+                          checked={form.password_method === 'manual'}
+                          onChange={() => setForm((f) => ({ ...f, password_method: 'manual' }))}
+                          className="mt-0.5 accent-primary"
+                        />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">Set password now</p>
+                          <p className="text-xs text-gray-500 mt-0.5">You type the initial password. User will be required to change it on first login.</p>
+                        </div>
+                      </label>
+                    </div>
                   </div>
+                )}
+
+                {/* Password fields — shown when editing OR when manual create is selected */}
+                {(editingUser || form.password_method === 'manual') && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Password {editingUser && <span className="text-gray-400">(leave blank to keep current)</span>}
+                      </label>
+                      <input
+                        type="password"
+                        value={form.password}
+                        onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
+                      />
+                    </div>
+                    {form.password && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                        <input
+                          type="password"
+                          value={form.password_confirmation}
+                          onChange={(e) => setForm((f) => ({ ...f, password_confirmation: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
+                        />
+                      </div>
+                    )}
+                  </>
                 )}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>

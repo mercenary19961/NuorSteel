@@ -42,6 +42,7 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
+                'status' => fn () => $request->session()->get('status'),
             ],
             'siteSettings' => fn () => $this->getSiteSettings(),
             'turnstileSiteKey' => fn () => config('services.turnstile.site_key'),
@@ -66,7 +67,7 @@ class HandleInertiaRequests extends Middleware
             $this->cachedSettings = Setting::whereIn('key', [
                 'company_phone', 'company_email',
                 'company_address_en', 'company_address_ar',
-                'linkedin_url',
+                'linkedin_url', 'facebook_url', 'instagram_url',
                 'google_maps_embed_url', 'google_maps_place_url',
             ])->pluck('value', 'key')->toArray();
         }
@@ -78,6 +79,8 @@ class HandleInertiaRequests extends Middleware
             'email' => $this->cachedSettings['company_email'] ?? '',
             'address' => $this->cachedSettings[$addressKey] ?? '',
             'linkedin_url' => $this->cachedSettings['linkedin_url'] ?? '',
+            'facebook_url' => $this->cachedSettings['facebook_url'] ?? '',
+            'instagram_url' => $this->cachedSettings['instagram_url'] ?? '',
             'google_maps_embed_url' => $this->cachedSettings['google_maps_embed_url'] ?? '',
             'google_maps_place_url' => $this->cachedSettings['google_maps_place_url'] ?? '',
         ];

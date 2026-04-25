@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Mail\PasswordResetEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -19,6 +21,11 @@ class User extends Authenticatable
         'role',
         'is_active',
         'avatar_path',
+        'must_change_password',
+        'password_changed_at',
+        'last_login_at',
+        'last_login_ip',
+        'invited_at',
     ];
 
     protected $hidden = [
@@ -32,6 +39,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'must_change_password' => 'boolean',
+            'password_changed_at' => 'datetime',
+            'last_login_at' => 'datetime',
+            'invited_at' => 'datetime',
         ];
     }
 
@@ -58,5 +69,24 @@ class User extends Authenticatable
     public function createdCareerListings(): HasMany
     {
         return $this->hasMany(CareerListing::class, 'created_by');
+    }
+
+    /**
+     * Override Laravel's default password-reset notification to send our themed Mailable
+     * instead of the generic Notifiable email. Called by Password::sendResetLink().
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $expiryMinutes = (int) config('auth.passwords.users.expire', 60);
+        $resetUrl = url(route('password.reset', [
+            'token' => $token,
+            'email' => $this->email,
+        ], false));
+
+        Mail::to($this->email)->send(new PasswordResetEmail(
+            userName: $this->name,
+            resetUrl: $resetUrl,
+            expiryMinutes: $expiryMinutes,
+        ));
     }
 }

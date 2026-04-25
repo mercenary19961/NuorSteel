@@ -6,6 +6,11 @@ export interface User {
   role: "admin" | "editor";
   is_active: boolean;
   avatar_path: string | null;
+  must_change_password?: boolean;
+  last_login_at?: string | null;
+  last_login_ip?: string | null;
+  invited_at?: string | null;
+  is_pending_invite?: boolean;
   created_at: string;
 }
 
@@ -24,6 +29,8 @@ export interface PageProps {
     email: string;
     address: string;
     linkedin_url: string;
+    facebook_url: string;
+    instagram_url: string;
     google_maps_embed_url: string;
     google_maps_place_url: string;
   };
