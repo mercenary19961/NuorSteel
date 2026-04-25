@@ -6,6 +6,9 @@ export interface User {
   role: "admin" | "editor";
   is_active: boolean;
   avatar_path: string | null;
+  must_change_password?: boolean;
+  last_login_at?: string | null;
+  last_login_ip?: string | null;
   created_at: string;
 }
 

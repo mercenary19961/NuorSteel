@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import ConfirmDialog from '@/Components/Admin/ConfirmDialog';
-import { Plus, Edit2, Trash2, ToggleLeft, ToggleRight, Shield, User as UserIcon } from 'lucide-react';
+import { Plus, Edit2, Trash2, ToggleLeft, ToggleRight, Shield, Lock, User as UserIcon } from 'lucide-react';
 import CustomSelect from '@/Components/Admin/CustomSelect';
 import type { User, PageProps } from '@/types';
 
@@ -145,6 +145,8 @@ export default function UsersPage({ users }: Props) {
               <tbody>
                 {users.map((user) => {
                   const isSelf = user.id === currentUser?.id;
+                  // Admin accounts are self-managed: another admin can't edit/toggle/delete this row.
+                  const isOtherAdmin = user.role === 'admin' && !isSelf;
                   return (
                     <tr key={user.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
                       <td className="py-3 px-4">
@@ -185,30 +187,40 @@ export default function UsersPage({ users }: Props) {
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => openEdit(user)}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50"
-                            title="Edit"
-                          >
-                            <Edit2 size={16} />
-                          </button>
-                          {!isSelf && (
+                          {isOtherAdmin ? (
+                            <span
+                              className="inline-flex items-center gap-1.5 text-xs text-gray-400 px-2 py-1 rounded-md bg-gray-50 border border-gray-200"
+                              title="Admin accounts are self-managed. Only this admin can edit their own row."
+                            >
+                              <Lock size={12} />
+                              Self-managed
+                            </span>
+                          ) : (
                             <>
                               <button
-                                onClick={() => handleToggle(user)}
+                                onClick={() => openEdit(user)}
                                 className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50"
-                                title={user.is_active ? 'Deactivate' : 'Activate'}
+                                title="Edit"
                               >
-                                {user.is_active ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
+                                <Edit2 size={16} />
                               </button>
-                              {user.role !== 'admin' && (
-                                <button
-                                  onClick={() => setDeleteTarget(user)}
-                                  className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
-                                  title="Delete"
-                                >
-                                  <Trash2 size={16} />
-                                </button>
+                              {!isSelf && (
+                                <>
+                                  <button
+                                    onClick={() => handleToggle(user)}
+                                    className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50"
+                                    title={user.is_active ? 'Deactivate' : 'Activate'}
+                                  >
+                                    {user.is_active ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
+                                  </button>
+                                  <button
+                                    onClick={() => setDeleteTarget(user)}
+                                    className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
+                                    title="Delete"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                </>
                               )}
                             </>
                           )}
