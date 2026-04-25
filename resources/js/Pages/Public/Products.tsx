@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowRight, ArrowLeft, LayoutGrid, Ruler, Shield, Package, Zap, Flame, Box, Microscope, Target, CheckCircle } from 'lucide-react';
+import { ArrowRight, ArrowLeft, LayoutGrid, Ruler, Shield, Package, Zap, Flame, Box, Microscope, Target, CheckCircle, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -104,7 +104,10 @@ function SpecDataTable({ tableData }: { tableData: { title: string; headers: str
   if (!tableData || !tableData.headers?.length) return null;
   const [expandedHeader, setExpandedHeader] = useState<number | null>(null);
   const [truncatedHeaders, setTruncatedHeaders] = useState<Set<number>>(new Set());
+  const [hasOverflow, setHasOverflow] = useState(false);
+  const [isAtBottom, setIsAtBottom] = useState(false);
   const headerRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (expandedHeader === null) return;
@@ -124,10 +127,39 @@ function SpecDataTable({ tableData }: { tableData: { title: string; headers: str
     setTruncatedHeaders(truncated);
   }, [tableData.headers]);
 
+  // Track vertical overflow + scroll position so we know when to show the "more below" hint
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const check = () => {
+      const overflow = el.scrollHeight > el.clientHeight + 1;
+      const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 4;
+      setHasOverflow(overflow);
+      setIsAtBottom(atBottom);
+    };
+    check();
+    el.addEventListener('scroll', check, { passive: true });
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener('scroll', check);
+      ro.disconnect();
+    };
+  }, [tableData.rows, tableData.headers]);
+
+  const showHint = hasOverflow && !isAtBottom;
+
+  const handleHintClick = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ top: el.clientHeight * 0.7, behavior: 'smooth' });
+  };
+
   return (
     <div className="mb-8">
       <h3 className="text-lg font-bold text-white mb-4">{tableData.title}</h3>
-      <div className="overflow-x-auto overflow-y-auto max-h-72 scrollbar-thin">
+      <div className="relative">
+      <div ref={scrollRef} className="overflow-x-auto overflow-y-auto max-h-72 scrollbar-bright">
         <table className="w-full border-collapse">
           <thead className="sticky top-0 z-10">
             <tr className="bg-white/20 backdrop-blur-sm">
@@ -179,6 +211,28 @@ function SpecDataTable({ tableData }: { tableData: { title: string; headers: str
             ))}
           </tbody>
         </table>
+      </div>
+        {/* "More rows below" hint — bouncing chevron + bottom fade, hidden when scrolled to bottom */}
+        {showHint && (
+          <>
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-12 rounded-b-md"
+              style={{
+                background: 'linear-gradient(to top, rgba(0,0,0,0.25), transparent)',
+              }}
+            />
+            <button
+              type="button"
+              onClick={handleHintClick}
+              aria-label="Scroll for more rows"
+              className="absolute bottom-2 end-2 z-10 flex items-center gap-1.5 rounded-full bg-white/95 hover:bg-white text-gray-900 px-3 py-1 text-xs font-semibold shadow-lg cursor-pointer animate-scroll-hint"
+            >
+              <ChevronDown size={14} />
+              <span>More</span>
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

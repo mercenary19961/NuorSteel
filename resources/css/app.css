@@ -117,6 +117,21 @@ html[dir="rtl"] body {
     animation: bounce-subtle 1.5s ease-in-out infinite;
 }
 
+/* Scroll hint — gentle downward bounce for "more rows below" indicator */
+@keyframes scroll-hint {
+    0%, 100% {
+        transform: translateY(0);
+        opacity: 0.7;
+    }
+    50% {
+        transform: translateY(4px);
+        opacity: 1;
+    }
+}
+.animate-scroll-hint {
+    animation: scroll-hint 1.4s ease-in-out infinite;
+}
+
 @keyframes detailSlideUp {
     from {
         opacity: 0;
@@ -157,6 +172,26 @@ html[dir="rtl"] body {
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background: rgba(255 255 255 / 0.35);
+}
+
+/* Brighter, always-visible variant — used on spec tables so users see they can scroll */
+.scrollbar-bright {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255 255 255 / 0.6) rgba(255 255 255 / 0.12);
+}
+.scrollbar-bright::-webkit-scrollbar {
+    width: 8px;
+}
+.scrollbar-bright::-webkit-scrollbar-track {
+    background: rgba(255 255 255 / 0.12);
+    border-radius: 9999px;
+}
+.scrollbar-bright::-webkit-scrollbar-thumb {
+    background: rgba(255 255 255 / 0.6);
+    border-radius: 9999px;
+}
+.scrollbar-bright::-webkit-scrollbar-thumb:hover {
+    background: rgba(255 255 255 / 0.85);
 }
 
 /* Partners section — single horizontal marquee belt */
