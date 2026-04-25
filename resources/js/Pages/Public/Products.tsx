@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowRight, ArrowLeft, LayoutGrid, Ruler, Shield, Package, Zap, Flame, Box, Microscope, Target, CheckCircle, ChevronDown } from 'lucide-react';
+import { ArrowRight, ArrowLeft, LayoutGrid, Ruler, Shield, Package, Zap, Flame, Box, Microscope, Target, CheckCircle, ChevronDown, FileText, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -98,6 +98,26 @@ const iconRegistry: Record<string, React.ElementType> = {
 
 const resolveIcon = (key: string | undefined): React.ElementType =>
   (key && iconRegistry[key]) || Package;
+
+// --- Per-product downloadable datasheet (slug → PDF + button label)
+interface ProductDocument {
+  url: string;
+  labelEn: string;
+  labelAr: string;
+}
+
+const productDocuments: Record<string, ProductDocument> = {
+  'billets': {
+    url: '/documents/products/billet-specification-sheet.pdf',
+    labelEn: 'View Specification Sheet',
+    labelAr: 'عرض ورقة المواصفات',
+  },
+  'tmt-bars': {
+    url: '/documents/products/tmt-bars-material-test-certificate.pdf',
+    labelEn: 'View Material Test Certificate',
+    labelAr: 'عرض شهادة اختبار المواد',
+  },
+};
 
 // --- Spec Data Table Component ---
 function SpecDataTable({ tableData }: { tableData: { title: string; headers: string[]; rows: string[][] } | null }) {
@@ -399,6 +419,7 @@ export default function Products({ products }: Props) {
   const [autoCycle, setAutoCycle] = useState(true);
   const [cycleProgress, setCycleProgress] = useState(0);
   const [isLg, setIsLg] = useState(false);
+  const [viewingDoc, setViewingDoc] = useState<ProductDocument | null>(null);
   const detailRef = useRef<HTMLDivElement>(null);
   const leftPanelRef = useRef<HTMLDivElement>(null);
   const [panelSize, setPanelSize] = useState({ w: 0, h: 0 });
@@ -636,7 +657,8 @@ export default function Products({ products }: Props) {
     if (!selectedProduct) return null;
 
     switch (activeTab) {
-      case 'overview':
+      case 'overview': {
+        const doc = productDocuments[selectedProduct.slug];
         return (
           <div className="space-y-8">
             {/* Description */}
@@ -645,6 +667,21 @@ export default function Products({ products }: Props) {
                 <p key={i} className="text-white leading-relaxed">{paragraph}</p>
               ))}
             </div>
+
+            {/* Datasheet — opens in an in-page PDF viewer modal */}
+            {doc && (
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setViewingDoc(doc)}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-primary font-semibold text-sm hover:bg-white/90 transition-colors cursor-pointer group"
+                >
+                  <FileText size={16} />
+                  {language === 'ar' ? doc.labelAr : doc.labelEn}
+                  <ArrowRight className="ms-1 rtl:rotate-180 group-hover:translate-x-0.5 transition-transform" size={14} />
+                </button>
+              </div>
+            )}
 
             {/* Spec Highlight Icons */}
             {selectedProduct.spec_icons.length > 0 && (
@@ -680,6 +717,7 @@ export default function Products({ products }: Props) {
             )}
           </div>
         );
+      }
 
       case 'specifications':
         return (
@@ -1120,6 +1158,53 @@ export default function Products({ products }: Props) {
           </AnimatePresence>
         </div>
       </section>
+
+      {/* PDF Viewer Modal — opened from the Overview tab's datasheet button */}
+      <AnimatePresence>
+        {viewingDoc && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={() => setViewingDoc(null)}
+          >
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="relative bg-gray-900 border border-white/10 rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-gray-900/95 backdrop-blur-sm shrink-0">
+                <div className="flex items-center gap-3 min-w-0">
+                  <FileText size={20} className="text-primary shrink-0" />
+                  <h3 className="text-white font-semibold truncate">
+                    {language === 'ar' ? viewingDoc.labelAr : viewingDoc.labelEn}
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setViewingDoc(null)}
+                  aria-label="Close"
+                  className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0 ms-4"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="flex-1 min-h-0 bg-gray-800">
+                <iframe
+                  src={viewingDoc.url}
+                  className="w-full h-full min-h-[70vh] border-0"
+                  title={language === 'ar' ? viewingDoc.labelAr : viewingDoc.labelEn}
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </PublicLayout>
   );
 }
