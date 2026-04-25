@@ -229,6 +229,8 @@ export default function Settings({ settings, undoMeta }: Props) {
     company_address_en: MapPin,
     company_address_ar: MapPin,
     linkedin_url: Linkedin,
+    facebook_url: Facebook,
+    instagram_url: Instagram,
     contact_recipients: Inbox,
     career_recipients: Briefcase,
     google_maps_embed_url: Map,
