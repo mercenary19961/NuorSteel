@@ -375,6 +375,10 @@ const en = {
       label: "Quality Assurance",
       title: "Quality & Manufacturing Standards",
       subtitle: "Engineered precision and consistent performance across every product we deliver.",
+      manufacturingProcess: {
+        button: "View Manufacturing Process",
+        title: "Manufacturing Process",
+      },
     },
     assurance: {
       label: "Our Approach",
