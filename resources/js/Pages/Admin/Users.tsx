@@ -107,6 +107,17 @@ export default function UsersPage({ users }: Props) {
     router.post(`/admin/users/${user.id}/resend-invite`, {}, { preserveScroll: true });
   };
 
+  // Compact relative-time formatter — avoids pulling in date-fns for one usage.
+  const relativeTime = (iso: string | null | undefined): string => {
+    if (!iso) return 'Never';
+    const diffSeconds = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+    if (diffSeconds < 60) return 'Just now';
+    if (diffSeconds < 3600) return `${Math.floor(diffSeconds / 60)} min ago`;
+    if (diffSeconds < 86400) return `${Math.floor(diffSeconds / 3600)} hr ago`;
+    if (diffSeconds < 2592000) return `${Math.floor(diffSeconds / 86400)} days ago`;
+    return new Date(iso).toLocaleDateString();
+  };
+
   const handleToggle = (user: User) => {
     if (user.id === currentUser?.id) return;
     router.post(`/admin/users/${user.id}/toggle`, {}, { preserveScroll: true });
@@ -150,6 +161,7 @@ export default function UsersPage({ users }: Props) {
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">User</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Role</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Status</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Last login</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Created</th>
                   <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">Actions</th>
                 </tr>
@@ -199,6 +211,12 @@ export default function UsersPage({ users }: Props) {
                           }`}>
                             {user.is_active ? 'Active' : 'Inactive'}
                           </span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-700">
+                        <div>{relativeTime(user.last_login_at)}</div>
+                        {user.last_login_ip && (
+                          <div className="text-xs text-gray-400 mt-0.5">From {user.last_login_ip}</div>
                         )}
                       </td>
                       <td className="py-3 px-4 text-sm text-gray-500">

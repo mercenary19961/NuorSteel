@@ -53,6 +53,9 @@ class LoginController extends Controller
 
         if (!Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             RateLimiter::hit($key, self::DECAY_SECONDS);
+            // 750ms delay on failed login — slows down brute force without being
+            // annoyingly slow for a real user who mistyped their password once.
+            usleep(750_000);
 
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
@@ -66,6 +69,7 @@ class LoginController extends Controller
             $request->session()->invalidate();
             $request->session()->regenerateToken();
             RateLimiter::hit($key, self::DECAY_SECONDS);
+            usleep(750_000);
 
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
@@ -74,6 +78,12 @@ class LoginController extends Controller
 
         RateLimiter::clear($key);
         $request->session()->regenerate();
+
+        // Stamp last-login audit fields (slice 8 surface in admin users list).
+        $user->forceFill([
+            'last_login_at' => now(),
+            'last_login_ip' => $request->ip(),
+        ])->save();
 
         return redirect()->intended('/admin');
     }
