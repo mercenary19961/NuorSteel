@@ -24,6 +24,8 @@ export interface PageProps {
     email: string;
     address: string;
     linkedin_url: string;
+    facebook_url: string;
+    instagram_url: string;
     google_maps_embed_url: string;
     google_maps_place_url: string;
   };

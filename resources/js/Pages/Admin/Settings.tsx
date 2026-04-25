@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Save, Settings as SettingsIcon, X, Plus, Info, Phone, Mail, MapPin, Linkedin, Inbox, Briefcase, Map, ExternalLink, AlertTriangle, Lock, Pencil, type LucideIcon } from 'lucide-react';
+import { Save, Settings as SettingsIcon, X, Plus, Info, Phone, Mail, MapPin, Linkedin, Facebook, Instagram, Inbox, Briefcase, Map, ExternalLink, AlertTriangle, Lock, Pencil, type LucideIcon } from 'lucide-react';
 import UndoButton from '@/Components/Admin/UndoButton';
 import type { Setting, UndoMeta } from '@/types';
 
