@@ -498,11 +498,19 @@ Comprehensive auth hardening + invite/reset email flows. Eight slices, four merg
 - [x] Schemas: Organization, WebSite, SiteNavigationElement, FAQPage
 - [x] Included in `app.blade.php` via `@include('partials.structured-data')`
 - [x] Phone, email, LinkedIn URL driven by `Setting::get()` (editable from admin Settings)
+- [x] **Dynamic sitemap at `/sitemap.xml`** ([SitemapController](app/Http/Controllers/SitemapController.php) + [sitemap.blade.php](resources/views/sitemap.blade.php)) — emits all 7 static public pages + each active product detail page + each open career listing, with `<lastmod>` from the model `updated_at` for dynamic entries. Route registered in [routes/web.php](routes/web.php) (no auth, no rate limit — search engines need free access)
+- [x] **`robots.txt` hardened** — disallows `/admin`, `/login`, `/forgot-password`, `/reset-password`, `/media/`; references `https://nuorsteel.com/sitemap.xml`
 - [ ] **TODO: Replace remaining PLACEHOLDER values** before going live:
   - Address (street, city, region, postal code)
   - Number of employees
   - FAQ answers (city name)
   - OG image path
+- [ ] **TODO (post-deploy, after final domain is live)**:
+  1. **Verify `APP_URL` on Railway** matches the production domain (e.g. `https://nuorsteel.com`). The sitemap uses Laravel's `route()` helper which derives absolute URLs from `APP_URL` — if it's still set to the staging URL, every `<loc>` in the sitemap will point to staging and Google will index the wrong URLs.
+  2. **Update `Sitemap:` line in [public/robots.txt](public/robots.txt)** if the final domain differs from `https://nuorsteel.com` (currently hardcoded).
+  3. **Submit to Google Search Console**: verify domain ownership (DNS TXT record), submit `/sitemap.xml` under the Sitemaps section, and use URL Inspection to request indexing on the home page + 4–5 most-trafficked pages (about, products, contact, career, quality).
+  4. **Hit `/sitemap.xml` in production** once after deploy — confirm all `<loc>` URLs use `https://` + the correct domain, not localhost or staging.
+  5. **(Optional)** Submit to **Bing Webmaster Tools** as well — same sitemap URL, separate verification.
 - [ ] **TODO: Cookie consent banner** — when SEO/analytics work begins OR any ad/tracking API is integrated (Google Analytics, Google Ads, Meta Pixel, LinkedIn Insight Tag, etc.), add a consent service that captures user approval BEFORE loading the tracking scripts. Use the same approach as Hardrock (reference implementation). GDPR + Saudi PDPL compliance — no trackers should fire until consent is granted. Applies to: gtag.js, fbq, LinkedIn partner script, anything setting non-essential cookies.
 
 ### Settings Wired to Site (DONE)
