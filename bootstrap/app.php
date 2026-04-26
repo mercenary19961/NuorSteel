@@ -69,5 +69,20 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Per-IP throttle on POST /admin/login (throttle:10,15) hits the user with
+        // a default 429 page that boots them off the login form. Catch it and
+        // redirect back so they see the same inline error the per-email throttle
+        // already shows, with their email preserved.
+        $exceptions->render(function (\Illuminate\Http\Exceptions\ThrottleRequestsException $e, \Illuminate\Http\Request $request) {
+            if ($request->isMethod('POST') && $request->is('admin/login')) {
+                $retryAfter = (int) ($e->getHeaders()['Retry-After'] ?? 60);
+                $minutes = max(1, (int) ceil($retryAfter / 60));
+
+                return redirect()->route('login')
+                    ->withErrors([
+                        'email' => "Too many login attempts from this network. Please try again in {$minutes} minute(s).",
+                    ])
+                    ->withInput($request->only('email'));
+            }
+        });
     })->create();

@@ -7,7 +7,7 @@ import type { PageProps } from '@/types';
 
 export default function Footer() {
   const { t } = useTranslation();
-  const { siteSettings } = usePage<PageProps>().props;
+  const { siteSettings, turnstileSiteKey } = usePage<PageProps>().props;
   const currentYear = new Date().getFullYear();
   const [highlightContact, setHighlightContact] = useState(false);
   const turnstileRef = useRef<TurnstileHandle>(null);
@@ -182,7 +182,7 @@ export default function Footer() {
                 )}
                 <button
                   type="submit"
-                  disabled={processing || !data['cf-turnstile-response']}
+                  disabled={processing || (!!turnstileSiteKey && !data['cf-turnstile-response'])}
                   className="px-4 py-2 bg-primary hover:bg-primary-dark rounded-md text-sm font-medium transition-colors disabled:opacity-50"
                 >
                   {processing ? '...' : t('footer.subscribe')}

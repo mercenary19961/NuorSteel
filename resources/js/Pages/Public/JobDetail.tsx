@@ -1,9 +1,10 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowLeft, MapPin, Clock, Calendar, Send, CheckCircle } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import Turnstile, { type TurnstileHandle } from '@/Components/Public/Turnstile';
+import type { PageProps } from '@/types';
 
 interface Props {
   job: {
@@ -23,6 +24,7 @@ interface Props {
 
 export default function JobDetail({ job }: Props) {
   const { t } = useTranslation();
+  const { turnstileSiteKey } = usePage<PageProps>().props;
   const [showForm, setShowForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
@@ -162,7 +164,7 @@ export default function JobDetail({ job }: Props) {
                   <Turnstile ref={turnstileRef} onVerify={setTurnstileToken} />
                   <button
                     type="submit"
-                    disabled={processing || !turnstileToken}
+                    disabled={processing || (!!turnstileSiteKey && !turnstileToken)}
                     className="w-full inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-md font-medium transition-colors"
                   >
                     {processing ? t('career.form.submitting') : t('career.form.submit')}

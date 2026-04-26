@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Services\TurnstileVerifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,8 +39,9 @@ class LoginController extends Controller
 
         if (RateLimiter::tooManyAttempts($key, self::MAX_ATTEMPTS)) {
             $seconds = RateLimiter::availableIn($key);
+            $minutes = max(1, (int) ceil($seconds / 60));
             throw ValidationException::withMessages([
-                'email' => ['Too many login attempts. Please try again in '.ceil($seconds / 60).' minute(s).'],
+                'email' => ["Too many login attempts for this email. Please try again in {$minutes} minute(s)."],
             ])->status(429);
         }
 
@@ -51,6 +53,23 @@ class LoginController extends Controller
             ]);
         }
 
+        // Per client request: distinguish wrong-email vs wrong-password in the
+        // error message. This is a deliberate trade-off — it enables user
+        // enumeration (an attacker can confirm whether a given email is a
+        // registered admin). Mitigated by: invite-only admin accounts (no public
+        // signup), per-email + per-IP throttles, Turnstile, and 750ms delay on
+        // every failed attempt.
+        $existingUser = User::where('email', $request->input('email'))->first();
+
+        if (!$existingUser) {
+            RateLimiter::hit($key, self::DECAY_SECONDS);
+            usleep(750_000);
+
+            throw ValidationException::withMessages([
+                'email' => ['No account found with this email address.'],
+            ]);
+        }
+
         if (!Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             RateLimiter::hit($key, self::DECAY_SECONDS);
             // 750ms delay on failed login — slows down brute force without being
@@ -58,7 +77,7 @@ class LoginController extends Controller
             usleep(750_000);
 
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+                'password' => ['Incorrect password. Please try again.'],
             ]);
         }
 
@@ -72,7 +91,7 @@ class LoginController extends Controller
             usleep(750_000);
 
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+                'email' => ['This account has been deactivated. Please contact your administrator.'],
             ]);
         }
 
