@@ -2,6 +2,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Lock, Mail } from 'lucide-react';
 import { useRef } from 'react';
 import Turnstile, { type TurnstileHandle } from '@/Components/Public/Turnstile';
+import PasswordInput from '@/Components/ui/PasswordInput';
 import type { PageProps } from '@/types';
 
 export default function Login() {
@@ -92,19 +93,16 @@ export default function Login() {
                     Forgot password?
                   </Link>
                 </div>
-                <div className="relative">
-                  <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    id="password"
-                    type="password"
-                    value={data.password}
-                    onChange={(e) => setData('password', e.target.value)}
-                    required
-                    autoComplete="current-password"
-                    className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                    placeholder="Enter your password"
-                  />
-                </div>
+                <PasswordInput
+                  id="password"
+                  value={data.password}
+                  onChange={(e) => setData('password', e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  placeholder="Enter your password"
+                  leftIcon={<Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />}
+                  className="w-full pl-10 pr-10 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                />
               </div>
 
               <Turnstile

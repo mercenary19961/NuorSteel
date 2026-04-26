@@ -1,5 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
 import { Lock, User as UserIcon } from 'lucide-react';
+import PasswordInput from '@/Components/ui/PasswordInput';
 
 interface Props {
   user: {
@@ -52,40 +53,34 @@ export default function AcceptInvite({ user, signedQuery }: Props) {
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                   Password
                 </label>
-                <div className="relative">
-                  <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    id="password"
-                    type="password"
-                    value={data.password}
-                    onChange={(e) => setData('password', e.target.value)}
-                    required
-                    autoComplete="new-password"
-                    minLength={8}
-                    className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                    placeholder="At least 8 characters"
-                  />
-                </div>
+                <PasswordInput
+                  id="password"
+                  value={data.password}
+                  onChange={(e) => setData('password', e.target.value)}
+                  required
+                  autoComplete="new-password"
+                  minLength={8}
+                  placeholder="At least 8 characters"
+                  leftIcon={<Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />}
+                  className="w-full pl-10 pr-10 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                />
               </div>
 
               <div>
                 <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-700 mb-1">
                   Confirm password
                 </label>
-                <div className="relative">
-                  <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    id="password_confirmation"
-                    type="password"
-                    value={data.password_confirmation}
-                    onChange={(e) => setData('password_confirmation', e.target.value)}
-                    required
-                    autoComplete="new-password"
-                    minLength={8}
-                    className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                    placeholder="Re-enter your password"
-                  />
-                </div>
+                <PasswordInput
+                  id="password_confirmation"
+                  value={data.password_confirmation}
+                  onChange={(e) => setData('password_confirmation', e.target.value)}
+                  required
+                  autoComplete="new-password"
+                  minLength={8}
+                  placeholder="Re-enter your password"
+                  leftIcon={<Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />}
+                  className="w-full pl-10 pr-10 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                />
               </div>
 
               <button

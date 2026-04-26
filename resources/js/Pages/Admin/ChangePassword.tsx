@@ -1,5 +1,6 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Lock, AlertTriangle, ArrowLeft } from 'lucide-react';
+import PasswordInput from '@/Components/ui/PasswordInput';
 import type { PageProps } from '@/types';
 
 interface Props {
@@ -59,18 +60,15 @@ export default function ChangePassword({ forced }: Props) {
                 <label htmlFor="current_password" className="block text-sm font-medium text-gray-700 mb-1">
                   Current password
                 </label>
-                <div className="relative">
-                  <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    id="current_password"
-                    type="password"
-                    value={data.current_password}
-                    onChange={(e) => setData('current_password', e.target.value)}
-                    required
-                    autoComplete="current-password"
-                    className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                  />
-                </div>
+                <PasswordInput
+                  id="current_password"
+                  value={data.current_password}
+                  onChange={(e) => setData('current_password', e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  leftIcon={<Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />}
+                  className="w-full pl-10 pr-10 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                />
                 {errors.current_password && (
                   <p className="text-xs text-red-600 mt-1">{errors.current_password}</p>
                 )}
@@ -80,20 +78,17 @@ export default function ChangePassword({ forced }: Props) {
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                   New password
                 </label>
-                <div className="relative">
-                  <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    id="password"
-                    type="password"
-                    value={data.password}
-                    onChange={(e) => setData('password', e.target.value)}
-                    required
-                    autoComplete="new-password"
-                    minLength={8}
-                    className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                    placeholder="At least 8 characters"
-                  />
-                </div>
+                <PasswordInput
+                  id="password"
+                  value={data.password}
+                  onChange={(e) => setData('password', e.target.value)}
+                  required
+                  autoComplete="new-password"
+                  minLength={8}
+                  placeholder="At least 8 characters"
+                  leftIcon={<Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />}
+                  className="w-full pl-10 pr-10 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                />
                 {errors.password && (
                   <p className="text-xs text-red-600 mt-1">{errors.password}</p>
                 )}
@@ -103,19 +98,16 @@ export default function ChangePassword({ forced }: Props) {
                 <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-700 mb-1">
                   Confirm new password
                 </label>
-                <div className="relative">
-                  <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    id="password_confirmation"
-                    type="password"
-                    value={data.password_confirmation}
-                    onChange={(e) => setData('password_confirmation', e.target.value)}
-                    required
-                    autoComplete="new-password"
-                    minLength={8}
-                    className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                  />
-                </div>
+                <PasswordInput
+                  id="password_confirmation"
+                  value={data.password_confirmation}
+                  onChange={(e) => setData('password_confirmation', e.target.value)}
+                  required
+                  autoComplete="new-password"
+                  minLength={8}
+                  leftIcon={<Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />}
+                  className="w-full pl-10 pr-10 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                />
               </div>
 
               <button
