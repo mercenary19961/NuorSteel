@@ -12,6 +12,7 @@ use App\Http\Controllers\Public\ContactController;
 use App\Http\Controllers\Public\NewsletterController;
 use App\Http\Controllers\Public\LocaleController;
 use App\Http\Controllers\MediaServeController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Auth\AdminInviteController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -62,6 +63,9 @@ Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
 
 // Media serve (public access to uploaded files)
 Route::get('/media/{id}', [MediaServeController::class, 'show'])->name('media.serve')->where('id', '[0-9]+');
+
+// Sitemap for search engines
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // Locale switch
 Route::post('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch')->middleware('throttle:30,1');
