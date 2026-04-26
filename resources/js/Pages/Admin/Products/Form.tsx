@@ -422,57 +422,34 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <div className="flex items-center flex-wrap gap-6">
+              <label className="flex items-center gap-2 cursor-pointer">
                 <input
-                  type="text"
-                  value={form.category}
-                  onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-                  placeholder="e.g. Rebar, Wire Rod"
-                  className={inputClass}
+                  type="checkbox"
+                  checked={form.is_active}
+                  onChange={(e) => setForm((f) => ({ ...f, is_active: e.target.checked }))}
+                  className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
+                <span className="text-sm text-gray-700">Active</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
                 <input
-                  type="number"
-                  value={form.sort_order}
-                  onChange={(e) => setForm((f) => ({ ...f, sort_order: Number(e.target.value) }))}
-                  className={inputClass}
+                  type="checkbox"
+                  checked={form.is_featured}
+                  onChange={(e) => setForm((f) => ({ ...f, is_featured: e.target.checked }))}
+                  className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                 />
-              </div>
-
-              <div className="flex items-end flex-wrap gap-6 pb-2">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={form.is_active}
-                    onChange={(e) => setForm((f) => ({ ...f, is_active: e.target.checked }))}
-                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
-                  />
-                  <span className="text-sm text-gray-700">Active</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={form.is_featured}
-                    onChange={(e) => setForm((f) => ({ ...f, is_featured: e.target.checked }))}
-                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
-                  />
-                  <span className="text-sm text-gray-700">Featured</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer" title="Shows a 'Request Quote' tab on the public product page">
-                  <input
-                    type="checkbox"
-                    checked={form.show_quote_tab}
-                    onChange={(e) => setForm((f) => ({ ...f, show_quote_tab: e.target.checked }))}
-                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
-                  />
-                  <span className="text-sm text-gray-700">Show "Request Quote" tab</span>
-                </label>
-              </div>
+                <span className="text-sm text-gray-700">Featured</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer" title="Shows a 'Request Quote' tab on the public product page">
+                <input
+                  type="checkbox"
+                  checked={form.show_quote_tab}
+                  onChange={(e) => setForm((f) => ({ ...f, show_quote_tab: e.target.checked }))}
+                  className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                />
+                <span className="text-sm text-gray-700">Show "Request Quote" tab</span>
+              </label>
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
