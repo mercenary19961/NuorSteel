@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
+import type { PageProps } from '@/types';
 import {
   Briefcase, MapPin, Clock, Send, CheckCircle, X,
   ArrowRight, FileUp, UserPlus,
@@ -409,6 +410,7 @@ interface ApplicationFormProps {
 }
 
 function ApplicationForm({ formRef, turnstileRef, formError, processing, defaultJobTitle, onSubmit, t }: ApplicationFormProps) {
+  const { turnstileSiteKey } = usePage<PageProps>().props;
   const [turnstileToken, setTurnstileToken] = useState('');
   return (
     <form ref={formRef} onSubmit={onSubmit} className="space-y-4">
@@ -483,7 +485,7 @@ function ApplicationForm({ formRef, turnstileRef, formError, processing, default
       <Turnstile ref={turnstileRef} theme="dark" onVerify={setTurnstileToken} />
       <button
         type="submit"
-        disabled={processing || !turnstileToken}
+        disabled={processing || (!!turnstileSiteKey && !turnstileToken)}
         className="w-full inline-flex items-center justify-center px-6 py-3 bg-primary hover:bg-primary/90 disabled:bg-primary/40 text-white rounded-lg font-medium transition-colors cursor-pointer"
       >
         {processing ? t('career.form.submitting') : t('career.form.submit')}

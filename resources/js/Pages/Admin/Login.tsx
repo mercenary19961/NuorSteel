@@ -6,7 +6,7 @@ import type { PageProps } from '@/types';
 
 export default function Login() {
   const turnstileRef = useRef<TurnstileHandle>(null);
-  const { flash } = usePage<PageProps>().props;
+  const { flash, turnstileSiteKey } = usePage<PageProps>().props;
   const status = (flash as Record<string, string | undefined>)?.status;
   const { data, setData, post, processing, errors } = useForm({
     email: '',
@@ -43,9 +43,19 @@ export default function Login() {
             )}
 
             {/* Error */}
-            {(errors.email || turnstileError) && (
+            {(errors.email || errors.password || turnstileError) && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-700">{errors.email || turnstileError}</p>
+                <p className="text-sm text-red-700">
+                  {errors.email || errors.password || turnstileError}
+                </p>
+                {errors.password && (
+                  <Link
+                    href="/forgot-password"
+                    className="inline-block mt-2 text-xs font-medium text-red-700 underline hover:text-red-900"
+                  >
+                    Forgot your password? Reset it here →
+                  </Link>
+                )}
               </div>
             )}
 
@@ -77,7 +87,7 @@ export default function Login() {
                   </label>
                   <Link
                     href="/forgot-password"
-                    className="text-xs text-primary hover:text-primary-dark transition-colors"
+                    className="text-sm font-medium text-primary hover:text-primary-dark transition-colors"
                   >
                     Forgot password?
                   </Link>
@@ -105,7 +115,7 @@ export default function Login() {
 
               <button
                 type="submit"
-                disabled={processing || !data['cf-turnstile-response']}
+                disabled={processing || (!!turnstileSiteKey && !data['cf-turnstile-response'])}
                 className="w-full py-2.5 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
               >
                 {processing ? 'Signing in...' : 'Sign In'}

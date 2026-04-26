@@ -116,7 +116,7 @@ function RequestTypeSelect({
 }
 
 export default function Contact({ content_en, content_ar }: Props) {
-  const { siteSettings } = usePage<PageProps>().props;
+  const { siteSettings, turnstileSiteKey } = usePage<PageProps>().props;
   const { language } = useLanguage();
   const { t } = useTranslation();
   const content = language === 'ar' ? content_ar : content_en;
@@ -368,7 +368,7 @@ export default function Contact({ content_en, content_ar }: Props) {
                   <Turnstile ref={turnstileRef} theme="dark" onVerify={setTurnstileToken} />
                   <button
                     type="submit"
-                    disabled={processing || !turnstileToken}
+                    disabled={processing || (!!turnstileSiteKey && !turnstileToken)}
                     className="inline-flex items-center px-6 py-3 bg-primary hover:bg-primary/90 disabled:bg-primary/40 text-white rounded-lg font-medium transition-colors cursor-pointer"
                   >
                     {processing ? t('contact.form.sending') : (content?.form?.submit_text || t('contact.form.submit'))}
