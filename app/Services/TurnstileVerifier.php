@@ -51,7 +51,19 @@ class TurnstileVerifier
             return false;
         }
 
-        return $response->json('success') === true;
+        $success = $response->json('success') === true;
+
+        // Cloudflare returns 200 OK with success=false + error-codes on hostname
+        // mismatch, expired/duplicated token, etc. Log so we can diagnose the
+        // "widget says Success! but server rejects" failure mode.
+        if (!$success) {
+            Log::warning('Turnstile siteverify rejected', [
+                'error_codes' => $response->json('error-codes'),
+                'hostname' => $response->json('hostname'),
+            ]);
+        }
+
+        return $success;
     }
 
     public function isEnabled(): bool
