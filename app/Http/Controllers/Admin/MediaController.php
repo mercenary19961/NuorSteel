@@ -220,6 +220,33 @@ class MediaController extends Controller
         return redirect()->back()->with('success', 'Media deleted successfully.');
     }
 
+    /**
+     * Soft-delete multiple media items in one shot.
+     *
+     * Undo intentionally not supported here — the modal confirmation IS the
+     * safety net for an explicit bulk action. Items remain soft-deleted in the
+     * media table and can be restored from there if needed.
+     */
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'ids'   => ['required', 'array', 'min:1', 'max:200'],
+            'ids.*' => ['integer'],
+        ]);
+
+        $deleted = Media::whereIn('id', $request->input('ids'))->get();
+        foreach ($deleted as $media) {
+            $media->delete();
+        }
+
+        $count = $deleted->count();
+
+        return redirect()->back()->with(
+            'success',
+            "{$count} " . ($count === 1 ? 'file' : 'files') . ' deleted.',
+        );
+    }
+
     public function jsonIndex(Request $request): \Illuminate\Http\JsonResponse
     {
         $query = Media::query();
@@ -330,24 +357,38 @@ class MediaController extends Controller
     public function deleteFolder(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string'],
+            'name'         => ['required', 'string'],
+            'delete_files' => ['nullable', 'boolean'],
         ]);
 
         $name = $request->input('name');
+        $deleteFiles = $request->boolean('delete_files');
 
         if ($name === 'general') {
             return redirect()->back()->with('error', 'The "general" folder cannot be deleted.');
         }
 
-        // Move any files in this folder to "general"
-        Media::where('folder', $name)->update(['folder' => 'general']);
+        if ($deleteFiles) {
+            // Soft-delete every file in this folder. Caller has already
+            // type-confirmed the folder name in the UI, so this is opt-in.
+            $files = Media::where('folder', $name)->get();
+            $deletedCount = $files->count();
+            foreach ($files as $media) {
+                $media->delete();
+            }
+            $message = "Folder \"{$name}\" deleted along with {$deletedCount} "
+                . ($deletedCount === 1 ? 'file' : 'files') . '.';
+        } else {
+            // Default behaviour: move files to "general" so they aren't lost.
+            Media::where('folder', $name)->update(['folder' => 'general']);
+            $message = "Folder \"{$name}\" deleted. Files moved to \"general\".";
+        }
 
         // Remove from custom folders list
         $customFolders = array_filter($this->getCustomFolders(), fn ($f) => $f !== $name);
         $this->saveCustomFolders(array_values($customFolders));
 
-        return redirect()->route('admin.media.index')
-            ->with('success', "Folder \"{$name}\" deleted. Files moved to \"general\".");
+        return redirect()->route('admin.media.index')->with('success', $message);
     }
 
     /**

@@ -130,6 +130,7 @@ Route::middleware(['auth', AdminIdleTimeout::class, ForcePasswordChange::class])
     Route::post('/media/folders', [AdminMediaController::class, 'createFolder'])->name('media.create-folder');
     Route::put('/media/folders', [AdminMediaController::class, 'renameFolder'])->name('media.rename-folder');
     Route::delete('/media/folders', [AdminMediaController::class, 'deleteFolder'])->name('media.delete-folder');
+    Route::post('/media/bulk-delete', [AdminMediaController::class, 'bulkDestroy'])->name('media.bulk-destroy');
     Route::put('/media/{id}', [AdminMediaController::class, 'update'])->name('media.update');
     Route::delete('/media/{id}', [AdminMediaController::class, 'destroy'])->name('media.destroy');
 

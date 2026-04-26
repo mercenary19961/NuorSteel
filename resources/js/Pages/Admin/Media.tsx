@@ -23,6 +23,9 @@ import {
   Link2,
   Eye,
   Download,
+  CheckSquare,
+  Square,
+  Check,
 } from 'lucide-react';
 import UndoButton from '@/Components/Admin/UndoButton';
 import type { Media, MediaUsage, PaginatedData, UndoMeta } from '@/types';
@@ -87,7 +90,57 @@ export default function MediaPage({ media, folders, folderCounts, folderPreviews
   const [previewItem, setPreviewItem] = useState<Media | null>(null);
   const [processing, setProcessing] = useState(false);
 
+  // Multi-select (only inside a folder)
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+  const [bulkDeleteConfirmText, setBulkDeleteConfirmText] = useState('');
+
+  // Folder-delete also-delete-files toggle
+  const [deleteFolderFiles, setDeleteFolderFiles] = useState(false);
+
   const items = media.data;
+  const allSelectedOnPage = items.length > 0 && items.every((it) => selectedIds.has(it.id));
+
+  // Drop selection when the user navigates between folders or pages.
+  // Stale ids from another view would otherwise hang around in state.
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [filters.folder, media.current_page]);
+
+  const toggleSelected = (id: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (allSelectedOnPage) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(items.map((it) => it.id)));
+    }
+  };
+
+  const clearSelection = () => setSelectedIds(new Set());
+
+  const handleBulkDelete = () => {
+    if (selectedIds.size === 0) return;
+    router.post('/admin/media/bulk-delete', {
+      ids: Array.from(selectedIds),
+    } as unknown as Record<string, string>, {
+      preserveScroll: true,
+      onStart: () => setProcessing(true),
+      onFinish: () => setProcessing(false),
+      onSuccess: () => {
+        setShowBulkDeleteModal(false);
+        setBulkDeleteConfirmText('');
+        setSelectedIds(new Set());
+      },
+    });
+  };
 
   // Close folder context menu when clicking outside
   useEffect(() => {
@@ -183,15 +236,19 @@ export default function MediaPage({ media, folders, folderCounts, folderPreviews
   const openDeleteFolder = (folder: string) => {
     setDeletingFolder(folder);
     setDeleteConfirmText('');
+    setDeleteFolderFiles(false);
     setFolderMenuOpen(null);
   };
 
   const handleDeleteFolder = () => {
     if (!deletingFolder || deleteConfirmText !== deletingFolder) return;
+    const target = deletingFolder;
+    const alsoDeleteFiles = deleteFolderFiles;
     setDeletingFolder(null);
     setDeleteConfirmText('');
+    setDeleteFolderFiles(false);
     router.delete('/admin/media/folders', {
-      data: { name: deletingFolder },
+      data: { name: target, delete_files: alsoDeleteFiles },
       preserveState: false,
     });
   };
@@ -476,6 +533,52 @@ export default function MediaPage({ media, folders, folderCounts, folderPreviews
               <span className="text-sm text-gray-500 ml-auto">{media.total} files</span>
             </div>
 
+            {/* ---- Inside Folder: Selection Action Bar ---- */}
+            {items.length > 0 && (
+              <div
+                className={`flex items-center gap-3 mb-4 p-3 rounded-lg border transition-colors ${
+                  selectedIds.size > 0
+                    ? 'bg-primary/5 border-primary/30'
+                    : 'bg-white border-gray-200'
+                }`}
+              >
+                <button
+                  onClick={toggleSelectAll}
+                  className="flex items-center gap-2 px-2 py-1 -m-1 rounded-md hover:bg-white/60 transition-colors text-sm font-medium text-gray-700 cursor-pointer"
+                >
+                  {allSelectedOnPage ? (
+                    <CheckSquare size={18} className="text-primary" />
+                  ) : (
+                    <Square size={18} className="text-gray-400" />
+                  )}
+                  {allSelectedOnPage ? 'Deselect all' : 'Select all'}
+                </button>
+
+                {selectedIds.size > 0 && (
+                  <>
+                    <span className="text-sm text-gray-600">
+                      <strong className="text-gray-900">{selectedIds.size}</strong> selected
+                    </span>
+                    <button
+                      onClick={clearSelection}
+                      className="text-sm text-gray-500 hover:text-gray-700 underline cursor-pointer"
+                    >
+                      Clear
+                    </button>
+                    <div className="ml-auto">
+                      <button
+                        onClick={() => setShowBulkDeleteModal(true)}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg cursor-pointer"
+                      >
+                        <Trash2 size={14} />
+                        Delete ({selectedIds.size})
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
             {/* ---- Inside Folder: Media Grid ---- */}
             {items.length === 0 ? (
               <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
@@ -485,11 +588,34 @@ export default function MediaPage({ media, folders, folderCounts, folderPreviews
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {items.map((item) => (
+                {items.map((item) => {
+                  const isSelected = selectedIds.has(item.id);
+                  return (
                   <div
                     key={item.id}
-                    className="group relative bg-white rounded-xl border border-gray-200 hover:shadow-md transition-shadow"
+                    className={`group relative bg-white rounded-xl border transition-shadow hover:shadow-md ${
+                      isSelected ? 'border-primary ring-2 ring-primary/30' : 'border-gray-200'
+                    }`}
                   >
+                    {/* Selection checkbox — always visible when something is selected on this page,
+                        else only on hover. Stops click propagation so it doesn't open the preview. */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleSelected(item.id);
+                      }}
+                      aria-label={isSelected ? 'Deselect' : 'Select'}
+                      className={`absolute top-2 left-2 z-10 w-6 h-6 rounded-md flex items-center justify-center transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-primary text-white shadow-md opacity-100'
+                          : `bg-white/90 backdrop-blur-sm border border-gray-300 text-transparent hover:border-primary ${
+                              selectedIds.size > 0 ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                            }`
+                      }`}
+                    >
+                      <Check size={14} strokeWidth={3} />
+                    </button>
+
                     <div
                       className="aspect-square bg-gray-100 flex items-center justify-center relative rounded-t-xl overflow-hidden cursor-pointer"
                       onClick={() => setPreviewItem(item)}
@@ -586,7 +712,8 @@ export default function MediaPage({ media, folders, folderCounts, folderPreviews
                       </div>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
@@ -979,6 +1106,61 @@ export default function MediaPage({ media, folders, folderCounts, folderPreviews
           </div>
         )}
 
+        {/* ---- Bulk Delete Confirmation Modal ---- */}
+        {showBulkDeleteModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div
+              className="absolute inset-0 bg-black/50"
+              onClick={() => { setShowBulkDeleteModal(false); setBulkDeleteConfirmText(''); }}
+            />
+            <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                  <AlertTriangle size={20} className="text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Delete Selected Files</h3>
+                  <p className="mt-1 text-sm text-gray-600">
+                    You're about to delete{' '}
+                    <strong className="text-red-600">{selectedIds.size} {selectedIds.size === 1 ? 'file' : 'files'}</strong>.
+                    Files will be soft-deleted and can be restored from the database.
+                  </p>
+                </div>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Type <span className="font-mono text-red-600 bg-red-50 px-1.5 py-0.5 rounded">delete</span> to confirm
+                </label>
+                <input
+                  type="text"
+                  value={bulkDeleteConfirmText}
+                  onChange={(e) => setBulkDeleteConfirmText(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && bulkDeleteConfirmText === 'delete' && handleBulkDelete()}
+                  placeholder="Type 'delete'..."
+                  autoFocus
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400"
+                />
+              </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => { setShowBulkDeleteModal(false); setBulkDeleteConfirmText(''); }}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleBulkDelete}
+                  disabled={bulkDeleteConfirmText !== 'delete' || processing}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Trash2 size={16} />
+                  Delete {selectedIds.size} {selectedIds.size === 1 ? 'file' : 'files'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ---- Delete Folder Confirmation Modal ---- */}
         {deletingFolder && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -993,13 +1175,37 @@ export default function MediaPage({ media, folders, folderCounts, folderPreviews
                   <p className="mt-1 text-sm text-gray-600">
                     Are you sure you want to delete the folder <strong>"{folderDisplayName(deletingFolder)}"</strong>?
                     {(folderCounts[deletingFolder] ?? 0) > 0 && (
-                      <span className="block mt-1 text-red-600 font-medium">
-                        This folder contains {folderCounts[deletingFolder]} {folderCounts[deletingFolder] === 1 ? 'file' : 'files'} that will be moved to the "general" folder.
-                      </span>
+                      deleteFolderFiles ? (
+                        <span className="block mt-1 text-red-600 font-medium">
+                          {folderCounts[deletingFolder]} {folderCounts[deletingFolder] === 1 ? 'file' : 'files'} inside this folder will also be deleted.
+                        </span>
+                      ) : (
+                        <span className="block mt-1 text-gray-600">
+                          The {folderCounts[deletingFolder]} {folderCounts[deletingFolder] === 1 ? 'file' : 'files'} inside will be moved to the "General Media" folder.
+                        </span>
+                      )
                     )}
                   </p>
                 </div>
               </div>
+
+              {(folderCounts[deletingFolder] ?? 0) > 0 && (
+                <label className="flex items-start gap-2.5 mb-4 p-3 rounded-lg bg-gray-50 border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={deleteFolderFiles}
+                    onChange={(e) => setDeleteFolderFiles(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 rounded border-gray-300 text-red-600 focus:ring-red-500 cursor-pointer"
+                  />
+                  <span className="text-sm text-gray-700">
+                    <span className="font-medium">Also delete all files inside this folder</span>
+                    <span className="block text-xs text-gray-500 mt-0.5">
+                      Files will be soft-deleted and can be restored from the database, but they won't appear in the Media Library anymore.
+                    </span>
+                  </span>
+                </label>
+              )}
+
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Type <span className="font-mono text-red-600 bg-red-50 px-1.5 py-0.5 rounded">{deletingFolder}</span> to confirm
@@ -1016,7 +1222,7 @@ export default function MediaPage({ media, folders, folderCounts, folderPreviews
               </div>
               <div className="flex justify-end gap-3">
                 <button
-                  onClick={() => { setDeletingFolder(null); setDeleteConfirmText(''); }}
+                  onClick={() => { setDeletingFolder(null); setDeleteConfirmText(''); setDeleteFolderFiles(false); }}
                   className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
                   Cancel
