@@ -27,14 +27,23 @@ class DemoContentSeeder extends Seeder
 
         $mediaItems = [];
         $images = [
-            ['source' => 'products/tmt-bars-desktop.png', 'original_filename' => 'tmt-bars.png', 'mime' => 'image/png', 'alt_text_en' => 'TMT reinforcement steel bars', 'alt_text_ar' => 'حديد التسليح', 'folder' => 'products'],
-            ['source' => 'products/billets-desktop.png', 'original_filename' => 'billets.png', 'mime' => 'image/png', 'alt_text_en' => 'Steel billets', 'alt_text_ar' => 'ستيل بِليت', 'folder' => 'products'],
+            ['source' => 'home/products/tmt-bars-desktop.png', 'original_filename' => 'tmt-bars.png', 'mime' => 'image/png', 'alt_text_en' => 'TMT reinforcement steel bars', 'alt_text_ar' => 'حديد التسليح', 'folder' => 'products'],
+            ['source' => 'home/products/billets-desktop.png', 'original_filename' => 'billets.png', 'mime' => 'image/png', 'alt_text_en' => 'Steel billets', 'alt_text_ar' => 'ستيل بِليت', 'folder' => 'products'],
         ];
 
         Storage::makeDirectory('media');
 
         foreach ($images as $img) {
             $sourcePath = public_path('images/' . $img['source']);
+
+            // Skip silently if the source asset isn't present in this checkout.
+            // Lets a collaborator with a partial clone still seed the rest of the
+            // demo data instead of crashing the whole seeder run.
+            if (!file_exists($sourcePath)) {
+                $this->command?->warn("Skipping product image (source not found): {$img['source']}");
+                continue;
+            }
+
             $filename = Str::random(20) . '.png';
             $storagePath = 'media/' . $filename;
 
@@ -103,7 +112,7 @@ class DemoContentSeeder extends Seeder
             'description_en' => 'Our TMT Bars are manufactured using advanced Thermo-Mechanical Treatment technology, ensuring superior strength, ductility, and weldability. Compliant with SASO and international standards (BS 4449:2005, Grade B500B), available in sizes from 8mm to 32mm diameter. Ideal for residential, commercial, and infrastructure projects across the Kingdom.',
             'description_ar' => 'يتم تصنيع قضبان التسليح لدينا باستخدام تقنية المعالجة الحرارية الميكانيكية المتقدمة، مما يضمن قوة فائقة ومرونة وقابلية للحام. متوافقة مع معايير ساسو والمعايير الدولية (BS 4449:2005, Grade B500B)، متوفرة بأقطار من 8 مم إلى 32 مم. مثالية للمشاريع السكنية والتجارية والبنية التحتية في جميع أنحاء المملكة.',
             'category' => 'tmt-bars',
-            'featured_image_id' => $mediaItems[0]->id,
+            'featured_image_id' => $mediaItems[0]->id ?? null,
             'is_active' => true,
             'is_featured' => true,
             'sort_order' => 0,
@@ -119,7 +128,7 @@ class DemoContentSeeder extends Seeder
             'description_en' => 'Nuor Steel produces premium steel billets through Electric Arc Furnace (EAF) steelmaking and continuous casting. Our billets serve as the primary feedstock for TMT bar production and are also available for sale to external rolling mills. Produced to strict chemical and dimensional specifications, ensuring consistent quality downstream.',
             'description_ar' => 'تنتج شركة نور للحديد كتل صلب عالية الجودة من خلال صناعة الصلب بفرن القوس الكهربائي والصب المستمر. تعد ستيل بِليت لدينا المادة الخام الأساسية لإنتاج قضبان التسليح، كما أنها متاحة للبيع لمصانع الدرفلة الخارجية. يتم إنتاجها وفق مواصفات كيميائية وأبعاد صارمة لضمان جودة متسقة.',
             'category' => 'billets',
-            'featured_image_id' => $mediaItems[1]->id,
+            'featured_image_id' => $mediaItems[1]->id ?? null,
             'is_active' => true,
             'is_featured' => true,
             'sort_order' => 1,
