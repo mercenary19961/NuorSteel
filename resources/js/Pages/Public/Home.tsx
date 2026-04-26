@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowRight, ChevronLeft, ChevronRight, ShieldCheck, Leaf, Lightbulb, TrendingUp, Users, Handshake, Linkedin, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import PublicLayout from '@/Layouts/PublicLayout';
@@ -10,7 +10,7 @@ import PartnersSection, { type PartnerData } from '@/Components/Public/PartnersS
 import { HeroTypewriter } from '@/Components/ui/typewriter';
 import { MagicCardGrid, MagicCard } from '@/Components/ui/magic-card';
 import { useLanguage } from '@/contexts/LanguageContext';
-import type { LinkedinPost } from '@/types';
+import type { LinkedinPost, PageProps } from '@/types';
 
 type ContentMap = Record<string, Record<string, string>>;
 
@@ -103,6 +103,7 @@ function HeroVideo() {
 export default function Home({ content_en, content_ar, linkedin_posts, partners }: Props) {
   const { t } = useTranslation();
   const { language } = useLanguage();
+  const { siteSettings } = usePage<PageProps>().props;
   const content = language === 'ar' ? content_ar : content_en;
 
   // Warm the browser cache for the opposite-language hero + about images during idle time.
@@ -644,15 +645,17 @@ export default function Home({ content_en, content_ar, linkedin_posts, partners 
                 </div>
               )}
 
-              <a
-                href="https://www.linkedin.com/company/nuor-steel/?trk=public_post_embed_feed-actor-name"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-6 py-3 bg-[#0A66C2] hover:bg-[#004182] text-white rounded-md font-medium transition-colors"
-              >
-                {t('footer.followLinkedIn')}
-                <Linkedin className="ltr:ml-2 rtl:mr-2" size={18} />
-              </a>
+              {siteSettings.linkedin_url && (
+                <a
+                  href={siteSettings.linkedin_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3 bg-[#0A66C2] hover:bg-[#004182] text-white rounded-md font-medium transition-colors"
+                >
+                  {t('footer.followLinkedIn')}
+                  <Linkedin className="ltr:ml-2 rtl:mr-2" size={18} />
+                </a>
+              )}
             </div>
 
             {/* Right column: post embed (flips to left in RTL) */}
