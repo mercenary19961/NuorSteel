@@ -413,7 +413,7 @@ function ApplicationForm({ formRef, turnstileRef, formError, processing, default
   const { turnstileSiteKey } = usePage<PageProps>().props;
   const [turnstileToken, setTurnstileToken] = useState('');
   return (
-    <form ref={formRef} onSubmit={onSubmit} className="space-y-4">
+    <form ref={formRef} onSubmit={onSubmit} className="space-y-4 form-dark">
       {formError && (
         <div className="p-3 bg-red-950/30 border border-red-500/20 rounded-lg text-sm text-red-300">
           {formError}

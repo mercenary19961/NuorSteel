@@ -173,7 +173,7 @@ export default function Applications({ applications, filters, undoMeta, undoMode
                 {/* Header: name + status */}
                 <div className="flex items-start justify-between mb-3">
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-semibold text-gray-900 truncate">{item.name}</h3>
+                    <h3 className="font-semibold text-gray-900 truncate" dir="auto">{item.name}</h3>
                     <p className="text-xs text-gray-500 truncate">{item.email}</p>
                   </div>
                   <StatusBadge status={item.status} size="sm" />
@@ -183,7 +183,7 @@ export default function Applications({ applications, filters, undoMeta, undoMode
                 <div className="space-y-2 flex-1">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Briefcase size={14} className="text-gray-400 shrink-0" />
-                    <span className="truncate">{item.job_title}</span>
+                    <span className="truncate" dir="auto">{item.job_title}</span>
                   </div>
                   {item.career_listing && (
                     <div className="flex items-center gap-2 text-xs text-gray-400">
@@ -268,7 +268,7 @@ export default function Applications({ applications, filters, undoMeta, undoMode
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-xs text-gray-500">Name</p>
-                  <p className="text-sm font-medium text-gray-900">{viewItem.name}</p>
+                  <p className="text-sm font-medium text-gray-900" dir="auto">{viewItem.name}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Email</p>
@@ -280,7 +280,7 @@ export default function Applications({ applications, filters, undoMeta, undoMode
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Job Title</p>
-                  <p className="text-sm text-gray-700">{viewItem.job_title}</p>
+                  <p className="text-sm text-gray-700" dir="auto">{viewItem.job_title}</p>
                 </div>
               </div>
 

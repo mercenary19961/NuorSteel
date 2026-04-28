@@ -131,11 +131,11 @@ export default function ChangeLog({ logs, users, sectionLabels, filters }: Props
     <div className="py-1.5">
       <p className="text-[11px] font-medium text-gray-400 mb-0.5">{change.label}</p>
       <div className="flex items-center gap-1.5 text-xs">
-        <span className="text-red-500 line-through truncate" title={change.old || '(empty)'}>
+        <span className="text-red-500 line-through truncate" title={change.old || '(empty)'} dir="auto">
           {change.old || <span className="no-underline italic text-gray-300">(empty)</span>}
         </span>
         <ArrowRight size={10} className="text-gray-300 shrink-0" />
-        <span className="text-green-600 truncate" title={change.new || '(empty)'}>
+        <span className="text-green-600 truncate" title={change.new || '(empty)'} dir="auto">
           {change.new || <span className="italic text-gray-300">(empty)</span>}
         </span>
       </div>

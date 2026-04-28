@@ -35,6 +35,23 @@
     }
 }
 
+/* Browser autofill override for dark-themed forms.
+   Chrome ignores background-color on :-webkit-autofill; the inset box-shadow
+   paints over it, and text-fill-color keeps the text white. */
+.form-dark input:-webkit-autofill,
+.form-dark input:-webkit-autofill:hover,
+.form-dark input:-webkit-autofill:focus,
+.form-dark textarea:-webkit-autofill,
+.form-dark textarea:-webkit-autofill:hover,
+.form-dark textarea:-webkit-autofill:focus,
+.form-dark select:-webkit-autofill,
+.form-dark select:-webkit-autofill:hover,
+.form-dark select:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #4a494b inset !important;
+    -webkit-text-fill-color: white !important;
+    caret-color: white;
+}
+
 /* Arabic font — Cairo for RTL pages */
 [dir="rtl"] {
     --font-sans: 'Cairo', ui-sans-serif, system-ui, sans-serif;
