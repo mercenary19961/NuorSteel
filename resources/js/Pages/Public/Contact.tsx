@@ -250,7 +250,7 @@ export default function Contact({ content_en, content_ar }: Props) {
                   </p>
                 </div>
               ) : (
-                <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+                <form ref={formRef} onSubmit={handleSubmit} className="space-y-5 form-dark">
                   {formError && (
                     <div className="p-3 bg-red-950/30 border border-red-500/20 rounded-lg text-sm text-red-300">
                       {formError}
