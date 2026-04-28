@@ -326,12 +326,12 @@ export default function Contacts({ submissions, filters, undoMeta, undoModelId }
 
               <div>
                 <p className="text-xs text-gray-500">Subject</p>
-                <p className="text-sm font-medium text-gray-900">{viewItem.subject}</p>
+                <p className="text-sm font-medium text-gray-900" dir="auto">{viewItem.subject}</p>
               </div>
 
               <div>
                 <p className="text-xs text-gray-500 mb-1">Message</p>
-                <div className="p-3 bg-gray-50 rounded-lg text-sm text-gray-700 whitespace-pre-wrap">
+                <div className="p-3 bg-gray-50 rounded-lg text-sm text-gray-700 whitespace-pre-wrap" dir="auto">
                   {viewItem.message}
                 </div>
               </div>
