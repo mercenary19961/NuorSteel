@@ -82,8 +82,8 @@ export default function Dashboard({ stats, recent_applications, recent_contacts 
               recent_applications.map((app) => (
                 <div key={app.id} className="px-6 py-3 flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{app.name}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm font-medium text-gray-900" dir="auto">{app.name}</p>
+                    <p className="text-xs text-gray-500" dir="auto">
                       {app.job_title}
                       {app.listing_title && <span> — {app.listing_title}</span>}
                     </p>
@@ -119,7 +119,7 @@ export default function Dashboard({ stats, recent_applications, recent_contacts 
                       )}
                       {contact.name}
                     </p>
-                    <p className="text-xs text-gray-500">{contact.subject}</p>
+                    <p className="text-xs text-gray-500" dir="auto">{contact.subject}</p>
                   </div>
                   <div className="flex items-center gap-3">
                     <StatusBadge status={contact.request_type} size="sm" />

@@ -142,10 +142,10 @@ export default function Contacts({ submissions, filters, undoMeta, undoModelId }
             <span className="w-2 h-2 bg-blue-500 rounded-full shrink-0" />
           )}
           <div>
-            <p className={`text-sm ${item.is_read ? 'text-gray-700' : 'font-semibold text-gray-900'}`}>
+            <p className={`text-sm ${item.is_read ? 'text-gray-700' : 'font-semibold text-gray-900'}`} dir="auto">
               {item.name}
             </p>
-            {item.company && <p className="text-xs text-gray-500">{item.company}</p>}
+            {item.company && <p className="text-xs text-gray-500" dir="auto">{item.company}</p>}
           </div>
         </div>
       ),
