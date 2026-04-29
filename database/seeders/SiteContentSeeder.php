@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\SiteContent;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class SiteContentSeeder extends Seeder
 {
@@ -17,13 +18,13 @@ class SiteContentSeeder extends Seeder
             // Home Page - Vision & Mission section
             ['page' => 'home', 'section' => 'vision_mission', 'key' => 'title', 'content_en' => 'Vision & Mission', 'content_ar' => 'الرؤية والرسالة', 'type' => 'text'],
             ['page' => 'home', 'section' => 'vision_mission', 'key' => 'vision_title', 'content_en' => 'Vision', 'content_ar' => 'الرؤية', 'type' => 'text'],
-            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'vision_description', 'content_en' => 'To be the leading producer and marketer of high-quality steel products in the Middle East, setting benchmarks for quality, reliability, and sustainability.', 'content_ar' => 'أن نكون المنتج والمسوّق الرائد لمنتجات الحديد عالية الجودة في الشرق الأوسط، ونضع معايير الجودة والموثوقية والاستدامة.', 'type' => 'textarea'],
+            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'vision_description', 'content_en' => 'To be the leading producer and marketer of high-quality steel products in the Middle East, setting benchmarks for quality, reliability, and sustainability.', 'content_ar' => 'أن نكون الخيار الأول في الشرق الأوسط لإنتاج وتسويق الحديد عالي الجودة، مع ترسيخ أعلى معايير الجودة والموثوقية والاستدامة.', 'type' => 'textarea'],
             ['page' => 'home', 'section' => 'vision_mission', 'key' => 'mission_title', 'content_en' => 'Mission', 'content_ar' => 'الرسالة', 'type' => 'text'],
-            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'mission_description', 'content_en' => 'To be the most trusted provider of construction materials in Saudi Arabia and the leading TMT bar brand in the Middle East, powered by innovation, uncompromising quality, and continuous improvement.', 'content_ar' => 'أن نكون المزوّد الأكثر ثقة لمواد البناء في المملكة العربية السعودية والعلامة التجارية الرائدة لحديد التسليح في الشرق الأوسط، بدعم من الابتكار والجودة المتميزة والتحسين المستمر.', 'type' => 'textarea'],
+            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'mission_description', 'content_en' => 'To be the most trusted provider of construction materials in Saudi Arabia and the leading TMT bar brand in the Middle East, powered by innovation, uncompromising quality, and continuous improvement.', 'content_ar' => 'أن نقود قطاع مواد البناء في المملكة، ونرسّخ ريادتنا كأبرز علامة لحديد التسليح في الشرق الأوسط، من خلال الابتكار والجودة والتحسين المستمر.', 'type' => 'textarea'],
 
             // Home Page - Vision 2030 section
-            ['page' => 'home', 'section' => 'vision2030', 'key' => 'paragraph1', 'content_en' => 'Nuor Steel Industry Company supports Saudi Vision 2030 by strengthening local industrial capabilities and advancing the localization of critical construction materials. As a fully integrated steel manufacturer, Nuor Steel is positioned to support giga and mega-projects through reliable supply, consistent quality, and national-scale production.', 'content_ar' => 'تدعم شركة نور للصناعات الحديدية رؤية السعودية 2030 من خلال تعزيز القدرات الصناعية المحلية والنهوض بتوطين مواد البناء الحيوية. بصفتها مصنعاً متكاملاً للحديد، تتمتع نور ستيل بالقدرة على دعم المشاريع العملاقة والكبرى من خلال إمداد موثوق وجودة ثابتة وإنتاج على المستوى الوطني.', 'type' => 'textarea'],
-            ['page' => 'home', 'section' => 'vision2030', 'key' => 'paragraph2', 'content_en' => 'As a proud member of the "Made in Saudi" program, Nuor Steel contributes to local value creation and the growth of a competitive, globally respected Saudi industrial sector.', 'content_ar' => 'بصفتها عضواً فخوراً في برنامج "صنع في السعودية"، تساهم نور ستيل في خلق القيمة المحلية ونمو قطاع صناعي سعودي تنافسي ومحترم عالمياً.', 'type' => 'textarea'],
+            ['page' => 'home', 'section' => 'vision2030', 'key' => 'paragraph1', 'content_en' => 'Nuor Steel Industry Company supports Saudi Vision 2030 by strengthening local industrial capabilities and advancing the localization of critical construction materials. As a fully integrated steel manufacturer, Nuor Steel is positioned to support giga and mega-projects through reliable supply, consistent quality, and national-scale production.', 'content_ar' => 'تدعم شركة حديد نور للصناعة رؤية السعودية 2030 عبر تعزيز القدرات الصناعية المحلية وتسريع توطين مواد البناء الحيوية. وبصفتها مصنعًا متكاملًا للحديد، تمكّن نور ستيل المشاريع الكبرى من خلال إمداد موثوق، وجودة ثابتة، وإنتاج وطني بمعايير عالية.', 'type' => 'textarea'],
+            ['page' => 'home', 'section' => 'vision2030', 'key' => 'paragraph2', 'content_en' => 'As a proud member of the "Made in Saudi" program, Nuor Steel contributes to local value creation and the growth of a competitive, globally respected Saudi industrial sector.', 'content_ar' => 'كعضو فاعل في برنامج "صنع في السعودية"، تقود شركة حديد نور للصناعة تعزيز القيمة المحلية وترسّخ حضور قطاع صناعي سعودي تنافسي على الساحة العالمية.', 'type' => 'textarea'],
 
             // Home Page - Core Values section
             ['page' => 'home', 'section' => 'core_values', 'key' => 'title', 'content_en' => 'Core Values', 'content_ar' => 'القيم الأساسية', 'type' => 'text'],
@@ -96,10 +97,11 @@ class SiteContentSeeder extends Seeder
         }
 
         // Clean up deprecated sections
-        SiteContent::where('page', 'home')
+        DB::table('site_content')
+            ->where('page', 'home')
             ->whereIn('section', ['hero', 'products', 'certificates', 'newsletter', 'cta'])
             ->delete();
-        SiteContent::where('page', 'recycling')->delete();
-        SiteContent::where('page', 'about')->where('section', 'governance')->delete();
+        DB::table('site_content')->where('page', 'recycling')->delete();
+        DB::table('site_content')->where('page', 'about')->where('section', 'governance')->delete();
     }
 }
