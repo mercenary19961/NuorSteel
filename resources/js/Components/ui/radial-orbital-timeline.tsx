@@ -556,9 +556,9 @@ export default function RadialOrbitalTimeline({
                 <h3 className="text-2xl xl:text-3xl font-bold text-white">
                   {activeItem.title}
                 </h3>
-                <div className="w-10 h-10 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center overflow-hidden shrink-0">
+                <div className={`w-10 h-10 rounded-full ${activeItem.imageBg ? 'bg-primary' : 'bg-primary/15'} border border-primary/30 flex items-center justify-center overflow-hidden shrink-0`}>
                   {activeItem.image ? (
-                    <img src={activeItem.image} alt={activeItem.title} className="w-full h-full object-cover" />
+                    <img src={activeItem.image} alt={activeItem.title} className={`object-cover ${activeItem.imageBg ? 'w-3/4 h-3/4' : 'w-full h-full'}`} />
                   ) : (
                     <activeItem.icon size={20} className="text-primary" />
                   )}
