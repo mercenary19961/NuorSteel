@@ -90,7 +90,7 @@ export default function Footer() {
             <div className="grid grid-cols-[minmax(0,1fr)_12rem] gap-4 items-start">
               <ul className="space-y-3 min-w-0">
                 <li className="flex items-start text-sm text-gray-400">
-                  <MapPin size={16} className="mr-2 mt-0.5 shrink-0" />
+                  <MapPin size={16} className="me-2 mt-0.5 shrink-0" />
                   <span>{siteSettings.address || t('footer.address')}</span>
                 </li>
                 {siteSettings.phone && (
@@ -101,10 +101,10 @@ export default function Footer() {
                         : 'text-gray-400'
                     }`}
                   >
-                    <Phone size={16} className="mr-2 mt-0.5 shrink-0" />
+                    <Phone size={16} className="me-2 mt-0.5 shrink-0" />
                     <span className="flex flex-col gap-0.5">
                       {siteSettings.phone.split(',').map((p) => (
-                        <a key={p} href={`tel:${p.trim().replace(/\s/g, '')}`} className="hover:text-white transition-colors">
+                        <a key={p} href={`tel:${p.trim().replace(/\s/g, '')}`} dir="ltr" className="hover:text-white transition-colors">
                           {p.trim()}
                         </a>
                       ))}
@@ -119,7 +119,7 @@ export default function Footer() {
                         : 'text-gray-400'
                     }`}
                   >
-                    <Mail size={16} className="mr-2 mt-0.5 shrink-0" />
+                    <Mail size={16} className="me-2 mt-0.5 shrink-0" />
                     <span className="flex flex-col gap-0.5">
                       {siteSettings.email.split(',').map((e) => (
                         <a key={e} href={`mailto:${e.trim()}`} className="hover:text-white transition-colors">

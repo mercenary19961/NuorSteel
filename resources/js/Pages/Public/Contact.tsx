@@ -208,7 +208,7 @@ export default function Contact({ content_en, content_ar }: Props) {
                     <h3 className="font-medium text-white text-sm mb-1">{t('contact.info.phone')}</h3>
                     <div className="flex flex-col gap-0.5">
                       {(siteSettings.phone || '+966543781868').split(',').map((p) => (
-                        <a key={p} href={`tel:${p.trim().replace(/\s/g, '')}`} className="text-gray-400 text-sm hover:text-primary transition-colors">
+                        <a key={p} href={`tel:${p.trim().replace(/\s/g, '')}`} dir="ltr" className="text-gray-400 text-sm hover:text-primary transition-colors">
                           {p.trim()}
                         </a>
                       ))}
