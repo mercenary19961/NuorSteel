@@ -200,7 +200,7 @@ export default function Header() {
                 >
                   <Link
                     href={item.path}
-                    className={`group relative inline-flex items-center gap-1 py-2 text-xs uppercase tracking-[0.14em] font-medium transition-colors duration-200 ${
+                    className={`group relative inline-flex items-center gap-1 py-2 ${isAtTop ? 'text-sm' : 'text-xs'} uppercase tracking-[0.14em] font-medium transition-colors duration-200 ${
                       active ? 'text-white' : isAtTop ? 'text-white/90 hover:text-white' : 'text-white/75 hover:text-white'
                     }`}
                     style={{ textShadow: isAtTop ? '0 1px 3px rgba(0,0,0,0.8), 0 2px 12px rgba(0,0,0,0.5)' : undefined }}
@@ -251,7 +251,7 @@ export default function Header() {
           <div className="flex items-center gap-3">
             <Link
               href="/contact"
-              className={`hidden lg:inline-flex items-center px-4 py-1.5 text-xs uppercase tracking-[0.14em] font-medium rounded-md transition-all duration-300 ${
+              className={`hidden lg:inline-flex items-center px-4 py-1 text-xs uppercase tracking-[0.14em] font-medium rounded-md transition-all duration-300 ${
                 isActive('/contact')
                   ? 'bg-primary text-white shadow-lg shadow-primary/25'
                   : 'bg-primary/90 text-white hover:bg-primary hover:shadow-lg hover:shadow-primary/25'
@@ -261,7 +261,7 @@ export default function Header() {
             </Link>
             <button
               onClick={toggleLanguage}
-              className="px-3 py-1.5 text-sm font-medium border border-white/30 text-white hover:bg-white/10 rounded-md transition-colors duration-200"
+              className="px-3 py-1.5 text-sm lg:py-1 lg:text-xs font-medium border border-white/30 text-white hover:bg-white/10 rounded-md transition-colors duration-200"
             >
               {language === 'en' ? 'عربي' : 'EN'}
             </button>

@@ -16,7 +16,7 @@ const en = {
       title: "Powering Saudi Arabia's Industrial Future",
       line1: "Powering Saudi",
       line2: "Arabia's Industrial",
-      typewriterWords: "Future,Growth,Strength,Vision",
+      typewriterWords: "Sustainability,Leadership,Strength,Integration",
       subtitle: "Quality steel products for a sustainable future",
       cta: "Get in Touch",
       contactLink: "Contact Us",
@@ -84,7 +84,7 @@ const en = {
       },
     },
     partners: {
-      title: "Our Partners",
+      title: "Our Collaborators",
       description: "Our partnerships reflect our commitment to excellence, working alongside renowned organizations to deliver consistent quality and long-term value.",
     },
     linkedin: {
@@ -176,7 +176,7 @@ const en = {
       subtitle: "Comprehensive steel manufacturing capabilities to support your projects",
       integratedManufacturing: {
         title: "Integrated Steel Manufacturing",
-        description: "Fully integrated production of steel billets and TMT rebars, ensuring full control over quality, consistency, and traceability from raw material to finished product.",
+        description: "Fully integrated production of TMT rebars and steel billets, ensuring full control over quality, consistency, and traceability from raw material to finished product.",
       },
       advancedTechnology: {
         title: "Advanced Production Technology",

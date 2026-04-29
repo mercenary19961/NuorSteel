@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\SiteContent;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class SiteContentSeeder extends Seeder
 {
@@ -11,19 +12,19 @@ class SiteContentSeeder extends Seeder
     {
         $contents = [
             // Home Page - About section
-            ['page' => 'home', 'section' => 'about', 'key' => 'title', 'content_en' => 'About Nuor Steel', 'content_ar' => 'عن شركة نور للحديد', 'type' => 'text'],
-            ['page' => 'home', 'section' => 'about', 'key' => 'description', 'content_en' => 'Nuor Steel Industry Company is a leading Saudi steel manufacturer founded in 2010 in Al Kharj Industrial City. As a fully integrated producer of steel billets and TMT rebars, it supports national infrastructure and industrial growth aligned with Saudi Vision 2030.', 'content_ar' => 'شركة نور للصناعات الحديدية هي شركة سعودية رائدة في صناعة الحديد تأسست عام 2010 في المدينة الصناعية بالخرج. بصفتها منتجاً متكاملاً لستيل بِليت وحديد التسليح، تدعم البنية التحتية الوطنية والنمو الصناعي بما يتماشى مع رؤية السعودية 2030.', 'type' => 'textarea'],
+            ['page' => 'home', 'section' => 'about', 'key' => 'title', 'content_en' => 'About Nuor Steel', 'content_ar' => 'عن شركة حديد نور', 'type' => 'text'],
+            ['page' => 'home', 'section' => 'about', 'key' => 'description', 'content_en' => 'Nuor Steel Industry Company is a leading Saudi steel manufacturer founded in 2010 in Al Kharj Industrial City. As a fully integrated producer of steel billets and TMT rebars, it supports national infrastructure and industrial growth aligned with Saudi Vision 2030.', 'content_ar' => 'شركة حديد نور للصناعة هي شركة سعودية رائدة في صناعة الحديد تأسست عام 2010 في المدينة الصناعية بالخرج. بصفتها منتجاً متكاملاً لستيل بِليت وحديد التسليح، تدعم البنية التحتية الوطنية والنمو الصناعي بما يتماشى مع رؤية السعودية 2030.', 'type' => 'textarea'],
 
             // Home Page - Vision & Mission section
             ['page' => 'home', 'section' => 'vision_mission', 'key' => 'title', 'content_en' => 'Vision & Mission', 'content_ar' => 'الرؤية والرسالة', 'type' => 'text'],
             ['page' => 'home', 'section' => 'vision_mission', 'key' => 'vision_title', 'content_en' => 'Vision', 'content_ar' => 'الرؤية', 'type' => 'text'],
-            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'vision_description', 'content_en' => 'To be the leading producer and marketer of high-quality steel products in the Middle East, setting benchmarks for quality, reliability, and sustainability.', 'content_ar' => 'أن نكون المنتج والمسوّق الرائد لمنتجات الحديد عالية الجودة في الشرق الأوسط، ونضع معايير الجودة والموثوقية والاستدامة.', 'type' => 'textarea'],
+            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'vision_description', 'content_en' => 'To be the leading producer and marketer of high-quality steel products in the Middle East, setting benchmarks for quality, reliability, and sustainability.', 'content_ar' => 'أن نكون الخيار الأول في الشرق الأوسط لإنتاج وتسويق الحديد عالي الجودة، مع ترسيخ أعلى معايير الجودة والموثوقية والاستدامة.', 'type' => 'textarea'],
             ['page' => 'home', 'section' => 'vision_mission', 'key' => 'mission_title', 'content_en' => 'Mission', 'content_ar' => 'الرسالة', 'type' => 'text'],
-            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'mission_description', 'content_en' => 'To be the most trusted provider of construction materials in Saudi Arabia and the leading TMT bar brand in the Middle East, powered by innovation, uncompromising quality, and continuous improvement.', 'content_ar' => 'أن نكون المزوّد الأكثر ثقة لمواد البناء في المملكة العربية السعودية والعلامة التجارية الرائدة لحديد التسليح في الشرق الأوسط، بدعم من الابتكار والجودة المتميزة والتحسين المستمر.', 'type' => 'textarea'],
+            ['page' => 'home', 'section' => 'vision_mission', 'key' => 'mission_description', 'content_en' => 'To be the most trusted provider of construction materials in Saudi Arabia and the leading TMT bar brand in the Middle East, powered by innovation, uncompromising quality, and continuous improvement.', 'content_ar' => 'أن نقود قطاع مواد البناء في المملكة، ونرسّخ ريادتنا كأبرز علامة لحديد التسليح في الشرق الأوسط، من خلال الابتكار والجودة والتحسين المستمر.', 'type' => 'textarea'],
 
             // Home Page - Vision 2030 section
-            ['page' => 'home', 'section' => 'vision2030', 'key' => 'paragraph1', 'content_en' => 'Nuor Steel Industry Company supports Saudi Vision 2030 by strengthening local industrial capabilities and advancing the localization of critical construction materials. As a fully integrated steel manufacturer, Nuor Steel is positioned to support giga and mega-projects through reliable supply, consistent quality, and national-scale production.', 'content_ar' => 'تدعم شركة نور للصناعات الحديدية رؤية السعودية 2030 من خلال تعزيز القدرات الصناعية المحلية والنهوض بتوطين مواد البناء الحيوية. بصفتها مصنعاً متكاملاً للحديد، تتمتع نور ستيل بالقدرة على دعم المشاريع العملاقة والكبرى من خلال إمداد موثوق وجودة ثابتة وإنتاج على المستوى الوطني.', 'type' => 'textarea'],
-            ['page' => 'home', 'section' => 'vision2030', 'key' => 'paragraph2', 'content_en' => 'As a proud member of the "Made in Saudi" program, Nuor Steel contributes to local value creation and the growth of a competitive, globally respected Saudi industrial sector.', 'content_ar' => 'بصفتها عضواً فخوراً في برنامج "صنع في السعودية"، تساهم نور ستيل في خلق القيمة المحلية ونمو قطاع صناعي سعودي تنافسي ومحترم عالمياً.', 'type' => 'textarea'],
+            ['page' => 'home', 'section' => 'vision2030', 'key' => 'paragraph1', 'content_en' => 'Nuor Steel Industry Company supports Saudi Vision 2030 by strengthening local industrial capabilities and advancing the localization of critical construction materials. As a fully integrated steel manufacturer, Nuor Steel is positioned to support giga and mega-projects through reliable supply, consistent quality, and national-scale production.', 'content_ar' => 'تدعم شركة حديد نور للصناعة رؤية السعودية 2030 عبر تعزيز القدرات الصناعية المحلية وتسريع توطين مواد البناء الحيوية. وبصفتها مصنعًا متكاملًا للحديد، تمكّن نور ستيل المشاريع الكبرى من خلال إمداد موثوق، وجودة ثابتة، وإنتاج وطني بمعايير عالية.', 'type' => 'textarea'],
+            ['page' => 'home', 'section' => 'vision2030', 'key' => 'paragraph2', 'content_en' => 'As a proud member of the "Made in Saudi" program, Nuor Steel contributes to local value creation and the growth of a competitive, globally respected Saudi industrial sector.', 'content_ar' => 'كعضو فاعل في برنامج "صنع في السعودية"، تقود شركة حديد نور للصناعة تعزيز القيمة المحلية وترسّخ حضور قطاع صناعي سعودي تنافسي على الساحة العالمية.', 'type' => 'textarea'],
 
             // Home Page - Core Values section
             ['page' => 'home', 'section' => 'core_values', 'key' => 'title', 'content_en' => 'Core Values', 'content_ar' => 'القيم الأساسية', 'type' => 'text'],
@@ -42,7 +43,7 @@ class SiteContentSeeder extends Seeder
 
             // About Page
             ['page' => 'about', 'section' => 'overview', 'key' => 'title', 'content_en' => 'About Us', 'content_ar' => 'من نحن', 'type' => 'text'],
-            ['page' => 'about', 'section' => 'overview', 'key' => 'description', 'content_en' => 'Nuor Steel Industry Company is dedicated to manufacturing premium quality steel products while maintaining the highest standards of environmental responsibility and workplace safety.', 'content_ar' => 'شركة نور للصناعات الحديدية مكرسة لتصنيع منتجات الحديد عالية الجودة مع الحفاظ على أعلى معايير المسؤولية البيئية وسلامة مكان العمل.', 'type' => 'textarea'],
+            ['page' => 'about', 'section' => 'overview', 'key' => 'description', 'content_en' => 'Nuor Steel Industry Company is dedicated to manufacturing premium quality steel products while maintaining the highest standards of environmental responsibility and workplace safety.', 'content_ar' => 'شركة حديد نور للصناعة هي شركة رائدة في صناعة الحديد في المملكة العربية السعودية، تأسست عام 2010 ويقع مقرها الرئيسي في المدينة الصناعية بالخرج. تأسست في الأصل كشركة تجارة حديد، وتطورت شركة حديد نور لتصبح منتجاً متكاملاً للحديد بمرافق تصنيع متقدمة متخصصة في إنتاج كتل الحديد عالية الجودة وحديد التسليح.', 'type' => 'textarea'],
 
             ['page' => 'about', 'section' => 'vision', 'key' => 'title', 'content_en' => 'Our Vision', 'content_ar' => 'رؤيتنا', 'type' => 'text'],
             ['page' => 'about', 'section' => 'vision', 'key' => 'description', 'content_en' => 'To be the leading steel manufacturer in the region, recognized for quality, innovation, and sustainability.', 'content_ar' => 'أن نكون الشركة الرائدة في تصنيع الحديد في المنطقة، معروفين بالجودة والابتكار والاستدامة.', 'type' => 'textarea'],
@@ -96,10 +97,11 @@ class SiteContentSeeder extends Seeder
         }
 
         // Clean up deprecated sections
-        SiteContent::where('page', 'home')
+        DB::table('site_content')
+            ->where('page', 'home')
             ->whereIn('section', ['hero', 'products', 'certificates', 'newsletter', 'cta'])
             ->delete();
-        SiteContent::where('page', 'recycling')->delete();
-        SiteContent::where('page', 'about')->where('section', 'governance')->delete();
+        DB::table('site_content')->where('page', 'recycling')->delete();
+        DB::table('site_content')->where('page', 'about')->where('section', 'governance')->delete();
     }
 }

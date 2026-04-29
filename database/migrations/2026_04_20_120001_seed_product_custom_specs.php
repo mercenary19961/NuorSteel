@@ -37,10 +37,10 @@ return new class extends Migration
                 ],
             ], JSON_UNESCAPED_UNICODE),
             'features' => json_encode([
-                ['icon' => 'flame', 'title_en' => 'Thermo-Mechanical Treatment', 'title_ar' => 'المعالجة الحرارية الميكانيكية', 'description_en' => 'Advanced TMT process ensures optimal balance of strength and ductility through controlled cooling.', 'description_ar' => 'عملية TMT المتقدمة تضمن التوازن الأمثل بين القوة والمرونة من خلال التبريد المتحكم.'],
+                ['icon' => 'flame', 'title_en' => 'Thermo-Mechanical Treatment', 'title_ar' => 'المعالجة الحرارية الميكانيكية', 'description_en' => 'Advanced TMT process ensures optimal balance of strength and ductility through controlled cooling.', 'description_ar' => 'عملية TMT المتقدمة تضمن التوازن الأمثل بين القوة والمرونة من خلال التبريد المحكم.'],
                 ['icon' => 'zap', 'title_en' => 'Superior Ductility', 'title_ar' => 'مرونة فائقة', 'description_en' => 'High elongation values ensure safe performance in seismic zones and under dynamic loading.', 'description_ar' => 'قيم استطالة عالية تضمن أداءً آمناً في المناطق الزلزالية وتحت الأحمال الديناميكية.'],
                 ['icon' => 'target', 'title_en' => 'Excellent Weldability', 'title_ar' => 'قابلية لحام ممتازة', 'description_en' => 'Low carbon equivalent enables reliable on-site welding without pre-heating.', 'description_ar' => 'مكافئ كربون منخفض يتيح لحاماً موثوقاً في الموقع دون تسخين مسبق.'],
-                ['icon' => 'shield', 'title_en' => 'Corrosion Resistance', 'title_ar' => 'مقاومة التآكل', 'description_en' => 'Tempered martensite outer layer provides enhanced resistance to environmental degradation.', 'description_ar' => 'طبقة مارتنسيت مقسّاة خارجية توفر مقاومة معززة للتدهور البيئي.'],
+                ['icon' => 'shield', 'title_en' => 'Corrosion Resistance', 'title_ar' => 'مقاومةُ التآكلِ:', 'description_en' => 'Tempered martensite outer layer provides enhanced resistance to environmental degradation.', 'description_ar' => 'طبقةٌ خارجيةٌ من المارتنسيتِ المُقسّى توفّرُ مقاومةً مُعزَّزةً للتدهورِ البيئيّ.'],
             ], JSON_UNESCAPED_UNICODE),
             'show_quote_tab' => true,
         ];
