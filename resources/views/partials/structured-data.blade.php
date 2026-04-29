@@ -7,7 +7,7 @@
     "@@context": "https://schema.org",
     "@@type": "Organization",
     "name": "Nuor Steel Industry Company",
-    "alternateName": "شركة نور للصناعات الحديدية",
+    "alternateName": "شركة حديد نور للصناعة",
     "image": "{{ config('app.url') }}/images/og-image.webp",
     "description": "Leading steel industry company specializing in steel manufacturing, recycling, and sustainable production.",
     "address": {

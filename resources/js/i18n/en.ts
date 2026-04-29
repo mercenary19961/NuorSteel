@@ -176,7 +176,7 @@ const en = {
       subtitle: "Comprehensive steel manufacturing capabilities to support your projects",
       integratedManufacturing: {
         title: "Integrated Steel Manufacturing",
-        description: "Fully integrated production of steel billets and TMT rebars, ensuring full control over quality, consistency, and traceability from raw material to finished product.",
+        description: "Fully integrated production of TMT rebars and steel billets, ensuring full control over quality, consistency, and traceability from raw material to finished product.",
       },
       advancedTechnology: {
         title: "Advanced Production Technology",
