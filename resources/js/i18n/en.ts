@@ -84,7 +84,7 @@ const en = {
       },
     },
     partners: {
-      title: "Our Partners",
+      title: "Our Collaborators",
       description: "Our partnerships reflect our commitment to excellence, working alongside renowned organizations to deliver consistent quality and long-term value.",
     },
     linkedin: {
