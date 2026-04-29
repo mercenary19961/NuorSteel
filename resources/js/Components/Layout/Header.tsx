@@ -261,7 +261,7 @@ export default function Header() {
             </Link>
             <button
               onClick={toggleLanguage}
-              className="px-3 py-1.5 text-sm font-medium border border-white/30 text-white hover:bg-white/10 rounded-md transition-colors duration-200"
+              className="px-3 py-1.5 text-sm lg:py-1 lg:text-xs font-medium border border-white/30 text-white hover:bg-white/10 rounded-md transition-colors duration-200"
             >
               {language === 'en' ? 'عربي' : 'EN'}
             </button>

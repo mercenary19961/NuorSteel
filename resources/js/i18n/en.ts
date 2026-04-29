@@ -16,7 +16,7 @@ const en = {
       title: "Powering Saudi Arabia's Industrial Future",
       line1: "Powering Saudi",
       line2: "Arabia's Industrial",
-      typewriterWords: "Future,Growth,Strength,Vision",
+      typewriterWords: "Sustainability,Leadership,Strength,Integration",
       subtitle: "Quality steel products for a sustainable future",
       cta: "Get in Touch",
       contactLink: "Contact Us",
