@@ -32,7 +32,7 @@ const L = {
     capabilities: { en: 'Capabilities', ar: 'إمكانياتنا' },
   },
   products: {
-    tmtDesc: { en: 'Thermo-mechanically treated reinforcement bars', ar: 'قضبان تسليح معالجة حراريًا وميكانيكيًا' },
+    steelRebarsDesc: { en: 'Thermo-mechanically treated steel rebars', ar: 'حديد تسليح معالج حراريًا وميكانيكيًا' },
     billetsDesc: { en: 'Semi-finished steel for rolling mills', ar: 'فولاذ نصف مصنّع لمصانع الدرفلة' },
     viewAll: { en: 'View all products', ar: 'عرض جميع المنتجات' },
   },
@@ -64,10 +64,10 @@ function buildNavItems(t: (k: string) => string, lang: 'en' | 'ar'): NavItem[] {
         type: 'mega',
         children: [
           {
-            label: t('home.products.tmtBars.title'),
-            href: '/products?product=tmt-bars',
-            description: L.products.tmtDesc[lang],
-            image: `/images/products/renders/tmt-bars-${lang}.webp`,
+            label: t('home.products.steelRebars.title'),
+            href: '/products?product=steel-rebars',
+            description: L.products.steelRebarsDesc[lang],
+            image: `/images/products/renders/steel-rebars-${lang}.webp`,
             imageScale: 'scale-[3]',
           },
           {

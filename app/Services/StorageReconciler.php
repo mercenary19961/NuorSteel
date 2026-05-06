@@ -39,7 +39,7 @@ class StorageReconciler
         ['storage/seeds/certificates/aramco-registration-letter.pdf',   'certificates/aramco-registration-letter.pdf'],
 
         // Products — sourced from public/ renders, restored to media/<slug>-product.png
-        ['public/images/home/products/tmt-bars-desktop.png',            'media/tmt-bars-product.png'],
+        ['public/images/home/products/steel-rebars-desktop.png',        'media/steel-rebars-product.png'],
         ['public/images/home/products/billets-desktop.png',             'media/billets-product.png'],
 
         // Partners — sourced from public/ logos, restored to media/partners/<slug>.webp

@@ -525,9 +525,9 @@ export default function Home({ content_en, content_ar, linkedin_posts, partners 
           {content?.products?.title || t('home.products.title', 'Our Products')}
         </h2>
         <div className="flex flex-col lg:flex-row min-h-100 lg:min-h-137.5 lg:bg-white/20">
-          {/* TMT Bars */}
+          {/* Steel Rebars */}
           <Link
-            href="/products?product=tmt-bars&expanded=true"
+            href="/products?product=steel-rebars&expanded=true"
             className="relative z-10 flex-1 overflow-hidden cursor-pointer group"
             style={{
               flex: hoveredProduct === 0 ? 1.4 : hoveredProduct === 1 ? 0.6 : 1,
@@ -543,8 +543,8 @@ export default function Home({ content_en, content_ar, linkedin_posts, partners 
           >
             {/* Background image */}
             <picture>
-              <source media="(max-width: 1023px)" srcSet="/images/home/products/tmt-bars-mobile.png" />
-              <img src="/images/home/products/tmt-bars-desktop.png" alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+              <source media="(max-width: 1023px)" srcSet="/images/home/products/steel-rebars-mobile.png" />
+              <img src="/images/home/products/steel-rebars-desktop.png" alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
             </picture>
             {/* Color Overlay */}
             <div
@@ -554,10 +554,10 @@ export default function Home({ content_en, content_ar, linkedin_posts, partners 
             {/* Content */}
             <div className="relative z-10 h-full flex flex-col justify-center items-center p-8 lg:p-12 text-white text-center min-h-87.5 lg:min-h-0">
               <h3 className="text-3xl lg:text-4xl font-black mb-4 text-primary">
-                {t('home.products.tmtBars.title')}
+                {t('home.products.steelRebars.title')}
               </h3>
               <p className="text-sm lg:text-base text-white/80 max-w-md leading-relaxed">
-                {t('home.products.tmtBars.description')}
+                {t('home.products.steelRebars.description')}
               </p>
               <span className="mt-6 inline-flex items-center text-sm font-medium text-white/60 group-hover:text-white transition-colors duration-300">
                 {t('products.viewDetails')}

@@ -28,7 +28,7 @@ const en = {
     },
     about: {
       title: "About Nuor Steel",
-      description: "Nuor Steel Industry Company is a leading Saudi steel manufacturer founded in 2010 in Al Kharj Industrial City. As a fully integrated producer of TMT rebars and steel billets, it supports national infrastructure and industrial growth aligned with Saudi Vision 2030.",
+      description: "Nuor Steel Industry Company is a leading Saudi steel manufacturer founded in 2010 in Al Kharj Industrial City. As a fully integrated producer of Steel Rebars and Steel Billets, it supports national infrastructure and industrial growth aligned with Saudi Vision 2030.",
       learnMore: "Learn More",
     },
     visionMission: {
@@ -36,7 +36,7 @@ const en = {
       visionTitle: "Vision",
       visionDescription: "To be the leading producer and marketer of high-quality steel products in the Middle East, setting benchmarks for quality, reliability, and sustainability.",
       missionTitle: "Mission",
-      missionDescription: "To be the most trusted provider of construction materials in Saudi Arabia and the leading TMT bar brand in the Middle East, powered by innovation, uncompromising quality, and continuous improvement.",
+      missionDescription: "To be the most trusted provider of construction materials in Saudi Arabia and the leading Steel Rebar brand in the Middle East, powered by innovation, uncompromising quality, and continuous improvement.",
     },
     vision2030: {
       paragraph1: "Nuor Steel Industry Company supports Saudi Vision 2030 by strengthening local industrial capabilities and advancing the localization of critical construction materials. As a fully integrated steel manufacturer, Nuor Steel is positioned to support giga and mega-projects through reliable supply, consistent quality, and national-scale production.",
@@ -74,9 +74,9 @@ const en = {
       title: "Our Products",
       subtitle: "Discover our range of high-quality steel products",
       viewAll: "View All Products",
-      tmtBars: {
-        title: "TMT Bars",
-        description: "Thermo-Mechanically Treated reinforcement steel bars manufactured to ASTM A615 standards. Available in 8mm to 32mm diameters for residential, commercial, and infrastructure projects.",
+      steelRebars: {
+        title: "Steel Rebars",
+        description: "Thermo-Mechanically Treated Steel Rebars manufactured to ASTM A615 standards. Available in 8mm to 32mm diameters for residential, commercial, and infrastructure projects.",
       },
       billets: {
         title: "Billets",
@@ -106,14 +106,14 @@ const en = {
     },
     overview: {
       title: "Company Overview",
-      description: "Nuor Steel Industry Company is a leading Saudi steel manufacturer established in 2010 and headquartered in Al Kharj Industrial City. Originally founded as a steel trading business, Nuor Steel has evolved into a fully integrated steel producer with advanced manufacturing facilities specializing in the production of high-quality TMT steel rebars and steel billets.",
+      description: "Nuor Steel Industry Company is a leading Saudi steel manufacturer established in 2010 and headquartered in Al Kharj Industrial City. Originally founded as a steel trading business, Nuor Steel has evolved into a fully integrated steel producer with advanced manufacturing facilities specializing in the production of high-quality Steel Rebars and Steel Billets.",
     },
     intro: {
       headline: "Nuor Steel is A Leading Steel Manufacturer in",
       headlineHighlight: "Saudi Arabia",
       subline: "Founded in 2010 and headquartered in Al Kharj Industrial City",
       body: "From a steel trading business to a fully integrated steel producer,\nNuor Steel delivers advanced manufacturing capabilities for:",
-      highlight: "High-Quality TMT Rebars & Steel Billets",
+      highlight: "High-Quality Steel Rebars & Steel Billets",
     },
     visionMission: {
       title: "Vision & Mission",
@@ -128,7 +128,7 @@ const en = {
       },
       mission: {
         title: "Mission",
-        description: "To be the most trusted provider of construction materials in Saudi Arabia and the leading TMT bar brand in the Middle East, powered by innovation, uncompromising quality, and continuous improvement.",
+        description: "To be the most trusted provider of construction materials in Saudi Arabia and the leading Steel Rebar brand in the Middle East, powered by innovation, uncompromising quality, and continuous improvement.",
       },
       employees: {
         title: "Employees",
@@ -162,12 +162,12 @@ const en = {
         {
           year: "2023",
           title: "Delivering Finished Strength to the Market",
-          body: "In 2023, Nuor Steel began the production of TMT bars, marking a new chapter in delivering finished steel solutions to the construction and infrastructure sectors. This achievement represented the culmination of years of strategic investment, industrial expansion, and operational development. By entering TMT bar production, Nuor Steel strengthened its position as a manufacturer capable of supplying high-performance products engineered for strength, consistency, and modern building requirements. This was more than a product launch; it was the realization of a long-term vision to move from foundational industrial capability to market-ready steel solutions that directly support regional development.",
+          body: "In 2023, Nuor Steel began the production of Steel Rebars, marking a new chapter in delivering finished steel solutions to the construction and infrastructure sectors. This achievement represented the culmination of years of strategic investment, industrial expansion, and operational development. By entering Steel Rebar production, Nuor Steel strengthened its position as a manufacturer capable of supplying high-performance products engineered for strength, consistency, and modern building requirements. This was more than a product launch; it was the realization of a long-term vision to move from foundational industrial capability to market-ready steel solutions that directly support regional development.",
         },
         {
           year: "Present",
           title: "A Fully Integrated Industrial Vision",
-          body: "Today, Nuor Steel stands as one of the leading steel manufacturers in the region, backed by an integrated production model, advanced industrial facilities, and a clear commitment to quality. From its beginnings as a trading business to its evolution into a producer of TMT bars and steel billets, the company's journey reflects ambition guided by strategy and growth supported by capability. Nuor Steel continues to serve the market with confidence, delivering reliable steel solutions to businesses across Saudi Arabia and the wider MENA region. Its story is still being written; driven by progress, powered by industry, and built on a vision of long-term manufacturing excellence.",
+          body: "Today, Nuor Steel stands as one of the leading steel manufacturers in the region, backed by an integrated production model, advanced industrial facilities, and a clear commitment to quality. From its beginnings as a trading business to its evolution into a producer of Steel Rebars and Steel Billets, the company's journey reflects ambition guided by strategy and growth supported by capability. Nuor Steel continues to serve the market with confidence, delivering reliable steel solutions to businesses across Saudi Arabia and the wider MENA region. Its story is still being written; driven by progress, powered by industry, and built on a vision of long-term manufacturing excellence.",
         },
       ],
     },
@@ -176,7 +176,7 @@ const en = {
       subtitle: "Comprehensive steel manufacturing capabilities to support your projects",
       integratedManufacturing: {
         title: "Integrated Steel Manufacturing",
-        description: "Fully integrated production of TMT rebars and steel billets, ensuring full control over quality, consistency, and traceability from raw material to finished product.",
+        description: "Fully integrated production of Steel Rebars and Steel Billets, ensuring full control over quality, consistency, and traceability from raw material to finished product.",
       },
       advancedTechnology: {
         title: "Advanced Production Technology",
@@ -220,7 +220,7 @@ const en = {
       button: "Get a Quote",
     },
     specNote: "Other specifications are possible. Please contact Sales & Marketing for details.",
-    tmtBars: {
+    steelRebars: {
       highlights: [
         "Manufactured to ASTM A615 standards",
         "Available in diameters from 8mm to 32mm",
