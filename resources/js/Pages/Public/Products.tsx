@@ -112,8 +112,8 @@ const productDocuments: Record<string, ProductDocument> = {
     labelEn: 'View Specification Sheet',
     labelAr: 'عرض ورقة المواصفات',
   },
-  'tmt-bars': {
-    url: '/documents/products/tmt-bars-material-test-certificate.pdf',
+  'steel-rebars': {
+    url: '/documents/products/steel-rebars-material-test-certificate.pdf',
     labelEn: 'View Material Test Certificate',
     labelAr: 'عرض شهادة اختبار المواد',
   },
@@ -321,7 +321,7 @@ function ProductTabs({
   );
 }
 
-// --- TMT Bar Marking Dots (overlay for the tagged rebar image) ---
+// --- Steel Rebar Marking Dots (overlay for the tagged rebar image) ---
 interface TmtMarking {
   leftPct: number;
   labelEn: string;
@@ -541,14 +541,14 @@ export default function Products({ products }: Props) {
   const getShortDesc = (p: ProductData) => language === 'ar' ? p.short_description_ar : p.short_description_en;
   const getDesc = (p: ProductData) => language === 'ar' ? p.description_ar : p.description_en;
   // Bilingual 3D renders for known products; falls back to DB-stored image.
-  const localRenderSlugs = new Set(['tmt-bars', 'billets']);
+  const localRenderSlugs = new Set(['steel-rebars', 'billets']);
   const getProductImage = (p: ProductData) =>
     localRenderSlugs.has(p.slug)
       ? `/images/products/renders/${p.slug}-${language}.webp`
       : p.image;
-  // TMT bars shows a tagged variant in the default hero (desktop + mobile),
+  // Steel Rebars shows a tagged variant in the default hero (desktop + mobile),
   // but the plain bar everywhere else (thumbnails + Explore More detail).
-  const heroVariantSlugs = new Set(['tmt-bars']);
+  const heroVariantSlugs = new Set(['steel-rebars']);
   const getProductHeroImage = (p: ProductData) =>
     heroVariantSlugs.has(p.slug)
       ? `/images/products/renders/${p.slug}-hero-${language}.webp`
@@ -559,7 +559,7 @@ export default function Products({ products }: Props) {
     if (typeof window === 'undefined') return;
     const other = language === 'ar' ? 'en' : 'ar';
     const urls = [
-      `/images/products/renders/tmt-bars-${other}.webp`,
+      `/images/products/renders/steel-rebars-${other}.webp`,
       `/images/products/renders/billets-${other}.webp`,
     ];
     const preload = () => urls.forEach((src) => { const img = new Image(); img.src = src; });
@@ -946,7 +946,7 @@ export default function Products({ products }: Props) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.4 }}
-                className={`relative ${selectedSlug === 'billets' ? 'translate-y-12' : selectedSlug === 'tmt-bars' ? 'translate-y-52' : ''}`}
+                className={`relative ${selectedSlug === 'billets' ? 'translate-y-12' : selectedSlug === 'steel-rebars' ? 'translate-y-52' : ''}`}
               >
                 {getProductHeroImage(selectedProduct) ? (
                   <img
@@ -1009,7 +1009,7 @@ export default function Products({ products }: Props) {
                       alt={getName(selectedProduct)}
                       className={`object-contain drop-shadow-2xl ${selectedSlug === 'billets' ? 'max-h-32 xl:max-h-40 max-w-105 xl:max-w-130' : 'max-h-32 xl:max-h-48 2xl:max-h-60 w-auto'}`}
                     />
-                    {selectedSlug === 'tmt-bars' && <TmtMarkingDots language={language} />}
+                    {selectedSlug === 'steel-rebars' && <TmtMarkingDots language={language} />}
                   </div>
                 ) : (
                   <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center">

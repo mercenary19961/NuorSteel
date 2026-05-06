@@ -92,7 +92,7 @@ export default function CapabilitiesSection() {
   const segmentSize = (cardRangeEnd - cardRangeStart) / CARD_COUNT;
 
   return (
-    <div ref={wrapperRef} className="relative" style={{ height: isDesktop ? '350vh' : 'auto' }}>
+    <div ref={wrapperRef} className="relative" style={{ height: isDesktop ? '250vh' : 'auto' }}>
       <section className="sticky top-0 h-screen bg-surface overflow-hidden" style={isDesktop ? undefined : { position: 'relative', height: 'auto' }}>
 
         {isDesktop ? (
