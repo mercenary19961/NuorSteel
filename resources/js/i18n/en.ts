@@ -28,7 +28,7 @@ const en = {
     },
     about: {
       title: "About Nuor Steel",
-      description: "Nuor Steel Industry Company is a leading Saudi steel manufacturer founded in 2010 in Al Kharj Industrial City. As a fully integrated producer of steel billets and TMT rebars, it supports national infrastructure and industrial growth aligned with Saudi Vision 2030.",
+      description: "Nuor Steel Industry Company is a leading Saudi steel manufacturer founded in 2010 in Al Kharj Industrial City. As a fully integrated producer of TMT rebars and steel billets, it supports national infrastructure and industrial growth aligned with Saudi Vision 2030.",
       learnMore: "Learn More",
     },
     visionMission: {
@@ -106,14 +106,14 @@ const en = {
     },
     overview: {
       title: "Company Overview",
-      description: "Nuor Steel Industry Company is a leading Saudi steel manufacturer established in 2010 and headquartered in Al Kharj Industrial City. Originally founded as a steel trading business, Nuor Steel has evolved into a fully integrated steel producer with advanced manufacturing facilities specializing in the production of high-quality steel billets and TMT steel rebars.",
+      description: "Nuor Steel Industry Company is a leading Saudi steel manufacturer established in 2010 and headquartered in Al Kharj Industrial City. Originally founded as a steel trading business, Nuor Steel has evolved into a fully integrated steel producer with advanced manufacturing facilities specializing in the production of high-quality TMT steel rebars and steel billets.",
     },
     intro: {
       headline: "Nuor Steel is A Leading Steel Manufacturer in",
       headlineHighlight: "Saudi Arabia",
       subline: "Founded in 2010 and headquartered in Al Kharj Industrial City",
       body: "From a steel trading business to a fully integrated steel producer,\nNuor Steel delivers advanced manufacturing capabilities for:",
-      highlight: "High-Quality Steel Billets & TMT Rebars",
+      highlight: "High-Quality TMT Rebars & Steel Billets",
     },
     visionMission: {
       title: "Vision & Mission",
@@ -167,7 +167,7 @@ const en = {
         {
           year: "Present",
           title: "A Fully Integrated Industrial Vision",
-          body: "Today, Nuor Steel stands as one of the leading steel manufacturers in the region, backed by an integrated production model, advanced industrial facilities, and a clear commitment to quality. From its beginnings as a trading business to its evolution into a producer of steel billets and TMT bars, the company's journey reflects ambition guided by strategy and growth supported by capability. Nuor Steel continues to serve the market with confidence, delivering reliable steel solutions to businesses across Saudi Arabia and the wider MENA region. Its story is still being written; driven by progress, powered by industry, and built on a vision of long-term manufacturing excellence.",
+          body: "Today, Nuor Steel stands as one of the leading steel manufacturers in the region, backed by an integrated production model, advanced industrial facilities, and a clear commitment to quality. From its beginnings as a trading business to its evolution into a producer of TMT bars and steel billets, the company's journey reflects ambition guided by strategy and growth supported by capability. Nuor Steel continues to serve the market with confidence, delivering reliable steel solutions to businesses across Saudi Arabia and the wider MENA region. Its story is still being written; driven by progress, powered by industry, and built on a vision of long-term manufacturing excellence.",
         },
       ],
     },
