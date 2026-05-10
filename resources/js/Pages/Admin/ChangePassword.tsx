@@ -1,6 +1,7 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Lock, AlertTriangle, ArrowLeft } from 'lucide-react';
 import PasswordInput from '@/Components/ui/PasswordInput';
+import { useForceLtr } from '@/hooks/useForceLtr';
 import type { PageProps } from '@/types';
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export default function ChangePassword({ forced }: Props) {
+  useForceLtr();
   const { auth, flash } = usePage<PageProps>().props;
   const { data, setData, post, processing, errors, reset } = useForm({
     current_password: '',

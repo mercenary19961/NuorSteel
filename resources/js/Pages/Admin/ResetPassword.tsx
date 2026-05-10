@@ -1,6 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import { Lock, Mail } from 'lucide-react';
 import PasswordInput from '@/Components/ui/PasswordInput';
+import { useForceLtr } from '@/hooks/useForceLtr';
 
 interface Props {
   token: string;
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export default function ResetPassword({ token, email }: Props) {
+  useForceLtr();
   const { data, setData, post, processing, errors } = useForm({
     token,
     email,
