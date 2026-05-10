@@ -99,10 +99,10 @@ export default function Quality() {
         {/* Background image */}
         <div className="absolute inset-0">
           <picture>
-            <source media="(max-width: 639px)" srcSet={`/images/quality/hero/hero-mobile-${language}.webp`} />
+            <source media="(max-width: 639px)" srcSet={`/images/quality/hero/hero-mobile-${language}-v2.webp`} />
             <img
               key={`quality-hero-${language}`}
-              src={`/images/quality/hero/hero-desktop-${language}.webp`}
+              src={`/images/quality/hero/hero-desktop-${language}-v2.webp`}
               alt=""
               fetchPriority="high"
               decoding="async"
