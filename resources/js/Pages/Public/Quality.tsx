@@ -220,6 +220,14 @@ export default function Quality() {
               {t('quality.assurance.closing', 'Our objective is not only to meet standards but to provide contractors and consultants with confidence that the material will perform as designed throughout the life of the structure.')}
             </p>
           </div>
+
+          {/* Accreditation logos — static row */}
+          <div className="mt-20 max-w-5xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10 lg:gap-12 items-center justify-items-center">
+            <img src="/images/quality/logos/aces.webp" alt="ACES" loading="lazy" decoding="async" className="h-14 lg:h-16 w-auto max-w-45 object-contain" />
+            <img src="/images/quality/logos/hoty.webp" alt="Al-Hoty Analytical Services" loading="lazy" decoding="async" className="h-14 lg:h-16 w-auto max-w-45 object-contain" />
+            <img src="/images/quality/logos/iso.webp" alt="ISO" loading="lazy" decoding="async" className="h-14 lg:h-16 w-auto max-w-45 object-contain" />
+            <img src="/images/quality/logos/saso.webp" alt="SASO" loading="lazy" decoding="async" className="h-14 lg:h-16 w-auto max-w-45 object-contain" />
+          </div>
         </div>
       </section>
 
