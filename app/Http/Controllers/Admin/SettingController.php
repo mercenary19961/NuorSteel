@@ -7,11 +7,16 @@ use App\Models\Setting;
 use App\Services\UndoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class SettingController extends Controller
 {
+    /** Hard cap on comma-separated entries for company_phone / company_email. */
+    private const MULTI_VALUE_LIMIT = 4;
+    private const MULTI_VALUE_KEYS = ['company_phone', 'company_email'];
+
     public function __construct(
         protected UndoService $undoService,
     ) {}
@@ -38,6 +43,27 @@ class SettingController extends Controller
             'settings.*.key' => ['required', 'string', 'in:' . implode(',', $allowedKeys)],
             'settings.*.value' => 'nullable|string',
         ]);
+
+        // Cap comma-separated multi-value fields (company_phone / company_email)
+        // at MULTI_VALUE_LIMIT entries. Empty entries from trailing commas are
+        // ignored so "a@b.com,a@b.com,," doesn't fail the count.
+        $errors = [];
+        foreach ($request->settings as $i => $setting) {
+            if (!in_array($setting['key'], self::MULTI_VALUE_KEYS, true)) {
+                continue;
+            }
+            $count = collect(explode(',', (string) ($setting['value'] ?? '')))
+                ->map(fn ($v) => trim($v))
+                ->filter()
+                ->count();
+            if ($count > self::MULTI_VALUE_LIMIT) {
+                $label = $setting['key'] === 'company_phone' ? 'phone numbers' : 'email addresses';
+                $errors["settings.{$i}.value"] = "You can list at most " . self::MULTI_VALUE_LIMIT . " {$label} (got {$count}).";
+            }
+        }
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
 
         // Snapshot current state before applying changes
         $keys = collect($request->settings)->pluck('key')->all();

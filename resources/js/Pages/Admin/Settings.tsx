@@ -195,6 +195,16 @@ export default function Settings({ settings, undoMeta }: Props) {
   const hasChanges = Object.keys(editedValues).some(isDirty);
   const dirtyCount = Object.keys(editedValues).filter(isDirty).length;
 
+  // Hard cap on comma-separated entries — must match MULTI_VALUE_LIMIT in
+  // SettingController. Empty entries are not counted.
+  const MULTI_VALUE_LIMIT = 4;
+  const MULTI_VALUE_KEYS: ReadonlyArray<string> = ['company_phone', 'company_email'];
+  const countMultiValues = (value: string) =>
+    value.split(',').map((v) => v.trim()).filter(Boolean).length;
+  const isOverLimit = (key: string) =>
+    MULTI_VALUE_KEYS.includes(key) && countMultiValues(editedValues[key] ?? '') > MULTI_VALUE_LIMIT;
+  const hasLimitErrors = MULTI_VALUE_KEYS.some(isOverLimit);
+
   const handleChange = (key: string, value: string) => {
     setEditedValues((prev) => ({ ...prev, [key]: value }));
   };
@@ -237,6 +247,14 @@ export default function Settings({ settings, undoMeta }: Props) {
     google_maps_place_url: ExternalLink,
   };
 
+  // Helper hints rendered below specific inputs. Only fields that accept
+  // multiple comma-separated values get a hint here — everything else is a
+  // single value and doesn't need it.
+  const settingHelpers: Record<string, string> = {
+    company_phone: `You can add up to ${MULTI_VALUE_LIMIT} phone numbers, separated by commas. Example: +966543781868, +966545198760. Each number will appear as a separate clickable link in the website footer and contact page.`,
+    company_email: `You can add up to ${MULTI_VALUE_LIMIT} email addresses, separated by commas. Example: info@nuorsteel.com, sales@nuorsteel.com. Each address will appear as a separate clickable link in the website footer and contact page.`,
+  };
+
   if (Object.keys(settings).length === 0) {
     return (
       <AdminLayout>
@@ -268,7 +286,8 @@ export default function Settings({ settings, undoMeta }: Props) {
             <UndoButton modelType="settings" modelId="all" undoMeta={undoMeta} />
             <button
               onClick={handleSave}
-              disabled={!hasChanges || saving}
+              disabled={!hasChanges || saving || hasLimitErrors}
+              title={hasLimitErrors ? `Phone and email are limited to ${MULTI_VALUE_LIMIT} values each.` : undefined}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 disabled:opacity-50"
             >
               <Save size={16} />
@@ -355,6 +374,21 @@ export default function Settings({ settings, undoMeta }: Props) {
                         className={fieldClass}
                       />
                     )}
+                    {settingHelpers[setting.key] && (
+                      <p className="mt-1 text-[11px] text-gray-500 leading-relaxed">
+                        {settingHelpers[setting.key]}
+                      </p>
+                    )}
+                    {MULTI_VALUE_KEYS.includes(setting.key) && (() => {
+                      const count = countMultiValues(editedValues[setting.key] ?? '');
+                      const over = count > MULTI_VALUE_LIMIT;
+                      return (
+                        <p className={`mt-1 text-[11px] ${over ? 'text-red-600 font-medium' : 'text-gray-400'}`}>
+                          {count} / {MULTI_VALUE_LIMIT} values
+                          {over && ` — please remove ${count - MULTI_VALUE_LIMIT} to save.`}
+                        </p>
+                      );
+                    })()}
                     {dirty && !isEmailSetting(group) && (
                       <p className="mt-1 text-[11px] text-amber-700 truncate">
                         Was: <span className="font-mono">{originalValues[setting.key] || '(empty)'}</span>
