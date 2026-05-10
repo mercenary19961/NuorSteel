@@ -40,7 +40,7 @@ class StorageReconciler
 
         // Products — sourced from public/ renders, restored to media/<slug>-product.png
         ['public/images/home/products/steel-rebars-desktop.png',        'media/steel-rebars-product.png'],
-        ['public/images/home/products/billets-desktop.png',             'media/billets-product.png'],
+        ['public/images/home/products/billets-desktop.webp',            'media/billets-product.webp'],
 
         // Partners — sourced from public/ logos, restored to media/partners/<slug>.webp
         ['public/images/home/partners/aramco.webp',                     'media/partners/aramco.webp'],

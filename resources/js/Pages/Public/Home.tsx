@@ -584,8 +584,8 @@ export default function Home({ content_en, content_ar, linkedin_posts, partners 
           >
             {/* Background image */}
             <picture>
-              <source media="(max-width: 1023px)" srcSet="/images/home/products/billets-mobile.png" />
-              <img src="/images/home/products/billets-desktop.png" alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+              <source media="(max-width: 1023px)" srcSet="/images/home/products/billets-mobile.webp" />
+              <img src="/images/home/products/billets-desktop.webp" alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
             </picture>
             {/* Color Overlay */}
             <div
