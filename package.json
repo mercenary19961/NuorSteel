@@ -4,7 +4,9 @@
     "type": "module",
     "scripts": {
         "build": "vite build && vite build --ssr",
-        "dev": "vite"
+        "build:ssr": "vite build --ssr",
+        "dev": "vite",
+        "start": "node bootstrap/ssr/ssr.js"
     },
     "dependencies": {
         "@hookform/resolvers": "^5.2.2",

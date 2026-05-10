@@ -3,9 +3,11 @@ import { Lock, Mail } from 'lucide-react';
 import { useRef } from 'react';
 import Turnstile, { type TurnstileHandle } from '@/Components/Public/Turnstile';
 import PasswordInput from '@/Components/ui/PasswordInput';
+import { useForceLtr } from '@/hooks/useForceLtr';
 import type { PageProps } from '@/types';
 
 export default function Login() {
+  useForceLtr();
   const turnstileRef = useRef<TurnstileHandle>(null);
   const { flash, turnstileSiteKey } = usePage<PageProps>().props;
   const status = (flash as Record<string, string | undefined>)?.status;

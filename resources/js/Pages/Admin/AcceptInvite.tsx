@@ -1,6 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import { Lock, User as UserIcon } from 'lucide-react';
 import PasswordInput from '@/Components/ui/PasswordInput';
+import { useForceLtr } from '@/hooks/useForceLtr';
 
 interface Props {
   user: {
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export default function AcceptInvite({ user, signedQuery }: Props) {
+  useForceLtr();
   const { data, setData, post, processing, errors } = useForm({
     password: '',
     password_confirmation: '',

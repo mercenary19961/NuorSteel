@@ -2,6 +2,7 @@ import { useState, useEffect, type ReactNode } from 'react';
 import { usePage, router } from '@inertiajs/react';
 import type { PageProps } from '@/types';
 import AdminSidebar from '@/Components/Layout/AdminSidebar';
+import { useForceLtr } from '@/hooks/useForceLtr';
 import { LogOut, User as UserIcon, Menu } from 'lucide-react';
 
 interface Props {
@@ -16,6 +17,8 @@ export default function AdminLayout({ children }: Props) {
   const user = props.auth.user;
   const [sidebarCollapsed, setSidebarCollapsed] = useState(globalSidebarCollapsed);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useForceLtr();
 
   // Reset mobile sidebar state when viewport reaches desktop size
   useEffect(() => {

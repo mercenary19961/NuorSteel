@@ -75,11 +75,20 @@ class SiteContentSeeder extends Seeder
             ['page' => 'certificates', 'section' => 'governance', 'key' => 'title', 'content_en' => 'Governance Documents', 'content_ar' => 'وثائق الحوكمة', 'type' => 'text'],
 
             // Career Page
+            ['page' => 'career', 'section' => 'hero', 'key' => 'label', 'content_en' => 'Careers', 'content_ar' => 'الوظائف', 'type' => 'text'],
             ['page' => 'career', 'section' => 'overview', 'key' => 'title', 'content_en' => 'Career Opportunities', 'content_ar' => 'فرص العمل', 'type' => 'text'],
             ['page' => 'career', 'section' => 'overview', 'key' => 'description', 'content_en' => 'Join our team and be part of a dynamic organization committed to excellence.', 'content_ar' => 'انضم إلى فريقنا وكن جزءًا من منظمة ديناميكية ملتزمة بالتميز.', 'type' => 'textarea'],
 
+            ['page' => 'career', 'section' => 'listings', 'key' => 'title', 'content_en' => 'Open Positions', 'content_ar' => 'الوظائف المتاحة', 'type' => 'text'],
+            ['page' => 'career', 'section' => 'listings', 'key' => 'subtitle', 'content_en' => 'Explore current opportunities and find your place at Nuor Steel.', 'content_ar' => 'استكشف الفرص المتاحة وابحث عن مكانك في شركة حديد نور للصناعة.', 'type' => 'textarea'],
+
             ['page' => 'career', 'section' => 'open_application', 'key' => 'title', 'content_en' => 'Open Application', 'content_ar' => 'تقديم طلب مفتوح', 'type' => 'text'],
             ['page' => 'career', 'section' => 'open_application', 'key' => 'description', 'content_en' => "Don't see a position that fits? Submit your CV and we'll keep it on file for future opportunities.", 'content_ar' => 'لا ترى وظيفة مناسبة؟ أرسل سيرتك الذاتية وسنحتفظ بها للفرص المستقبلية.', 'type' => 'text'],
+
+            // Sustainability Page
+            ['page' => 'sustainability', 'section' => 'hero', 'key' => 'label', 'content_en' => 'Sustainability', 'content_ar' => 'الاستدامة', 'type' => 'text'],
+            ['page' => 'sustainability', 'section' => 'hero', 'key' => 'title', 'content_en' => 'Our Commitment to People, Planet & Principles', 'content_ar' => 'التزامنا تجاه الإنسان والكوكب والمبادئ', 'type' => 'text'],
+            ['page' => 'sustainability', 'section' => 'hero', 'key' => 'subtitle', 'content_en' => 'From environmental performance to workplace safety and corporate governance, our responsibility extends beyond the mill floor.', 'content_ar' => 'من الأداء البيئي إلى السلامة المهنية والحوكمة المؤسسية، مسؤوليتنا تمتد إلى ما هو أبعد من أرضية المصنع.', 'type' => 'textarea'],
 
             // Contact Page
             ['page' => 'contact', 'section' => 'overview', 'key' => 'title', 'content_en' => 'Get in Touch', 'content_ar' => 'تواصل معنا', 'type' => 'text'],

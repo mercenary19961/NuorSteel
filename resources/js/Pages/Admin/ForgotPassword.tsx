@@ -1,11 +1,13 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Mail, ArrowLeft } from 'lucide-react';
+import { useForceLtr } from '@/hooks/useForceLtr';
 
 interface Props {
   status?: string;
 }
 
 export default function ForgotPassword({ status }: Props) {
+  useForceLtr();
   const { data, setData, post, processing, errors, wasSuccessful } = useForm({
     email: '',
   });

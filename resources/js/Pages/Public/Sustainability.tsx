@@ -4,6 +4,7 @@ import { Head } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Leaf, HardHat, Scale, FileText, Eye, X, ShieldCheck, FileCheck2, Landmark } from 'lucide-react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 type TabKey = 'environment' | 'safety' | 'governance';
 
@@ -27,8 +28,15 @@ const TABS: { key: TabKey; icon: typeof Leaf }[] = [
   { key: 'governance',  icon: Scale },
 ];
 
-export default function Sustainability() {
+interface Props {
+  content_en?: Record<string, Record<string, string>>;
+  content_ar?: Record<string, Record<string, string>>;
+}
+
+export default function Sustainability({ content_en, content_ar }: Props) {
   const { t } = useTranslation();
+  const { language } = useLanguage();
+  const content = language === 'ar' ? content_ar : content_en;
   const [activeTab, setActiveTab] = useState<TabKey>('environment');
   const [viewingPdf, setViewingPdf] = useState<Doc | null>(null);
 
@@ -50,13 +58,13 @@ export default function Sustainability() {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl">
             <p className="text-primary font-semibold text-sm uppercase tracking-widest mb-4">
-              {t('sustainability.hero.label')}
+              {content?.hero?.label || t('sustainability.hero.label')}
             </p>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-5">
-              {t('sustainability.hero.title')}
+              {content?.hero?.title || t('sustainability.hero.title')}
             </h1>
             <p className="text-base lg:text-lg text-gray-300 leading-relaxed">
-              {t('sustainability.hero.subtitle')}
+              {content?.hero?.subtitle || t('sustainability.hero.subtitle')}
             </p>
           </div>
         </div>

@@ -61,6 +61,12 @@ class ProductController extends Controller
         $data['created_by'] = $request->user()->id;
         $data['updated_by'] = $request->user()->id;
 
+        foreach (['spec_table', 'spec_table_2'] as $tableKey) {
+            if (isset($data[$tableKey]) && is_array($data[$tableKey]) && $this->isEmptySpecTable($data[$tableKey])) {
+                $data[$tableKey] = null;
+            }
+        }
+
         Product::create($data);
 
         return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
@@ -97,6 +103,13 @@ class ProductController extends Controller
         $data['slug'] = Str::slug($request->input('name_en'));
         $data['updated_by'] = $request->user()->id;
 
+        // Null out empty spec tables so the public page doesn't render an empty tab
+        foreach (['spec_table', 'spec_table_2'] as $tableKey) {
+            if (isset($data[$tableKey]) && is_array($data[$tableKey]) && $this->isEmptySpecTable($data[$tableKey])) {
+                $data[$tableKey] = null;
+            }
+        }
+
         $newData = ['id' => $product->id];
         foreach ($trackedFields as $field) {
             $value = $data[$field] ?? null;
@@ -112,6 +125,16 @@ class ProductController extends Controller
         $product->update($data);
 
         return redirect()->back()->with('success', 'Product updated successfully.');
+    }
+
+    protected function isEmptySpecTable(array $table): bool
+    {
+        $hasHeaders = !empty($table['headers_en'] ?? []) || !empty($table['headers_ar'] ?? []);
+        $hasRows = !empty($table['rows'] ?? []);
+        $hasLabels = !empty($table['tab_label_en'] ?? '') || !empty($table['tab_label_ar'] ?? '')
+            || !empty($table['title_en'] ?? '') || !empty($table['title_ar'] ?? '');
+
+        return !$hasHeaders && !$hasRows && !$hasLabels;
     }
 
     protected function productFillableFields(): array
