@@ -28,7 +28,8 @@ class SettingController extends Controller
     {
         $allowedKeys = [
             'company_phone', 'company_email', 'company_address_en', 'company_address_ar',
-            'linkedin_url', 'contact_recipients', 'career_recipients',
+            'linkedin_url', 'facebook_url', 'instagram_url',
+            'contact_recipients', 'career_recipients',
             'google_maps_embed_url', 'google_maps_place_url',
         ];
 

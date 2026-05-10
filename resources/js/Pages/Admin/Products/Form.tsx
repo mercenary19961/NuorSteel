@@ -26,6 +26,7 @@ interface ProductForm {
   highlights: ProductHighlight[];
   spec_icons: ProductSpecIcon[];
   spec_table: ProductSpecTable;
+  spec_table_2: ProductSpecTable;
   features: ProductFeature[];
   show_quote_tab: boolean;
   is_active: boolean;
@@ -46,7 +47,9 @@ const ICON_OPTIONS = [
 ];
 
 const emptySpecTable = (): ProductSpecTable => ({
-  title_en: '', title_ar: '', headers_en: [], headers_ar: [], rows: [],
+  tab_label_en: '', tab_label_ar: '',
+  title_en: '', title_ar: '',
+  headers_en: [], headers_ar: [], rows: [],
 });
 
 interface SpecForm {
@@ -85,6 +88,7 @@ function initForm(item: Product | null): ProductForm {
       highlights: [],
       spec_icons: [],
       spec_table: emptySpecTable(),
+      spec_table_2: emptySpecTable(),
       features: [],
       show_quote_tab: true,
       is_active: true,
@@ -104,12 +108,272 @@ function initForm(item: Product | null): ProductForm {
     highlights: item.highlights ?? [],
     spec_icons: item.spec_icons ?? [],
     spec_table: item.spec_table ?? emptySpecTable(),
+    spec_table_2: item.spec_table_2 ?? emptySpecTable(),
     features: item.features ?? [],
     show_quote_tab: item.show_quote_tab ?? true,
     is_active: item.is_active,
     is_featured: item.is_featured,
     sort_order: item.sort_order,
   };
+}
+
+interface SpecTableEditorProps {
+  heading: string;
+  description: string;
+  value: ProductSpecTable;
+  onChange: (patch: Partial<ProductSpecTable>) => void;
+  inputClass: string;
+}
+
+function SpecTableEditor({ heading, description, value, onChange, inputClass }: SpecTableEditorProps) {
+  const hasRowsAr = !!value.rows_ar && value.rows_ar.length > 0;
+  const colCount = value.headers_en.length;
+
+  const setBilingualRows = (enabled: boolean) => {
+    if (enabled) {
+      // Initialize rows_ar from rows shape (empty strings)
+      onChange({ rows_ar: value.rows.map((r) => r.map(() => '')) });
+    } else {
+      onChange({ rows_ar: undefined });
+    }
+  };
+
+  const addColumn = () => {
+    const patch: Partial<ProductSpecTable> = {
+      headers_en: [...value.headers_en, ''],
+      headers_ar: [...value.headers_ar, ''],
+      rows: value.rows.map((r) => [...r, '']),
+    };
+    if (hasRowsAr && value.rows_ar) {
+      patch.rows_ar = value.rows_ar.map((r) => [...r, '']);
+    }
+    onChange(patch);
+  };
+
+  const removeColumn = (col: number) => {
+    const patch: Partial<ProductSpecTable> = {
+      headers_en: value.headers_en.filter((_, i) => i !== col),
+      headers_ar: value.headers_ar.filter((_, i) => i !== col),
+      rows: value.rows.map((r) => r.filter((_, i) => i !== col)),
+    };
+    if (hasRowsAr && value.rows_ar) {
+      patch.rows_ar = value.rows_ar.map((r) => r.filter((_, i) => i !== col));
+    }
+    onChange(patch);
+  };
+
+  const updateHeader = (lang: 'en' | 'ar', col: number, v: string) => {
+    const key = lang === 'en' ? 'headers_en' : 'headers_ar';
+    onChange({ [key]: value[key].map((h, i) => (i === col ? v : h)) } as Partial<ProductSpecTable>);
+  };
+
+  const addRow = () => {
+    const cols = colCount || 1;
+    const patch: Partial<ProductSpecTable> = {
+      rows: [...value.rows, Array(cols).fill('')],
+    };
+    if (hasRowsAr && value.rows_ar) {
+      patch.rows_ar = [...value.rows_ar, Array(cols).fill('')];
+    }
+    onChange(patch);
+  };
+
+  const removeRow = (row: number) => {
+    const patch: Partial<ProductSpecTable> = {
+      rows: value.rows.filter((_, i) => i !== row),
+    };
+    if (hasRowsAr && value.rows_ar) {
+      patch.rows_ar = value.rows_ar.filter((_, i) => i !== row);
+    }
+    onChange(patch);
+  };
+
+  const updateCell = (lang: 'en' | 'ar', row: number, col: number, v: string) => {
+    if (lang === 'en') {
+      onChange({
+        rows: value.rows.map((r, ri) =>
+          ri === row ? r.map((c, ci) => (ci === col ? v : c)) : r,
+        ),
+      });
+    } else if (value.rows_ar) {
+      onChange({
+        rows_ar: value.rows_ar.map((r, ri) =>
+          ri === row ? r.map((c, ci) => (ci === col ? v : c)) : r,
+        ),
+      });
+    }
+  };
+
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">{heading}</h2>
+          <p className="text-xs text-gray-500 mt-0.5">{description}</p>
+        </div>
+      </div>
+
+      {/* Tab label (drives the public-page tab title) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">Tab Label (EN)</label>
+          <input
+            type="text"
+            placeholder="e.g. Specifications, Chemical Composition"
+            value={value.tab_label_en ?? ''}
+            onChange={(e) => onChange({ tab_label_en: e.target.value })}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">Tab Label (AR)</label>
+          <input
+            type="text"
+            placeholder="مثال: المواصفات، التركيب الكيميائي"
+            value={value.tab_label_ar ?? ''}
+            onChange={(e) => onChange({ tab_label_ar: e.target.value })}
+            dir="rtl"
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">Title (EN)</label>
+          <input
+            type="text"
+            value={value.title_en}
+            onChange={(e) => onChange({ title_en: e.target.value })}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">Title (AR)</label>
+          <input
+            type="text"
+            value={value.title_ar}
+            onChange={(e) => onChange({ title_ar: e.target.value })}
+            dir="rtl"
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={addColumn}
+            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+          >
+            <Plus size={12} />
+            Add Column
+          </button>
+          <button
+            type="button"
+            onClick={addRow}
+            disabled={colCount === 0}
+            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-40"
+          >
+            <Plus size={12} />
+            Add Row
+          </button>
+        </div>
+        <label className="flex items-center gap-2 text-xs text-gray-700 cursor-pointer" title="Adds a parallel Arabic value next to each table cell. Useful when row labels are localized.">
+          <input
+            type="checkbox"
+            checked={hasRowsAr}
+            onChange={(e) => setBilingualRows(e.target.checked)}
+            className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+          />
+          Bilingual cells (provide Arabic per cell)
+        </label>
+      </div>
+
+      {colCount === 0 ? (
+        <p className="text-sm text-gray-500 text-center py-6">
+          Click "Add Column" to start building the table.
+        </p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr>
+                {value.headers_en.map((_, col) => (
+                  <th key={col} className="border border-gray-200 p-2 bg-gray-50 align-top min-w-40">
+                    <div className="space-y-1.5">
+                      <input
+                        type="text"
+                        placeholder={`Header ${col + 1} (EN)`}
+                        value={value.headers_en[col] ?? ''}
+                        onChange={(e) => updateHeader('en', col, e.target.value)}
+                        className={inputClass}
+                      />
+                      <input
+                        type="text"
+                        placeholder={`Header ${col + 1} (AR)`}
+                        value={value.headers_ar[col] ?? ''}
+                        onChange={(e) => updateHeader('ar', col, e.target.value)}
+                        dir="rtl"
+                        className={inputClass}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeColumn(col)}
+                        className="w-full text-xs text-red-500 hover:bg-red-50 rounded py-1"
+                      >
+                        Remove column
+                      </button>
+                    </div>
+                  </th>
+                ))}
+                <th className="w-8"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {value.rows.map((row, ri) => (
+                <tr key={ri}>
+                  {value.headers_en.map((_, ci) => (
+                    <td key={ci} className="border border-gray-200 p-1 align-top">
+                      <div className={hasRowsAr ? 'space-y-1' : ''}>
+                        <input
+                          type="text"
+                          value={row[ci] ?? ''}
+                          onChange={(e) => updateCell('en', ri, ci, e.target.value)}
+                          className={inputClass}
+                          placeholder={hasRowsAr ? `Cell (EN)` : undefined}
+                        />
+                        {hasRowsAr && value.rows_ar && (
+                          <input
+                            type="text"
+                            value={value.rows_ar[ri]?.[ci] ?? ''}
+                            onChange={(e) => updateCell('ar', ri, ci, e.target.value)}
+                            dir="rtl"
+                            className={inputClass}
+                            placeholder={`Cell (AR)`}
+                          />
+                        )}
+                      </div>
+                    </td>
+                  ))}
+                  <td className="border border-gray-200 p-1 text-center align-top">
+                    <button
+                      type="button"
+                      onClick={() => removeRow(ri)}
+                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
 }
 
 function initSpecs(item: Product | null): SpecForm[] {
@@ -235,51 +499,11 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
   const removeSpecIcon = (i: number) =>
     setForm((f) => ({ ...f, spec_icons: f.spec_icons.filter((_, idx) => idx !== i) }));
 
-  // Spec Table
-  const updateSpecTable = (patch: Partial<ProductSpecTable>) =>
+  // Spec Tables (primary + secondary, e.g. Specifications + Chemical Composition)
+  const patchSpecTable = (patch: Partial<ProductSpecTable>) =>
     setForm((f) => ({ ...f, spec_table: { ...f.spec_table, ...patch } }));
-
-  const addTableColumn = () => {
-    updateSpecTable({
-      headers_en: [...form.spec_table.headers_en, ''],
-      headers_ar: [...form.spec_table.headers_ar, ''],
-      rows: form.spec_table.rows.map((r) => [...r, '']),
-    });
-  };
-
-  const removeTableColumn = (col: number) => {
-    updateSpecTable({
-      headers_en: form.spec_table.headers_en.filter((_, i) => i !== col),
-      headers_ar: form.spec_table.headers_ar.filter((_, i) => i !== col),
-      rows: form.spec_table.rows.map((r) => r.filter((_, i) => i !== col)),
-    });
-  };
-
-  const updateHeader = (lang: 'en' | 'ar', col: number, value: string) => {
-    const key = lang === 'en' ? 'headers_en' : 'headers_ar';
-    updateSpecTable({
-      [key]: form.spec_table[key].map((h, i) => (i === col ? value : h)),
-    });
-  };
-
-  const addTableRow = () => {
-    const colCount = form.spec_table.headers_en.length || 1;
-    updateSpecTable({
-      rows: [...form.spec_table.rows, Array(colCount).fill('')],
-    });
-  };
-
-  const removeTableRow = (row: number) => {
-    updateSpecTable({ rows: form.spec_table.rows.filter((_, i) => i !== row) });
-  };
-
-  const updateCell = (row: number, col: number, value: string) => {
-    updateSpecTable({
-      rows: form.spec_table.rows.map((r, ri) =>
-        ri === row ? r.map((c, ci) => (ci === col ? value : c)) : r,
-      ),
-    });
-  };
+  const patchSpecTable2 = (patch: Partial<ProductSpecTable>) =>
+    setForm((f) => ({ ...f, spec_table_2: { ...f.spec_table_2, ...patch } }));
 
   // Features
   const addFeature = () =>
@@ -618,128 +842,23 @@ export default function ProductFormPage({ item, undoMeta }: Props) {
               )}
             </section>
 
-            {/* Spec Table */}
-            <section className="bg-white rounded-xl border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Spec Table</h2>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    Tabular data shown on the Specifications tab.
-                  </p>
-                </div>
-              </div>
+            {/* Spec Table (primary) */}
+            <SpecTableEditor
+              heading="Spec Table"
+              description="Tabular data shown on the first specifications tab. Leave Tab Label blank to use the default."
+              value={form.spec_table}
+              onChange={patchSpecTable}
+              inputClass={inputClass}
+            />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">Title (EN)</label>
-                  <input
-                    type="text"
-                    value={form.spec_table.title_en}
-                    onChange={(e) => updateSpecTable({ title_en: e.target.value })}
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">Title (AR)</label>
-                  <input
-                    type="text"
-                    value={form.spec_table.title_ar}
-                    onChange={(e) => updateSpecTable({ title_ar: e.target.value })}
-                    dir="rtl"
-                    className={inputClass}
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 mb-3">
-                <button
-                  type="button"
-                  onClick={addTableColumn}
-                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  <Plus size={12} />
-                  Add Column
-                </button>
-                <button
-                  type="button"
-                  onClick={addTableRow}
-                  disabled={form.spec_table.headers_en.length === 0}
-                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-40"
-                >
-                  <Plus size={12} />
-                  Add Row
-                </button>
-              </div>
-
-              {form.spec_table.headers_en.length === 0 ? (
-                <p className="text-sm text-gray-500 text-center py-6">
-                  Click "Add Column" to start building the table.
-                </p>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse text-sm">
-                    <thead>
-                      <tr>
-                        {form.spec_table.headers_en.map((_, col) => (
-                          <th key={col} className="border border-gray-200 p-2 bg-gray-50 align-top min-w-40">
-                            <div className="space-y-1.5">
-                              <input
-                                type="text"
-                                placeholder={`Header ${col + 1} (EN)`}
-                                value={form.spec_table.headers_en[col] ?? ''}
-                                onChange={(e) => updateHeader('en', col, e.target.value)}
-                                className={inputClass}
-                              />
-                              <input
-                                type="text"
-                                placeholder={`Header ${col + 1} (AR)`}
-                                value={form.spec_table.headers_ar[col] ?? ''}
-                                onChange={(e) => updateHeader('ar', col, e.target.value)}
-                                dir="rtl"
-                                className={inputClass}
-                              />
-                              <button
-                                type="button"
-                                onClick={() => removeTableColumn(col)}
-                                className="w-full text-xs text-red-500 hover:bg-red-50 rounded py-1"
-                              >
-                                Remove column
-                              </button>
-                            </div>
-                          </th>
-                        ))}
-                        <th className="w-8"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {form.spec_table.rows.map((row, ri) => (
-                        <tr key={ri}>
-                          {form.spec_table.headers_en.map((_, ci) => (
-                            <td key={ci} className="border border-gray-200 p-1">
-                              <input
-                                type="text"
-                                value={row[ci] ?? ''}
-                                onChange={(e) => updateCell(ri, ci, e.target.value)}
-                                className={inputClass}
-                              />
-                            </td>
-                          ))}
-                          <td className="border border-gray-200 p-1 text-center">
-                            <button
-                              type="button"
-                              onClick={() => removeTableRow(ri)}
-                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
-                            >
-                              <Trash2 size={12} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </section>
+            {/* Spec Table 2 (optional second tab — e.g. Chemical Composition for billets) */}
+            <SpecTableEditor
+              heading="Spec Table 2 (optional)"
+              description="Adds a second specifications tab on the public product page. Leave all fields blank to hide it."
+              value={form.spec_table_2}
+              onChange={patchSpecTable2}
+              inputClass={inputClass}
+            />
 
             {/* Features */}
             <section className="bg-white rounded-xl border border-gray-200 p-6">

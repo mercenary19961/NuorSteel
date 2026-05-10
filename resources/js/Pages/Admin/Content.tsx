@@ -3,7 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BilingualEditor from '@/Components/Admin/BilingualEditor';
 import UndoButton from '@/Components/Admin/UndoButton';
-import { ChevronDown, ChevronRight, Save, Eye, ExternalLink, Maximize2, Minimize2, MousePointerClick, Home, Building2, ShieldCheck, Briefcase, Award, Mail, Package, Info, type LucideIcon } from 'lucide-react';
+import { ChevronDown, ChevronRight, Save, Eye, ExternalLink, Maximize2, Minimize2, MousePointerClick, Home, Building2, ShieldCheck, Briefcase, Mail, Package, Info, Leaf, type LucideIcon } from 'lucide-react';
 import type { SiteContent, UndoMeta } from '@/types';
 
 const PAGE_CONFIG: Record<string, { label: string; labelAr: string; icon: LucideIcon }> = {
@@ -11,7 +11,7 @@ const PAGE_CONFIG: Record<string, { label: string; labelAr: string; icon: Lucide
   about: { label: 'About Us', labelAr: 'من نحن', icon: Building2 },
   products: { label: 'Products', labelAr: 'المنتجات', icon: Package },
   quality: { label: 'Quality', labelAr: 'الجودة', icon: ShieldCheck },
-  certificates: { label: 'Certificates', labelAr: 'الشهادات', icon: Award },
+  sustainability: { label: 'Sustainability', labelAr: 'الاستدامة', icon: Leaf },
   career: { label: 'Career', labelAr: 'الوظائف', icon: Briefcase },
   contact: { label: 'Contact', labelAr: 'تواصل معنا', icon: Mail },
 };
@@ -31,11 +31,13 @@ const SECTION_LABELS: Record<string, string> = {
   certifications: 'الاعتمادات',
   esg: 'البيئة والمجتمع والحوكمة',
   quality: 'الجودة',
+  listings: 'الوظائف المتاحة',
   open_application: 'تقديم طلب مفتوح',
   form: 'النموذج',
 };
 
 const KEY_LABELS: Record<string, string> = {
+  label: 'التسمية',
   title: 'العنوان',
   subtitle: 'العنوان الفرعي',
   description: 'الوصف',
@@ -69,8 +71,8 @@ const SECTION_ORDER: Record<string, string[]> = {
   about: ['overview', 'vision', 'mission', 'timeline'],
   products: ['overview'],
   quality: ['overview', 'certifications'],
-  certificates: ['overview', 'esg', 'quality', 'governance'],
-  career: ['overview', 'open_application'],
+  sustainability: ['hero'],
+  career: ['hero', 'overview', 'listings', 'open_application'],
   contact: ['overview', 'form'],
 };
 
@@ -79,7 +81,7 @@ const PAGE_URLS: Record<string, string> = {
   about: '/about',
   products: '/products',
   quality: '/quality',
-  certificates: '/certificates',
+  sustainability: '/sustainability',
   career: '/career',
   contact: '/contact',
 };

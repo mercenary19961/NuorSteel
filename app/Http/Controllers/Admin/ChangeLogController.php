@@ -24,6 +24,8 @@ class ChangeLogController extends Controller
         'application' => 'Applications',
         'contact' => 'Contacts',
         'newsletter' => 'Newsletter',
+        'linkedin' => 'LinkedIn Posts',
+        'partner' => 'Partners',
     ];
 
     public function __construct(
