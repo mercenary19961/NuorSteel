@@ -161,7 +161,7 @@ export default function Header() {
       }`}
     >
       <div className="container mx-auto px-4">
-        <div className={`flex items-center justify-between transition-all duration-300 ${isAtTop ? 'h-16 lg:h-20' : 'h-12 lg:h-14'}`}>
+        <div className={`flex items-center justify-between transition-all duration-300 ${isAtTop ? 'h-20 lg:h-24' : 'h-14 lg:h-16'}`}>
           {/* Logo — products page wraps the mark in a gray plate so it doesn't
               get washed out against the orange hero panel */}
           <Link
@@ -173,13 +173,13 @@ export default function Header() {
           >
             <picture>
               <source
-                srcSet={isAtTop ? '/images/shared/logo/logo-lg.webp' : '/images/shared/logo/logo-sm.webp'}
+                srcSet={isAtTop ? '/images/shared/logo/logo-lg-v2.webp' : '/images/shared/logo/logo-sm-v2.webp'}
                 type="image/webp"
               />
               <img
-                src={isAtTop ? '/images/shared/logo/logo-lg.png' : '/images/shared/logo/logo-sm.png'}
+                src={isAtTop ? '/images/shared/logo/logo-lg-v2.png' : '/images/shared/logo/logo-sm-v2.png'}
                 alt={t('company.name')}
-                className={`transition-all duration-300 ${isAtTop ? 'h-10 lg:h-12' : 'h-7 lg:h-9'}`}
+                className={`transition-all duration-300 ${isAtTop ? 'h-14 lg:h-16' : 'h-10 lg:h-12'}`}
               />
             </picture>
           </Link>
